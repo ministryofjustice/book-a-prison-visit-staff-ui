@@ -1339,6 +1339,7 @@ export interface components {
         | 'APPLICATION_INVALID_NO_VO_BALANCE'
         | 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
         | 'APPLICATION_INVALID_VISIT_DATE_BLOCKED'
+        | 'APPLICATION_INVALID_SESSION_DATE_BLOCKED'
         | 'APPLICATION_INVALID_USER_TYPE'
       )[]
     }
@@ -2263,6 +2264,8 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2272,20 +2275,18 @@ export interface components {
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
-      first?: boolean
-      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean

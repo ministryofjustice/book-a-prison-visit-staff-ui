@@ -1,4 +1,4 @@
-import { VisitSlotList } from '../@types/bapv'
+import { GOVUKTag, VisitSlotList } from '../@types/bapv'
 import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 import TestData from '../routes/testutils/testData'
@@ -726,15 +726,15 @@ describe('Visit sessions service', () => {
         {
           monthLabel: 'August',
           days: [
-            { date: '2025-08-30', sessionCount: 0 },
-            { date: '2025-08-31', sessionCount: 1, selected: true },
+            { date: '2025-08-30', sessionCount: 0, selected: false, outline: false },
+            { date: '2025-08-31', sessionCount: 1, selected: true, outline: false },
           ],
         },
         {
           monthLabel: 'September',
           days: [
-            { date: '2025-09-01', sessionCount: 2 },
-            { date: '2025-09-02', sessionCount: 3 },
+            { date: '2025-09-01', sessionCount: 2, selected: false, outline: false },
+            { date: '2025-09-02', sessionCount: 3, selected: false, outline: false },
           ],
         },
       ]
@@ -746,6 +746,7 @@ describe('Visit sessions service', () => {
         minNumberOfDays: 2,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
+        originalVisitSession: undefined,
       })
 
       expect(result.calendar).toStrictEqual(expectedCalendar)
@@ -771,7 +772,7 @@ describe('Visit sessions service', () => {
               TestData.visitSessionV2({ startTime: '11:30', endTime: '12:30', sessionTemplateReference: 'b' }),
             ],
             scheduledEvents: [
-              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
+              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education 1' }),
             ],
           }),
 
@@ -782,7 +783,7 @@ describe('Visit sessions service', () => {
               TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'c' }),
             ],
             scheduledEvents: [
-              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
+              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education 2' }),
             ],
           }),
 
@@ -794,8 +795,8 @@ describe('Visit sessions service', () => {
               TestData.visitSessionV2({ startTime: '13:00', endTime: '14:30', sessionTemplateReference: 'e' }),
             ],
             scheduledEvents: [
-              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education' }),
-              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education' }),
+              TestData.prisonerScheduledEvent({ startTime: '09:00', endTime: '11:00', eventSourceDesc: 'Education 3' }),
+              TestData.prisonerScheduledEvent({ startTime: '14:30', endTime: '16:00', eventSourceDesc: 'Education 4' }),
             ],
           }),
         ],
@@ -810,20 +811,28 @@ describe('Visit sessions service', () => {
               date: '2025-08-31',
               sessionTemplateReference: 'a',
               daySection: 'morning',
-              time: '10am to 11am',
+              startTime: '10:00',
+              endTime: '11:00',
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
+              capacity: 20,
+              disabled: false,
             },
             {
               date: '2025-08-31',
               sessionTemplateReference: 'b',
               daySection: 'morning',
-              time: '11:30am to 12:30pm',
+              startTime: '11:30',
+              endTime: '12:30',
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
+              capacity: 20,
+              disabled: false,
             },
           ],
-          scheduledEvents: [{ daySection: 'morning', time: '9am to 11am', description: 'Activity - Education' }],
+          scheduledEvents: [
+            { daySection: 'morning', startTime: '09:00', endTime: '11:00', description: 'Activity - Education 1' },
+          ],
         },
         {
           date: '2025-09-01',
@@ -832,12 +841,17 @@ describe('Visit sessions service', () => {
               date: '2025-09-01',
               sessionTemplateReference: 'c',
               daySection: 'afternoon',
-              time: '1pm to 2:30pm',
+              startTime: '13:00',
+              endTime: '14:30',
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
+              capacity: 20,
+              disabled: false,
             },
           ],
-          scheduledEvents: [{ daySection: 'afternoon', time: '2:30pm to 4pm', description: 'Activity - Education' }],
+          scheduledEvents: [
+            { daySection: 'afternoon', startTime: '14:30', endTime: '16:00', description: 'Activity - Education 2' },
+          ],
         },
         {
           date: '2025-09-02',
@@ -846,22 +860,28 @@ describe('Visit sessions service', () => {
               date: '2025-09-02',
               sessionTemplateReference: 'd',
               daySection: 'morning',
-              time: '10am to 11am',
+              startTime: '10:00',
+              endTime: '11:00',
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
+              capacity: 20,
+              disabled: false,
             },
             {
               date: '2025-09-02',
               sessionTemplateReference: 'e',
               daySection: 'afternoon',
-              time: '1pm to 2:30pm',
+              startTime: '13:00',
+              endTime: '14:30',
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
+              capacity: 20,
+              disabled: false,
             },
           ],
           scheduledEvents: [
-            { daySection: 'morning', time: '9am to 11am', description: 'Activity - Education' },
-            { daySection: 'afternoon', time: '2:30pm to 4pm', description: 'Activity - Education' },
+            { daySection: 'morning', startTime: '09:00', endTime: '11:00', description: 'Activity - Education 3' },
+            { daySection: 'afternoon', startTime: '14:30', endTime: '16:00', description: 'Activity - Education 4' },
           ],
         },
       ]
@@ -873,44 +893,14 @@ describe('Visit sessions service', () => {
         minNumberOfDays: 2,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
+        originalVisitSession: undefined,
       })
 
       expect(result.calendarFullDays).toStrictEqual(expectedCalendarFullDays)
     })
 
     describe('Selected calendar grid day', () => {
-      it('should default to selecting the first day with a visit session if selectedVisitSession not set', async () => {
-        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
-          sessionsAndSchedule: [
-            TestData.sessionsAndScheduleDto({ date: '2025-08-30', visitSessions: [] }),
-            TestData.sessionsAndScheduleDto({ date: '2025-08-31', visitSessions: [TestData.visitSessionV2()] }),
-          ],
-        })
-        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
-
-        const expectedCalendar: CalendarMonth[] = [
-          {
-            monthLabel: 'August',
-            days: [
-              { date: '2025-08-30', sessionCount: 0 },
-              { date: '2025-08-31', sessionCount: 1, selected: true },
-            ],
-          },
-        ]
-
-        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
-          username,
-          prisonId,
-          prisonerId,
-          minNumberOfDays: 2,
-          visitRestriction: 'OPEN',
-          selectedVisitSession: undefined,
-        })
-
-        expect(result.calendar).toStrictEqual(expectedCalendar)
-      })
-
-      it('should select day matching selectedVisitSession', async () => {
+      it('should select and outline day matching selectedVisitSession', async () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
             TestData.sessionsAndScheduleDto({
@@ -929,8 +919,8 @@ describe('Visit sessions service', () => {
           {
             monthLabel: 'August',
             days: [
-              { date: '2025-08-30', sessionCount: 1 },
-              { date: '2025-08-31', sessionCount: 1, selected: true },
+              { date: '2025-08-30', sessionCount: 1, selected: false, outline: false },
+              { date: '2025-08-31', sessionCount: 1, selected: true, outline: true },
             ],
           },
         ]
@@ -941,13 +931,21 @@ describe('Visit sessions service', () => {
           prisonerId,
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
-          selectedVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b' },
+          selectedVisitSession: {
+            date: '2025-08-31',
+            sessionTemplateReference: 'b',
+            startTime: '',
+            endTime: '',
+            availableTables: 1,
+            capacity: 10,
+          },
+          originalVisitSession: undefined,
         })
 
         expect(result.calendar).toStrictEqual(expectedCalendar)
       })
 
-      it('should default to selecting the first day with a visit session if selectedVisitSession not found', async () => {
+      it('should default to selecting the first day with a visit session and outlining selectedVisitSession date if selectedVisitSession not found', async () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
             TestData.sessionsAndScheduleDto({ date: '2025-08-30', visitSessions: [] }),
@@ -960,8 +958,8 @@ describe('Visit sessions service', () => {
           {
             monthLabel: 'August',
             days: [
-              { date: '2025-08-30', sessionCount: 0 },
-              { date: '2025-08-31', sessionCount: 1, selected: true },
+              { date: '2025-08-30', sessionCount: 0, selected: false, outline: true },
+              { date: '2025-08-31', sessionCount: 1, selected: true, outline: false },
             ],
           },
         ]
@@ -972,10 +970,208 @@ describe('Visit sessions service', () => {
           prisonerId,
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
-          selectedVisitSession: { date: '0000-00-00', sessionTemplateReference: 'not found' },
+          selectedVisitSession: {
+            date: '2025-08-30',
+            sessionTemplateReference: 'not found',
+            startTime: '',
+            endTime: '',
+            availableTables: 1,
+            capacity: 10,
+          },
+          originalVisitSession: undefined,
         })
 
         expect(result.calendar).toStrictEqual(expectedCalendar)
+      })
+
+      it('should default to selecting but NOT outlining the first day with a visit session if selectedVisitSession not set', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({ date: '2025-08-30', visitSessions: [] }),
+            TestData.sessionsAndScheduleDto({ date: '2025-08-31', visitSessions: [TestData.visitSessionV2()] }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const expectedCalendar: CalendarMonth[] = [
+          {
+            monthLabel: 'August',
+            days: [
+              { date: '2025-08-30', sessionCount: 0, selected: false, outline: false },
+              { date: '2025-08-31', sessionCount: 1, selected: true, outline: false },
+            ],
+          },
+        ]
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendar).toStrictEqual(expectedCalendar)
+      })
+    })
+
+    describe('Original booking (update journey)', () => {
+      it('should select and outline day matching originalVisitSession if that visit session is present', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-30',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'a' })],
+            }),
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-31',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'b' })],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const expectedCalendar: CalendarMonth[] = [
+          {
+            monthLabel: 'August',
+            days: [
+              { date: '2025-08-30', sessionCount: 1, selected: false, outline: false },
+              { date: '2025-08-31', sessionCount: 1, selected: true, outline: true },
+            ],
+          },
+        ]
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b' },
+        })
+
+        expect(result.calendar).toStrictEqual(expectedCalendar)
+      })
+
+      it('should outline day matching originalVisitSession if that session not present and default to selecting first day with a session', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-30',
+              visitSessions: [],
+            }),
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-31',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'b' })],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const expectedCalendar: CalendarMonth[] = [
+          {
+            monthLabel: 'August',
+            days: [
+              { date: '2025-08-30', sessionCount: 0, selected: false, outline: true },
+              { date: '2025-08-31', sessionCount: 1, selected: true, outline: false },
+            ],
+          },
+        ]
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a' },
+        })
+
+        expect(result.calendar).toStrictEqual(expectedCalendar)
+      })
+
+      it('should outline day matching originalVisitSession and outline and select selectedVisitSession', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-30',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'a' })],
+            }),
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-31',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'b' })],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const expectedCalendar: CalendarMonth[] = [
+          {
+            monthLabel: 'August',
+            days: [
+              { date: '2025-08-30', sessionCount: 1, selected: true, outline: true },
+              { date: '2025-08-31', sessionCount: 1, selected: false, outline: true },
+            ],
+          },
+        ]
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: {
+            date: '2025-08-31',
+            sessionTemplateReference: 'b',
+            startTime: '',
+            endTime: '',
+            availableTables: 1,
+            capacity: 10,
+          },
+          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a' },
+        })
+
+        expect(result.calendar).toStrictEqual(expectedCalendar)
+      })
+
+      it('should tag the originally selected visit session', async () => {
+        const originalVisitSession = TestData.visitSessionV2()
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [TestData.sessionsAndScheduleDto({ visitSessions: [originalVisitSession] })],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: {
+            date: visitSessionsAndSchedule.sessionsAndSchedule[0].date,
+            sessionTemplateReference: originalVisitSession.sessionTemplateReference,
+            startTime: '',
+            endTime: '',
+            availableTables: 1,
+            capacity: 10,
+          },
+          originalVisitSession: {
+            date: visitSessionsAndSchedule.sessionsAndSchedule[0].date,
+            sessionTemplateReference: originalVisitSession.sessionTemplateReference,
+          },
+        })
+
+        expect(result.calendarFullDays[0].visitSessions.length).toBe(1)
+        expect(result.calendarFullDays[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+          text: 'Original booking',
+          classes: 'govuk-tag--blue',
+        })
       })
     })
 
@@ -991,6 +1187,7 @@ describe('Visit sessions service', () => {
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
+          originalVisitSession: undefined,
         })
 
         expect(result.calendarFullDays[0].visitSessions[0].availableTables).toBe(18)
@@ -1007,28 +1204,116 @@ describe('Visit sessions service', () => {
           minNumberOfDays: 2,
           visitRestriction: 'CLOSED',
           selectedVisitSession: undefined,
+          originalVisitSession: undefined,
         })
 
         expect(result.calendarFullDays[0].visitSessions[0].availableTables).toBe(1)
       })
     })
 
-    // describe('Prisoner already has a visit', () => {
-    // ACCOUNT FOR FACT THAT WE DON'T KNOW ORIGINAL BOOKING OR SELECTED SESSION??? (ie. reserved vs double-booked)
-    // grid day color if no other sessions - red ? (check)
-    // grid day color if other sessions also full - red ? (check)
-    // grid day color if other have availability - orange ? (check)
+    describe('Currently reserved visit session', () => {
+      it('should tag the visit session matching the currently reserved visit session', async () => {
+        const selectedVisitSession = TestData.visitSessionV2({ sessionTemplateReference: 'a' })
+        const anotherVisitSession = TestData.visitSessionV2({ sessionTemplateReference: 'b' })
 
-    // grid day color if no other sessions - red ? (check)
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              visitSessions: [selectedVisitSession, anotherVisitSession],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
 
-    // tag on visit session
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: {
+            date: visitSessionsAndSchedule.sessionsAndSchedule[0].date,
+            sessionTemplateReference: selectedVisitSession.sessionTemplateReference,
+            startTime: '',
+            endTime: '',
+            availableTables: 1,
+            capacity: 10,
+          },
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendarFullDays[0].visitSessions.length).toBe(2)
+        expect(result.calendarFullDays[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+          text: 'Reserved visit time',
+          classes: 'govuk-tag--blue',
+        })
+        expect(result.calendarFullDays[0].visitSessions[1].tag).toBeUndefined()
+      })
+    })
+
+    describe('Visit session when prisoner already has a visit', () => {
+      it('should tag the visit session if prisoner already has a visit', async () => {
+        const visitSessionWithExistingVisit = TestData.visitSessionV2({
+          sessionTemplateReference: 'a',
+          sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+        })
+        const anotherVisitSession = TestData.visitSessionV2({ sessionTemplateReference: 'b' })
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              visitSessions: [visitSessionWithExistingVisit, anotherVisitSession],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendarFullDays[0].visitSessions.length).toBe(2)
+        expect(result.calendarFullDays[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+          text: 'Prisoner has a visit',
+          classes: 'govuk-tag--red',
+        })
+        expect(result.calendarFullDays[0].visitSessions[1].tag).toBeUndefined()
+      })
+    })
+
+    describe('Fully booked visit session', () => {
+      it('should tag visit session with no available tables', async () => {
+        const fullVisitSession = TestData.visitSessionV2({ openVisitCapacity: 10, openVisitBookedCount: 10 })
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [TestData.sessionsAndScheduleDto({ visitSessions: [fullVisitSession] })],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays: 2,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendarFullDays[0].visitSessions.length).toBe(1)
+        expect(result.calendarFullDays[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+          text: 'Fully booked',
+          classes: 'govuk-tag--red',
+        })
+      })
+    })
+
+    // TODO grid day colours (red / orange)
   })
-  // TODO calendar test - colour
-  // TODO calendar test - selected
-  // TODO calendar test - outline
-
-  // TODO disabled visit session
-
-  // TODO GOVUK tags
-  // })
 })

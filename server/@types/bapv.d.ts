@@ -10,7 +10,7 @@ import {
   VisitSession,
   VisitSummary,
 } from '../data/orchestrationApiTypes'
-import { CalendarVisitSession } from '../services/visitSessionsService';
+import type { CalendarVisitSession } from '../services/visitSessionsService'
 
 type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
@@ -58,6 +58,7 @@ export type PrisonerProfilePage = {
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }
 
+// TODO remove this and related types
 // Visit slots, for representing data derived from VisitSessions
 export type VisitSlot = {
   id: string
@@ -104,12 +105,17 @@ export type VisitSessionData = {
     alerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
-  allVisitSessionIds?: string[] // e.g. ['2025-09-22_session-ref']
+  prisonId: string
   allVisitSessions?: CalendarVisitSession[]
-  selectedVisitSession?: CalendarVisitSession // TODO add to session check middleware
-  originalVisitSession?: CalendarVisitSession // TODO add to session check middleware?
-  visitSlot?: VisitSlot // TODO remove (and 'VisitSlot' type definition)
-  originalVisitSlot?: VisitSlot // TODO remove
+  selectedVisitSession?: {
+    date: string
+    sessionTemplateReference: string
+    startTime: string
+    endTime: string
+    availableTables: number
+    capacity: number
+  }
+  originalVisitSession?: { date: string; sessionTemplateReference: string }
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitorIds?: number[]
   visitors?: VisitorListItem[]

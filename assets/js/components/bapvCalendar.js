@@ -21,7 +21,7 @@ function handleSelectDate(event) {
   selectedFormGroup.classList.add(calendarDayGroupActiveClass)
 
   // scroll to sessions if first input is not in viewport
-  const firstSession = document.getElementById(`date-${dateToShow}`)
+  const firstSession = selectedFormGroup.querySelector('input')
   const isFirstSessionInViewport = window.innerHeight <= firstSession.getBoundingClientRect().bottom
   if (isFirstSessionInViewport) {
     selectedFormGroup.scrollIntoView({ behavior: 'smooth' })
