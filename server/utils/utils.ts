@@ -13,7 +13,6 @@ import {
 } from 'date-fns'
 // eslint-disable-next-line import/no-named-as-default
 import parsePhoneNumber from 'libphonenumber-js/mobile'
-import { VisitSlot } from '../@types/bapv'
 import config from '../config'
 
 export const properCase = (word: string): string =>
@@ -161,14 +160,6 @@ export const getWeekOfDatesStartingMonday = (
   const nextWeek = format(addWeeks(weekStartDate, 1), dateFormat)
 
   return { weekOfDates, previousWeek, nextWeek }
-}
-
-export const isSameVisitSlot = (visitSlot: VisitSlot, originalVisitSlot: VisitSlot): boolean => {
-  const isMatchingTemplateReference = visitSlot.sessionTemplateReference === originalVisitSlot.sessionTemplateReference
-
-  const isMatchingStartTimestamp = visitSlot.startTimestamp === originalVisitSlot.startTimestamp
-
-  return isMatchingTemplateReference && isMatchingStartTimestamp
 }
 
 export const initialiseName = (fullName?: string): string | null => {

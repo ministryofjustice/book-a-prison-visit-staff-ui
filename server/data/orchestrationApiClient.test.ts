@@ -293,9 +293,11 @@ describe('orchestrationApiClient', () => {
   describe('changeVisitApplication', () => {
     it('should return a changed visit application given visit session data', async () => {
       const visitSessionData = <VisitSessionData>{
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -314,7 +316,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visits/application/${visitSessionData.applicationReference}/slot/change`, <ChangeApplicationDto>{
           applicationRestriction: visitSessionData.visitRestriction,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           visitContact: {
             name: visitSessionData.mainContact.contactName,
@@ -345,9 +347,11 @@ describe('orchestrationApiClient', () => {
         prisoner: {
           offenderNo: 'A1234BC',
         },
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -367,7 +371,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visits/application/${visitSessionData.visitReference}/change`, <CreateApplicationDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           applicationRestriction: visitSessionData.visitRestriction,
           visitContact: {
@@ -401,9 +405,11 @@ describe('orchestrationApiClient', () => {
         prisoner: {
           offenderNo: 'A1234BC',
         },
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -421,7 +427,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .post('/visits/application/slot/reserve', <CreateApplicationDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           applicationRestriction: visitSessionData.visitRestriction,
           visitors: visitSessionData.visitors.map(visitor => {

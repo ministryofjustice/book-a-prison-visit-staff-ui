@@ -1,0 +1,40 @@
+{% extends "layout.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "A visit cannot be booked" %}
+
+{% set backLinkHref = urlPrefix + "/select-visitors" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+      
+      {% include "partials/dateAndTimePrisonerInfo.njk" %}
+
+      {{ govukWarningText({
+        text: "There are no available visit times for this prisoner. " +
+          "This may be due to existing visits, non-associations or visitors who are banned.",
+        iconFallbackText: "Warning",
+        classes: "govuk-!-width-two-thirds"
+      }) }}
+
+      {{ govukButton({
+        classes: "govuk-!-margin-top-3",
+        text: "Back to start",
+        href: "/back-to-start",
+        attributes: { "data-test": "back-to-start" },
+        preventDoubleClick: true
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}

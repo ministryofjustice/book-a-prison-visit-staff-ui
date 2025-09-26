@@ -1,5 +1,6 @@
 import { format, parseISO, isAfter, isBefore, parse } from 'date-fns'
-import { VisitSlot, VisitSlotList, VisitSlotsForDay, VisitSessionData, PrisonerEvent, GOVUKTag } from '../@types/bapv'
+import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
+import { VisitSlot, VisitSlotList, VisitSlotsForDay, PrisonerEvent, GOVUKTag, VisitSessionData } from '../@types/bapv'
 import {
   VisitSession,
   SessionCapacity,
@@ -9,16 +10,14 @@ import {
   PrisonerScheduledEventDto,
 } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
-import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient, WhereaboutsApiClient } from '../data'
-import { formatStartToEndTime } from '../utils/utils'
 
 // Single date on the calendar grid
 type CalendarGridDate = {
   date: string // e.g. 2025-09-01
   sessionCount: number
   colour?: 'orange' | 'red' // defaults to grey (no sessions) or blue (sessions)
-  selected?: boolean // renders with filled circle background
-  outline?: boolean // renders with circular outline
+  selected: boolean // renders with filled circle background
+  outline: boolean // renders with circular outline
 }
 
 export type CalendarMonth = {
@@ -26,31 +25,34 @@ export type CalendarMonth = {
   days: CalendarGridDate[]
 }
 
-// Single visit session entry within a morning/afternoon section
-type CalendarVisitSession = {
+type CalendarDaySection = 'morning' | 'afternoon'
+
+// Single visit session entry
+export type CalendarVisitSession = {
+  date: string // yyyy-mm-dd
   sessionTemplateReference: string
-  time: string // e.g. "10am to 11am"
+  daySection: CalendarDaySection
+  startTime: string // e.g. "10:00"
+  endTime: string
   visitRoom: string
   availableTables: number
-  disabled?: boolean
+  capacity: number
+  disabled: boolean // is radio input disabled
   tag?: GOVUKTag
 }
 
-// Single prisoner event entry within a morning/afternoon section
+// Single prisoner event entry
 type CalendarScheduledEvent = {
-  time: string // e.g. "10am to 11am"
+  daySection: CalendarDaySection
+  startTime: string // e.g. "10:00"
+  endTime: string
   description: string
-}
-
-type CalendarDaySection = {
-  label: 'morning' | 'afternoon'
-  visitSessions: CalendarVisitSession[]
-  scheduledEvents: CalendarScheduledEvent[]
 }
 
 export type CalendarFullDay = {
   date: string // yyyy-mm-dd
-  daySection: CalendarDaySection[]
+  visitSessions: CalendarVisitSession[]
+  scheduledEvents: CalendarScheduledEvent[]
 }
 
 export default class VisitSessionsService {
@@ -242,15 +244,17 @@ export default class VisitSessionsService {
     prisonId,
     prisonerId,
     minNumberOfDays,
-    selectedVisitSession,
     visitRestriction,
+    selectedVisitSession,
+    originalVisitSession,
   }: {
     username: string
     prisonId: string
     prisonerId: string
     minNumberOfDays: number
-    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     visitRestriction: VisitSessionData['visitRestriction']
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
+    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
   }): Promise<{ calendar: CalendarMonth[]; calendarFullDays: CalendarFullDay[]; scheduledEventsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
@@ -262,8 +266,19 @@ export default class VisitSessionsService {
       username,
     })
 
-    const calendar = this.buildCalendarMonths(sessionsAndSchedule, selectedVisitSession)
-    const calendarFullDays = this.buildCalendarFullDays(sessionsAndSchedule, visitRestriction)
+    const calendar = this.buildCalendarMonths(
+      sessionsAndSchedule,
+      selectedVisitSession,
+      originalVisitSession,
+      visitRestriction,
+    )
+
+    const calendarFullDays = this.buildCalendarFullDays(
+      sessionsAndSchedule,
+      visitRestriction,
+      selectedVisitSession,
+      originalVisitSession,
+    )
 
     return {
       calendar,
@@ -274,7 +289,9 @@ export default class VisitSessionsService {
 
   private buildCalendarMonths(
     sessionsAndSchedule: SessionsAndScheduleDto[],
-    selectedVisitSession: VisitSessionData['selectedVisitSession' | undefined],
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
+    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
+    visitRestriction: VisitSessionData['visitRestriction'],
   ): CalendarMonth[] {
     let selectedDateFound = false
     const calendarMonths = sessionsAndSchedule.reduce((months, day) => {
@@ -285,20 +302,36 @@ export default class VisitSessionsService {
         months.push({ monthLabel, days: [] })
       }
 
+      const sessionCount =
+        visitRestriction === 'OPEN'
+          ? visitSessions.filter(session => session.openVisitCapacity > 0).length
+          : visitSessions.filter(session => session.closedVisitCapacity > 0).length
+
       const calendarGridDate: CalendarGridDate = {
         date,
-        sessionCount: visitSessions.length,
+        sessionCount,
+        selected: false,
+        outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
       }
 
-      const matchesSelectedVisitSession =
-        selectedVisitSession?.date === date &&
-        visitSessions.some(
-          session => session.sessionTemplateReference === selectedVisitSession?.sessionTemplateReference,
-        )
+      if (!selectedDateFound) {
+        const matchesSelectedVisitSession =
+          selectedVisitSession &&
+          selectedVisitSession.date === date &&
+          visitSessions.some(
+            session => session.sessionTemplateReference === selectedVisitSession?.sessionTemplateReference,
+          )
+        const matchesOriginalVisitSession =
+          originalVisitSession &&
+          originalVisitSession.date === date &&
+          visitSessions.some(
+            session => session.sessionTemplateReference === originalVisitSession?.sessionTemplateReference,
+          )
 
-      if (matchesSelectedVisitSession) {
-        calendarGridDate.selected = true
-        selectedDateFound = true
+        if (matchesSelectedVisitSession || matchesOriginalVisitSession) {
+          calendarGridDate.selected = true
+          selectedDateFound = true
+        }
       }
 
       months.at(-1).days.push(calendarGridDate)
@@ -322,71 +355,121 @@ export default class VisitSessionsService {
   private buildCalendarFullDays(
     sessionsAndSchedule: SessionsAndScheduleDto[],
     visitRestriction: VisitSessionData['visitRestriction'],
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
+    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
   ): CalendarFullDay[] {
     const daysWithVisitSessions = sessionsAndSchedule.filter(day => day.visitSessions.length > 0)
 
-    const sessionsAndScheduleDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
-      const currentDaySessionSchedule: CalendarFullDay = {
+    const calendarFullDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
+      return {
         date: day.date,
-        daySection: [],
+        visitSessions: day.visitSessions.map(visitSession =>
+          this.buildVisitSession(day.date, visitSession, visitRestriction, selectedVisitSession, originalVisitSession),
+        ),
+        scheduledEvents: day.scheduledEvents.map(event => this.buildScheduledEvent(event)),
       }
-
-      // split visit sessions to morning / afternoon
-      const morningVisitSessions = day.visitSessions.filter(session => this.isBeforeMorningCutOff(session.startTime))
-      const afternoonVisitSessions = day.visitSessions.filter(session => !this.isBeforeMorningCutOff(session.startTime))
-
-      if (morningVisitSessions.length) {
-        const morningEvents = day.scheduledEvents.filter(event => this.isBeforeMorningCutOff(event.startTime))
-
-        currentDaySessionSchedule.daySection.push({
-          label: 'morning',
-          visitSessions: morningVisitSessions.map(visitSession =>
-            this.buildVisitSession(visitSession, visitRestriction),
-          ),
-          scheduledEvents: morningEvents.map(event => this.buildCalendarScheduledEvent(event)),
-        })
-      }
-
-      if (afternoonVisitSessions.length) {
-        const afternoonEvents = day.scheduledEvents.filter(event => !this.isBeforeMorningCutOff(event.startTime))
-
-        currentDaySessionSchedule.daySection.push({
-          label: 'afternoon',
-          visitSessions: afternoonVisitSessions.map(visitSession =>
-            this.buildVisitSession(visitSession, visitRestriction),
-          ),
-          scheduledEvents: afternoonEvents.map(event => this.buildCalendarScheduledEvent(event)),
-        })
-      }
-
-      return currentDaySessionSchedule
     })
 
-    return sessionsAndScheduleDays
+    return calendarFullDays
   }
 
   private buildVisitSession(
+    date: string,
     visitSession: VisitSessionV2Dto,
     visitRestriction: VisitSessionData['visitRestriction'],
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
+    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
   ): CalendarVisitSession {
     const availableTables =
       visitRestriction === 'OPEN'
         ? visitSession.openVisitCapacity - visitSession.openVisitBookedCount
         : visitSession.closedVisitCapacity - visitSession.closedVisitBookedCount
 
+    const capacity = visitRestriction === 'OPEN' ? visitSession.openVisitCapacity : visitSession.closedVisitCapacity
+
+    const tag = this.getVisitSessionTag(date, visitSession, selectedVisitSession, originalVisitSession, availableTables)
+
     return {
+      date,
       sessionTemplateReference: visitSession.sessionTemplateReference,
-      time: formatStartToEndTime(visitSession.startTime, visitSession.endTime),
+      daySection: this.isBeforeMorningCutOff(visitSession.startTime) ? 'morning' : 'afternoon',
+      startTime: visitSession.startTime,
+      endTime: visitSession.endTime,
       visitRoom: visitSession.visitRoom,
       availableTables,
-      // TODO disabled
-      // TODO tag
+      capacity,
+      disabled: this.isVisitSessionDisabled(date, visitSession, originalVisitSession),
+      ...(tag && { tag }),
     }
   }
 
-  private buildCalendarScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
+  private isVisitSessionDisabled(
+    date: string,
+    visitSession: VisitSessionV2Dto,
+    originalVisitSession: VisitSessionData['originalVisitSession'],
+  ): boolean {
+    // original visit session should be selectable (not disabled)
+    if (
+      originalVisitSession &&
+      date === originalVisitSession.date &&
+      visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
+    ) {
+      return false
+    }
+
+    // otherwise disabled if existing booking
+    return visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION')
+  }
+
+  private getVisitSessionTag(
+    date: string,
+    visitSession: VisitSessionV2Dto,
+    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
+    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
+    availableTables: number,
+  ): GOVUKTag | undefined {
+    if (
+      date === originalVisitSession?.date &&
+      visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
+    ) {
+      return {
+        text: 'Original booking',
+        classes: 'govuk-tag--blue',
+      }
+    }
+
+    if (
+      date === selectedVisitSession?.date &&
+      visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
+    ) {
+      return {
+        text: 'Reserved visit time',
+        classes: 'govuk-tag--blue',
+      }
+    }
+
+    if (visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION')) {
+      return {
+        text: 'Prisoner has a visit',
+        classes: 'govuk-tag--red',
+      }
+    }
+
+    if (availableTables <= 0) {
+      return {
+        text: 'Fully booked',
+        classes: 'govuk-tag--red',
+      }
+    }
+
+    return undefined
+  }
+
+  private buildScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
     return {
-      time: formatStartToEndTime(event.startTime, event.endTime),
+      daySection: this.isBeforeMorningCutOff(event.startTime) ? 'morning' : 'afternoon',
+      startTime: event.startTime,
+      endTime: event.endTime,
       description: this.getEventDescription(event),
     }
   }

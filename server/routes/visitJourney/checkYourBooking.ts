@@ -30,7 +30,7 @@ export default class CheckYourBooking {
       mainContact: visitSessionData.mainContact,
       prisoner: visitSessionData.prisoner,
       prisonerName,
-      visitSlot: visitSessionData.visitSlot,
+      visitSession: visitSessionData.selectedVisitSession,
       visitRestriction: visitSessionData.visitRestriction,
       visitors: visitSessionData.visitors,
       additionalSupport,
@@ -81,14 +81,15 @@ export default class CheckYourBooking {
       visitSessionData.visitReference = bookedVisit.reference
       visitSessionData.visitStatus = bookedVisit.visitStatus
 
+      const { date, startTime, endTime } = visitSessionData.selectedVisitSession
       await this.auditService.bookedVisit({
         applicationReference: visitSessionData.applicationReference,
         visitReference: visitSessionData.visitReference,
         prisonerId: visitSessionData.prisoner.offenderNo,
         prisonId,
         visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-        startTimestamp: visitSessionData.visitSlot.startTimestamp,
-        endTimestamp: visitSessionData.visitSlot.endTimestamp,
+        startTimestamp: `${date}T${startTime}:00`,
+        endTimestamp: `${date}T${endTime}:00`,
         visitRestriction: visitSessionData.visitRestriction,
         username: res.locals.user.username,
         operationId: res.locals.appInsightsOperationId,
@@ -100,7 +101,7 @@ export default class CheckYourBooking {
 
         const { mojAlert, url } = validationErrorsToMoJAlert(
           prisonerName,
-          visitSessionData.visitSlot.startTimestamp,
+          `${visitSessionData.selectedVisitSession.date}T${visitSessionData.selectedVisitSession.startTime}:00`,
           validationErrors,
         )
 
@@ -121,7 +122,7 @@ export default class CheckYourBooking {
         mainContact: visitSessionData.mainContact,
         prisoner: visitSessionData.prisoner,
         prisonerName,
-        visitSlot: visitSessionData.visitSlot,
+        visitSession: visitSessionData.selectedVisitSession,
         visitRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors,
         additionalSupport: visitSessionData.visitorSupport.description,

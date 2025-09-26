@@ -180,8 +180,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
       data: <ChangeApplicationDto>{
         applicationRestriction: visitSessionData.visitRestriction,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -202,8 +202,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.visitReference}/change`,
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
@@ -225,8 +225,8 @@ export default class OrchestrationApiClient {
       path: '/visits/application/slot/reserve',
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors.map(visitor => {
           return {

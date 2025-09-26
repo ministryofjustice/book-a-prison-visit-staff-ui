@@ -10,7 +10,6 @@ export declare module 'express-session' {
     nowInMinutes: number
     visitorList: { visitors: VisitorListItem[] } // TODO move into VisitSessionData
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
-    slotsList: VisitSlotList // TODO remove
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison
     visitBlockDate?: string // format YYYY-MM-DD
