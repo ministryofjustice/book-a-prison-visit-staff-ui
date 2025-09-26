@@ -266,7 +266,13 @@ export default class VisitSessionsService {
       username,
     })
 
-    const calendar = this.buildCalendarMonths(sessionsAndSchedule, selectedVisitSession, originalVisitSession)
+    const calendar = this.buildCalendarMonths(
+      sessionsAndSchedule,
+      selectedVisitSession,
+      originalVisitSession,
+      visitRestriction,
+    )
+
     const calendarFullDays = this.buildCalendarFullDays(
       sessionsAndSchedule,
       visitRestriction,
@@ -285,6 +291,7 @@ export default class VisitSessionsService {
     sessionsAndSchedule: SessionsAndScheduleDto[],
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
+    visitRestriction: VisitSessionData['visitRestriction'],
   ): CalendarMonth[] {
     let selectedDateFound = false
     const calendarMonths = sessionsAndSchedule.reduce((months, day) => {
@@ -295,9 +302,14 @@ export default class VisitSessionsService {
         months.push({ monthLabel, days: [] })
       }
 
+      const sessionCount =
+        visitRestriction === 'OPEN'
+          ? visitSessions.filter(session => session.openVisitCapacity > 0).length
+          : visitSessions.filter(session => session.closedVisitCapacity > 0).length
+
       const calendarGridDate: CalendarGridDate = {
         date,
-        sessionCount: visitSessions.length,
+        sessionCount,
         selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
       }

@@ -718,6 +718,7 @@ describe('Visit sessions service', () => {
             date: '2025-09-02',
             visitSessions: [TestData.visitSessionV2(), TestData.visitSessionV2(), TestData.visitSessionV2()],
           }),
+          // TODO add test coverage for not including when OPEN/CLOSED capacity being zero
         ],
       })
       orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
@@ -1050,7 +1051,7 @@ describe('Visit sessions service', () => {
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
-          originalVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b' },
+          originalVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b', visitRestriction: 'OPEN' },
         })
 
         expect(result.calendar).toStrictEqual(expectedCalendar)
@@ -1088,7 +1089,7 @@ describe('Visit sessions service', () => {
           minNumberOfDays: 2,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
-          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a' },
+          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a', visitRestriction: 'OPEN' },
         })
 
         expect(result.calendar).toStrictEqual(expectedCalendar)
@@ -1133,7 +1134,7 @@ describe('Visit sessions service', () => {
             availableTables: 1,
             capacity: 10,
           },
-          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a' },
+          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a', visitRestriction: 'OPEN' },
         })
 
         expect(result.calendar).toStrictEqual(expectedCalendar)
@@ -1164,6 +1165,7 @@ describe('Visit sessions service', () => {
           originalVisitSession: {
             date: visitSessionsAndSchedule.sessionsAndSchedule[0].date,
             sessionTemplateReference: originalVisitSession.sessionTemplateReference,
+            visitRestriction: 'OPEN',
           },
         })
 

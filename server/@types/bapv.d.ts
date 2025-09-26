@@ -115,7 +115,7 @@ export type VisitSessionData = {
     availableTables: number
     capacity: number
   }
-  originalVisitSession?: { date: string; sessionTemplateReference: string }
+  originalVisitSession?: { date: string; sessionTemplateReference: string; visitRestriction: 'OPEN' | 'CLOSED' }
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitorIds?: number[]
   visitors?: VisitorListItem[]

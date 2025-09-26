@@ -55,6 +55,7 @@ export default class DateAndTime {
     )
     visitSessionData.allVisitSessions = allVisitSessions
 
+    // TODO move setting messages elsewhere?
     if (isBanActive) {
       messages.push({
         variant: 'information',
@@ -64,49 +65,39 @@ export default class DateAndTime {
       })
     }
 
-    // TODO move to private or utility function to produce messages
-    // first time here on update journey, visitSlot.id will be ''
-    // if (isUpdate && visitSessionData.visitSlot?.id === '') {
-    //   const matchingSlot = getMatchingSlot(
-    //     slotsList,
-    //     visitSessionData.visitSlot.startTimestamp,
-    //     visitSessionData.visitSlot.endTimestamp,
-    //     visitSessionData.visitRestriction,
-    //     visitSessionData.visitSlot.sessionTemplateReference,
-    //   )
+    // Messages to add if updating and no session selected yet
+    if (isUpdate && !visitSessionData.selectedVisitSession) {
+      const isOriginalSessionAvailable = this.isVisitSessionAvailable(
+        visitSessionData.originalVisitSession,
+        allVisitSessions,
+      )
 
-    //   if (
-    //     matchingSlot &&
-    //     (matchingSlot.availableTables > 0 ||
-    //       visitSessionData.visitRestriction === visitSessionData.originalVisitSlot.visitRestriction)
-    //   ) {
-    //     visitSessionData.visitSlot.id = matchingSlot.id
-    //   }
+      if (!isOriginalSessionAvailable) {
+        messages.push({
+          variant: 'error',
+          title: 'The prisoner’s information has changed',
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
 
-    //   if (!matchingSlot) {
-    //     messages.push({
-    //       variant: 'error',
-    //       title: 'The prisoner’s information has changed',
-    //       showTitleAsHeading: true,
-    //       text: 'Select a new visit time.',
-    //     })
-    //   }
+      const visitRestrictionHasChanged =
+        visitSessionData.visitRestriction !== visitSessionData.originalVisitSession.visitRestriction
+      if (visitRestrictionHasChanged) {
+        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
 
-    //   if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-    //     const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
-
-    //     messages.push({
-    //       variant: 'error',
-    //       title: `The visit type has changed from ${restrictionChange}`,
-    //       showTitleAsHeading: true,
-    //       text: 'Select a new visit time.',
-    //     })
-    //   }
-    // }
+        messages.push({
+          variant: 'error',
+          title: `The visit type has changed from ${restrictionChange}`,
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
+    }
 
     const formValues = {
       // TODO simplify
-      visitSessionId: this.isSelectedVisitSessionStillAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
+      visitSessionId: this.isVisitSessionAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
         ? `${visitSessionData.selectedVisitSession.date}_${visitSessionData.selectedVisitSession.sessionTemplateReference}`
         : '',
     }
@@ -159,18 +150,9 @@ export default class DateAndTime {
       capacity: selectedVisitSession.capacity,
     }
 
-    // const isOriginalSlot = isUpdate
-    //   ? isSameVisitSlot(visitSessionData.visitSlot, visitSessionData.originalVisitSlot)
-    //   : false
-
-    // // If 'available tables is less than or equal to zero
-    // if (visitSessionData.visitSlot.availableTables <= 0) {
-    //   // If on update journey, and not the original slot OR is not update journey
-    //   if ((isUpdate && !isOriginalSlot) || !isUpdate) {
-    //     // show overbooking page
-    //     return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
-    //   }
-    // }
+    if (this.isAnOverbooking(isUpdate, selectedVisitSession, visitSessionData.originalVisitSession)) {
+      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
+    }
 
     await this.reserveOrChangeApplication(req, res)
 
@@ -262,18 +244,42 @@ export default class DateAndTime {
     )
   }
 
-  private isSelectedVisitSessionStillAvailable(
-    selectedVisitSession: VisitSessionData['selectedVisitSession'],
+  private isVisitSessionAvailable(
+    visitSession: VisitSessionData['selectedVisitSession'] | VisitSessionData['originalVisitSession'],
     allVisitSessions: CalendarVisitSession[],
   ): boolean {
-    if (!selectedVisitSession) {
+    if (!visitSession) {
       return false
     }
 
     return allVisitSessions.some(
-      visitSession =>
-        visitSession.date === selectedVisitSession.date &&
-        visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference,
+      session =>
+        session.date === visitSession.date &&
+        session.sessionTemplateReference === visitSession.sessionTemplateReference,
     )
+  }
+
+  private isAnOverbooking(
+    isUpdate: boolean,
+    selectedVisitSession: VisitSessionData['selectedVisitSession'],
+    originalVisitSession: VisitSessionData['originalVisitSession'],
+  ): boolean {
+    const isOverbooked = selectedVisitSession.availableTables <= 0
+
+    if (!isOverbooked) {
+      return false
+    }
+
+    // if updating an existing booking, don't treat as an overbooking
+    if (isUpdate) {
+      const isOriginalSession =
+        originalVisitSession.date === selectedVisitSession.date && originalVisitSession.sessionTemplateReference
+
+      if (isOriginalSession) {
+        return false
+      }
+    }
+
+    return true
   }
 }

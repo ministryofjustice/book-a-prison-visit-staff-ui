@@ -54,6 +54,8 @@ export default class UpdateVisitController {
         originalVisitSession: {
           date: visitDetails.startTimestamp.split('T')[0],
           sessionTemplateReference: visitDetails.sessionTemplateReference,
+          // FIXME visitDetails.visitRestriction can be UNKNOWN. Defaulting to open but need to check
+          visitRestriction: visitDetails.visitRestriction === 'CLOSED' ? 'CLOSED' : 'OPEN',
         },
         visitRestriction,
         visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
