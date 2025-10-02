@@ -68,13 +68,13 @@
           {# Day name headings on first month only - unless more than 2 months #}
           {% if loop.first or loop.length > 2 %}{# TODO unit test #}
             <ul class="govuk-list bapv-calendar__day-headings" aria-hidden="true">
-              <li>Mon</li>
-              <li>Tue</li>
-              <li>Wed</li>
-              <li>Thu</li>
-              <li>Fri</li>
-              <li>Sat</li>
-              <li>Sun</li>
+              <li>M<span>on</span></li>
+              <li>T<span>ue</span></li>
+              <li>W<span>ed</span></li>
+              <li>T<span>hu</span></li>
+              <li>F<span>ri</span></li>
+              <li>S<span>at</span></li>
+              <li>S<span>un</span></li>
             </ul>
           {% endif %}
 

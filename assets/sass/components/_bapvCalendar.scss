@@ -42,8 +42,14 @@
   margin-top: govuk-spacing(3);
 
   li {
-    min-width: 2.25rem;
-    max-width: 3rem;
+    width: 3rem;
+  }
+
+  // only show abbreviated weekday names on mobile
+  span {
+    @include govuk-media-query($until: tablet) {
+      display: none;
+    }
   }
 }
 
