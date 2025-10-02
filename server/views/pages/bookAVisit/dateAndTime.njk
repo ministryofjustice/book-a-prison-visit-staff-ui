@@ -58,16 +58,15 @@
         </ul>
       {% endcall %}
 
-
       {# Calendar #}
       <nav class="bapv-calendar govuk-!-width-one-half" aria-label="Visit date selection calendar" role="navigation">
 
         {# Loop over months #}
-        {% for month in calendar %}
-          <h2 class="govuk-heading-m">{{ month.monthLabel }}</h2>
+        {% for monthHeading, days in calendar | groupby("monthHeading") %}
+          <h2 class="govuk-heading-m">{{ monthHeading }}</h2>
 
           {# Day name headings on first month only - unless more than 2 months #}
-          {% if loop.first or calendar | length > 2 %}
+          {% if loop.first or loop.length > 2 %}{# TODO unit test #}
             <ul class="govuk-list bapv-calendar__day-headings" aria-hidden="true">
               <li>Mon</li>
               <li>Tue</li>
@@ -81,7 +80,8 @@
 
           {# Days for this month #}
           <ul class="govuk-list bapv-calendar__month">
-            {% for day in month.days %}
+            {% for day in days %}
+              {%- set sessionCount = day.visitSessions | length -%}
               <li data-date="{{ day.date }}" class="bapv-calendar__day
                 {#- add column offset class based on ISO day of week (1-7) -#}
                 {%- if loop.first %} bapv-calendar__day--start-col-{{ day.date | formatDate('i') }}{% endif -%}
@@ -89,13 +89,13 @@
                 {%- if day.colour %} bapv-calendar__day--{{ day.colour }}{% endif -%}
                 {%- if day.selected %} bapv-calendar__day--selected{%- endif -%}
                 {%- if day.outline %} bapv-calendar__day--outline{%- endif %}"
-                {%- if not day.sessionCount %} aria-hidden="true"{% endif -%}
+                {%- if not sessionCount %} aria-hidden="true"{% endif -%}
                 >
 
-                {%- if day.sessionCount -%}
+                {%- if sessionCount -%}
                   <a id="day-link-{{ day.date }}" href="#day-group-{{ day.date }}">
                     {{- day.date | formatDate("d") -}}
-                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ day.sessionCount }} visit {{ "time" | pluralise(day.sessionCount )}}</span>
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ sessionCount }} visit {{ "time" | pluralise sessionCount )}}</span>
                   </a>
                 {% else -%}
                     <span>{{ day.date | formatDate("d") }}</span>
@@ -113,7 +113,7 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {# Days and visit sessions / schedule #}
-        {% for day in calendarFullDays %}
+        {% for day in calendar %}
           <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
 
             {% call govukFieldset({

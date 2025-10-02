@@ -149,7 +149,6 @@ testJourneys.forEach(journey => {
       visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
       visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
         calendar: [],
-        calendarFullDays: [],
         scheduledEventsAvailable: true,
       }) // FIXME
     })
@@ -531,7 +530,6 @@ describe.skip('Update journey override booking window', () => {
     visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList: {}, whereaboutsAvailable: true })
     visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
       calendar: [],
-      calendarFullDays: [],
       scheduledEventsAvailable: true,
     }) // FIXME
 
@@ -594,7 +592,6 @@ describe.skip('Update journey specific warning messages', () => {
     visitSessionsService.getVisitSessions.mockResolvedValue({ slotsList, whereaboutsAvailable: true })
     visitSessionsService.getVisitSessionsAndScheduleCalendar.mockResolvedValue({
       calendar: [],
-      calendarFullDays: [],
       scheduledEventsAvailable: true,
     }) // FIXME
 

@@ -29,7 +29,7 @@ export default class DateAndTime {
     const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
     const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
 
-    const { calendar, calendarFullDays } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
+    const { calendar } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
       username: res.locals.user.username,
       prisonId,
       prisonerId: visitSessionData.prisoner.offenderNo,
@@ -39,7 +39,8 @@ export default class DateAndTime {
       originalVisitSession: visitSessionData.originalVisitSession,
     })
 
-    if (!calendarFullDays.length) {
+    const isAtLeastOneVisitSession = calendar.some(day => day.visitSessions.length > 0)
+    if (!isAtLeastOneVisitSession) {
       return res.render('pages/bookAVisit/dateAndTimeNoVisitSessions', {
         messages,
         prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
@@ -49,10 +50,7 @@ export default class DateAndTime {
     }
 
     // store visit sessions for use in validation
-    const allVisitSessions: CalendarVisitSession[] = calendarFullDays.reduce(
-      (acc, cur) => acc.concat(cur.visitSessions),
-      [],
-    )
+    const allVisitSessions: CalendarVisitSession[] = calendar.reduce((acc, cur) => acc.concat(cur.visitSessions), [])
     visitSessionData.allVisitSessions = allVisitSessions
 
     // TODO move setting messages elsewhere?
@@ -122,7 +120,6 @@ export default class DateAndTime {
       visitRestriction: visitSessionData.visitRestriction,
       policyNoticeDaysMax,
       calendar,
-      calendarFullDays,
     })
   }
 

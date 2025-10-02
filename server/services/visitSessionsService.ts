@@ -5,24 +5,23 @@ import {
   VisitSession,
   SessionCapacity,
   SessionSchedule,
-  SessionsAndScheduleDto,
   VisitSessionV2Dto,
   PrisonerScheduledEventDto,
 } from '../data/orchestrationApiTypes'
 import { ScheduledEvent } from '../data/whereaboutsApiTypes'
 
-// Single date on the calendar grid
-type CalendarGridDate = {
+// Single day on calendar with info for grid day and any visit sessions/events
+export type CalendarDay = {
   date: string // e.g. 2025-09-01
-  sessionCount: number
+  monthHeading: string // e.g. September
+
+  // grid day options
   colour?: 'orange' | 'red' // defaults to grey (no sessions) or blue (sessions)
   selected: boolean // renders with filled circle background
   outline: boolean // renders with circular outline
-}
 
-export type CalendarMonth = {
-  monthLabel: string // e.g. 'March'
-  days: CalendarGridDate[]
+  visitSessions: CalendarVisitSession[] // visit sessions with capacity for given OPEN/CLOSED restriction
+  scheduledEvents: CalendarScheduledEvent[]
 }
 
 type CalendarDaySection = 'morning' | 'afternoon'
@@ -47,12 +46,6 @@ type CalendarScheduledEvent = {
   startTime: string // e.g. "10:00"
   endTime: string
   description: string
-}
-
-export type CalendarFullDay = {
-  date: string // yyyy-mm-dd
-  visitSessions: CalendarVisitSession[]
-  scheduledEvents: CalendarScheduledEvent[]
 }
 
 export default class VisitSessionsService {
@@ -255,7 +248,7 @@ export default class VisitSessionsService {
     visitRestriction: VisitSessionData['visitRestriction']
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
-  }): Promise<{ calendar: CalendarMonth[]; calendarFullDays: CalendarFullDay[]; scheduledEventsAvailable: boolean }> {
+  }): Promise<{ calendar: CalendarDay[]; scheduledEventsAvailable: boolean }> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
@@ -266,54 +259,24 @@ export default class VisitSessionsService {
       username,
     })
 
-    const calendar = this.buildCalendarMonths(
-      sessionsAndSchedule,
-      selectedVisitSession,
-      originalVisitSession,
-      visitRestriction,
-    )
+    let selectedDateFound = false // FIXME "let"
 
-    const calendarFullDays = this.buildCalendarFullDays(
-      sessionsAndSchedule,
-      visitRestriction,
-      selectedVisitSession,
-      originalVisitSession,
-    )
+    const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
+      const { date, visitSessions, scheduledEvents } = day
 
-    return {
-      calendar,
-      calendarFullDays,
-      scheduledEventsAvailable,
-    }
-  }
+      // Filter out sessions with no capacity for visit restriction type
+      const visitSessionsWithCapacityForRestriction = visitSessions.filter(visitSession =>
+        visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0,
+      )
 
-  private buildCalendarMonths(
-    sessionsAndSchedule: SessionsAndScheduleDto[],
-    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
-    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
-    visitRestriction: VisitSessionData['visitRestriction'],
-  ): CalendarMonth[] {
-    let selectedDateFound = false
-    const calendarMonths = sessionsAndSchedule.reduce((months, day) => {
-      const { date, visitSessions } = day
+      // Transform visit sessions and events to format for the calendar
+      const calendarVisitSessions = visitSessionsWithCapacityForRestriction.map(visitSession =>
+        this.buildVisitSession(date, visitSession, visitRestriction, selectedVisitSession, originalVisitSession),
+      )
+      const calendarScheduledEvents = scheduledEvents.map(event => this.buildScheduledEvent(event))
 
-      const monthLabel = format(day.date, 'MMMM') // e.g. 'September'
-      if (months.at(-1)?.monthLabel !== monthLabel) {
-        months.push({ monthLabel, days: [] })
-      }
-
-      const sessionCount =
-        visitRestriction === 'OPEN'
-          ? visitSessions.filter(session => session.openVisitCapacity > 0).length
-          : visitSessions.filter(session => session.closedVisitCapacity > 0).length
-
-      const calendarGridDate: CalendarGridDate = {
-        date,
-        sessionCount,
-        selected: false,
-        outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
-      }
-
+      /// TODO Move to function?
+      let selected = false
       if (!selectedDateFound) {
         const matchesSelectedVisitSession =
           selectedVisitSession &&
@@ -329,48 +292,29 @@ export default class VisitSessionsService {
           )
 
         if (matchesSelectedVisitSession || matchesOriginalVisitSession) {
-          calendarGridDate.selected = true
+          selected = true
           selectedDateFound = true
         }
       }
+      // ///////////
 
-      months.at(-1).days.push(calendarGridDate)
-
-      return months
-    }, [] as CalendarMonth[])
-
-    if (!selectedDateFound) {
-      for (const month of calendarMonths) {
-        const firstDayWithVisitSessions = month.days.find(day => day.sessionCount > 0)
-        if (firstDayWithVisitSessions) {
-          firstDayWithVisitSessions.selected = true
-          break
-        }
-      }
-    }
-
-    return calendarMonths
-  }
-
-  private buildCalendarFullDays(
-    sessionsAndSchedule: SessionsAndScheduleDto[],
-    visitRestriction: VisitSessionData['visitRestriction'],
-    selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
-    originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
-  ): CalendarFullDay[] {
-    const daysWithVisitSessions = sessionsAndSchedule.filter(day => day.visitSessions.length > 0)
-
-    const calendarFullDays: CalendarFullDay[] = daysWithVisitSessions.map(day => {
       return {
-        date: day.date,
-        visitSessions: day.visitSessions.map(visitSession =>
-          this.buildVisitSession(day.date, visitSession, visitRestriction, selectedVisitSession, originalVisitSession),
-        ),
-        scheduledEvents: day.scheduledEvents.map(event => this.buildScheduledEvent(event)),
+        date,
+        monthHeading: format(date, 'MMMM'),
+        // colour
+        selected,
+        outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
+        visitSessions: calendarVisitSessions,
+        scheduledEvents: calendarScheduledEvents,
       }
     })
 
-    return calendarFullDays
+    if (!selectedDateFound && calendar.length) {
+      const firstDayWithVisitSession = calendar.find(day => day.visitSessions.length > 0)
+      firstDayWithVisitSession.selected = true
+    }
+
+    return { calendar, scheduledEventsAvailable }
   }
 
   private buildVisitSession(
