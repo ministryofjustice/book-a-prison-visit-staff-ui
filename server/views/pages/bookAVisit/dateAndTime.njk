@@ -95,7 +95,7 @@
                 {%- if sessionCount -%}
                   <a id="day-link-{{ day.date }}" href="#day-group-{{ day.date }}">
                     {{- day.date | formatDate("d") -}}
-                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ sessionCount }} visit {{ "time" | pluralise sessionCount )}}</span>
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ sessionCount }} visit {{ "time" | pluralise(sessionCount) }}</span>
                   </a>
                 {% else -%}
                     <span>{{ day.date | formatDate("d") }}</span>

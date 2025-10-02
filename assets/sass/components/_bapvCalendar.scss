@@ -174,7 +174,7 @@
 
 .bapv-calendar__event {
   @include govuk-font($size: 19);
-  background-color: rgba(86, 148, 202, 0.25);
+  background-color: #e0eef8;
   display: inline-block;
   margin-bottom: govuk-spacing(2);
   margin-top: govuk-spacing(1);

@@ -16,7 +16,7 @@ export type CalendarDay = {
   monthHeading: string // e.g. September
 
   // grid day options
-  colour?: 'orange' | 'red' // defaults to grey (no sessions) or blue (sessions)
+  colour?: 'orange' | 'red' // defaults is grey (no sessions) or blue (sessions)
   selected: boolean // renders with filled circle background
   outline: boolean // renders with circular outline
 
@@ -36,6 +36,7 @@ export type CalendarVisitSession = {
   visitRoom: string
   availableTables: number
   capacity: number
+  sessionConflicts: VisitSessionV2Dto['sessionConflicts']
   disabled: boolean // is radio input disabled
   tag?: GOVUKTag
 }
@@ -259,7 +260,7 @@ export default class VisitSessionsService {
       username,
     })
 
-    let selectedDateFound = false // FIXME "let"
+    let selectedDateFound = false
 
     const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
       const { date, visitSessions, scheduledEvents } = day
@@ -275,7 +276,8 @@ export default class VisitSessionsService {
       )
       const calendarScheduledEvents = scheduledEvents.map(event => this.buildScheduledEvent(event))
 
-      /// TODO Move to function?
+      const colour = this.getDayColour(calendarVisitSessions, selectedVisitSession, originalVisitSession)
+
       let selected = false
       if (!selectedDateFound) {
         const matchesSelectedVisitSession =
@@ -296,12 +298,11 @@ export default class VisitSessionsService {
           selectedDateFound = true
         }
       }
-      // ///////////
 
       return {
         date,
         monthHeading: format(date, 'MMMM'),
-        // colour
+        ...(colour && { colour }),
         selected,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
         visitSessions: calendarVisitSessions,
@@ -309,9 +310,11 @@ export default class VisitSessionsService {
       }
     })
 
-    if (!selectedDateFound && calendar.length) {
+    if (!selectedDateFound) {
       const firstDayWithVisitSession = calendar.find(day => day.visitSessions.length > 0)
-      firstDayWithVisitSession.selected = true
+      if (firstDayWithVisitSession) {
+        firstDayWithVisitSession.selected = true
+      }
     }
 
     return { calendar, scheduledEventsAvailable }
@@ -342,6 +345,7 @@ export default class VisitSessionsService {
       visitRoom: visitSession.visitRoom,
       availableTables,
       capacity,
+      sessionConflicts: visitSession.sessionConflicts,
       disabled: this.isVisitSessionDisabled(date, visitSession, originalVisitSession),
       ...(tag && { tag }),
     }
@@ -378,7 +382,7 @@ export default class VisitSessionsService {
     ) {
       return {
         text: 'Original booking',
-        classes: 'govuk-tag--blue',
+        classes: 'govuk-tag--light-blue',
       }
     }
 
@@ -388,7 +392,7 @@ export default class VisitSessionsService {
     ) {
       return {
         text: 'Reserved visit time',
-        classes: 'govuk-tag--blue',
+        classes: 'govuk-tag--light-blue',
       }
     }
 
@@ -402,7 +406,7 @@ export default class VisitSessionsService {
     if (availableTables <= 0) {
       return {
         text: 'Fully booked',
-        classes: 'govuk-tag--red',
+        classes: 'govuk-tag--orange',
       }
     }
 
@@ -422,6 +426,52 @@ export default class VisitSessionsService {
   private isBeforeMorningCutOff(time: string): boolean {
     const hours = parseInt(time.substring(0, 2), 10)
     return hours < this.morningCutOff
+  }
+
+  // Determine day colours based on visit session availability and existing bookings/reservations
+  private getDayColour(
+    calendarVisitSessions: CalendarVisitSession[],
+    selectedVisitSession: VisitSessionData['selectedVisitSession'],
+    originalVisitSession: VisitSessionData['originalVisitSession'],
+  ): CalendarDay['colour'] | undefined {
+    if (calendarVisitSessions.length === 0) {
+      return undefined
+    }
+
+    const hasSelectedVisitSession =
+      selectedVisitSession &&
+      calendarVisitSessions.some(
+        visitSession =>
+          visitSession.date === selectedVisitSession.date &&
+          visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference,
+      )
+    const hasOriginalVisitSession =
+      originalVisitSession &&
+      calendarVisitSessions.some(
+        visitSession =>
+          visitSession.date === originalVisitSession.date &&
+          visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference,
+      )
+    if (hasSelectedVisitSession || hasOriginalVisitSession) {
+      return undefined
+    }
+
+    const allSessionsHaveExistingVisit = calendarVisitSessions.every(visitSession =>
+      visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION'),
+    )
+    if (allSessionsHaveExistingVisit) {
+      return 'red'
+    }
+
+    const allAvailableSessionsFull = calendarVisitSessions
+      .filter(visitSession => visitSession.sessionConflicts.length === 0)
+      .every(visitSession => visitSession.availableTables <= 0)
+    if (allAvailableSessionsFull) {
+      return 'orange'
+    }
+
+    // default (blue)
+    return undefined
   }
 
   // TODO remove
