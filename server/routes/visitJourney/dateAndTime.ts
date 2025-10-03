@@ -29,7 +29,7 @@ export default class DateAndTime {
     const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
     const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
 
-    const { calendar } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
+    const { calendar, scheduledEventsAvailable } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
       username: res.locals.user.username,
       prisonId,
       prisonerId: visitSessionData.prisoner.offenderNo,
@@ -121,6 +121,7 @@ export default class DateAndTime {
       policyNoticeDaysMax,
       calendar,
       originalVisitSession: visitSessionData.originalVisitSession,
+      scheduledEventsAvailable,
     })
   }
 
