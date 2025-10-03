@@ -76,7 +76,7 @@
           <h2 class="govuk-heading-m">{{ monthHeading }}</h2>
 
           {# Day name headings on first month only - unless more than 2 months #}
-          {% if loop.first or loop.length > 2 %}{# TODO unit test #}
+          {% if loop.first or loop.length > 2 %}
             <ul class="govuk-list bapv-calendar__day-headings" aria-hidden="true">
               <li>M<span>on</span></li>
               <li>T<span>ue</span></li>
@@ -118,101 +118,105 @@
       </nav>
 
       {# Days / visit sessions #}
-      {# TODO fix disable-button-on-submit code #}
       <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate class="disable-button-on-submit">
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {# Days and visit sessions / schedule #}
         {% for day in calendar %}
-          <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
+          {# skip days with no visit sessions #}
+          {%- if day.visitSessions | length %}
+            <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
 
-            {% call govukFieldset({
-              attributes: { id: 'day-group-' + day.date },
-              legend: {
-                text: day.date | formatDate("EEEE d MMMM yyyy"),
-                classes: "govuk-fieldset__legend--m"
-              }
-            }) -%}
+              {% call govukFieldset({
+                attributes: { id: 'day-group-' + day.date },
+                legend: {
+                  text: day.date | formatDate("EEEE d MMMM yyyy"),
+                  classes: "govuk-fieldset__legend--m"
+                }
+              }) -%}
 
-            {# Scheduled events unavailable message #}
-            {%- if not scheduledEventsAvailable %}
-              {{ govukWarningText({
-                text: "The prisoner schedule is unavailable. " +
-                  "Check NOMIS for court appearances, official visits and medical appointments.",
-                iconFallbackText: "Warning",
-                classes: "govuk-!-width-two-thirds govuk-!-margin-top-5 govuk-!-margin-bottom-4",
-                attributes: { "data-test": "prisoner-schedule-unavailable" }
-              }) }}
-            {% endif -%}
+              {# Scheduled events unavailable message #}
+              {%- if not scheduledEventsAvailable %}
+                {{ govukWarningText({
+                  text: "The prisoner schedule is unavailable. " +
+                    "Check NOMIS for court appearances, official visits and medical appointments.",
+                  iconFallbackText: "Warning",
+                  classes: "govuk-!-width-two-thirds govuk-!-margin-top-5 govuk-!-margin-bottom-4",
+                  attributes: { "data-test": "prisoner-schedule-unavailable" }
+                }) }}
+              {% endif -%}
 
-            {# morning and/or afternoon sections #}
-            {%- for sectionLabel, visitSessions in day.visitSessions | groupby("daySection") %}
-              <div class="govuk-grid-row">
+              {# morning and/or afternoon sections #}
+              {%- for sectionLabel, visitSessions in day.visitSessions | groupby("daySection") %}
+                <div class="govuk-grid-row">
 
-                {# radio inputs #}
-                <div class="govuk-grid-column-one-quarter">
-                  <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
-                    {# build radio items #}
-                    {% set visitSessionItems = [] %}
-                    {%- for visitSession in visitSessions %}
-                      {% set radioValue = day.date + "_" + visitSession.sessionTemplateReference %}
+                  {# radio inputs #}
+                  <div class="govuk-grid-column-one-quarter">
+                    <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
+                      {# build radio items #}
+                      {% set visitSessionItems = [] %}
+                      {%- for visitSession in visitSessions %}
+                        {% set radioValue = day.date + "_" + visitSession.sessionTemplateReference %}
 
-                      {% set radioLabelHtml -%}
-                        <span class="govuk-!-font-weight-bold">{{ visitSession | formatStartToEndTime }}</span>
-                        <br>
-                        <span>{{ visitSession.visitRoom }}</span>
-                        <br>
-                        {% if visitSession.tag %}
-                          {{ govukTag({
-                            text: visitSession.tag.text,
-                            classes: visitSession.tag.classes
-                          }) }}
-                        {% else %}
-                          <span class="bapv-secondary-text">
-                            {{ visitSession.availableTables }} {{ "table" | pluralise(visitSession.availableTables) }} available
-                          </span>
-                        {% endif %}
-                      {%- endset %}
-                      {% set visitSessionItems = (visitSessionItems.push({
-                        value: radioValue,
-                        html: radioLabelHtml,
-                        disabled: visitSession.disabled
-                      }), visitSessionItems) %}
-                    {% endfor %}
+                        {% set radioLabelHtml -%}
+                          <span class="govuk-!-font-weight-bold">{{ visitSession | formatStartToEndTime }}</span>
+                          <br>
+                          <span>{{ visitSession.visitRoom }}</span>
+                          <br>
+                          {% if visitSession.tag %}
+                            {{ govukTag({
+                              text: visitSession.tag.text,
+                              classes: visitSession.tag.classes
+                            }) }}
+                          {% else %}
+                            <span class="bapv-secondary-text">
+                              {{ visitSession.availableTables }} {{ "table" | pluralise(visitSession.availableTables) }} available
+                            </span>
+                          {% endif %}
+                        {%- endset %}
+                        {% set visitSessionItems = (visitSessionItems.push({
+                          value: radioValue,
+                          html: radioLabelHtml,
+                          disabled: visitSession.disabled
+                        }), visitSessionItems) %}
+                      {% endfor %}
 
-                    {{- govukRadios({
-                      name: "visitSessionId",
-                      idPrefix: "date-" + day.date + "-" + sectionLabel,
-                      items: visitSessionItems,
-                      value: formValues.visitSessionId
-                    }) }} {# TODO handle errorMessage #}
-                </div>
-
-                {# prisoner schedule #}
-                {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
-                {% if scheduledEventsByDaySection[sectionLabel] | length %}
-                  <div class="govuk-grid-column-three-quarters">
-                    <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
-                    {% for event in scheduledEventsByDaySection[sectionLabel] %}
-                      <div class="bapv-calendar__event">
-                        {{ event | formatStartToEndTime }}
-                        <br>
-                        {{ event.description }}
-                      </div>
-                    {% endfor %}
+                      {%- set idPrefix = "date-" + day.date + "-" + sectionLabel -%}
+                      {{- govukRadios({
+                        name: "visitSessionId",
+                        idPrefix: idPrefix,
+                        items: visitSessionItems,
+                        value: formValues.visitSessionId,
+                        errorMessage: (errors | findError(firstVisitSessionRadioInputId)) if firstVisitSessionRadioInputId === idPrefix
+                      }) }}
                   </div>
-                {% endif %}
-              </div>
-            {% endfor %}
 
-            <p class="govuk-!-display-inline-block">
-              <a class="govuk-visually-hidden-focusable govuk-!-display-block govuk-!-margin-top-5" href="#day-link-{{ day.date }}">
-                Choose a different date above
-              </a>
-            </p>
+                  {# prisoner schedule #}
+                  {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
+                  {% if scheduledEventsByDaySection[sectionLabel] | length %}
+                    <div class="govuk-grid-column-three-quarters">
+                      <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
+                      {% for event in scheduledEventsByDaySection[sectionLabel] %}
+                        <div class="bapv-calendar__event">
+                          {{ event | formatStartToEndTime }}
+                          <br>
+                          {{ event.description }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
 
-            {%- endcall %}
-          </div>
+              <p class="govuk-!-display-inline-block">
+                <a class="govuk-visually-hidden-focusable govuk-!-display-block govuk-!-margin-top-5" href="#day-link-{{ day.date }}">
+                  Choose a different date above
+                </a>
+              </p>
+
+              {%- endcall %}
+            </div>
+          {% endif %}
         {% endfor %}
 
         {{ govukButton({
@@ -228,4 +232,5 @@
 
 {% block pageScripts %}
 <script src="/assets/components/bapvCalendar.js"></script>
+<script src="/assets/disableButtonOnSubmit.js"></script>
 {% endblock %}

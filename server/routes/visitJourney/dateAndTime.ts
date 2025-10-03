@@ -121,6 +121,7 @@ export default class DateAndTime {
       policyNoticeDaysMax,
       calendar,
       originalVisitSession: visitSessionData.originalVisitSession,
+      firstVisitSessionRadioInputId: this.getFirstVisitSessionRadioInputId(visitSessionData.allVisitSessions),
       scheduledEventsAvailable,
     })
   }
@@ -133,8 +134,13 @@ export default class DateAndTime {
     const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
-      // TODO fix errors data for correct error summary link - see https://github.com/ministryofjustice/hmpps-book-a-prison-visit-ui/blob/d04a98c94467ff048f8c1d0686bf1fc961e250ab/server/routes/bookVisit/chooseVisitTimeController.ts#L85-L96
-      req.flash('errors', errors.array() as [])
+      const errorsArray = errors.array()
+      if (errorsArray[0].type === 'field') {
+        // update the path in error obj to match ID of first radio input so ErrorSummary link works correctly
+        const firstVisitSessionRadioInputId = this.getFirstVisitSessionRadioInputId(visitSessionData.allVisitSessions)
+        errorsArray[0].path = firstVisitSessionRadioInputId
+      }
+      req.flash('errors', errorsArray)
       return res.redirect(`${urlPrefix}/select-date-and-time`)
     }
 
@@ -280,5 +286,10 @@ export default class DateAndTime {
     }
 
     return true
+  }
+
+  // Return radio input ID for first visit session in form e.g. "date-2025-09-01-morning"
+  private getFirstVisitSessionRadioInputId(allVisitSessions: CalendarVisitSession[]): string {
+    return `date-${allVisitSessions?.[0]?.date}-${allVisitSessions?.[0]?.daySection}`
   }
 }

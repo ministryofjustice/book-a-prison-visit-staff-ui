@@ -198,9 +198,5 @@
 {% endblock %}
 
 {% block pageScripts %}
-  <script nonce="{{ cspNonce }}">
-    document.querySelector('.disable-button-on-submit').addEventListener('submit', e => {
-      e.target.querySelector('button[type=submit]').setAttribute('disabled', 'disabled')
-    })
-  </script>
+<script src="/assets/disableButtonOnSubmit.js"></script>
 {% endblock %}
