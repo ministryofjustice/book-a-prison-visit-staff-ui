@@ -802,6 +802,47 @@ describe('Visit sessions service', () => {
       expect(result.calendar).toStrictEqual(expectedCalendarDays)
     })
 
+    it('should correctly format scheduled events based on event type', async () => {
+      const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+        sessionsAndSchedule: [
+          TestData.sessionsAndScheduleDto({
+            scheduledEvents: [
+              TestData.prisonerScheduledEvent({
+                eventType: 'APP',
+                eventSourceDesc: 'eventSourceDesc',
+                eventSubTypeDesc: 'eventSubTypeDesc',
+              }),
+              TestData.prisonerScheduledEvent({
+                eventType: 'VISIT',
+                eventSourceDesc: 'eventSourceDesc',
+                eventSubTypeDesc: 'eventSubTypeDesc',
+              }),
+              TestData.prisonerScheduledEvent({
+                eventType: 'OTHER',
+                eventSourceDesc: 'eventSourceDesc',
+                eventSubTypeDesc: 'eventSubTypeDesc',
+              }),
+            ],
+          }),
+        ],
+      })
+      orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+      const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+        username,
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        visitRestriction: 'OPEN',
+        selectedVisitSession: undefined,
+        originalVisitSession: undefined,
+      })
+
+      expect(result.calendar[0].scheduledEvents[0].description).toBe('Appointment - eventSubTypeDesc')
+      expect(result.calendar[0].scheduledEvents[1].description).toBe('Visit - eventSourceDesc')
+      expect(result.calendar[0].scheduledEvents[2].description).toBe('Activity - eventSourceDesc')
+    })
+
     describe('Visit restriction (OPEN / CLOSED) - session filtering and availability', () => {
       it('should exclude visit sessions with no capacity and calculate available tables - OPEN visit restriction', async () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
@@ -1271,10 +1312,12 @@ describe('Visit sessions service', () => {
       it('should outline day matching originalVisitSession and outline and select selectedVisitSession', async () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
+            // original visit session
             TestData.sessionsAndScheduleDto({
               date: '2025-08-30',
               visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'a' })],
             }),
+            // selected visit session
             TestData.sessionsAndScheduleDto({
               date: '2025-08-31',
               visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'b' })],
@@ -1303,11 +1346,11 @@ describe('Visit sessions service', () => {
         expect(result.calendar.length).toBe(2)
 
         expect(result.calendar[0].colour).toBeUndefined()
-        expect(result.calendar[0].selected).toBe(true)
+        expect(result.calendar[0].selected).toBe(false)
         expect(result.calendar[0].outline).toBe(true)
 
         expect(result.calendar[1].colour).toBeUndefined()
-        expect(result.calendar[1].selected).toBe(false)
+        expect(result.calendar[1].selected).toBe(true)
         expect(result.calendar[1].outline).toBe(true)
       })
     })
@@ -1415,7 +1458,5 @@ describe('Visit sessions service', () => {
         })
       })
     })
-
-    // TODO update journey - should default to selecting the reserved slot (if set) in preference to original one
   })
 })

@@ -16,7 +16,7 @@ export type CalendarDay = {
   monthHeading: string // e.g. September
 
   // grid day options
-  colour?: 'orange' | 'red' // defaults is grey (no sessions) or blue (sessions)
+  colour?: 'orange' | 'red' // default is grey (no sessions) or blue (sessions)
   selected: boolean // renders with filled circle background
   outline: boolean // renders with circular outline
 
@@ -42,7 +42,7 @@ export type CalendarVisitSession = {
 }
 
 // Single prisoner event entry
-type CalendarScheduledEvent = {
+export type CalendarScheduledEvent = {
   daySection: CalendarDaySection
   startTime: string // e.g. "10:00"
   endTime: string
@@ -260,17 +260,16 @@ export default class VisitSessionsService {
       username,
     })
 
-    let selectedDateFound = false
-
+    // map raw session/schedule data to format for calendar
     const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
       const { date, visitSessions, scheduledEvents } = day
 
-      // Filter out sessions with no capacity for visit restriction type
+      // Filter out sessions with no capacity for requested visit restriction type
       const visitSessionsWithCapacityForRestriction = visitSessions.filter(visitSession =>
         visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0,
       )
 
-      // Transform visit sessions and events to format for the calendar
+      // Transform visit sessions and events data for calendar
       const calendarVisitSessions = visitSessionsWithCapacityForRestriction.map(visitSession =>
         this.buildVisitSession(date, visitSession, visitRestriction, selectedVisitSession, originalVisitSession),
       )
@@ -278,39 +277,34 @@ export default class VisitSessionsService {
 
       const colour = this.getDayColour(calendarVisitSessions, selectedVisitSession, originalVisitSession)
 
-      let selected = false
-      if (!selectedDateFound) {
-        const matchesSelectedVisitSession =
-          selectedVisitSession &&
-          selectedVisitSession.date === date &&
-          visitSessions.some(
-            session => session.sessionTemplateReference === selectedVisitSession?.sessionTemplateReference,
-          )
-        const matchesOriginalVisitSession =
-          originalVisitSession &&
-          originalVisitSession.date === date &&
-          visitSessions.some(
-            session => session.sessionTemplateReference === originalVisitSession?.sessionTemplateReference,
-          )
-
-        if (matchesSelectedVisitSession || matchesOriginalVisitSession) {
-          selected = true
-          selectedDateFound = true
-        }
-      }
-
       return {
         date,
         monthHeading: format(date, 'MMMM'),
         ...(colour && { colour }),
-        selected,
+        selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
         visitSessions: calendarVisitSessions,
         scheduledEvents: calendarScheduledEvents,
       }
     })
 
-    if (!selectedDateFound) {
+    // Determine which grid day to select (highlight). Order of preference is the day with:
+    // 1. selected visit session (if set)
+    // 2. original visit session (set on update journey)
+    // 3. first available visit session (if there are any)
+    const dayWithSelectedVisitSession =
+      selectedVisitSession &&
+      this.getCalendarDay(calendar, selectedVisitSession.date, selectedVisitSession.sessionTemplateReference)
+
+    const dayWithOriginalVisitSession =
+      originalVisitSession &&
+      this.getCalendarDay(calendar, originalVisitSession.date, originalVisitSession.sessionTemplateReference)
+
+    const dayToSelect = dayWithSelectedVisitSession ?? dayWithOriginalVisitSession
+
+    if (dayToSelect) {
+      dayToSelect.selected = true
+    } else {
       const firstDayWithVisitSession = calendar.find(day => day.visitSessions.length > 0)
       if (firstDayWithVisitSession) {
         firstDayWithVisitSession.selected = true
@@ -472,6 +466,19 @@ export default class VisitSessionsService {
 
     // default (blue)
     return undefined
+  }
+
+  private getCalendarDay(
+    calendar: CalendarDay[],
+    date: string,
+    sessionTemplateReference: string,
+  ): CalendarDay | undefined {
+    return calendar.find(day =>
+      day.visitSessions.find(
+        visitSession =>
+          visitSession.date === date && visitSession.sessionTemplateReference === sessionTemplateReference,
+      ),
+    )
   }
 
   // TODO remove
