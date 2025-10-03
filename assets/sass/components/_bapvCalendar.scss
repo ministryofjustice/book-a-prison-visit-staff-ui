@@ -1,3 +1,32 @@
+.bapv-calendar__key {
+  & li > span {
+    display: inline-block;
+    width: 10%;
+  }
+}
+
+.bapv-calendar__key__colour--grey {
+  color: $govuk-secondary-text-colour;
+}
+
+.bapv-calendar__key__colour--blue {
+  @include govuk-link-decoration;
+  color: $govuk-link-colour;
+  font-weight: $govuk-font-weight-bold;
+}
+
+.bapv-calendar__key__colour--orange {
+  @include govuk-link-decoration;
+  color: $moj-warning-colour;
+  font-weight: $govuk-font-weight-bold;
+}
+
+.bapv-calendar__key__colour--red {
+  @include govuk-link-decoration;
+  color: govuk-colour("red");
+  font-weight: $govuk-font-weight-bold;
+}
+
 .bapv-calendar {
   margin-bottom: govuk-spacing(9);
 }
@@ -13,8 +42,14 @@
   margin-top: govuk-spacing(3);
 
   li {
-    min-width: 2.25rem;
-    max-width: 3rem;
+    width: 3rem;
+  }
+
+  // only show abbreviated weekday names on mobile
+  span {
+    @include govuk-media-query($until: tablet) {
+      display: none;
+    }
   }
 }
 
@@ -126,6 +161,14 @@
     padding-top: 0;
   }
 
+  .govuk-radios__input:disabled + .govuk-radios__label {
+    opacity: unset;
+
+    &::before, & span {
+      opacity: 0.5;
+    }
+  }
+
   .govuk-tag {
     margin-top: govuk-spacing(1);
   }
@@ -137,7 +180,7 @@
 
 .bapv-calendar__event {
   @include govuk-font($size: 19);
-  background-color: rgba(86, 148, 202, 0.25);
+  background-color: #e0eef8;
   display: inline-block;
   margin-bottom: govuk-spacing(2);
   margin-top: govuk-spacing(1);
