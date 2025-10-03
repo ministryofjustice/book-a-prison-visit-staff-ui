@@ -800,6 +800,7 @@ describe('Visit sessions service', () => {
       })
 
       expect(result.calendar).toStrictEqual(expectedCalendarDays)
+      expect(result.scheduledEventsAvailable).toBe(true)
     })
 
     it('should correctly format scheduled events based on event type', async () => {
@@ -841,6 +842,23 @@ describe('Visit sessions service', () => {
       expect(result.calendar[0].scheduledEvents[0].description).toBe('Appointment - eventSubTypeDesc')
       expect(result.calendar[0].scheduledEvents[1].description).toBe('Visit - eventSourceDesc')
       expect(result.calendar[0].scheduledEvents[2].description).toBe('Activity - eventSourceDesc')
+    })
+
+    it('should return scheduled events API availability flag', async () => {
+      const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({ scheduledEventsAvailable: false })
+      orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+      const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+        username,
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        visitRestriction: 'OPEN',
+        selectedVisitSession: undefined,
+        originalVisitSession: undefined,
+      })
+
+      expect(result.scheduledEventsAvailable).toBe(false)
     })
 
     describe('Visit restriction (OPEN / CLOSED) - session filtering and availability', () => {
