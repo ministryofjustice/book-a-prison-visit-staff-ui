@@ -120,7 +120,7 @@ export type VisitSessionData = {
     sessionTemplateReference: string
     startTime: string
     endTime: string
-    visitRestriction: 'OPEN' | 'CLOSED'
+    visitRestriction: 'OPEN' | 'CLOSED' | undefined // 'undefined' for migrated visits
   }
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitorIds?: number[]

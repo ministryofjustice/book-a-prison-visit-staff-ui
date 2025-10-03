@@ -62,8 +62,7 @@ export default class UpdateVisitController {
           sessionTemplateReference: visitDetails.sessionTemplateReference,
           startTime,
           endTime,
-          // FIXME visitDetails.visitRestriction can be UNKNOWN. Defaulting to open but need to check
-          visitRestriction: visitDetails.visitRestriction === 'CLOSED' ? 'CLOSED' : 'OPEN',
+          visitRestriction,
         },
         visitRestriction,
         visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
