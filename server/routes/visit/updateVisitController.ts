@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import { differenceInCalendarDays } from 'date-fns'
+import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { VisitService } from '../../services'
 import { clearSession } from '../visitorUtils'
 import { VisitSessionData } from '../../@types/bapv'
@@ -40,6 +40,12 @@ export default class UpdateVisitController {
         contactName: visitDetails.visitContact.name,
       }
 
+      const startDateTime = parseISO(visitDetails.startTimestamp)
+      const endDateTime = parseISO(visitDetails.endTimestamp)
+      const date = format(startDateTime, 'yyyy-MM-dd')
+      const startTime = format(startDateTime, 'HH:mm')
+      const endTime = format(endDateTime, 'HH:mm')
+
       const visitSessionData: VisitSessionData = {
         allowOverBooking: false,
         prisoner: {
@@ -52,8 +58,10 @@ export default class UpdateVisitController {
         },
         prisonId: prisoner.prisonId,
         originalVisitSession: {
-          date: visitDetails.startTimestamp.split('T')[0],
+          date,
           sessionTemplateReference: visitDetails.sessionTemplateReference,
+          startTime,
+          endTime,
           // FIXME visitDetails.visitRestriction can be UNKNOWN. Defaulting to open but need to check
           visitRestriction: visitDetails.visitRestriction === 'CLOSED' ? 'CLOSED' : 'OPEN',
         },

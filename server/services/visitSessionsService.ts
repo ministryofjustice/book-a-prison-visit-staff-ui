@@ -416,7 +416,7 @@ export default class VisitSessionsService {
     }
   }
 
-  // is a start time (HH:MM) before morning cut off time
+  // is a start time (HH:mm) before morning cut off time
   private isBeforeMorningCutOff(time: string): boolean {
     const hours = parseInt(time.substring(0, 2), 10)
     return hours < this.morningCutOff

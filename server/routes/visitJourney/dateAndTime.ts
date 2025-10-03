@@ -120,6 +120,7 @@ export default class DateAndTime {
       visitRestriction: visitSessionData.visitRestriction,
       policyNoticeDaysMax,
       calendar,
+      originalVisitSession: visitSessionData.originalVisitSession,
     })
   }
 

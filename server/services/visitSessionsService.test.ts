@@ -1178,7 +1178,13 @@ describe('Visit sessions service', () => {
             availableTables: 1,
             capacity: 10,
           },
-          originalVisitSession: { date: '2025-09-02', sessionTemplateReference: 'c', visitRestriction: 'OPEN' },
+          originalVisitSession: {
+            date: '2025-09-02',
+            sessionTemplateReference: 'c',
+            startTime: '',
+            endTime: '',
+            visitRestriction: 'OPEN',
+          },
         })
 
         expect(result.calendar[0].colour).toBeUndefined() // blue is the default
@@ -1255,7 +1261,13 @@ describe('Visit sessions service', () => {
           minNumberOfDays,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
-          originalVisitSession: { date: '2025-08-31', sessionTemplateReference: 'b', visitRestriction: 'OPEN' },
+          originalVisitSession: {
+            date: '2025-08-31',
+            sessionTemplateReference: 'b',
+            startTime: '',
+            endTime: '',
+            visitRestriction: 'OPEN',
+          },
         })
 
         expect(result.calendar.length).toBe(2)
@@ -1295,7 +1307,13 @@ describe('Visit sessions service', () => {
           minNumberOfDays,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
-          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a', visitRestriction: 'OPEN' },
+          originalVisitSession: {
+            date: '2025-08-30',
+            sessionTemplateReference: 'a',
+            startTime: '',
+            endTime: '',
+            visitRestriction: 'OPEN',
+          },
         })
 
         expect(result.calendar.length).toBe(2)
@@ -1340,7 +1358,13 @@ describe('Visit sessions service', () => {
             availableTables: 1,
             capacity: 10,
           },
-          originalVisitSession: { date: '2025-08-30', sessionTemplateReference: 'a', visitRestriction: 'OPEN' },
+          originalVisitSession: {
+            date: '2025-08-30',
+            sessionTemplateReference: 'a',
+            startTime: '',
+            endTime: '',
+            visitRestriction: 'OPEN',
+          },
         })
 
         expect(result.calendar.length).toBe(2)

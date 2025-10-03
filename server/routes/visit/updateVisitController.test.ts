@@ -70,6 +70,8 @@ describe('Start a visit update journey', () => {
             originalVisitSession: {
               date: '2022-01-14',
               sessionTemplateReference: 'v9d.7ed.7u',
+              startTime: '10:00',
+              endTime: '11:00',
               visitRestriction: 'OPEN',
             },
             visitRestriction: 'OPEN',

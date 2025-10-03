@@ -25,6 +25,15 @@
 
       {% include "partials/dateAndTimePrisonerInfo.njk" %}
 
+      {% if originalVisitSession %}
+        <p class="govuk-!-margin-top-5 govuk-!-margin-bottom-7">
+          <strong>Original booking:</strong>
+          <span data-test="original-booking-time-date">
+            {{- originalVisitSession | formatStartToEndTime }} on {{ originalVisitSession.date | formatDate -}}
+          </span>
+        </p>
+      {% endif %}
+
       {# Calendar key #}
       {% call govukDetails({
         summaryText: "Help with the calendar",
