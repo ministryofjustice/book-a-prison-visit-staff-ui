@@ -6,6 +6,10 @@
   color: $govuk-secondary-text-colour;
 }
 
+.bapv-visibility-hidden {
+  visibility: hidden;
+}
+
 .bapv-table th, .bapv-table td  {
   padding: govuk-spacing(4) govuk-spacing(4) govuk-spacing(4) 0;
 }
@@ -107,14 +111,6 @@
 .bapv-table-no-bottom-border .govuk-table__row:last-child .govuk-table__cell,
 .bapv-tabs .govuk-table__row:last-child .govuk-table__cell {
   border-bottom: 0;
-}
-
-.bapv-extraspacing {
-  line-height: 1.5;
-}
-
-.bapv-date-time-information span {
-  padding-right: govuk-spacing(6);
 }
 
 .bapv-sub-navigation {

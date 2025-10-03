@@ -33,6 +33,7 @@ import {
   VisitRequestSummary,
   VisitRestriction,
   VisitSession,
+  VisitSessionsAndScheduleDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -179,8 +180,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
       data: <ChangeApplicationDto>{
         applicationRestriction: visitSessionData.visitRestriction,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -201,8 +202,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.visitReference}/change`,
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
@@ -224,8 +225,8 @@ export default class OrchestrationApiClient {
       path: '/visits/application/slot/reserve',
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -350,6 +351,7 @@ export default class OrchestrationApiClient {
     })
   }
 
+  // TODO remove, and related wiremock
   async getVisitSessions(
     offenderNo: string,
     prisonId: string,
@@ -392,6 +394,28 @@ export default class OrchestrationApiClient {
     } catch {
       return null
     }
+  }
+
+  async getVisitSessionsAndSchedule({
+    prisonId,
+    prisonerId,
+    minNumberOfDays,
+    username,
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+  }): Promise<VisitSessionsAndScheduleDto> {
+    return this.restClient.get({
+      path: '/visit-sessions-and-schedule',
+      query: new URLSearchParams({
+        prisonId,
+        prisonerId,
+        min: minNumberOfDays.toString(),
+        username,
+      }).toString(),
+    })
   }
 
   // prisoner-profile-controller

@@ -9,10 +9,10 @@ import {
   previousMonday,
   addWeeks,
   subWeeks,
+  parse,
 } from 'date-fns'
 // eslint-disable-next-line import/no-named-as-default
 import parsePhoneNumber from 'libphonenumber-js/mobile'
-import { VisitSlot } from '../@types/bapv'
 import config from '../config'
 
 export const properCase = (word: string): string =>
@@ -162,14 +162,6 @@ export const getWeekOfDatesStartingMonday = (
   return { weekOfDates, previousWeek, nextWeek }
 }
 
-export const isSameVisitSlot = (visitSlot: VisitSlot, originalVisitSlot: VisitSlot): boolean => {
-  const isMatchingTemplateReference = visitSlot.sessionTemplateReference === originalVisitSlot.sessionTemplateReference
-
-  const isMatchingStartTimestamp = visitSlot.startTimestamp === originalVisitSlot.startTimestamp
-
-  return isMatchingTemplateReference && isMatchingStartTimestamp
-}
-
 export const initialiseName = (fullName?: string): string | null => {
   // this check is for the authError page
   if (!fullName) return null
@@ -184,4 +176,19 @@ export const getDpsPrisonerAlertsUrl = (offenderNo: string): string => {
 
 export const isMobilePhoneNumber = (phoneNumber: string): boolean => {
   return parsePhoneNumber(phoneNumber ?? '', 'GB')?.getType() === 'MOBILE'
+}
+
+// E.g. 10:00, 13:30 => "10am to 1:30pm"
+export const formatStartToEndTime = (startTime: string, endTime: string): string => {
+  try {
+    const now = new Date()
+    const startTimeAsDate = parse(startTime, 'HH:mm', now)
+    const endTimeAsDate = parse(endTime, 'HH:mm', now)
+    const startTimeAs12h = format(startTimeAsDate, 'h:mmaaa')
+    const endTimeAs12h = format(endTimeAsDate, 'h:mmaaa')
+
+    return `${startTimeAs12h} to ${endTimeAs12h}`.replace(/:00/g, '')
+  } catch {
+    return ''
+  }
 }

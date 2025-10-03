@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express'
-import { differenceInCalendarDays } from 'date-fns'
+import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { VisitService } from '../../services'
 import { clearSession } from '../visitorUtils'
-import { VisitSessionData, VisitSlot } from '../../@types/bapv'
+import { VisitSessionData } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
 import { getPrisonerLocation, isPublicBooking } from './visitUtils'
 
@@ -28,18 +28,6 @@ export default class UpdateVisitController {
 
       const visitRestriction = visitDetails.visitRestriction === 'UNKNOWN' ? undefined : visitDetails.visitRestriction
 
-      const visitSlot: VisitSlot = {
-        id: '',
-        sessionTemplateReference: visitDetails.sessionTemplateReference,
-        prisonId: prison.prisonId,
-        startTimestamp: visitDetails.startTimestamp,
-        endTimestamp: visitDetails.endTimestamp,
-        availableTables: 0,
-        capacity: undefined,
-        visitRoom: visitDetails.visitRoom,
-        visitRestriction,
-      }
-
       const relationshipDescription = visitDetails.visitors.find(
         visitor => visitor.personId === visitDetails.visitContact.visitContactId,
       )?.relationshipDescription
@@ -52,6 +40,12 @@ export default class UpdateVisitController {
         contactName: visitDetails.visitContact.name,
       }
 
+      const startDateTime = parseISO(visitDetails.startTimestamp)
+      const endDateTime = parseISO(visitDetails.endTimestamp)
+      const date = format(startDateTime, 'yyyy-MM-dd')
+      const startTime = format(startDateTime, 'HH:mm')
+      const endTime = format(endDateTime, 'HH:mm')
+
       const visitSessionData: VisitSessionData = {
         allowOverBooking: false,
         prisoner: {
@@ -62,8 +56,14 @@ export default class UpdateVisitController {
           alerts: prisoner.prisonerAlerts,
           restrictions: prisoner.prisonerRestrictions,
         },
-        visitSlot,
-        originalVisitSlot: visitSlot,
+        prisonId: prisoner.prisonId,
+        originalVisitSession: {
+          date,
+          sessionTemplateReference: visitDetails.sessionTemplateReference,
+          startTime,
+          endTime,
+          visitRestriction,
+        },
         visitRestriction,
         visitorIds: visitDetails.visitors.map(visitor => visitor.personId),
         visitorSupport: visitDetails.visitorSupport ?? { description: '' },

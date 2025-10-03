@@ -11,7 +11,7 @@ export default class Confirmation {
 
     res.locals.isUpdate = isUpdate
     res.locals.prisoner = visitSessionData.prisoner
-    res.locals.visitSlot = visitSessionData.visitSlot
+    res.locals.visitSession = visitSessionData.selectedVisitSession
     res.locals.visitRestriction = visitSessionData.visitRestriction
     res.locals.visitors = visitSessionData.visitors
     res.locals.mainContact = visitSessionData.mainContact

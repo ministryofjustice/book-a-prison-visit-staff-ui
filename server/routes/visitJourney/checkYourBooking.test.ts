@@ -40,18 +40,16 @@ testJourneys.forEach(journey => {
           offenderNo: 'A1234BC',
           location: 'location place',
         },
-        visitRestriction: 'OPEN',
-        visitSlot: {
-          id: '1',
+        prisonId: 'HEI',
+        selectedVisitSession: {
+          date: '2022-03-12',
           sessionTemplateReference: 'v9d.7ed.7u',
-          prisonId: 'HEI',
-          startTimestamp: '2022-03-12T09:30:00',
-          endTimestamp: '2022-03-12T10:30:00',
+          startTime: '09:30',
+          endTime: '10:30',
           availableTables: 1,
           capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
         },
+        visitRestriction: 'OPEN',
         visitorIds: [123],
         visitors: [
           {

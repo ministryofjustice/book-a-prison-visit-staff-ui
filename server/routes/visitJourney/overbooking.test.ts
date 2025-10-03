@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
-import { VisitSessionData, VisitSlot } from '../../@types/bapv'
+import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import {
   createMockAuditService,
@@ -20,6 +20,7 @@ const visitSessionsService = createMockVisitSessionsService()
 const visitService = createMockVisitService()
 
 let visitSessionData: VisitSessionData
+const prisonId = 'HEI'
 
 // run tests for booking and update journeys
 const testJourneys = [
@@ -36,18 +37,16 @@ beforeEach(() => {
       offenderNo: 'A1234BC',
       location: 'location place',
     },
-    visitRestriction: 'OPEN',
-    visitSlot: {
-      id: 'visitId',
+    prisonId,
+    selectedVisitSession: {
+      date: '2022-03-12',
       sessionTemplateReference: 'ab-cd-ef',
-      prisonId: 'HEI',
-      startTimestamp: '2022-03-12T09:30:00',
-      endTimestamp: '2022-03-12T10:30:00',
+      startTime: '09:30',
+      endTime: '10:30',
       availableTables: 0,
-      capacity: 30,
-      visitRoom: 'room name',
-      visitRestriction: 'OPEN',
+      capacity: 20,
     },
+    visitRestriction: 'OPEN',
     visitorIds: [4323],
     visitors: [
       {
@@ -98,12 +97,13 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toBe('This time slot is fully booked. Are you sure you want to continue?')
             expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/select-date-and-time`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/select-date-and-time/overbooking`)
-            expect($('[data-test=bookings-count]').text().trim()).toBe(
-              (visitSessionData.visitSlot.capacity - visitSessionData.visitSlot.availableTables).toString(),
+            const bookingsCount =
+              visitSessionData.selectedVisitSession.capacity - visitSessionData.selectedVisitSession.availableTables
+            expect($('[data-test=bookings-count]').text().trim()).toBe(bookingsCount.toString())
+            expect($('[data-test=capacity]').text().trim()).toBe(
+              visitSessionData.selectedVisitSession.capacity.toString(),
             )
-            expect($('[data-test=max-capacity]').text().trim()).toBe(visitSessionData.visitSlot.capacity.toString())
-            expect($('[data-test=visit-start-time]').text().trim()).toBe('9:30am')
-            expect($('[data-test=visit-end-time]').text().trim()).toBe('10:30am')
+            expect($('[data-test=visit-time]').text().trim()).toBe('9:30am to 10:30am')
             expect($('[data-test=visit-date]').text().trim()).toBe('Saturday 12 March')
           })
       })
@@ -140,7 +140,6 @@ testJourneys.forEach(journey => {
       const application: Partial<ApplicationDto> = {
         reference: 'aaa-bbb-ccc',
       }
-      const prisonId = 'HEI'
 
       beforeEach(() => {
         flashData = { errors: [], formValues: [], messages: [] }
@@ -159,6 +158,7 @@ testJourneys.forEach(journey => {
           } as SessionData,
         })
       })
+
       it('should make reservation when yes is selected on overbooking page, then go to additional support', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time/overbooking`)
@@ -166,16 +166,13 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/additional-support`)
           .expect(() => {
-            expect(visitSessionData.visitSlot).toStrictEqual(<VisitSlot>{
-              id: 'visitId',
+            expect(visitSessionData.selectedVisitSession).toStrictEqual<VisitSessionData['selectedVisitSession']>({
+              date: '2022-03-12',
               sessionTemplateReference: 'ab-cd-ef',
-              prisonId,
-              startTimestamp: '2022-03-12T09:30:00',
-              endTimestamp: '2022-03-12T10:30:00',
+              startTime: '09:30',
+              endTime: '10:30',
               availableTables: 0,
-              capacity: 30,
-              visitRoom: 'room name',
-              visitRestriction: 'OPEN',
+              capacity: 20,
             })
             expect(visitSessionData.applicationReference).toEqual(application.reference)
 
@@ -199,6 +196,7 @@ testJourneys.forEach(journey => {
             })
           })
       })
+
       it('should not make reservation when no is selected on overbooking page, then redirect to date and time', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-date-and-time/overbooking`)
@@ -206,7 +204,7 @@ testJourneys.forEach(journey => {
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-date-and-time`)
           .expect(() => {
-            expect(visitSessionData.visitSlot).toBeUndefined()
+            expect(visitSessionData.selectedVisitSession).toBeUndefined()
             expect(visitSessionData.applicationReference).toBeUndefined()
 
             expect(
@@ -255,18 +253,16 @@ testJourneys.forEach(journey => {
           offenderNo: 'A1234BC',
           location: 'location place',
         },
-        visitRestriction: 'OPEN',
-        visitSlot: {
-          id: 'visitId',
+        prisonId,
+        selectedVisitSession: {
+          date: '2022-03-12',
           sessionTemplateReference: 'ab-cd-ef',
-          prisonId: 'HEI',
-          startTimestamp: '2022-03-12T09:30:00',
-          endTimestamp: '2022-03-12T10:30:00',
-          availableTables: 1,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
+          startTime: '09:30',
+          endTime: '10:30',
+          availableTables: 0,
+          capacity: 20,
         },
+        visitRestriction: 'OPEN',
         visitorIds: [123],
         visitors: [
           {
@@ -323,10 +319,9 @@ testJourneys.forEach(journey => {
             expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
             expect($('[data-test=bookings-count]').text().trim()).toBe(visitSession.openVisitBookedCount.toString())
-            expect($('[data-test=max-capacity]').text().trim()).toBe(visitSession.openVisitCapacity.toString())
-            expect($('[data-test=visit-start-time]').text().trim()).toBe('10am')
-            expect($('[data-test=visit-end-time]').text().trim()).toBe('11am')
-            expect($('[data-test=visit-date]').text().trim()).toBe('Friday 14 January')
+            expect($('[data-test=capacity]').text().trim()).toBe(visitSession.openVisitCapacity.toString())
+            expect($('[data-test=visit-time]').text().trim()).toBe('9:30am to 10:30am')
+            expect($('[data-test=visit-date]').text().trim()).toBe('Saturday 12 March')
             expect($('.moj-alert__content h2').text()).toContain('Another person has booked the last table.')
             expect($('.moj-alert').text()).toContain('Select whether to book for this time or choose a new visit time.')
           })
@@ -335,7 +330,7 @@ testJourneys.forEach(journey => {
       it('should render the confirm overbooking page with all session information (Closed)', () => {
         const visitSession = TestData.visitSession({ closedVisitBookedCount: 10, closedVisitCapacity: 20 })
         visitSessionsService.getSingleVisitSession.mockResolvedValue(visitSession)
-        visitSessionData.visitSlot.visitRestriction = 'CLOSED'
+        visitSessionData.visitRestriction = 'CLOSED'
         return request(sessionApp)
           .get(`${journey.urlPrefix}/check-your-booking/overbooking`)
           .expect(200)
@@ -346,10 +341,9 @@ testJourneys.forEach(journey => {
             expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/check-your-booking`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking/overbooking`)
             expect($('[data-test=bookings-count]').text().trim()).toBe(visitSession.closedVisitBookedCount.toString())
-            expect($('[data-test=max-capacity]').text().trim()).toBe(visitSession.closedVisitCapacity.toString())
-            expect($('[data-test=visit-start-time]').text().trim()).toBe('10am')
-            expect($('[data-test=visit-end-time]').text().trim()).toBe('11am')
-            expect($('[data-test=visit-date]').text().trim()).toBe('Friday 14 January')
+            expect($('[data-test=capacity]').text().trim()).toBe(visitSession.closedVisitCapacity.toString())
+            expect($('[data-test=visit-time]').text().trim()).toBe('9:30am to 10:30am')
+            expect($('[data-test=visit-date]').text().trim()).toBe('Saturday 12 March')
           })
       })
 

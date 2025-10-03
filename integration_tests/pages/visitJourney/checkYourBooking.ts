@@ -33,14 +33,5 @@ export default class CheckYourBookingPage extends Page {
 
   changeRequestMethod = (): PageElement => cy.get('[data-test="change-request-method"]')
 
-  submitBooking = (): void => {
-    cy.get('[data-test=submit]').within(bookButton => {
-      // set a one-off event listener for window unload to check
-      // submit booking button is disabled after it is clicked
-      cy.once('window:before:unload', () => {
-        expect(bookButton.attr('disabled')).to.eq('disabled')
-      })
-      cy.wrap(bookButton).click()
-    })
-  }
+  submitBooking = (): void => this.clickDisabledOnSubmitButton('submit')
 }

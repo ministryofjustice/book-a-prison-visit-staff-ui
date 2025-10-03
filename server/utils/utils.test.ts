@@ -9,12 +9,11 @@ import {
   safeReturnUrl,
   getParsedDateFromQueryString,
   getWeekOfDatesStartingMonday,
-  isSameVisitSlot,
   initialiseName,
   isMobilePhoneNumber,
+  formatStartToEndTime,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
-import { VisitSlot } from '../@types/bapv'
 
 describe('convert to title case', () => {
   it.each([
@@ -162,77 +161,6 @@ describe('getWeekOfDatesStartingMonday', () => {
   })
 })
 
-describe('isSameVisitSlot', () => {
-  ;[
-    {
-      // Matches
-      sessionSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      originalVisitSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      expected: true,
-    },
-    {
-      // Incorrect sessionTemplateReference
-      sessionSlot: {
-        sessionTemplateReference: 'gh-ef-cd-ab',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      originalVisitSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      expected: false,
-    },
-    {
-      // Incorrect startTimestamp(time)
-      sessionSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T14:00:00',
-      },
-      originalVisitSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      expected: false,
-    },
-    {
-      // Incorrect startTimestamp(date)
-      sessionSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2021-01-01T10:00:00',
-      },
-      originalVisitSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      expected: false,
-    },
-    {
-      // Incorrect sessionTemplateReference and startTimestamp
-      sessionSlot: {
-        sessionTemplateReference: 'gh-ef-cd-ab',
-        startTimestamp: '2021-01-01T10:00:00',
-      },
-      originalVisitSlot: {
-        sessionTemplateReference: 'ab-cd-ef-gh',
-        startTimestamp: '2020-01-01T10:00:00',
-      },
-      expected: false,
-    },
-  ].forEach(testData => {
-    it(`should output ${testData.expected} when supplied with ${testData.sessionSlot.sessionTemplateReference} ${testData.sessionSlot.startTimestamp} and ${testData.originalVisitSlot.sessionTemplateReference} ${testData.originalVisitSlot.startTimestamp}`, () => {
-      expect(isSameVisitSlot(testData.sessionSlot as VisitSlot, testData.originalVisitSlot as VisitSlot)).toBe(
-        testData.expected,
-      )
-    })
-  })
-})
-
 describe('initialise name', () => {
   it.each([
     [null, null, null],
@@ -257,5 +185,19 @@ describe('isMobilePhoneNumber', () => {
     ['undefined number', undefined, false],
   ])('%s - %s - %s', (_: string, number: string, expected: boolean) => {
     expect(isMobilePhoneNumber(number)).toBe(expected)
+  })
+})
+
+describe('formatStartToEndTime', () => {
+  it.each([
+    ['10:00', '11:00', '10am to 11am'],
+    ['10:30', '12:45', '10:30am to 12:45pm'],
+    ['13:00', '14:00', '1pm to 2pm'],
+    ['13:15', '14:30', '1:15pm to 2:30pm'],
+    ['23:00', '00:00', '11pm to 12am'],
+    ['', '', ''],
+    [undefined, undefined, ''],
+  ])('%s - %s - %s', (startTime: string, endTime: string, expected: string) => {
+    expect(formatStartToEndTime(startTime, endTime)).toBe(expected)
   })
 })

@@ -46,7 +46,7 @@ describe('GET /visit/:reference/confirm-update', () => {
 
 describe('POST /visit/:reference/confirm-update', () => {
   beforeEach(() => {
-    visitSessionData = { allowOverBooking: false, prisoner: undefined }
+    visitSessionData = { allowOverBooking: false, prisoner: undefined, prisonId: '' }
 
     app = appWithAllRoutes({
       services: {},

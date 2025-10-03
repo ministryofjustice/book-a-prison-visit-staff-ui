@@ -1,6 +1,5 @@
 import type { Request, RequestHandler, Response } from 'express'
 import logger from '../../logger'
-import { isValidPrisonerNumber } from '../routes/validationChecks'
 
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
   return (req, res, next) => {
@@ -11,20 +10,11 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return logAndRedirect(req, res, '/search/prisoner/?error=missing-session')
     }
 
-    if (
-      visitSessionData.originalVisitSlot &&
-      visitSessionData.originalVisitSlot.prisonId !== selectedEstablishment.prisonId
-    ) {
+    if (visitSessionData.prisonId !== selectedEstablishment.prisonId) {
       return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 
-    if (
-      !visitSessionData.prisoner ||
-      !visitSessionData.prisoner.firstName ||
-      !visitSessionData.prisoner.lastName ||
-      !isValidPrisonerNumber(visitSessionData.prisoner.offenderNo || '') ||
-      !visitSessionData.prisoner.location
-    ) {
+    if (!visitSessionData.prisoner) {
       return logAndRedirect(req, res, '/search/prisoner/?error=missing-prisoner')
     }
 
@@ -35,19 +25,8 @@ export default function sessionCheckMiddleware({ stage }: { stage: number }): Re
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visitors`)
     }
 
-    if (
-      stage > 2 &&
-      (!visitSessionData.visitSlot ||
-        !visitSessionData.visitSlot.id ||
-        typeof visitSessionData.visitSlot.availableTables === 'undefined' ||
-        !visitSessionData.visitSlot.startTimestamp ||
-        !visitSessionData.visitSlot.endTimestamp)
-    ) {
+    if (stage > 2 && !visitSessionData.selectedVisitSession) {
       return logAndRedirect(req, res, `/prisoner/${visitSessionData.prisoner.offenderNo}?error=missing-visit`)
-    }
-
-    if (stage > 2 && visitSessionData.visitSlot.prisonId !== selectedEstablishment.prisonId) {
-      return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 
     if (stage > 2 && !visitSessionData.applicationReference) {

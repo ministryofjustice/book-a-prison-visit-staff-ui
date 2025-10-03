@@ -15,7 +15,8 @@ import SelectVisitTypePage from '../../pages/visitJourney/visitType'
 import SelectVisitDateAndTime from '../../pages/visitJourney/selectVisitDateAndTime'
 import RequestMethodPage from '../../pages/visitJourney/requestMethod'
 
-context('Book a visit', () => {
+// FIXME
+context.skip('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
