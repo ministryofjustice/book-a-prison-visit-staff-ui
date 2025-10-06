@@ -104,7 +104,7 @@
 
                 {%- if sessionCount -%}
                   <a id="day-link-{{ day.date }}" href="#day-group-{{ day.date }}">
-                    {{- day.date | formatDate("d") -}}
+                    {{- day.date | formatDate("d") }}
                     <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ sessionCount }} visit {{ "time" | pluralise(sessionCount) }}</span>
                   </a>
                 {% else -%}
@@ -221,7 +221,7 @@
 
         {{ govukButton({
           text: "Continue",
-          attributes: { "data-test": "continue-button" },
+          attributes: { "data-test": "submit" },
           preventDoubleClick: true
         }) }}
       </form>
