@@ -36,19 +36,16 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const { prisonId, policyNoticeDaysMax } = req.session.selectedEstablishment
+    const { prisonId, policyNoticeDaysMin, policyNoticeDaysMax } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
     const errors = req.flash('errors')
     const messages: MoJAlert[] = req.flash('messages')
 
     // calculate min booking window and any override or bans in place
-    const policyNoticeDaysMin = visitSessionData.overrideBookingWindow
-      ? 0
-      : req.session.selectedEstablishment.policyNoticeDaysMin + 1 // ensure 'full' min days
-
-    const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
-    const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
+    const adjustedPolicyNoticeDaysMin = visitSessionData.overrideBookingWindow ? 0 : policyNoticeDaysMin + 1 // + 1 to ensure 'full' min days
+    const isBanActive = visitSessionData.daysUntilBanExpiry > adjustedPolicyNoticeDaysMin
+    const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : adjustedPolicyNoticeDaysMin
 
     const { calendar, scheduledEventsAvailable } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
       username: res.locals.user.username,
@@ -77,59 +74,20 @@ export default class DateAndTime {
     const allVisitSessions: CalendarVisitSession[] = calendar.reduce((acc, cur) => acc.concat(cur.visitSessions), [])
     visitSessionData.allVisitSessions = allVisitSessions
 
-    // TODO move setting messages elsewhere?
-    if (isBanActive) {
-      messages.push({
-        variant: 'information',
-        title: 'A selected visitor is banned',
-        showTitleAsHeading: true,
-        text: 'Visit times during the period of the ban are not shown.',
-      })
-    }
+    // Add any additional messages
+    messages.push(...this.getAdditionalMessages(isUpdate, isBanActive, visitSessionData))
 
-    // Messages to add if updating and no session selected yet
-    if (isUpdate && !visitSessionData.selectedVisitSession) {
-      const isOriginalSessionAvailable = this.isVisitSessionAvailable(
-        visitSessionData.originalVisitSession,
-        allVisitSessions,
-      )
+    // Populate formValues if returning to the page or update journey
+    const selectedVisitSessionId = this.isVisitSessionAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
+      ? `${visitSessionData.selectedVisitSession.date}_${visitSessionData.selectedVisitSession.sessionTemplateReference}`
+      : undefined
 
-      if (!isOriginalSessionAvailable) {
-        messages.push({
-          variant: 'error',
-          title: 'The prisoner’s information has changed',
-          showTitleAsHeading: true,
-          text: 'Select a new visit time.',
-        })
-      }
-
-      const visitRestrictionHasChanged =
-        visitSessionData.visitRestriction !== visitSessionData.originalVisitSession.visitRestriction
-      if (visitRestrictionHasChanged) {
-        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
-
-        messages.push({
-          variant: 'error',
-          title: `The visit type has changed from ${restrictionChange}`,
-          showTitleAsHeading: true,
-          text: 'Select a new visit time.',
-        })
-      }
-    }
+    const originalVisitSessionId =
+      visitSessionData.originalVisitSession &&
+      `${visitSessionData.originalVisitSession.date}_${visitSessionData.originalVisitSession.sessionTemplateReference}`
 
     const formValues = {
-      // TODO simplify
-      visitSessionId: this.isVisitSessionAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
-        ? `${visitSessionData.selectedVisitSession.date}_${visitSessionData.selectedVisitSession.sessionTemplateReference}`
-        : '',
-    }
-
-    // TODO refactor alongside formValues above
-    // if update journey, default selectedVisitSession to originalVisitSession (if it's still present)
-    // is 'isUpdate' check needed?
-    if (!formValues.visitSessionId && visitSessionData.originalVisitSession) {
-      // don't need to actually check it exists?
-      formValues.visitSessionId = `${visitSessionData.originalVisitSession.date}_${visitSessionData.originalVisitSession.sessionTemplateReference}`
+      visitSessionId: selectedVisitSessionId ?? originalVisitSessionId ?? '',
     }
 
     visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
@@ -317,5 +275,55 @@ export default class DateAndTime {
   // Return radio input ID for first visit session in form e.g. "date-2025-09-01-morning"
   private getFirstVisitSessionRadioInputId(allVisitSessions: CalendarVisitSession[]): string {
     return `date-${allVisitSessions?.[0]?.date}-${allVisitSessions?.[0]?.daySection}`
+  }
+
+  // Work out any addition messages relating to bans, restriction change, etc
+  private getAdditionalMessages(
+    isUpdate: boolean,
+    isBanActive: boolean,
+    visitSessionData: VisitSessionData,
+  ): MoJAlert[] {
+    const messages: MoJAlert[] = []
+
+    if (isBanActive) {
+      messages.push({
+        variant: 'information',
+        title: 'A selected visitor is banned',
+        showTitleAsHeading: true,
+        text: 'Visit times during the period of the ban are not shown.',
+      })
+    }
+
+    // Messages to add if updating and no session selected yet
+    if (isUpdate && !visitSessionData.selectedVisitSession) {
+      const isOriginalSessionAvailable = this.isVisitSessionAvailable(
+        visitSessionData.originalVisitSession,
+        visitSessionData.allVisitSessions,
+      )
+
+      if (!isOriginalSessionAvailable) {
+        messages.push({
+          variant: 'error',
+          title: 'The prisoner’s information has changed',
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
+
+      const visitRestrictionHasChanged =
+        visitSessionData.visitRestriction !== visitSessionData.originalVisitSession.visitRestriction
+      if (visitRestrictionHasChanged) {
+        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+
+        messages.push({
+          variant: 'error',
+          title: `The visit type has changed from ${restrictionChange}`,
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
+    }
+
+    return messages
   }
 }
