@@ -1,10 +1,30 @@
 import type { Request, Response } from 'express'
-import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
-import { BookOrUpdate, MoJAlert, VisitSessionData } from '../../@types/bapv'
+import { body, matchedData, Meta, ValidationChain, ValidationError, validationResult } from 'express-validator'
+import { BookOrUpdate, FlashFormValues, MoJAlert, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
-import { CalendarVisitSession } from '../../services/visitSessionsService'
+import { CalendarDay, CalendarVisitSession } from '../../services/visitSessionsService'
+
+export type DateAndTimePageData = {
+  urlPrefix: string
+  errors: ValidationError[]
+  formValues: FlashFormValues
+  messages: MoJAlert[]
+  prisonerName: string
+  prisonerLocation: string
+  visitRestriction: VisitSessionData['visitRestriction']
+  policyNoticeDaysMax: number
+  calendar: CalendarDay[]
+  originalVisitSession: VisitSessionData['originalVisitSession']
+  firstVisitSessionRadioInputId: string
+  scheduledEventsAvailable: boolean
+}
+
+export type DateAndTimeNoVisitSessionsPageData = Pick<
+  DateAndTimePageData,
+  'urlPrefix' | 'messages' | 'prisonerName' | 'prisonerLocation' | 'visitRestriction'
+>
 
 export default class DateAndTime {
   constructor(
@@ -19,6 +39,7 @@ export default class DateAndTime {
     const { prisonId, policyNoticeDaysMax } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
+    const errors = req.flash('errors')
     const messages: MoJAlert[] = req.flash('messages')
 
     // calculate min booking window and any override or bans in place
@@ -41,12 +62,15 @@ export default class DateAndTime {
 
     const isAtLeastOneVisitSession = calendar.some(day => day.visitSessions.length > 0)
     if (!isAtLeastOneVisitSession) {
-      return res.render('pages/bookAVisit/dateAndTimeNoVisitSessions', {
+      const data: DateAndTimeNoVisitSessionsPageData = {
+        urlPrefix: getUrlPrefix(isUpdate),
         messages,
         prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
         prisonerLocation: visitSessionData.prisoner.location,
         visitRestriction: visitSessionData.visitRestriction,
-      })
+      }
+
+      return res.render('pages/bookAVisit/dateAndTimeNoVisitSessions', data)
     }
 
     // store visit sessions for use in validation
@@ -110,9 +134,9 @@ export default class DateAndTime {
 
     visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
 
-    return res.render('pages/bookAVisit/dateAndTime', {
+    const data: DateAndTimePageData = {
       urlPrefix: getUrlPrefix(isUpdate),
-      errors: req.flash('errors'),
+      errors,
       formValues,
       messages,
       prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
@@ -123,7 +147,9 @@ export default class DateAndTime {
       originalVisitSession: visitSessionData.originalVisitSession,
       firstVisitSessionRadioInputId: this.getFirstVisitSessionRadioInputId(visitSessionData.allVisitSessions),
       scheduledEventsAvailable,
-    })
+    }
+
+    return res.render('pages/bookAVisit/dateAndTime', data)
   }
 
   async post(req: Request, res: Response): Promise<void> {
