@@ -262,7 +262,8 @@ export default class DateAndTime {
     // if updating an existing booking, don't treat as an overbooking
     if (isUpdate) {
       const isOriginalSession =
-        originalVisitSession.date === selectedVisitSession.date && originalVisitSession.sessionTemplateReference
+        originalVisitSession.date === selectedVisitSession.date &&
+        originalVisitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
 
       if (isOriginalSession) {
         return false
