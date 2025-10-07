@@ -1,36 +1,6 @@
 import type { Request } from 'express'
 import type { SessionData } from 'express-session'
-import { FlashFormValues, VisitSlot, VisitSlotList } from '../@types/bapv'
-
-export const getSelectedSlot = (slotsList: VisitSlotList, selectedSlot: string): VisitSlot => {
-  return Object.values(slotsList)
-    .flat()
-    .reduce((allSlots, slot) => {
-      return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
-    }, [])
-    .find(slot => slot.id === selectedSlot)
-}
-
-export const getMatchingSlot = (
-  slotsList: VisitSlotList,
-  startTimestamp: string,
-  endTimestamp: string,
-  visitRestriction: string,
-  sessionTemplateReference: string,
-): VisitSlot => {
-  return Object.values(slotsList)
-    .flat()
-    .reduce((allSlots, slot) => {
-      return allSlots.concat(slot.slots.morning, slot.slots.afternoon)
-    }, [])
-    .find(
-      slot =>
-        slot.startTimestamp === startTimestamp &&
-        slot.endTimestamp === endTimestamp &&
-        slot.visitRestriction === visitRestriction &&
-        slot.sessionTemplateReference === sessionTemplateReference,
-    )
-}
+import { FlashFormValues } from '../@types/bapv'
 
 export const getFlashFormValues = (req: Request): FlashFormValues => {
   return req.flash('formValues')?.[0] || {}

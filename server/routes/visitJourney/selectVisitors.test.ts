@@ -15,6 +15,7 @@ const prisonerVisitorsService = createMockPrisonerVisitorsService()
 const supportedPrisonsService = createMockSupportedPrisonsService()
 
 let visitSessionData: VisitSessionData
+const prisonId = 'HEI'
 
 // run tests for booking and update journeys
 const testJourneys = [
@@ -107,6 +108,7 @@ testJourneys.forEach(journey => {
           alerts: [],
           restrictions: [],
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitReference: 'ab-cd-ef-gh',
       }
@@ -617,6 +619,7 @@ testJourneys.forEach(journey => {
           location: 'location place',
           restrictions: [],
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitReference,
       }

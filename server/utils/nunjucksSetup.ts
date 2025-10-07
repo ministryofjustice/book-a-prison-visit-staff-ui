@@ -4,7 +4,7 @@ import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import { FieldValidationError } from 'express-validator'
-import { initialiseName, properCaseFullName } from './utils'
+import { formatStartToEndTime, initialiseName, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
 import { Address } from '../data/prisonerContactRegistryApiTypes'
@@ -154,6 +154,10 @@ export function registerNunjucks(app?: express.Express): Environment {
 
   njkEnv.addFilter('formatAddress', (address: Address, noAddressText = 'Not entered') => {
     return address ? getFormattedAddress(address) : noAddressText
+  })
+
+  njkEnv.addFilter('formatStartToEndTime', ({ startTime, endTime }: { startTime: string; endTime: string }) => {
+    return formatStartToEndTime(startTime, endTime)
   })
 
   return njkEnv

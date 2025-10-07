@@ -7,7 +7,9 @@ import {
   OffenderRestriction,
   PrisonDto,
   PrisonerProfile,
+  PrisonerScheduledEventDto,
   SessionCapacity,
+  SessionsAndScheduleDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
@@ -21,6 +23,8 @@ import {
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
+  VisitSessionsAndScheduleDto,
+  VisitSessionV2Dto,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
@@ -284,6 +288,20 @@ export default class TestData {
       visits,
     }) as PrisonerProfile
 
+  static prisonerScheduledEvent = ({
+    eventType = 'PRISON_ACT',
+    eventSubTypeDesc = 'Prison activities',
+    eventSourceDesc = 'Educational activity',
+    startTime = '10:00',
+    endTime = '11:00',
+  }: Partial<PrisonerScheduledEventDto> = {}): PrisonerScheduledEventDto => ({
+    eventType,
+    eventSubTypeDesc,
+    eventSourceDesc,
+    startTime,
+    endTime,
+  })
+
   // Visitor restrictions
   static restriction = ({
     restrictionId = 1,
@@ -303,6 +321,7 @@ export default class TestData {
     comment,
   })
 
+  // TODO remove
   static scheduledEvent = ({
     bookingId = 12345,
     startTime = '2022-02-14T10:00:00',
@@ -317,6 +336,16 @@ export default class TestData {
 
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed }) as SessionCapacity
+
+  static sessionsAndScheduleDto = ({
+    date = '2022-01-14',
+    visitSessions = [this.visitSessionV2()],
+    scheduledEvents = [this.prisonerScheduledEvent()],
+  }: Partial<SessionsAndScheduleDto> = {}): SessionsAndScheduleDto => ({
+    date,
+    visitSessions,
+    scheduledEvents,
+  })
 
   static sessionSchedule = ({
     sessionTemplateReference = '-afe.dcc.0f',
@@ -719,6 +748,7 @@ export default class TestData {
     mainContact,
   })
 
+  // TODO remove
   static visitSession = ({
     sessionTemplateReference = 'v9d.7ed.7u',
     visitRoom = 'Visit room 1',
@@ -743,6 +773,36 @@ export default class TestData {
     startTimestamp,
     endTimestamp,
     sessionConflicts,
+  })
+
+  static visitSessionV2 = ({
+    sessionTemplateReference = 'v9d.7ed.7u',
+    visitRoom = 'Visit room 1',
+    openVisitCapacity = 20,
+    openVisitBookedCount = 2,
+    closedVisitCapacity = 2,
+    closedVisitBookedCount = 1,
+    startTime = '10:00',
+    endTime = '11:00',
+    sessionConflicts = [],
+  }: Partial<VisitSessionV2Dto> = {}): VisitSessionV2Dto => ({
+    sessionTemplateReference,
+    visitRoom,
+    openVisitCapacity,
+    openVisitBookedCount,
+    closedVisitCapacity,
+    closedVisitBookedCount,
+    startTime,
+    endTime,
+    sessionConflicts,
+  })
+
+  static visitSessionsAndSchedule = ({
+    scheduledEventsAvailable = true,
+    sessionsAndSchedule = [this.sessionsAndScheduleDto()],
+  }: Partial<VisitSessionsAndScheduleDto> = {}): VisitSessionsAndScheduleDto => ({
+    scheduledEventsAvailable,
+    sessionsAndSchedule,
   })
 
   static visitSummary = ({

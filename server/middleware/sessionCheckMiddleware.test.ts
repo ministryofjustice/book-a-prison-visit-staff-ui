@@ -32,16 +32,13 @@ const visitorsData: VisitSessionData['visitors'] = [
     banned: false,
   },
 ]
-const visitSlot: VisitSessionData['visitSlot'] = {
-  id: '1',
+const selectedVisitSession: VisitSessionData['selectedVisitSession'] = {
+  date: '2025-09-25',
   sessionTemplateReference: 'v9d.7ed.7u',
-  prisonId,
-  startTimestamp: '123',
-  endTimestamp: '123',
-  availableTables: 1,
-  capacity: 30,
-  visitRoom: 'visitRoom',
-  visitRestriction: 'OPEN',
+  startTime: '09:00',
+  endTime: '10:00',
+  availableTables: 5,
+  capacity: 10,
 }
 const visitRestriction: VisitSessionData['visitRestriction'] = 'OPEN'
 
@@ -76,72 +73,41 @@ describe('sessionCheckMiddleware', () => {
     expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-session')
   })
 
-  it('should redirect to the start page if prisonId in originalVisitSlot (set for update journey) does not match selected establishment', () => {
+  it('should redirect to the start page if prisonId in visit session date does not match selected establishment', () => {
     req.session.selectedEstablishment = TestData.prison({
       prisonId: 'BLI',
       prisonName: 'Bristol (HMP)',
     })
-    req.session.visitSessionData = { originalVisitSlot: visitSlot } as VisitSessionData
+    req.session.visitSessionData = { prisonId } as VisitSessionData
 
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
     expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
   })
 
-  describe('prisoner and allowOverBooking data missing', () => {
-    ;[
-      {
-        allowOverBooking: {},
-        prisoner: {},
+  it('should redirect to the prisoner search page when prisoner data missing', () => {
+    req.session.visitSessionData = { prisonId } as VisitSessionData
+
+    sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-prisoner')
+  })
+
+  it('should not redirect if prisoner data present at stage 1', () => {
+    req.session.visitSessionData = {
+      allowOverBooking: false,
+      prisoner: {
+        firstName: 'prisoner',
+        lastName: 'name',
+        offenderNo: 'A1234BC',
+        location: 'abc',
       },
-      {
-        allowOverBooking: false,
-        prisoner: {
-          firstName: 'prisoner',
-          lastName: 'name',
-        },
-      },
-      {
-        allowOverBooking: false,
-        prisoner: {
-          firstName: 'prisoner',
-          lastName: 'name',
-          offenderNo: 'A1234BC',
-        },
-      },
-      {
-        allowOverBooking: false,
-        prisoner: {
-          firstName: 'prisoner',
-          lastName: 'name',
-          offenderNo: 'A1234BC',
-        },
-      },
-    ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the prisoner search page when there are missing bits of prisoner data', () => {
-        req.session.visitSessionData = testData
+      prisonId,
+    }
 
-        sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
+    sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/search/prisoner/?error=missing-prisoner')
-      })
-    })
-
-    it('should not redirect when there are no bits of missing prisoner data at stage 1', () => {
-      req.session.visitSessionData = {
-        allowOverBooking: false,
-        prisoner: {
-          firstName: 'prisoner',
-          lastName: 'name',
-          offenderNo: 'A1234BC',
-          location: 'abc',
-        },
-      }
-
-      sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).not.toHaveBeenCalled()
-    })
+    expect(mockResponse.redirect).not.toHaveBeenCalled()
   })
 
   describe('visitors and visit restriction data missing', () => {
@@ -149,15 +115,18 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
       },
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
       },
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitors: [],
       },
@@ -177,6 +146,7 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
@@ -184,6 +154,7 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
@@ -194,6 +165,7 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
@@ -205,6 +177,7 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
@@ -217,6 +190,7 @@ describe('sessionCheckMiddleware', () => {
       {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
@@ -235,56 +209,6 @@ describe('sessionCheckMiddleware', () => {
         expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit')
       })
     })
-
-    it('should redirect to the start page if prisonId in visitSlot does not match selected establishment', () => {
-      req.session.selectedEstablishment = TestData.prison({
-        prisonId: 'BLI',
-        prisonName: 'Bristol (HMP)',
-      })
-      req.session.visitSessionData = {
-        allowOverBooking: false,
-        applicationReference: 'aaa-bbb-ccc',
-        prisoner: prisonerData,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visitReference: 'ab-cd-ef-gh',
-        visitSlot: {
-          id: '1',
-          prisonId,
-          availableTables: 0,
-          startTimestamp: '123',
-          endTimestamp: '123',
-        } as VisitSlot,
-      }
-
-      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).toHaveBeenCalledWith('/?error=establishment-mismatch')
-    })
-
-    it('should not reject a fully booked (zero capacity) visit', () => {
-      req.session.visitSessionData = {
-        allowOverBooking: false,
-        applicationReference: 'aaa-bbb-ccc',
-        prisoner: prisonerData,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visitReference: 'ab-cd-ef-gh',
-        visitSlot: {
-          id: '1',
-          prisonId,
-          availableTables: 0,
-          startTimestamp: '123',
-          endTimestamp: '123',
-        } as VisitSlot,
-      }
-
-      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
-
-      expect(mockResponse.redirect).not.toHaveBeenCalled()
-    })
   })
 
   describe('application reference', () => {
@@ -292,8 +216,9 @@ describe('sessionCheckMiddleware', () => {
       const testData: VisitSessionData = {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
       }
@@ -312,8 +237,9 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
         visitReference: 'ab-cd-ef-gh',
@@ -333,8 +259,9 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
@@ -344,8 +271,9 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
@@ -371,8 +299,9 @@ describe('sessionCheckMiddleware', () => {
         allowOverBooking: false,
         applicationReference: 'aaa-bbb-ccc',
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },
@@ -406,8 +335,9 @@ describe('sessionCheckMiddleware', () => {
       const testData: VisitSessionData = {
         allowOverBooking: false,
         prisoner: prisonerData,
+        prisonId,
         visitRestriction,
-        visitSlot,
+        selectedVisitSession,
         visitorIds,
         visitors: visitorsData,
         visitorSupport: { description: '' },

@@ -1,11 +1,30 @@
 import type { Request, Response } from 'express'
-import { body, ValidationChain, validationResult } from 'express-validator'
-import { BookOrUpdate, MoJAlert, VisitSlot } from '../../@types/bapv'
+import { body, matchedData, Meta, ValidationChain, ValidationError, validationResult } from 'express-validator'
+import { BookOrUpdate, FlashFormValues, MoJAlert, VisitSessionData } from '../../@types/bapv'
 import AuditService from '../../services/auditService'
-import { getFlashFormValues, getSelectedSlot, getMatchingSlot } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { VisitService, VisitSessionsService } from '../../services'
-import { isSameVisitSlot } from '../../utils/utils'
+import { CalendarDay, CalendarVisitSession } from '../../services/visitSessionsService'
+
+export type DateAndTimePageData = {
+  urlPrefix: string
+  errors: ValidationError[]
+  formValues: FlashFormValues
+  messages: MoJAlert[]
+  prisonerName: string
+  prisonerLocation: string
+  visitRestriction: VisitSessionData['visitRestriction']
+  policyNoticeDaysMax: number
+  calendar: CalendarDay[]
+  originalVisitSession: VisitSessionData['originalVisitSession']
+  firstVisitSessionRadioInputId: string
+  scheduledEventsAvailable: boolean
+}
+
+export type DateAndTimeNoVisitSessionsPageData = Pick<
+  DateAndTimePageData,
+  'urlPrefix' | 'messages' | 'prisonerName' | 'prisonerLocation' | 'visitRestriction'
+>
 
 export default class DateAndTime {
   constructor(
@@ -17,112 +36,78 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const { prisonId } = req.session.selectedEstablishment
+    const { prisonId, policyNoticeDaysMin, policyNoticeDaysMax } = req.session.selectedEstablishment
     const { visitSessionData } = req.session
 
+    const errors = req.flash('errors')
     const messages: MoJAlert[] = req.flash('messages')
 
     // calculate min booking window and any override or bans in place
-    const policyNoticeDaysMin = visitSessionData.overrideBookingWindow
-      ? 0
-      : req.session.selectedEstablishment.policyNoticeDaysMin + 1 // ensure 'full' min days
+    const adjustedPolicyNoticeDaysMin = visitSessionData.overrideBookingWindow ? 0 : policyNoticeDaysMin + 1 // + 1 to ensure 'full' min days
+    const isBanActive = visitSessionData.daysUntilBanExpiry > adjustedPolicyNoticeDaysMin
+    const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : adjustedPolicyNoticeDaysMin
 
-    const isBanActive = visitSessionData.daysUntilBanExpiry > policyNoticeDaysMin
-    const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : policyNoticeDaysMin
-
-    if (isBanActive) {
-      messages.push({
-        variant: 'information',
-        title: 'A selected visitor is banned',
-        showTitleAsHeading: true,
-        text: 'Visit times during the period of the ban are not shown.',
-      })
-    }
-
-    const { slotsList, whereaboutsAvailable } = await this.visitSessionsService.getVisitSessions({
+    const { calendar, scheduledEventsAvailable } = await this.visitSessionsService.getVisitSessionsAndScheduleCalendar({
       username: res.locals.user.username,
-      offenderNo: visitSessionData.prisoner.offenderNo,
-      visitRestriction: visitSessionData.visitRestriction,
       prisonId,
+      prisonerId: visitSessionData.prisoner.offenderNo,
       minNumberOfDays,
+      visitRestriction: visitSessionData.visitRestriction,
+      selectedVisitSession: visitSessionData.selectedVisitSession,
+      originalVisitSession: visitSessionData.originalVisitSession,
     })
 
-    // first time here on update journey, visitSlot.id will be ''
-    if (isUpdate && visitSessionData.visitSlot?.id === '') {
-      const matchingSlot = getMatchingSlot(
-        slotsList,
-        visitSessionData.visitSlot.startTimestamp,
-        visitSessionData.visitSlot.endTimestamp,
-        visitSessionData.visitRestriction,
-        visitSessionData.visitSlot.sessionTemplateReference,
-      )
-
-      if (
-        matchingSlot &&
-        (matchingSlot.availableTables > 0 ||
-          visitSessionData.visitRestriction === visitSessionData.originalVisitSlot.visitRestriction)
-      ) {
-        visitSessionData.visitSlot.id = matchingSlot.id
+    const isAtLeastOneVisitSession = calendar.some(day => day.visitSessions.length > 0)
+    if (!isAtLeastOneVisitSession) {
+      const data: DateAndTimeNoVisitSessionsPageData = {
+        urlPrefix: getUrlPrefix(isUpdate),
+        messages,
+        prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
+        prisonerLocation: visitSessionData.prisoner.location,
+        visitRestriction: visitSessionData.visitRestriction,
       }
 
-      if (!matchingSlot) {
-        messages.push({
-          variant: 'error',
-          title: 'The prisoner’s information has changed',
-          showTitleAsHeading: true,
-          text: 'Select a new visit time.',
-        })
-      }
-
-      if (visitSessionData.visitRestriction !== visitSessionData.originalVisitSlot.visitRestriction) {
-        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
-
-        messages.push({
-          variant: 'error',
-          title: `The visit type has changed from ${restrictionChange}`,
-          showTitleAsHeading: true,
-          text: 'Select a new visit time.',
-        })
-      }
+      return res.render('pages/bookAVisit/dateAndTimeNoVisitSessions', data)
     }
 
-    // matching on original time but session's current visit restriction to ensure
-    // originally selected time slot is available for re-selection even if restriction changes
-    const originalVisitSlot = visitSessionData.originalVisitSlot
-      ? getMatchingSlot(
-          slotsList,
-          visitSessionData.originalVisitSlot.startTimestamp,
-          visitSessionData.originalVisitSlot.endTimestamp,
-          visitSessionData.visitRestriction,
-          visitSessionData.originalVisitSlot.sessionTemplateReference,
-        )
+    // store visit sessions for use in validation
+    const allVisitSessions: CalendarVisitSession[] = calendar.reduce((acc, cur) => acc.concat(cur.visitSessions), [])
+    visitSessionData.allVisitSessions = allVisitSessions
+
+    // Add any additional messages
+    messages.push(...this.getAdditionalMessages(isUpdate, isBanActive, visitSessionData))
+
+    // Populate formValues if returning to the page or update journey
+    const selectedVisitSessionId = this.isVisitSessionAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
+      ? `${visitSessionData.selectedVisitSession.date}_${visitSessionData.selectedVisitSession.sessionTemplateReference}`
       : undefined
 
-    const formValues = getFlashFormValues(req)
-    if (!Object.keys(formValues).length && visitSessionData.visitSlot?.id) {
-      formValues['visit-date-and-time'] = visitSessionData.visitSlot?.id
+    const originalVisitSessionId =
+      visitSessionData.originalVisitSession &&
+      `${visitSessionData.originalVisitSession.date}_${visitSessionData.originalVisitSession.sessionTemplateReference}`
+
+    const formValues = {
+      visitSessionId: selectedVisitSessionId ?? originalVisitSessionId ?? '',
     }
-
-    const slotsPresent = Object.values(slotsList).some(value => value.length)
-
-    req.session.slotsList = slotsList
 
     visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
 
-    res.render('pages/bookAVisit/dateAndTime', {
-      errors: req.flash('errors'),
-      messages,
-      visitRestriction: visitSessionData.visitRestriction,
-      prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
-      offenderNo: visitSessionData.prisoner.offenderNo,
-      location: visitSessionData.prisoner.location,
-      whereaboutsAvailable,
-      slotsList,
-      formValues,
-      slotsPresent,
-      originalVisitSlot,
+    const data: DateAndTimePageData = {
       urlPrefix: getUrlPrefix(isUpdate),
-    })
+      errors,
+      formValues,
+      messages,
+      prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
+      prisonerLocation: visitSessionData.prisoner.location,
+      visitRestriction: visitSessionData.visitRestriction,
+      policyNoticeDaysMax,
+      calendar,
+      originalVisitSession: visitSessionData.originalVisitSession,
+      firstVisitSessionRadioInputId: this.getFirstVisitSessionRadioInputId(visitSessionData.allVisitSessions),
+      scheduledEventsAvailable,
+    }
+
+    return res.render('pages/bookAVisit/dateAndTime', data)
   }
 
   async post(req: Request, res: Response): Promise<void> {
@@ -133,24 +118,29 @@ export default class DateAndTime {
     const urlPrefix = getUrlPrefix(isUpdate)
 
     if (!errors.isEmpty()) {
-      req.flash('errors', errors.array() as [])
-      req.flash('formValues', req.body)
+      const errorsArray = errors.array()
+      if (errorsArray[0].type === 'field') {
+        // update the path in error obj to match ID of first radio input so ErrorSummary link works correctly
+        const firstVisitSessionRadioInputId = this.getFirstVisitSessionRadioInputId(visitSessionData.allVisitSessions)
+        errorsArray[0].path = firstVisitSessionRadioInputId
+      }
+      req.flash('errors', errorsArray)
       return res.redirect(`${urlPrefix}/select-date-and-time`)
     }
 
-    visitSessionData.visitSlot = getSelectedSlot(req.session.slotsList, req.body['visit-date-and-time'])
+    const { visitSessionId } = matchedData<{ visitSessionId: string }>(req)
+    const selectedVisitSession = this.getSelectedVisitSession(visitSessionData.allVisitSessions, visitSessionId)
+    visitSessionData.selectedVisitSession = {
+      date: selectedVisitSession.date,
+      sessionTemplateReference: selectedVisitSession.sessionTemplateReference,
+      startTime: selectedVisitSession.startTime,
+      endTime: selectedVisitSession.endTime,
+      availableTables: selectedVisitSession.availableTables,
+      capacity: selectedVisitSession.capacity,
+    }
 
-    const isOriginalSlot = isUpdate
-      ? isSameVisitSlot(visitSessionData.visitSlot, visitSessionData.originalVisitSlot)
-      : false
-
-    // If 'available tables is less than or equal to zero
-    if (visitSessionData.visitSlot.availableTables <= 0) {
-      // If on update journey, and not the original slot OR is not update journey
-      if ((isUpdate && !isOriginalSlot) || !isUpdate) {
-        // show overbooking page
-        return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
-      }
+    if (this.isAnOverbooking(isUpdate, selectedVisitSession, visitSessionData.originalVisitSession)) {
+      return res.redirect(`${urlPrefix}/select-date-and-time/overbooking`)
     }
 
     await this.reserveOrChangeApplication(req, res)
@@ -166,7 +156,7 @@ export default class DateAndTime {
 
     const { confirmOverBooking } = req.body // this will be set if we have come from overbooking confirmation page
     if (confirmOverBooking === 'no') {
-      delete visitSessionData.visitSlot
+      delete visitSessionData.selectedVisitSession
       return res.redirect(`${urlPrefix}/select-date-and-time`) // i.e. return early if we're going to
     }
     if (confirmOverBooking === 'yes') {
@@ -185,6 +175,7 @@ export default class DateAndTime {
 
   private async reserveOrChangeApplication(req: Request, res: Response): Promise<void> {
     const { visitSessionData } = req.session
+    const { prisonId } = req.session.selectedEstablishment
     const isUpdate = this.mode === 'update'
 
     // See README ('Visit journeys – book and update') for explanation of this flow
@@ -209,14 +200,15 @@ export default class DateAndTime {
       visitSessionData.applicationReference = reference
     }
 
+    const { date, startTime, endTime } = visitSessionData.selectedVisitSession
     await this.auditService.reservedVisit({
       applicationReference: visitSessionData.applicationReference,
       visitReference: visitSessionData.visitReference,
       prisonerId: visitSessionData.prisoner.offenderNo,
-      prisonId: visitSessionData.visitSlot.prisonId,
+      prisonId,
       visitorIds: visitSessionData.visitors.map(visitor => visitor.personId.toString()),
-      startTimestamp: visitSessionData.visitSlot.startTimestamp,
-      endTimestamp: visitSessionData.visitSlot.endTimestamp,
+      startTimestamp: `${date}T${startTime}:00`,
+      endTimestamp: `${date}T${endTime}:00`,
       visitRestriction: visitSessionData.visitRestriction,
       username: res.locals.user.username,
       operationId: res.locals.appInsightsOperationId,
@@ -224,15 +216,114 @@ export default class DateAndTime {
   }
 
   validate(): ValidationChain {
-    return body('visit-date-and-time').custom((value: string, { req }) => {
-      // check selected slot is in the list that was shown
-      const selectedSlot: VisitSlot = getSelectedSlot(req.session.slotsList, value)
+    return body('visitSessionId')
+      .custom((visitSessionId: string, { req }: Meta & { req: Express.Request }) => {
+        return !!this.getSelectedVisitSession(req.session.visitSessionData.allVisitSessions, visitSessionId)
+      })
+      .withMessage('No visit time selected')
+  }
 
-      if (selectedSlot === undefined) {
-        throw new Error('No time slot selected')
+  private getSelectedVisitSession(
+    allVisitSessions: CalendarVisitSession[],
+    visitSessionId: string,
+  ): CalendarVisitSession | undefined {
+    const [date, sessionTemplateReference] = visitSessionId.split('_')
+    return allVisitSessions?.find(
+      visitSession => visitSession.date === date && visitSession.sessionTemplateReference === sessionTemplateReference,
+    )
+  }
+
+  private isVisitSessionAvailable(
+    visitSession: VisitSessionData['selectedVisitSession'] | VisitSessionData['originalVisitSession'],
+    allVisitSessions: CalendarVisitSession[],
+  ): boolean {
+    if (!visitSession) {
+      return false
+    }
+
+    return allVisitSessions.some(
+      session =>
+        session.date === visitSession.date &&
+        session.sessionTemplateReference === visitSession.sessionTemplateReference,
+    )
+  }
+
+  private isAnOverbooking(
+    isUpdate: boolean,
+    selectedVisitSession: VisitSessionData['selectedVisitSession'],
+    originalVisitSession: VisitSessionData['originalVisitSession'],
+  ): boolean {
+    const isOverbooked = selectedVisitSession.availableTables <= 0
+
+    if (!isOverbooked) {
+      return false
+    }
+
+    // if updating an existing booking, don't treat as an overbooking
+    if (isUpdate) {
+      const isOriginalSession =
+        originalVisitSession.date === selectedVisitSession.date && originalVisitSession.sessionTemplateReference
+
+      if (isOriginalSession) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  // Return radio input ID for first visit session in form e.g. "date-2025-09-01-morning"
+  private getFirstVisitSessionRadioInputId(allVisitSessions: CalendarVisitSession[]): string {
+    return `date-${allVisitSessions?.[0]?.date}-${allVisitSessions?.[0]?.daySection}`
+  }
+
+  // Work out any addition messages relating to bans, restriction change, etc
+  private getAdditionalMessages(
+    isUpdate: boolean,
+    isBanActive: boolean,
+    visitSessionData: VisitSessionData,
+  ): MoJAlert[] {
+    const messages: MoJAlert[] = []
+
+    if (isBanActive) {
+      messages.push({
+        variant: 'information',
+        title: 'A selected visitor is banned',
+        showTitleAsHeading: true,
+        text: 'Visit times during the period of the ban are not shown.',
+      })
+    }
+
+    // Messages to add if updating and no session selected yet
+    if (isUpdate && !visitSessionData.selectedVisitSession) {
+      const isOriginalSessionAvailable = this.isVisitSessionAvailable(
+        visitSessionData.originalVisitSession,
+        visitSessionData.allVisitSessions,
+      )
+
+      if (!isOriginalSessionAvailable) {
+        messages.push({
+          variant: 'error',
+          title: 'The prisoner’s information has changed',
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
       }
 
-      return true
-    })
+      const visitRestrictionHasChanged =
+        visitSessionData.visitRestriction !== visitSessionData.originalVisitSession.visitRestriction
+      if (visitRestrictionHasChanged) {
+        const restrictionChange = visitSessionData.visitRestriction === 'OPEN' ? 'closed to open.' : 'open to closed.'
+
+        messages.push({
+          variant: 'error',
+          title: `The visit type has changed from ${restrictionChange}`,
+          showTitleAsHeading: true,
+          text: 'Select a new visit time.',
+        })
+      }
+    }
+
+    return messages
   }
 }
