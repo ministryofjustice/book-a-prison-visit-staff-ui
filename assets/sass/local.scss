@@ -18,44 +18,6 @@
   white-space: nowrap;
 }
 
-.bapv-radio-paragraph {
-  margin-top: -govuk-spacing(2);
-  margin-bottom: 0;
-}
-
-.govuk-accordion__section-heading-text-focus {
-  @include govuk-font($size: 19, $weight: "bold");
-}
-
-.bapv-visit-date-time-filter {
-  padding: govuk-spacing(4) govuk-spacing(4) 0;
-  background-color: govuk-colour("light-grey");
-  margin-bottom: govuk-spacing(4);
-
-  .govuk-button-group {
-    align-items: flex-end;
-    margin-bottom: 0;
-
-    .govuk-button {
-      margin-bottom: 32px;
-    }
-  }
-
-  .govuk-form-group {
-    margin-right: govuk-spacing(6);
-  }
-}
-
-.bapv-prisoner-event {
-  padding: govuk-spacing(2);
-  background-color: rgba(86, 148, 202, 0.25);
-  @include govuk-font($size: 16, $weight: "normal");
-}
-
-.bapv-prisoner-event--top-margin {
-  margin-top: 45px;
-}
-
 .bapv-booking-search {
   display: flex;
   align-items: center;
@@ -90,22 +52,6 @@
 
 .moj-side-navigation__title {
   color: $govuk-text-colour;
-}
-
-.bapv-morning-slots .govuk-form-group,
-.bapv-afternoon-slots .govuk-form-group {
-  margin-bottom: govuk-spacing(3);
-}
-
-.js-enabled .govuk-accordion__section-content {
-  padding-bottom: 0;
-}
-
-.js-enabled .govuk-accordion__section--expanded .govuk-accordion__section-button,
-.js-enabled .govuk-accordion__section-button {
-  padding-bottom: 0;
-  margin-bottom: 0;
-  border-bottom: 0;
 }
 
 .bapv-table-no-bottom-border .govuk-table__row:last-child .govuk-table__cell,

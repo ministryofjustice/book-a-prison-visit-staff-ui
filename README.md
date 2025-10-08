@@ -45,7 +45,6 @@ COMPONENT_API_URL="https://frontend-components-dev.hmpps.service.justice.gov.uk"
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
 PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
-WHEREABOUTS_API_URL="https://whereabouts-api-dev.service.justice.gov.uk"
 ```
 
 And then, to build the assets and start the app with nodemon:

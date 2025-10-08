@@ -29,7 +29,6 @@ import {
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
 
 export default class TestData {
@@ -319,19 +318,6 @@ export default class TestData {
     expiryDate,
     globalRestriction,
     comment,
-  })
-
-  // TODO remove
-  static scheduledEvent = ({
-    bookingId = 12345,
-    startTime = '2022-02-14T10:00:00',
-    endTime = '2022-02-14T11:00:00',
-    eventSourceDesc = 'Educational activity',
-  }: Partial<ScheduledEvent> = {}): ScheduledEvent => ({
-    bookingId,
-    startTime,
-    endTime,
-    eventSourceDesc,
   })
 
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
@@ -748,7 +734,6 @@ export default class TestData {
     mainContact,
   })
 
-  // TODO remove
   static visitSession = ({
     sessionTemplateReference = 'v9d.7ed.7u',
     visitRoom = 'Visit room 1',

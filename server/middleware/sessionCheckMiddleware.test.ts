@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Cookie } from 'express-session'
-import { VisitSessionData, VisitSlot } from '../@types/bapv'
+import { VisitSessionData } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
 import TestData from '../routes/testutils/testData'
 
@@ -141,73 +141,20 @@ describe('sessionCheckMiddleware', () => {
     })
   })
 
-  describe('visit data missing', () => {
-    ;[
-      {
+  describe('selected visit data missing', () => {
+    it('should redirect to the prisoner profile when selected visit data missing', () => {
+      req.session.visitSessionData = {
         allowOverBooking: false,
         prisoner: prisonerData,
         prisonId,
         visitRestriction,
         visitorIds,
         visitors: visitorsData,
-      },
-      {
-        allowOverBooking: false,
-        prisoner: prisonerData,
-        prisonId,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visit: {
-          id: '1',
-        } as VisitSlot,
-      },
-      {
-        allowOverBooking: false,
-        prisoner: prisonerData,
-        prisonId,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visit: {
-          id: '1',
-          startTimestamp: '123',
-        } as VisitSlot,
-      },
-      {
-        allowOverBooking: false,
-        prisoner: prisonerData,
-        prisonId,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visit: {
-          id: '1',
-          startTimestamp: '123',
-          endTimestamp: '123',
-        } as VisitSlot,
-      },
-      {
-        allowOverBooking: false,
-        prisoner: prisonerData,
-        prisonId,
-        visitRestriction,
-        visitorIds,
-        visitors: visitorsData,
-        visit: {
-          id: '1',
-          startTimestamp: '123',
-          endTimestamp: '123',
-        } as VisitSlot,
-      },
-    ].forEach((testData: VisitSessionData) => {
-      it('should redirect to the prisoner profile when there is missing visit data', () => {
-        req.session.visitSessionData = testData
+      }
 
-        sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
+      sessionCheckMiddleware({ stage: 3 })(req as Request, mockResponse as Response, next)
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit')
-      })
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/prisoner/A1234BC?error=missing-visit')
     })
   })
 

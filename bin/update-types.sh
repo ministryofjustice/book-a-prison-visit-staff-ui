@@ -16,10 +16,6 @@ APIS='{
     {
       "api": "prisoner-offender-search-api",
       "url": "https://prisoner-search-dev.prison.service.justice.gov.uk/v3/api-docs"
-    },
-    {
-      "api": "whereabouts-api",
-      "url": "https://whereabouts-api-dev.service.justice.gov.uk/v3/api-docs"
     }
   ]
 }'
