@@ -10,13 +10,13 @@ $govuk-page-width: $moj-page-width;
 @import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/footer';
 @import 'node_modules/@ministryofjustice/hmpps-connect-dps-components/dist/assets/header-bar';
 
-@import './components/bapv_spacing';
-@import './components/bapvCalendar';
+@import './components/bapv-spacing';
+@import './components/bapv-calendar';
 @import './components/card';
-@import './components/expandableComment';
+@import './components/expandable-comment';
 @import './components/block-background';
 @import './components/filter';
-@import './components/notificationTypes';
+@import './components/notification-types';
 @import './components/prisoner-profile';
-@import './components/alertsAndRestrictions';
+@import './components/alerts-and-restrictions';
 @import './local';

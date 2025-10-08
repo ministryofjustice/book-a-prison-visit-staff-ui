@@ -140,7 +140,7 @@
 
     &:focus {
       background-color: transparent;
-      box-shadow: 0 4px $govuk-focus-text-colour;
+      box-shadow: none;
     }
   }
 }

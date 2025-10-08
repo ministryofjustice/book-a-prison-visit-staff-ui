@@ -15,13 +15,18 @@ function handleSelectDate(event) {
 
   // highlight selected day
   document.querySelector(`.${calendarDayClass}[data-date='${dateToShow}']`).classList.add(calendarDaySelectedClass)
+  document.getElementById(`day-link-${dateToShow}`).blur()
 
   // show selected day's sessions
   const selectedFormGroup = document.querySelector(`.${calendarDayGroupClass}[data-date='${dateToShow}']`)
   selectedFormGroup.classList.add(calendarDayGroupActiveClass)
 
-  // focus on first visit session for selected day
+  // focus on first session for selected day (scroll to it if it's not in viewport)
   const firstSession = selectedFormGroup.querySelector('input')
+  const isFirstSessionInViewport = window.innerHeight <= firstSession.getBoundingClientRect().bottom
+  if (isFirstSessionInViewport) {
+    selectedFormGroup.scrollIntoView({ behavior: 'smooth' })
+  }
   firstSession.focus({ preventScroll: true })
 }
 
