@@ -187,7 +187,7 @@ export const formatStartToEndTime = (startTime: string, endTime: string): string
     const startTimeAs12h = format(startTimeAsDate, 'h:mmaaa')
     const endTimeAs12h = format(endTimeAsDate, 'h:mmaaa')
 
-    return `${startTimeAs12h} to ${endTimeAs12h}`.replace(/:00/g, '')
+    return `${startTimeAs12h} to ${endTimeAs12h}`.replaceAll(':00', '')
   } catch {
     return ''
   }
