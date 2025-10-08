@@ -21,13 +21,15 @@ function handleSelectDate(event) {
   const selectedFormGroup = document.querySelector(`.${calendarDayGroupClass}[data-date='${dateToShow}']`)
   selectedFormGroup.classList.add(calendarDayGroupActiveClass)
 
-  // focus on first session for selected day (scroll to it if it's not in viewport)
+  // scroll to first session for selected day if it's not in viewport
   const firstSession = selectedFormGroup.querySelector('input')
   const isFirstSessionInViewport = window.innerHeight <= firstSession.getBoundingClientRect().bottom
   if (isFirstSessionInViewport) {
     selectedFormGroup.scrollIntoView({ behavior: 'smooth' })
   }
-  firstSession.focus({ preventScroll: true })
+
+  // focus on first non-disabled session
+  selectedFormGroup.querySelector('input:not(:disabled)')?.focus({ preventScroll: true })
 }
 
 // handle clicks on the calendar days
