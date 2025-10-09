@@ -33,6 +33,7 @@ import visitsByDateRoutes from './routes/visitsByDate/visitsByDate'
 import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
+import userRoles from './constants/bapvUserRoles'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -48,7 +49,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware(['ROLE_MANAGE_PRISON_VISITS']))
+  app.use(authorisationMiddleware([userRoles.STAFF_USER]))
   app.use(setUpCsrf())
   app.get(
     '*any',

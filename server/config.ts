@@ -129,6 +129,9 @@ export default {
         ).split(',')
       ),
     },
+    bookerManagement: {
+      enabled: get('FEATURE_BOOKER_MANAGEMENT', 'false') === 'true',
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),

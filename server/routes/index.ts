@@ -3,13 +3,15 @@ import { Router } from 'express'
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
 import { Prison } from '../@types/bapv'
+import bapvUserRoles from '../constants/bapvUserRoles'
+import config from '../config'
 
 export default function routes({ visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
 
   router.get('/', async (req, res) => {
     const prison = req.session.selectedEstablishment
-    const { username } = res.locals.user
+    const { username, userRoles } = res.locals.user
 
     const showRequestedVisitsTile = isPrisonEnabledForPublic(prison)
     const requestCount = showRequestedVisitsTile
@@ -17,7 +19,11 @@ export default function routes({ visitNotificationsService, visitRequestsService
       : null
 
     const reviewCount = (await visitNotificationsService.getNotificationCount(username, prison.prisonId)).count
-    res.render('pages/index', { showRequestedVisitsTile, requestCount, reviewCount })
+
+    const showBookerManagementTile =
+      userRoles.includes(bapvUserRoles.BOOKER_ADMIN) || config.features.bookerManagement.enabled
+
+    res.render('pages/index', { showRequestedVisitsTile, requestCount, reviewCount, showBookerManagementTile })
   })
 
   router.get('/back-to-start', (req, res) => {
