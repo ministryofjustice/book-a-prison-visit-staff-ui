@@ -19,7 +19,7 @@ import {
   VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
-  VisitSession,
+  VisitSessionsAndScheduleDto,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
@@ -620,31 +620,6 @@ export default {
     })
   },
 
-  stubVisitSessions: ({
-    prisonId,
-    offenderNo,
-    visitSessions,
-    username = 'USER1',
-    min = '3',
-  }: {
-    prisonId: string
-    offenderNo: string
-    visitSessions: VisitSession[]
-    username: string
-    min: string
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}&username=${username}&userType=STAFF`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitSessions,
-      },
-    })
-  },
   stubSessionSchedule: ({
     prisonId,
     date,
@@ -697,6 +672,39 @@ export default {
       },
     })
   },
+
+  stubGetVisitSessionsAndSchedule: ({
+    prisonId = 'HEI',
+    prisonerId,
+    minNumberOfDays = 3,
+    username = 'USER1',
+    visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+    visitSessionsAndSchedule: VisitSessionsAndScheduleDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/visit-sessions-and-schedule`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          prisonerId: { equalTo: prisonerId },
+          min: { equalTo: minNumberOfDays.toString() },
+          username: { equalTo: username },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitSessionsAndSchedule,
+      },
+    })
+  },
+
   stubPrisonerProfile: (profile: PrisonerProfile): SuperAgentRequest => {
     return stubFor({
       request: {

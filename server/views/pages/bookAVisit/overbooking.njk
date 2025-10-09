@@ -19,10 +19,10 @@
 
       <p>
         <span data-test="bookings-count">{{ bookingsCount }}</span> of
-        <span data-test="max-capacity">{{ maxCapacity }}</span> {{ "table" | pluralise(maxCapacity) }} are booked for
-        <span data-test="visit-start-time">{{ visitSession.startTimestamp | formatTime }}</span> to
-        <span data-test="visit-end-time">{{ visitSession.endTimestamp | formatTime }}</span> on 
-        <span data-test="visit-date">{{ visitSession.startTimestamp | formatDate("EEEE d MMMM") }}</span>.
+        <span data-test="capacity">{{ capacity }}</span> {{ "table" | pluralise(capacity) }}
+        {{ "is" | pluralise(bookingsCount, "are") }} booked for
+        <span data-test="visit-time">{{ time }}</span> on
+        <span data-test="visit-date">{{ date | formatDate("EEEE d MMMM") }}</span>.
       </p>
       <form action="{{ backLinkHref }}/overbooking" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">

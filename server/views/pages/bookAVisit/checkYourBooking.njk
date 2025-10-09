@@ -40,7 +40,7 @@
             text: "Date"
           },
           value: {
-            text: visitSlot.startTimestamp | formatDate("EEEE d MMMM yyyy"),
+            text: visitSession.date | formatDate("EEEE d MMMM yyyy"),
             classes: "test-visit-date"
           },
           actions: {
@@ -60,7 +60,7 @@
             text: "Time"
           },
           value: {
-            text: visitSlot.startTimestamp | formatTime + " to " + visitSlot.endTimestamp | formatTime,
+            text: visitSession | formatStartToEndTime,
             classes: "test-visit-time"
           },
           actions: {
@@ -198,9 +198,5 @@
 {% endblock %}
 
 {% block pageScripts %}
-  <script nonce="{{ cspNonce }}">
-    document.querySelector('.disable-button-on-submit').addEventListener('submit', e => {
-      e.target.querySelector('button[type=submit]').setAttribute('disabled', 'disabled')
-    })
-  </script>
+<script src="/assets/disableButtonOnSubmit.js"></script>
 {% endblock %}

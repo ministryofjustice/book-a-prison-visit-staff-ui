@@ -5,13 +5,18 @@ export default class SelectVisitDateAndTime extends Page {
     super('Select date and time of visit')
   }
 
-  expandAllSections = (): void => {
-    cy.get('.govuk-accordion__show-all').each(section => cy.wrap(section).click())
+  clickCalendarDay = (date: string): void => {
+    cy.get(`#day-link-${date}`).click()
   }
 
-  getSlotById = (id: number): PageElement => cy.get(`#${id}`)
+  getSessionLabel = (date: string, index: number): PageElement =>
+    cy.get(`#day-group-${date} input`).eq(index).siblings('label')
 
-  continueButton = (): PageElement => cy.get('[data-test=submit]')
+  selectSession = (date: string, index: number): void => {
+    cy.get(`#day-group-${date} input`).eq(index).click()
+  }
+
+  clickContinueButton = (): void => this.clickDisabledOnSubmitButton('submit')
 
   visitRestriction = (): PageElement => cy.get('[data-test="visit-restriction"]')
 }

@@ -1,9 +1,9 @@
-import { addDays, format, sub } from 'date-fns'
+import { addDays, eachDayOfInterval, format, sub } from 'date-fns'
 import Page from '../../pages/page'
 import PrisonerProfilePage from '../../pages/prisoner/prisonerProfile'
 import SelectVisitorsPage from '../../pages/visitJourney/selectVisitors'
 import TestData from '../../../server/routes/testutils/testData'
-import { VisitSession } from '../../../server/data/orchestrationApiTypes'
+import { SessionsAndScheduleDto } from '../../../server/data/orchestrationApiTypes'
 import AdditionalSupportPage from '../../pages/visitJourney/additionalSupport'
 import MainContactPage from '../../pages/visitJourney/mainContact'
 import CheckYourBookingPage from '../../pages/visitJourney/checkYourBooking'
@@ -17,7 +17,7 @@ context('Check visit details page', () => {
   const dayMonthFormat = 'd MMMM'
 
   const profile = TestData.prisonerProfile()
-  const { prisonerId, prisonId } = profile
+  const { prisonerId } = profile
 
   const today = new Date()
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
@@ -32,16 +32,31 @@ context('Check visit details page', () => {
     }),
   ]
 
-  const visitSessions: VisitSession[] = [
-    TestData.visitSession({
-      startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
-      endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
-    }),
-    TestData.visitSession({
-      startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
-      endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
-    }),
+  // generate array of dates over next month and add some visit sessions and events
+  const dateIn7Days = format(addDays(today, 7), shortDateFormat)
+  const dateIn8Days = format(addDays(today, 8), shortDateFormat)
+  const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
+
+  const sessionsAndSchedule: SessionsAndScheduleDto[] = eachDateUntilNextMonth.map(date => {
+    return {
+      date: format(date, shortDateFormat),
+      visitSessions: [],
+      scheduledEvents: [],
+    }
+  })
+  sessionsAndSchedule.at(7).visitSessions = [
+    TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'a' }),
   ]
+  sessionsAndSchedule.at(8).visitSessions = [
+    TestData.visitSessionV2({ startTime: '13:30', endTime: '15:00', sessionTemplateReference: 'b' }),
+  ]
+  const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({ sessionsAndSchedule })
+  const sessionIn7DaysStartTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].startTime}:00`
+  const sessionIn7DaysEndTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].endTime}:00`
+  const sessionIn7DaysTemplateReference = sessionsAndSchedule.at(7).visitSessions[0].sessionTemplateReference
+  const sessionIn8DaysStartTimestamp = `${sessionsAndSchedule.at(8).date}T${sessionsAndSchedule.at(8).visitSessions[0].startTime}:00`
+  const sessionIn8DaysEndTimestamp = `${sessionsAndSchedule.at(8).date}T${sessionsAndSchedule.at(8).visitSessions[0].endTime}:00`
+  const sessionIn8DaysTemplateReference = sessionsAndSchedule.at(8).visitSessions[0].sessionTemplateReference
 
   beforeEach(() => {
     cy.task('reset')
@@ -66,32 +81,22 @@ context('Check visit details page', () => {
     selectVisitorsPage.getVisitor(contacts[0].personId).check()
 
     // Select date and time
-    cy.task('stubVisitSessions', {
-      offenderNo: prisonerId,
-      prisonId,
-      visitSessions,
-    })
-    cy.task('stubOffenderEvents', {
-      offenderNo: prisonerId,
-      fromDate: format(today, shortDateFormat),
-      toDate: format(addDays(today, 8), shortDateFormat),
-      scheduledEvents: [],
-    })
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId, visitSessionsAndSchedule })
     cy.task(
       'stubCreateVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitors: [{ nomisPersonId: contacts[0].personId }],
+        sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).check()
+    selectVisitDateAndTime.selectSession(dateIn7Days, 0)
 
     // Additional support
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickContinueButton()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportNotRequired().check()
 
@@ -104,12 +109,12 @@ context('Check visit details page', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
-        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+        sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
 
@@ -123,7 +128,7 @@ context('Check visit details page', () => {
     // Check visit details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains('John Smith')
-    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
+    checkYourBookingPage.visitDate().contains(format(dateIn7Days, longDateFormat))
     checkYourBookingPage.visitTime().contains('10am to 11am')
     checkYourBookingPage.visitType().contains('Open')
     checkYourBookingPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -135,25 +140,24 @@ context('Check visit details page', () => {
     // Check details - change visit date - then proceed through journey
     checkYourBookingPage.changeVisitDate().click()
     Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).should('be.checked')
-    selectVisitDateAndTime.getSlotById(2).check()
+    selectVisitDateAndTime.clickCalendarDay(dateIn8Days)
+    selectVisitDateAndTime.selectSession(dateIn8Days, 0)
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
       }),
     )
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickContinueButton()
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
     requestMethodPage.continueButton().click()
-    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
+    checkYourBookingPage.visitDate().contains(format(dateIn8Days, longDateFormat))
     checkYourBookingPage.visitTime().contains('1:30pm to 3pm')
 
     // Check details - change visitors, add visitor - then proceed through journey
@@ -162,22 +166,21 @@ context('Check visit details page', () => {
     selectVisitorsPage.getVisitor(contacts[1].personId).should('not.be.checked')
     selectVisitorsPage.getVisitor(contacts[1].personId).check()
     selectVisitorsPage.continueButton().click()
-    selectVisitDateAndTime.getSlotById(2).should('be.checked')
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: { description: '' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
       }),
     )
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickContinueButton()
     additionalSupportPage.continueButton().click()
     mainContactPage.continueButton().click()
     requestMethodPage.continueButton().click()
@@ -193,15 +196,15 @@ context('Check visit details page', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: { description: 'Wheelchair ramp' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
       }),
     )
     mainContactPage.continueButton().click()
@@ -214,15 +217,15 @@ context('Check visit details page', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: { description: 'Wheelchair ramp' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
       }),
     )
     mainContactPage.continueButton().click()
@@ -240,8 +243,8 @@ context('Check visit details page', () => {
     cy.task('stubBookVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
@@ -258,7 +261,7 @@ context('Check visit details page', () => {
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(prisonerId)
-    confirmationPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
+    confirmationPage.visitDate().contains(format(dateIn8Days, longDateFormat))
     confirmationPage.visitTime().contains('1:30pm to 3pm')
     confirmationPage.visitType().contains('Open')
     confirmationPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -282,32 +285,22 @@ context('Check visit details page', () => {
     selectVisitorsPage.getVisitor(contacts[0].personId).check()
 
     // Select date and time
-    cy.task('stubVisitSessions', {
-      offenderNo: prisonerId,
-      prisonId,
-      visitSessions,
-    })
-    cy.task('stubOffenderEvents', {
-      offenderNo: prisonerId,
-      fromDate: format(today, shortDateFormat),
-      toDate: format(addDays(today, 8), shortDateFormat),
-      scheduledEvents: [],
-    })
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId, visitSessionsAndSchedule })
     cy.task(
       'stubCreateVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitors: [{ nomisPersonId: contacts[0].personId }],
+        sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).check()
+    selectVisitDateAndTime.selectSession(dateIn7Days, 0)
 
     // Additional support
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickContinueButton()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportNotRequired().check()
 
@@ -320,12 +313,12 @@ context('Check visit details page', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
-        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+        sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
 
@@ -339,12 +332,13 @@ context('Check visit details page', () => {
     // Check visit details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains('John Smith')
-    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
+    checkYourBookingPage.visitDate().contains(format(dateIn7Days, longDateFormat))
 
     cy.task('stubBookVisitValidationFailed', {
       applicationReference: TestData.visit().applicationReference,
     })
 
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId })
     checkYourBookingPage.submitBooking()
 
     // Check alert on select date and time page
@@ -352,9 +346,7 @@ context('Check visit details page', () => {
     selectVisitDateAndTime
       .getMessages()
       .eq(0)
-      .contains(
-        `John Smith now has a non-association on ${format(new Date(visitSessions[0].startTimestamp), dayMonthFormat)}.`,
-      )
+      .contains(`John Smith now has a non-association on ${format(dateIn7Days, dayMonthFormat)}.`)
     selectVisitDateAndTime.mojAlertBody().contains('Select a new visit time.')
   })
 })

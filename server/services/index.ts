@@ -16,7 +16,6 @@ export const services = () => {
     orchestrationApiClientBuilder,
     prisonerContactRegistryApiClientBuilder,
     prisonerSearchClientBuilder,
-    whereaboutsApiClientBuilder,
     applicationInfo,
   } = dataAccess()
 
@@ -36,11 +35,7 @@ export const services = () => {
 
   const visitRequestsService = new VisitRequestsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
-  const visitSessionsService = new VisitSessionsService(
-    orchestrationApiClientBuilder,
-    whereaboutsApiClientBuilder,
-    hmppsAuthClient,
-  )
+  const visitSessionsService = new VisitSessionsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const visitService = new VisitService(orchestrationApiClientBuilder, hmppsAuthClient)
 

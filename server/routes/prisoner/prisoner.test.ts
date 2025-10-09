@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { PrisonerProfilePage, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import { clearSession } from '../visitorUtils'
+import * as visitorUtils from '../visitorUtils'
 import TestData from '../testutils/testData'
 import {
   createMockAuditService,
@@ -21,25 +21,17 @@ const visitService = createMockVisitService()
 
 const prisonId = 'HEI'
 
-let visitSessionData: Partial<VisitSessionData>
-
-jest.mock('../visitorUtils', () => ({
-  clearSession: jest.fn((req: Express.Request) => {
-    req.session.visitSessionData = visitSessionData as VisitSessionData
-  }),
-}))
+let sessionData: SessionData
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
-  visitSessionData = {}
+  sessionData = {} as SessionData
 
   app = appWithAllRoutes({
     services: { auditService, prisonerProfileService, visitService },
-    sessionData: {
-      visitSessionData,
-    } as SessionData,
+    sessionData,
   })
 })
 
@@ -393,17 +385,21 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
   })
 
   describe('POST /prisoner/A1234BC', () => {
-    it('should set up visitSessionData and redirect to select visitors page', () => {
+    const clearSession = jest.spyOn(visitorUtils, 'clearSession')
+
+    it('should call clearSession(), set up visitSessionData and redirect to select visitors page', () => {
       return request(app)
         .post('/prisoner/A1234BC')
         .expect(302)
         .expect('location', '/book-a-visit/select-visitors')
-        .expect(res => {
+        .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
+          expect(sessionData.visitSessionData).toStrictEqual(<VisitSessionData>{
+            allowOverBooking: false,
+            prisonId,
             prisoner: {
               firstName: 'John',
               lastName: 'Smith',
@@ -424,7 +420,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .send('vo-override=override')
         .expect(302)
         .expect('location', '/book-a-visit/select-visitors')
-        .expect(res => {
+        .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
@@ -434,7 +430,9 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
             operationId: undefined,
           })
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
+          expect(sessionData.visitSessionData).toStrictEqual(<VisitSessionData>{
+            allowOverBooking: false,
+            prisonId,
             prisoner: {
               firstName: 'John',
               lastName: 'Smith',
@@ -448,22 +446,26 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
     })
 
     it('should replace existing visitSessionData and redirect to select visitors page', () => {
-      visitSessionData.prisoner = {
-        firstName: 'other',
-        lastName: 'prisoner',
-        offenderNo: 'C4321BA',
-        location: 'a cell, HMP Prison',
-      }
+      sessionData.visitSessionData = {
+        prisoner: {
+          firstName: 'other',
+          lastName: 'prisoner',
+          offenderNo: 'C4321BA',
+          location: 'a cell, HMP Prison',
+        },
+      } as VisitSessionData
 
       return request(app)
         .post('/prisoner/A1234BC')
         .expect(302)
         .expect('location', '/book-a-visit/select-visitors')
-        .expect(res => {
+        .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
-          expect(visitSessionData).toStrictEqual(<VisitSessionData>{
+          expect(sessionData.visitSessionData).toStrictEqual(<VisitSessionData>{
+            allowOverBooking: false,
+            prisonId,
             prisoner: {
               firstName: 'John',
               lastName: 'Smith',
@@ -483,11 +485,11 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .post('/prisoner/A1234BC')
         .expect(302)
         .expect('location', '/prisoner/A1234BC')
-        .expect(res => {
+        .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
           expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
-          expect(visitSessionData).toEqual({})
+          expect(sessionData.visitSessionData).toBeUndefined()
           expect(flashProvider).toHaveBeenCalledWith('errors', [
             {
               location: 'body',

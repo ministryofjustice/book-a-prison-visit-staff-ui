@@ -12,6 +12,7 @@ let flashData: FlashData
 const auditService = createMockAuditService()
 
 let visitSessionData: VisitSessionData
+const prisonId = 'HEI'
 
 // run tests for booking and update journeys
 const testJourneys = [{ urlPrefix: '/book-a-visit' }, { urlPrefix: '/update-a-visit' }]
@@ -46,6 +47,7 @@ testJourneys.forEach(journey => {
             },
           ],
         },
+        prisonId,
         visitRestriction: 'OPEN',
         visitorIds: [4322],
         visitors: [
