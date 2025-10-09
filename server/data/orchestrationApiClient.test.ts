@@ -450,8 +450,9 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getBookersByEmail', () => {
+    const email = 'booker@example.com'
+
     it('should return booker(s) for given email address', async () => {
-      const email = 'booker@example.com'
       const bookers = [TestData.bookerInfoDto()]
 
       fakeOrchestrationApi
@@ -462,6 +463,26 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getBookersByEmail(email)
 
       expect(output).toStrictEqual(bookers)
+    })
+
+    it('should return empty array if no booker for given email address (API 404)', async () => {
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404)
+
+      const output = await orchestrationApiClient.getBookersByEmail(email)
+
+      expect(output).toStrictEqual([])
+    })
+
+    it('should throw any other (non-404) API errors', async () => {
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(500)
+
+      await expect(orchestrationApiClient.getBookersByEmail(email)).rejects.toThrow('Internal Server Error')
     })
   })
 

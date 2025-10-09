@@ -244,10 +244,17 @@ export default class OrchestrationApiClient {
 
   // public-booker-controller
   async getBookersByEmail(email: string): Promise<BookerInfoDto[]> {
-    return this.restClient.post({
-      path: '/public/booker/search',
-      data: <SearchBookerDto>{ email },
-    })
+    try {
+      return await this.restClient.post({
+        path: '/public/booker/search',
+        data: <SearchBookerDto>{ email },
+      })
+    } catch (error) {
+      if (error.status === 404) {
+        return []
+      }
+      throw error
+    }
   }
 
   // visit notification controller
