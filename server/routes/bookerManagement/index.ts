@@ -8,7 +8,7 @@ import config from '../../config'
 export default function routes(services: Services): Router {
   const router = Router()
 
-  const bookerSearchController = new BookerSearchController(services.bookerService)
+  const bookerSearchController = new BookerSearchController(services.auditService, services.bookerService)
 
   // Restrict booker management routes by role
   if (!config.features.bookerManagement.enabled) {

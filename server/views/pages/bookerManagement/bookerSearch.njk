@@ -36,7 +36,7 @@
           errorMessage: errors | findError('search')
         }) }}
 
-        {% if noBookerMatch %}
+        {% if noBookerFound and formValues.search %}
           <p class="govuk-body-l">There is no match for this email address.</p>
         {% endif %}
 

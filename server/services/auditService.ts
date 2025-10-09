@@ -366,7 +366,16 @@ export default class AuditService {
     })
   }
 
-  async sendAuditMessage({
+  async bookerSearch({ search, username, operationId }: { search: string; username: string; operationId: string }) {
+    return this.sendAuditMessage({
+      action: 'SEARCHED_BOOKERS',
+      who: username,
+      operationId,
+      details: { search },
+    })
+  }
+
+  private async sendAuditMessage({
     action,
     who,
     timestamp = new Date(),
