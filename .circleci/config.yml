@@ -25,7 +25,7 @@ parameters:
 
   node-version:
     type: string
-    default: 22.19-browsers
+    default: 22.20-browsers
 
 jobs:
   acceptance_tests_staff_playwright-e2e:
