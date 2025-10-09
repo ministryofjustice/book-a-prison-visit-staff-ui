@@ -687,28 +687,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getVisitSessions', () => {
-    it('should return an array of Visit Sessions', async () => {
-      const results = [TestData.visitSession()]
-
-      fakeOrchestrationApi
-        .get('/visit-sessions')
-        .query({
-          prisonId: 'HEI',
-          prisonerId: 'A1234BC',
-          username: 'user1',
-          min: '2',
-          userType: 'STAFF',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getVisitSessions('A1234BC', prisonId, 'user1', 2)
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getSessionSchedule', () => {
     it('should return an array of scheduled sessions for the specified prison and date', async () => {
       const date = '2023-02-01'

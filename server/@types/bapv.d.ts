@@ -7,7 +7,6 @@ import {
   PrisonerProfile,
   Visit,
   VisitorSupport,
-  VisitSession,
   VisitSummary,
 } from '../data/orchestrationApiTypes'
 import type { CalendarVisitSession } from '../services/visitSessionsService'
@@ -56,43 +55,6 @@ export type PrisonerProfilePage = {
     }
   }
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
-}
-
-// TODO remove this and related types
-// Visit slots, for representing data derived from VisitSessions
-export type VisitSlot = {
-  id: string
-  sessionTemplateReference: string
-  prisonId: string
-  startTimestamp: string
-  endTimestamp: string
-  availableTables: number
-  capacity: number
-  visitRoom: string
-  visitRestriction: 'OPEN' | 'CLOSED'
-  sessionConflicts?: VisitSession['sessionConflicts']
-}
-
-export type PrisonerEvent = {
-  startTimestamp: string
-  endTimestamp: string
-  description: string
-}
-
-export type VisitSlotsForDay = {
-  date: string
-  slots: {
-    morning: VisitSlot[]
-    afternoon: VisitSlot[]
-  }
-  prisonerEvents: {
-    morning: PrisonerEvent[]
-    afternoon: PrisonerEvent[]
-  }
-}
-
-export type VisitSlotList = {
-  [key: string]: VisitSlotsForDay[] // keyed on month value, e.g. 'February 2022'
 }
 
 export type VisitSessionData = {

@@ -293,12 +293,6 @@ context('Book a visit', () => {
     selectVisitTypePage.selectClosedVisitType()
 
     cy.task('stubGetVisitSessionsAndSchedule', { prisonerId })
-    cy.task('stubOffenderEvents', {
-      offenderNo: prisonerId,
-      fromDate: format(today, shortDateFormat),
-      toDate: format(today, shortDateFormat),
-      scheduledEvents: [],
-    })
 
     selectVisitTypePage.submitButton().click()
 

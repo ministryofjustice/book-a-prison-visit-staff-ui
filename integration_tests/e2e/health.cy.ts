@@ -6,7 +6,6 @@ context('Healthcheck', () => {
       cy.task('stubTokenVerificationPing')
       cy.task('stubPrisonerSearchPing')
       cy.task('stubPrisonerContactRegistryPing')
-      cy.task('stubWhereaboutsPing')
       cy.task('stubOrchestrationPing')
 
       cy.task('stubAuthToken', {})
@@ -50,7 +49,6 @@ context('Healthcheck', () => {
       cy.task('stubTokenVerificationPing', 500)
       cy.task('stubPrisonerSearchPing')
       cy.task('stubPrisonerContactRegistryPing')
-      cy.task('stubWhereaboutsPing')
       cy.task('stubOrchestrationPing')
 
       cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).then(response => {

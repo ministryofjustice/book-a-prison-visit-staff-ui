@@ -351,25 +351,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  // TODO remove, and related wiremock
-  async getVisitSessions(
-    offenderNo: string,
-    prisonId: string,
-    username: string,
-    minNumberOfDays?: number,
-  ): Promise<VisitSession[]> {
-    return this.restClient.get({
-      path: '/visit-sessions',
-      query: new URLSearchParams({
-        prisonId,
-        prisonerId: offenderNo,
-        min: minNumberOfDays.toString(),
-        username,
-        userType: 'STAFF',
-      }).toString(),
-    })
-  }
-
   async getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
     return this.restClient.get({
       path: '/visit-sessions/schedule',
