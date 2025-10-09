@@ -331,6 +331,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Search for booker(s) via email
+     * @description Search for all booker accounts that are registered to email
+     */
+    post: operations['searchForBooker']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/{reference}': {
     parameters: {
       query?: never
@@ -696,6 +716,26 @@ export interface paths {
       cookie?: never
     }
     get: operations['getDlqMessages']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/public/booker/{bookerReference}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get detailed information for a booker (including prisoners and visitors) via booker reference.
+     * @description Returns detailed information for a booker (including prisoners and visitors) via booker reference.
+     */
+    get: operations['getBookerDetails']
     put?: never
     post?: never
     delete?: never
@@ -1618,6 +1658,59 @@ export interface components {
        */
       prisonId: string
     }
+    /** @description Find a booker via search criteria */
+    SearchBookerDto: {
+      /** @description auth email */
+      email: string
+    }
+    /** @description Details of a found booker via booker search */
+    BookerInfoDto: {
+      /** @description This is the booker reference, unique per booker */
+      reference: string
+      /** @description email registered to booker */
+      email: string
+      /**
+       * Format: date-time
+       * @description The time the booker account was created
+       */
+      createdTimestamp: string
+      /** @description Permitted prisoners list */
+      permittedPrisoners: components['schemas']['PermittedPrisonerForBookerDto'][]
+    }
+    /** @description Permitted prisoner associated with the booker. */
+    PermittedPrisonerForBookerDto: {
+      /**
+       * @description Prisoner Id
+       * @example A1234AA
+       */
+      prisonerId: string
+      /**
+       * @description Active / Inactive permitted prisoner
+       * @example true
+       */
+      active: boolean
+      /**
+       * @description prison code
+       * @example MDI
+       */
+      prisonCode: string
+      /** @description Permitted visitors */
+      permittedVisitors: components['schemas']['PermittedVisitorsForPermittedPrisonerBookerDto'][]
+    }
+    /** @description Permitted visitor associated with the permitted prisoner. */
+    PermittedVisitorsForPermittedPrisonerBookerDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description Active / Inactive permitted visitor
+       * @example true
+       */
+      active: boolean
+    }
     /** @description An address */
     AddressDto: {
       /**
@@ -2281,12 +2374,12 @@ export interface components {
       /** Format: int64 */
       offset?: number
       sort?: components['schemas']['SortObject']
-      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2667,6 +2760,139 @@ export interface components {
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
     }
+    /** @description Detailed information of a booker */
+    BookerDetailedInfoDto: {
+      /** @description This is the booker reference, unique per booker */
+      reference: string
+      /** @description email registered to booker */
+      email: string
+      /** @description Permitted prisoners list */
+      permittedPrisoners: components['schemas']['BookerPrisonerDetailedInfoDto'][]
+    }
+    BookerPrisonerDetailedInfoDto: {
+      /** @description Prisoner Details */
+      prisoner: components['schemas']['PrisonerDto']
+      /** @description Current prison code for the prison that the booker registered the prisoner with */
+      registeredPrison: components['schemas']['RegisteredPrisonDto']
+      /** @description Permitted visitors list */
+      permittedVisitors: components['schemas']['BookerPrisonerVisitorDetailedInfoDto'][]
+    }
+    /** @description A detailed view of a visitor for a prisoner */
+    BookerPrisonerVisitorDetailedInfoDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 2000-01-31
+       */
+      dateOfBirth?: string
+    }
+    CurrentIncentive: {
+      /** @description Incentive level */
+      level: components['schemas']['IncentiveLevel']
+      /**
+       * Format: date-time
+       * @description Date time of the incentive
+       * @example 2022-11-10T15:47:24
+       */
+      dateTime: string
+      /**
+       * Format: date
+       * @description Schedule new review date
+       * @example 2022-11-10
+       */
+      nextReviewDate: string
+    }
+    IncentiveLevel: {
+      /**
+       * @description code
+       * @example STD
+       */
+      code?: string
+      /**
+       * @description description
+       * @example Standard
+       */
+      description: string
+    }
+    PrisonerDto: {
+      /**
+       * @description Prisoner Number
+       * @example A1234AA
+       */
+      prisonerNumber: string
+      /**
+       * @description First Name
+       * @example Robert
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Larsen
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of Birth
+       * @example 1975-04-02
+       */
+      dateOfBirth: string
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      prisonId?: string
+      /**
+       * @description Prison Name
+       * @example HMP Leeds
+       */
+      prisonName?: string
+      /**
+       * @description In prison cell location
+       * @example A-1-002
+       */
+      cellLocation?: string
+      /** @description Incentive level */
+      currentIncentive?: components['schemas']['CurrentIncentive']
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
+      locationDescription?: string
+      /**
+       * @description Convicted Status
+       * @example Convicted
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
+    }
+    RegisteredPrisonDto: {
+      /**
+       * @description prison code
+       * @example MDI
+       */
+      prisonCode: string
+      /**
+       * @description prison name
+       * @example MDI
+       */
+      prisonName: string
+    }
     /** @description Visit */
     OrchestrationVisitDto: {
       /**
@@ -2796,97 +3022,6 @@ export interface components {
       nextAvailableVoDate: string
       /** @description Current prison code for the prison that the booker registered the prisoner with */
       registeredPrison: components['schemas']['RegisteredPrisonDto']
-    }
-    CurrentIncentive: {
-      /** @description Incentive level */
-      level: components['schemas']['IncentiveLevel']
-      /**
-       * Format: date-time
-       * @description Date time of the incentive
-       * @example 2022-11-10T15:47:24
-       */
-      dateTime: string
-      /**
-       * Format: date
-       * @description Schedule new review date
-       * @example 2022-11-10
-       */
-      nextReviewDate: string
-    }
-    IncentiveLevel: {
-      /**
-       * @description code
-       * @example STD
-       */
-      code?: string
-      /**
-       * @description description
-       * @example Standard
-       */
-      description: string
-    }
-    PrisonerDto: {
-      /**
-       * @description Prisoner Number
-       * @example A1234AA
-       */
-      prisonerNumber: string
-      /**
-       * @description First Name
-       * @example Robert
-       */
-      firstName: string
-      /**
-       * @description Last name
-       * @example Larsen
-       */
-      lastName: string
-      /**
-       * Format: date
-       * @description Date of Birth
-       * @example 1975-04-02
-       */
-      dateOfBirth: string
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
-      prisonId?: string
-      /**
-       * @description Prison Name
-       * @example HMP Leeds
-       */
-      prisonName?: string
-      /**
-       * @description In prison cell location
-       * @example A-1-002
-       */
-      cellLocation?: string
-      /** @description Incentive level */
-      currentIncentive?: components['schemas']['CurrentIncentive']
-      /**
-       * @description current prison or outside with last movement information.
-       * @example Outside - released from Leeds
-       */
-      locationDescription?: string
-      /**
-       * @description Convicted Status
-       * @example Convicted
-       * @enum {string}
-       */
-      convictedStatus?: 'Convicted' | 'Remand'
-    }
-    RegisteredPrisonDto: {
-      /**
-       * @description prison code
-       * @example MDI
-       */
-      prisonCode: string
-      /**
-       * @description prison name
-       * @example MDI
-       */
-      prisonName: string
     }
     BookerPrisonerValidationErrorResponse: {
       /** Format: int32 */
@@ -4487,6 +4622,48 @@ export interface operations {
       }
     }
   }
+  searchForBooker: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SearchBookerDto']
+      }
+    }
+    responses: {
+      /** @description Booker(s) found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerInfoDto'][]
+        }
+      }
+      /** @description Incorrect request to search for booker(s) */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getVisitsByReference: {
     parameters: {
       query?: never
@@ -5602,6 +5779,55 @@ export interface operations {
         }
         content: {
           '*/*': components['schemas']['GetDlqResult']
+        }
+      }
+    }
+  }
+  getBookerDetails: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerDetailedInfoDto']
+        }
+      }
+      /** @description Incorrect request to get booker details */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get booker details */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }

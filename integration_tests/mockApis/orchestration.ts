@@ -4,6 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApplicationValidationErrorResponse,
+  BookerInfoDto,
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
@@ -347,6 +348,31 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: { totalElements: count },
+      },
+    })
+  },
+
+  stubGetBookersByEmail: ({
+    email,
+    bookers = [TestData.bookerInfoDto()],
+  }: {
+    email: IgnoreVisitNotificationsDto
+    bookers: BookerInfoDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: '/orchestration/public/booker/search',
+        bodyPatterns: [
+          {
+            equalToJson: { email },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: bookers,
       },
     })
   },

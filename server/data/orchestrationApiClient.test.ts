@@ -15,6 +15,7 @@ import {
   PageVisitDto,
   PrisonDto,
   RejectVisitRequestBodyDto,
+  SearchBookerDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
@@ -445,6 +446,22 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.createVisitApplication(visitSessionData, 'user1')
 
       expect(output).toStrictEqual(result)
+    })
+  })
+
+  describe('getBookersByEmail', () => {
+    it('should return booker(s) for given email address', async () => {
+      const email = 'booker@example.com'
+      const bookers = [TestData.bookerInfoDto()]
+
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, bookers)
+
+      const output = await orchestrationApiClient.getBookersByEmail(email)
+
+      expect(output).toStrictEqual(bookers)
     })
   })
 

@@ -4,6 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApproveVisitRequestBodyDto,
+  BookerInfoDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
@@ -20,6 +21,7 @@ import {
   PrisonDto,
   PrisonerProfile,
   RejectVisitRequestBodyDto,
+  SearchBookerDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -237,6 +239,14 @@ export default class OrchestrationApiClient {
         actionedBy: username,
         allowOverBooking: true,
       },
+    })
+  }
+
+  // public-booker-controller
+  async getBookersByEmail(email: string): Promise<BookerInfoDto[]> {
+    return this.restClient.post({
+      path: '/public/booker/search',
+      data: <SearchBookerDto>{ email },
     })
   }
 

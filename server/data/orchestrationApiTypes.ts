@@ -83,3 +83,7 @@ export type VisitRequestSummary = components['schemas']['OrchestrationVisitReque
 export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']
 
 export type ApplicationValidationErrorResponse = components['schemas']['ApplicationValidationErrorResponse']
+
+// Booker management
+export type BookerInfoDto = components['schemas']['BookerInfoDto']
+export type SearchBookerDto = components['schemas']['SearchBookerDto']
