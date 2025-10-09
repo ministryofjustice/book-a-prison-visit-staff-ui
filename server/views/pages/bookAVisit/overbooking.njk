@@ -19,7 +19,8 @@
 
       <p>
         <span data-test="bookings-count">{{ bookingsCount }}</span> of
-        <span data-test="capacity">{{ capacity }}</span> {{ "table" | pluralise(capacity) }} are booked for
+        <span data-test="capacity">{{ capacity }}</span> {{ "table" | pluralise(capacity) }}
+        {{ "is" | pluralise(bookingsCount, "are") }} booked for
         <span data-test="visit-time">{{ time }}</span> on
         <span data-test="visit-date">{{ date | formatDate("EEEE d MMMM") }}</span>.
       </p>

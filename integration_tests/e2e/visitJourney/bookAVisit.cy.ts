@@ -1,4 +1,4 @@
-import { addDays, format, sub } from 'date-fns'
+import { addDays, eachDayOfInterval, format, sub } from 'date-fns'
 import HomePage from '../../pages/home'
 import Page from '../../pages/page'
 import SearchForAPrisonerPage from '../../pages/search/searchForAPrisoner'
@@ -6,7 +6,7 @@ import SearchForAPrisonerResultsPage from '../../pages/search/searchForAPrisoner
 import PrisonerProfilePage from '../../pages/prisoner/prisonerProfile'
 import SelectVisitorsPage from '../../pages/visitJourney/selectVisitors'
 import TestData from '../../../server/routes/testutils/testData'
-import { VisitSession } from '../../../server/data/orchestrationApiTypes'
+import { SessionsAndScheduleDto } from '../../../server/data/orchestrationApiTypes'
 import AdditionalSupportPage from '../../pages/visitJourney/additionalSupport'
 import MainContactPage from '../../pages/visitJourney/mainContact'
 import CheckYourBookingPage from '../../pages/visitJourney/checkYourBooking'
@@ -15,8 +15,7 @@ import SelectVisitTypePage from '../../pages/visitJourney/visitType'
 import SelectVisitDateAndTime from '../../pages/visitJourney/selectVisitDateAndTime'
 import RequestMethodPage from '../../pages/visitJourney/requestMethod'
 
-// FIXME
-context.skip('Book a visit', () => {
+context('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
@@ -44,33 +43,31 @@ context.skip('Book a visit', () => {
 
   it('should complete the book a visit journey', () => {
     const prisoner = TestData.prisoner()
-    const { prisonId, prisonerNumber: offenderNo } = prisoner
+    const { prisonerNumber: offenderNo } = prisoner
 
-    const visitSessions: VisitSession[] = [
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
-        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'13:30:00`),
-        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'15:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 32), `${shortDateFormat}'T'09:30:00`), // session in the following month
-        endTimestamp: format(addDays(today, 32), `${shortDateFormat}'T'10:00:00`),
-      }),
-    ]
+    // generate array of dates over next month and add some visit sessions and events
+    const dateIn7Days = format(addDays(today, 7), shortDateFormat)
+    const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
 
-    const scheduledEvents = [
-      TestData.scheduledEvent({
-        startTime: format(addDays(today, 7), `${shortDateFormat}'T'09:30:00`),
-        endTime: format(addDays(today, 7), `${shortDateFormat}'T'10:30:00`),
-      }),
-      TestData.scheduledEvent({
-        startTime: format(addDays(today, 32), `${shortDateFormat}'T'10:30:00`),
-        endTime: format(addDays(today, 32), `${shortDateFormat}'T'11:30:00`),
-      }),
+    const sessionsAndSchedule: SessionsAndScheduleDto[] = eachDateUntilNextMonth.map(date => {
+      return {
+        date: format(date, shortDateFormat),
+        visitSessions: [],
+        scheduledEvents: [],
+      }
+    })
+    sessionsAndSchedule.at(7).visitSessions = [TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00' })]
+    sessionsAndSchedule.at(7).scheduledEvents = [
+      TestData.prisonerScheduledEvent({ startTime: '09:30', endTime: '10:30' }),
     ]
+    sessionsAndSchedule.at(32).visitSessions = [TestData.visitSessionV2({ startTime: '09:30', endTime: '10:00' })]
+    sessionsAndSchedule.at(32).scheduledEvents = [
+      TestData.prisonerScheduledEvent({ startTime: '10:30', endTime: '11:30' }),
+    ]
+    const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({ sessionsAndSchedule })
+    const sessionIn7DaysStartTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].startTime}:00`
+    const sessionIn7DaysEndTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].endTime}:00`
+    const sessionIn7DaysTemplateReference = sessionsAndSchedule.at(7).visitSessions[0].sessionTemplateReference
 
     // Home page - start booking journey
     const homePage = Page.verifyOnPage(HomePage)
@@ -141,33 +138,22 @@ context.skip('Book a visit', () => {
     selectVisitorsPage.getVisitor(contacts[1].personId).check()
 
     // Select date and time
-    cy.task('stubVisitSessions', {
-      offenderNo,
-      prisonId,
-      visitSessions,
-    })
-    cy.task('stubOffenderEvents', {
-      offenderNo,
-      fromDate: format(today, shortDateFormat),
-      toDate: format(addDays(today, 32), shortDateFormat),
-      scheduledEvents,
-    })
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId: offenderNo, visitSessionsAndSchedule })
     cy.task(
       'stubCreateVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitors: [{ nomisPersonId: contacts[0].personId }, { nomisPersonId: contacts[1].personId }],
       }),
     )
 
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).check()
+    selectVisitDateAndTime.selectSession(dateIn7Days, 0)
 
     // Additional support
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickContinueButton()
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
     additionalSupportPage.additionalSupportRequired().check()
     additionalSupportPage.enterSupportDetails('Wheelchair ramp, Some extra help!')
@@ -181,14 +167,14 @@ context.skip('Book a visit', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
-        sessionTemplateReference: visitSessions[0].sessionTemplateReference,
+        sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
 
@@ -202,7 +188,7 @@ context.skip('Book a visit', () => {
     // Check booking details
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
     checkYourBookingPage.prisonerName().contains('John Smith')
-    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
+    checkYourBookingPage.visitDate().contains(format(dateIn7Days, longDateFormat))
     checkYourBookingPage.visitTime().contains('10am to 11am')
     checkYourBookingPage.visitType().contains('Open')
     checkYourBookingPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -216,8 +202,8 @@ context.skip('Book a visit', () => {
     cy.task('stubBookVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',
-        startTimestamp: visitSessions[0].startTimestamp,
-        endTimestamp: visitSessions[0].endTimestamp,
+        startTimestamp: sessionIn7DaysStartTimestamp,
+        endTimestamp: sessionIn7DaysEndTimestamp,
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -233,7 +219,7 @@ context.skip('Book a visit', () => {
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
-    confirmationPage.visitDate().contains(format(new Date(visitSessions[0].startTimestamp), longDateFormat))
+    confirmationPage.visitDate().contains(format(dateIn7Days, longDateFormat))
     confirmationPage.visitTime().contains('10am to 11am')
     confirmationPage.visitType().contains('Open')
     confirmationPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -286,7 +272,7 @@ context.skip('Book a visit', () => {
       }),
     ]
     const profile = TestData.prisonerProfile({ prisonerRestrictions })
-    const { prisonerId, prisonId } = profile
+    const { prisonerId } = profile
 
     // Prisoner profile page
     cy.task('stubPrisonerSocialContacts', { offenderNo: prisonerId, contacts })
@@ -306,11 +292,7 @@ context.skip('Book a visit', () => {
     selectVisitTypePage.getPrisonerRestrictionType(1).contains('Closed')
     selectVisitTypePage.selectClosedVisitType()
 
-    cy.task('stubVisitSessions', {
-      offenderNo: prisonerId,
-      prisonId,
-      visitSessions: [],
-    })
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId })
     cy.task('stubOffenderEvents', {
       offenderNo: prisonerId,
       fromDate: format(today, shortDateFormat),
