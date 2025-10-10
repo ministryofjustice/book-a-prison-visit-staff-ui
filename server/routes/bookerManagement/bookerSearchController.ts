@@ -11,6 +11,8 @@ export default class BookerSearchController {
 
   public view(): RequestHandler {
     return async (req, res) => {
+      delete req.session.matchedBookers
+
       const noBookerFound = req.query['no-booker-found'] === ''
 
       res.render('pages/bookerManagement/bookerSearch', {
@@ -23,6 +25,8 @@ export default class BookerSearchController {
 
   public search(): RequestHandler {
     return async (req, res) => {
+      delete req.session.matchedBookers
+
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())

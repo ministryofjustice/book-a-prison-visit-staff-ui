@@ -42,7 +42,9 @@ describe('Booker management - search for booker by email', () => {
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
-    it('should render booker search page', () => {
+    it('should render booker search page and clear any previously matched bookers from session', () => {
+      sessionData.matchedBookers = [booker]
+
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
@@ -59,6 +61,8 @@ describe('Booker management - search for booker by email', () => {
           expect($('input[name=search]').val()).toBeUndefined()
           expect($('[data-test=no-booker-found]').length).toBe(0)
           expect($('[data-test=search]').text().trim()).toBe('Search')
+
+          expect(sessionData.matchedBookers).toBeUndefined()
         })
     })
 
@@ -111,6 +115,7 @@ describe('Booker management - search for booker by email', () => {
     })
 
     it('should redirect to booker details page if single booker found', () => {
+      sessionData.matchedBookers = [booker] // previous match which should be cleared
       bookerService.getBookersByEmail.mockResolvedValue([booker])
 
       return request(app)
