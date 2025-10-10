@@ -37,7 +37,7 @@
         }) }}
 
         {% if noBookerFound and formValues.search %}
-          <p class="govuk-body-l">There is no match for this email address.</p>
+          <p class="govuk-body-l" data-test="no-booker-found">There is no match for this email address.</p>
         {% endif %}
 
         {{ govukButton({

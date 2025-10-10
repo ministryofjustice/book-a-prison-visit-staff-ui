@@ -8,7 +8,7 @@ import { createMockVisitNotificationsService, createMockVisitRequestsService } f
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
 import populateCurrentUser from '../middleware/populateCurrentUser'
-import userRoles from '../constants/bapvUserRoles'
+import bapvUserRoles from '../constants/bapvUserRoles'
 
 let app: Express
 
@@ -170,7 +170,7 @@ describe('GET /', () => {
 
     it('should render tile if role is present', () => {
       app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, userRoles: [userRoles.BOOKER_ADMIN] }),
+        userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
         services: { visitNotificationsService, visitRequestsService },
         sessionData,
       })

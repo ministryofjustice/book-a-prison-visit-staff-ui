@@ -23,6 +23,7 @@ import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/di
 import indexRoutes from '../index'
 import visitJourneyRoutes from '../visitJourney'
 import blockVisitDatesRoutes from '../blockVisitDates'
+import bookerManagementRoutes from '../bookerManagement'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import maintenancePageRoute from '../maintenancePageRoute'
 import prisonerRoutes from '../prisoner/prisoner'
@@ -82,6 +83,8 @@ function appSetup(
       feComponentsMeta,
     }
 
+    // res.locals.appInsightsOperationId = 'operationId' // FIXME
+
     // set default 'selectedEstablishment' unless explicitly set with corresponding service for 'populateSelectedEstablishment()'
     if (!sessionData.selectedEstablishment && !services.supportedPrisonsService) {
       // eslint-disable-next-line no-param-reassign
@@ -104,6 +107,7 @@ function appSetup(
   app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
+  app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/requested-visits', requestRoutes(services))
   app.use('/review', reviewRoutes(services))
