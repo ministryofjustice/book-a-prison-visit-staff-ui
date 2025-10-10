@@ -17,7 +17,8 @@ export declare module 'express-session' {
     cancelledVisitInfo?: CancelledVisitInfo
 
     // Booker management
-    matchedBookers?: BookerSearchResultsDto[] // matched booker accounts from an email search
+    // matched booker accounts from an email search (sorted, most recent 'active' account first)
+    matchedBookers?: BookerSearchResultsDto[]
   }
 }
 
