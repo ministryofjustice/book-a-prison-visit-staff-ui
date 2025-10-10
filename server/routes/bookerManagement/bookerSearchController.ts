@@ -51,7 +51,7 @@ export default class BookerSearchController {
       }
 
       // multiple booker records found
-      req.session.bookerEmail = search
+      req.session.matchedBookers = bookers
       return res.redirect('/manage-bookers/select-account')
     }
   }
