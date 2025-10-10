@@ -1,6 +1,7 @@
 import { dataAccess } from '../data'
 import AuditService from './auditService'
 import BlockedDatesService from './blockedDatesService'
+import BookerService from './bookerService'
 import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
@@ -23,6 +24,8 @@ export const services = () => {
 
   const blockedDatesService = new BlockedDatesService(orchestrationApiClientBuilder, hmppsAuthClient)
 
+  const bookerService = new BookerService(orchestrationApiClientBuilder, hmppsAuthClient)
+
   const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const prisonerProfileService = new PrisonerProfileService(orchestrationApiClientBuilder, hmppsAuthClient)
@@ -42,6 +45,7 @@ export const services = () => {
   return {
     auditService,
     blockedDatesService,
+    bookerService,
     prisonerProfileService,
     prisonerSearchService,
     prisonerVisitorsService,
@@ -59,6 +63,7 @@ export type Services = ReturnType<typeof services>
 export {
   AuditService,
   BlockedDatesService,
+  BookerService,
   PrisonerProfileService,
   PrisonerSearchService,
   PrisonerVisitorsService,

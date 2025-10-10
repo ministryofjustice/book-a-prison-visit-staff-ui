@@ -129,6 +129,7 @@ export default {
         ).split(',')
       ),
     },
+    // TODO remove this feature flag once role available
     bookerManagement: {
       enabled: get('FEATURE_BOOKER_MANAGEMENT', 'false') === 'true',
     },
