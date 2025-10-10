@@ -4,7 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApplicationValidationErrorResponse,
-  BookerInfoDto,
+  BookerSearchResultsDto,
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
@@ -354,10 +354,10 @@ export default {
 
   stubGetBookersByEmail: ({
     email,
-    bookers = [TestData.bookerInfoDto()],
+    bookers = [TestData.bookerSearchResults()],
   }: {
     email: IgnoreVisitNotificationsDto
-    bookers: BookerInfoDto[]
+    bookers: BookerSearchResultsDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
