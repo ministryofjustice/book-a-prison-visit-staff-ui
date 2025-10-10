@@ -2,7 +2,7 @@ import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types
 import {
   Alert,
   ApplicationDto,
-  BookerInfoDto,
+  BookerSearchResultsDto,
   ExcludeDateDto,
   NotificationCount,
   OffenderRestriction,
@@ -134,19 +134,11 @@ export default class TestData {
       applicationStatus,
     }) as ApplicationDto
 
-  static bookerInfoDto = ({
+  static bookerSearchResults = ({
     reference = 'aaaa-bbbb-cccc',
     email = 'booker@example.com',
     createdTimestamp = '2025-10-09T12:00:00',
-    permittedPrisoners = [
-      {
-        prisonerId: 'A1234BC',
-        active: true,
-        prisonCode: 'HEI',
-        permittedVisitors: [{ visitorId: 4321, active: true }],
-      },
-    ],
-  }: Partial<BookerInfoDto> = {}): BookerInfoDto => ({ reference, email, createdTimestamp, permittedPrisoners })
+  }: Partial<BookerSearchResultsDto> = {}): BookerSearchResultsDto => ({ reference, email, createdTimestamp })
 
   static caseLoad = ({
     caseLoadId = 'HEI',

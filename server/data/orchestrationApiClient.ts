@@ -4,7 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApproveVisitRequestBodyDto,
-  BookerInfoDto,
+  BookerSearchResultsDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
@@ -243,7 +243,7 @@ export default class OrchestrationApiClient {
   }
 
   // public-booker-controller
-  async getBookersByEmail(email: string): Promise<BookerInfoDto[]> {
+  async getBookersByEmail(email: string): Promise<BookerSearchResultsDto[]> {
     try {
       return await this.restClient.post({
         path: '/public/booker/search',

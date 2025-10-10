@@ -1407,6 +1407,21 @@ export interface components {
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /** @description flag to determine if visit should be a request or instant booking */
       isRequestBooking?: boolean
+      /** @description Set of visitor details - includes Person ID (nomis) of the visitor and their age (in years) at the time of booking */
+      visitorDetails?: components['schemas']['BookingRequestVisitorDetailsDto'][]
+    }
+    /** @description Visitor Details passed while making a booking */
+    BookingRequestVisitorDetailsDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       */
+      visitorId: number
+      /**
+       * Format: int32
+       * @description Age of the visitor while making the booking, null if not available
+       */
+      visitorAge?: number
     }
     RejectVisitRequestBodyDto: {
       /** @description Reference of the visit for rejection */
@@ -1664,7 +1679,7 @@ export interface components {
       email: string
     }
     /** @description Details of a found booker via booker search */
-    BookerInfoDto: {
+    BookerSearchResultsDto: {
       /** @description This is the booker reference, unique per booker */
       reference: string
       /** @description email registered to booker */
@@ -1674,42 +1689,6 @@ export interface components {
        * @description The time the booker account was created
        */
       createdTimestamp: string
-      /** @description Permitted prisoners list */
-      permittedPrisoners: components['schemas']['PermittedPrisonerForBookerDto'][]
-    }
-    /** @description Permitted prisoner associated with the booker. */
-    PermittedPrisonerForBookerDto: {
-      /**
-       * @description Prisoner Id
-       * @example A1234AA
-       */
-      prisonerId: string
-      /**
-       * @description Active / Inactive permitted prisoner
-       * @example true
-       */
-      active: boolean
-      /**
-       * @description prison code
-       * @example MDI
-       */
-      prisonCode: string
-      /** @description Permitted visitors */
-      permittedVisitors: components['schemas']['PermittedVisitorsForPermittedPrisonerBookerDto'][]
-    }
-    /** @description Permitted visitor associated with the permitted prisoner. */
-    PermittedVisitorsForPermittedPrisonerBookerDto: {
-      /**
-       * Format: int64
-       * @description Identifier for this contact (Person in NOMIS)
-       * @example 5871791
-       */
-      visitorId: number
-      /**
-       * @description Active / Inactive permitted visitor
-       * @example true
-       */
-      active: boolean
     }
     /** @description An address */
     AddressDto: {
@@ -4641,7 +4620,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          '*/*': components['schemas']['BookerInfoDto'][]
+          '*/*': components['schemas']['BookerSearchResultsDto'][]
         }
       }
       /** @description Incorrect request to search for booker(s) */

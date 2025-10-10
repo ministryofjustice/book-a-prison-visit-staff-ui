@@ -17,7 +17,7 @@ const bookerService = createMockBookerService()
 
 const url = '/manage-bookers/search'
 const urlNoBookerFound = `${url}?no-booker-found`
-const booker = TestData.bookerInfoDto()
+const booker = TestData.bookerSearchResults()
 
 beforeEach(() => {
   flashData = {}
