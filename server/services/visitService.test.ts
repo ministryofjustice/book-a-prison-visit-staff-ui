@@ -1,8 +1,9 @@
 import { NotFound } from 'http-errors'
-import { VisitInformation, VisitSessionData } from '../@types/bapv'
+import { VisitInformation, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import {
   ApplicationDto,
   ApplicationMethodType,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   Visit,
   VisitRestriction,
@@ -35,32 +36,80 @@ describe('Visit service', () => {
   })
 
   describe('Visit booking, update and cancellation', () => {
-    describe('bookVisit', () => {
-      it('should book a visit (complete an application so it is a visit)', async () => {
-        const applicationReference = 'aaa-bbb-ccc'
-        const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
+    describe('bookVisit and updateVisit', () => {
+      beforeEach(() => {
+        const fakeDate = new Date('2025-10-05T09:00:00')
+        jest.useFakeTimers({ now: fakeDate })
+      })
 
-        const visit: Partial<Visit> = {
-          applicationReference,
-          reference: 'ab-cd-ef-gh',
-          visitStatus: 'BOOKED',
-        }
+      afterEach(() => {
+        jest.useRealTimers()
+      })
 
+      const applicationReference = 'aaa-bbb-ccc'
+      const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
+
+      const visit: Partial<Visit> = {
+        applicationReference,
+        reference: 'ab-cd-ef-gh',
+        visitStatus: 'BOOKED',
+      }
+
+      const visitors: VisitorListItem[] = [
+        { personId: 1, dateOfBirth: '2025-07-01' }, // infant; age 0 years
+        { personId: 2, dateOfBirth: '2020-10-01' }, // child; age 5 years
+        { personId: 3, dateOfBirth: '2000-01-01' }, // adult; age 25 years
+        { personId: 4, dateOfBirth: '' }, // missing DoB
+        { personId: 5, dateOfBirth: null }, // missing DoB
+        { personId: 6, dateOfBirth: undefined }, // missing DoB
+      ] as VisitorListItem[]
+
+      const expectedVisitorDetails: BookingRequestVisitorDetailsDto[] = [
+        { visitorId: 1, visitorAge: 0 },
+        { visitorId: 2, visitorAge: 5 },
+        { visitorId: 3, visitorAge: 25 },
+        { visitorId: 4, visitorAge: null },
+        { visitorId: 5, visitorAge: null },
+        { visitorId: 6, visitorAge: null },
+      ]
+
+      it('should book a visit including visitor age data', async () => {
         orchestrationApiClient.bookVisit.mockResolvedValue(visit as Visit)
         const result = await visitService.bookVisit({
           username: 'user1',
           applicationReference,
           applicationMethod,
+          visitors,
           allowOverBooking: false,
         })
 
-        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledWith(
+        expect(orchestrationApiClient.bookVisit).toHaveBeenCalledWith({
           applicationReference,
           applicationMethod,
-          false,
-          'user1',
-        )
+          allowOverBooking: false,
+          visitorDetails: expectedVisitorDetails,
+          username: 'user1',
+        })
+        expect(result).toStrictEqual(visit)
+      })
+
+      it('should update a visit including visitor age data', async () => {
+        orchestrationApiClient.updateVisit.mockResolvedValue(visit as Visit)
+        const result = await visitService.updateVisit({
+          username: 'user1',
+          applicationReference,
+          applicationMethod,
+          visitors,
+          allowOverBooking: false,
+        })
+
+        expect(orchestrationApiClient.updateVisit).toHaveBeenCalledWith({
+          applicationReference,
+          applicationMethod,
+          allowOverBooking: false,
+          visitorDetails: expectedVisitorDetails,
+          username: 'user1',
+        })
         expect(result).toStrictEqual(visit)
       })
     })

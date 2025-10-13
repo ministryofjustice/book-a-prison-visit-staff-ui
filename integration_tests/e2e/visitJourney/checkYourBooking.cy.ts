@@ -20,9 +20,10 @@ context('Check visit details page', () => {
   const { prisonerId } = profile
 
   const today = new Date()
+  const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
   const contacts = [
-    TestData.contact(),
+    TestData.contact({ dateOfBirth: adultDob }),
     TestData.contact({
       personId: 4322,
       firstName: 'Bob',
@@ -254,6 +255,10 @@ context('Check visit details page', () => {
       }),
       applicationMethod: 'WEBSITE',
       username: 'USER1',
+      visitorDetails: [
+        { visitorId: 4321, visitorAge: 18 },
+        { visitorId: 4322, visitorAge: 5 },
+      ],
     })
 
     checkYourBookingPage.submitBooking()

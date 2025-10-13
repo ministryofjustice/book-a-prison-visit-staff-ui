@@ -5,6 +5,7 @@ import {
   ApplicationMethodType,
   ApplicationValidationErrorResponse,
   BookerSearchResultsDto,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
@@ -30,11 +31,13 @@ export default {
     applicationMethod,
     username,
     allowOverBooking = false,
+    visitorDetails,
   }: {
     visit: Visit
     applicationMethod: ApplicationMethodType
     username: string
     allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -47,6 +50,7 @@ export default {
               allowOverBooking,
               actionedBy: username,
               userType: 'STAFF',
+              visitorDetails,
             },
           },
         ],
@@ -88,11 +92,13 @@ export default {
     applicationMethod,
     username,
     allowOverBooking = false,
+    visitorDetails,
   }: {
     visit: Visit
     applicationMethod: ApplicationMethodType
     username: string
     allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -105,6 +111,7 @@ export default {
               allowOverBooking,
               actionedBy: username,
               userType: 'STAFF',
+              visitorDetails,
             },
           },
         ],

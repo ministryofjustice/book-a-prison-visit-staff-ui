@@ -20,9 +20,10 @@ context('Book a visit', () => {
   const longDateFormat = 'EEEE d MMMM yyyy'
 
   const today = new Date()
+  const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
   const contacts = [
-    TestData.contact({ restrictions: [TestData.restriction()] }),
+    TestData.contact({ dateOfBirth: adultDob, restrictions: [TestData.restriction()] }),
     TestData.contact({
       personId: 4322,
       firstName: 'Bob',
@@ -212,6 +213,10 @@ context('Book a visit', () => {
       }),
       applicationMethod: 'PHONE',
       username: 'USER1',
+      visitorDetails: [
+        { visitorId: 4321, visitorAge: 18 },
+        { visitorId: 4322, visitorAge: 5 },
+      ],
     })
 
     checkYourBookingPage.submitBooking()

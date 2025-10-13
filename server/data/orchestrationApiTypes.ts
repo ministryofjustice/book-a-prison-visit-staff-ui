@@ -31,6 +31,7 @@ export type IgnoreVisitNotificationsDto = components['schemas']['IgnoreVisitNoti
 
 export type ApplicationMethodType = components['schemas']['BookingOrchestrationRequestDto']['applicationMethodType']
 export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']
+export type BookingRequestVisitorDetailsDto = components['schemas']['BookingRequestVisitorDetailsDto']
 
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']

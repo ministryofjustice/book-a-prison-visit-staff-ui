@@ -186,6 +186,7 @@ testJourneys.forEach(journey => {
               applicationReference: visitSessionData.applicationReference,
               applicationMethod: visitSessionData.requestMethod,
               allowOverBooking: false,
+              visitors: visitSessionData.visitors,
             })
             expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
 
@@ -253,6 +254,7 @@ testJourneys.forEach(journey => {
                 applicationReference: visitSessionData.applicationReference,
                 applicationMethod: visitSessionData.requestMethod,
                 allowOverBooking: false,
+                visitors: visitSessionData.visitors,
               })
               expect(journey.isUpdate ? visitService.bookVisit : visitService.updateVisit).not.toHaveBeenCalled()
             })

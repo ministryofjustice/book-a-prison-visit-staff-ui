@@ -6,6 +6,7 @@ import {
   ApproveVisitRequestBodyDto,
   BookerSearchResultsDto,
   BookingOrchestrationRequestDto,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
   CreateApplicationDto,
@@ -66,12 +67,19 @@ export default class OrchestrationApiClient {
 
   // orchestration-visits-controller
 
-  async bookVisit(
-    applicationReference: string,
-    applicationMethod: ApplicationMethodType,
-    allowOverBooking: boolean,
-    username: string,
-  ): Promise<Visit> {
+  async bookVisit({
+    applicationReference,
+    applicationMethod,
+    allowOverBooking,
+    visitorDetails,
+    username,
+  }: {
+    applicationReference: string
+    applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
+    username: string
+  }): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/book`,
       data: <BookingOrchestrationRequestDto>{
@@ -79,16 +87,24 @@ export default class OrchestrationApiClient {
         allowOverBooking,
         actionedBy: username,
         userType: 'STAFF',
+        visitorDetails,
       },
     })
   }
 
-  async updateVisit(
-    applicationReference: string,
-    applicationMethod: ApplicationMethodType,
-    allowOverBooking: boolean,
-    username: string,
-  ): Promise<Visit> {
+  async updateVisit({
+    applicationReference,
+    applicationMethod,
+    allowOverBooking,
+    visitorDetails,
+    username,
+  }: {
+    applicationReference: string
+    applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
+    username: string
+  }): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/update`,
       data: <BookingOrchestrationRequestDto>{
@@ -96,6 +112,7 @@ export default class OrchestrationApiClient {
         allowOverBooking,
         actionedBy: username,
         userType: 'STAFF',
+        visitorDetails,
       },
     })
   }
