@@ -2,6 +2,7 @@ import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types
 import {
   Alert,
   ApplicationDto,
+  BookerDetailedInfoDto,
   BookerSearchResultsDto,
   ExcludeDateDto,
   NotificationCount,
@@ -133,6 +134,28 @@ export default class TestData {
       reserved,
       applicationStatus,
     }) as ApplicationDto
+
+  static bookerDetailedInfo = ({
+    reference = 'aaaa-bbbb-cccc',
+    email = 'booker@example.com',
+    permittedPrisoners = [
+      {
+        prisoner: {
+          prisonerNumber: 'A1234BC',
+          firstName: 'JOHN',
+          lastName: 'SMITH',
+          dateOfBirth: '1975-04-02',
+          prisonId: 'HEI',
+          prisonName: 'Hewell (HMP)',
+          cellLocation: '1-1-C-028',
+          locationDescription: 'Hewell (HMP)',
+          convictedStatus: 'Convicted',
+        },
+        registeredPrison: { prisonCode: 'HEI', prisonName: 'Hewell (HMP)' },
+        permittedVisitors: [{ visitorId: 4321, firstName: 'Jeanette', lastName: 'Smith', dateOfBirth: '1986-07-28' }],
+      },
+    ],
+  }: Partial<BookerDetailedInfoDto> = {}): BookerDetailedInfoDto => ({ reference, email, permittedPrisoners })
 
   static bookerSearchResults = ({
     reference = 'aaaa-bbbb-cccc',

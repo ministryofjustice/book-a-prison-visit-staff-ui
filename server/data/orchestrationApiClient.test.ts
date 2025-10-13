@@ -490,6 +490,22 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getBookerDetails', () => {
+    it('should return booker details for given booker reference', async () => {
+      const booker = TestData.bookerDetailedInfo()
+      const { reference } = booker
+
+      fakeOrchestrationApi
+        .get(`/public/booker/${reference}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, booker)
+
+      const output = await orchestrationApiClient.getBookerDetails(reference)
+
+      expect(output).toStrictEqual(booker)
+    })
+  })
+
   describe('ignoreNotifications', () => {
     it('should ignore visit notification with the specified reason and return visit', async () => {
       const reference = 'ab-cd-ef-gh'

@@ -4,6 +4,7 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApproveVisitRequestBodyDto,
+  BookerDetailedInfoDto,
   BookerSearchResultsDto,
   BookingOrchestrationRequestDto,
   BookingRequestVisitorDetailsDto,
@@ -272,6 +273,10 @@ export default class OrchestrationApiClient {
       }
       throw error
     }
+  }
+
+  async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {
+    return this.restClient.get({ path: `/public/booker/${reference}` })
   }
 
   // visit notification controller
