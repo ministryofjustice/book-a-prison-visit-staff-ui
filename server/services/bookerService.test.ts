@@ -25,16 +25,30 @@ describe('Booker service', () => {
   })
 
   describe('getBookersByEmail', () => {
-    it('should get book', async () => {
+    it('should return booker(s) for given email address', async () => {
       const email = 'booker@example.com'
       const bookers = [TestData.bookerSearchResults()]
 
       orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
 
-      const result = await bookerService.getBookersByEmail(username, email)
+      const result = await bookerService.getBookersByEmail({ username, email })
 
       expect(result).toStrictEqual(bookers)
       expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
+    })
+  })
+
+  describe('getBookerDetails', () => {
+    it('should return booker details for given booker reference', async () => {
+      const booker = TestData.bookerDetailedInfo()
+      const { reference } = booker
+
+      orchestrationApiClient.getBookerDetails.mockResolvedValue(booker)
+
+      const result = await bookerService.getBookerDetails({ username, reference })
+
+      expect(result).toStrictEqual(booker)
+      expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference)
     })
   })
 })

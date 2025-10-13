@@ -1,4 +1,21 @@
-import { isValidPrisonerNumber, extractPrisonerNumber, isValidVisitReference } from './validationChecks'
+import {
+  isValidPrisonerNumber,
+  extractPrisonerNumber,
+  isValidVisitReference,
+  isValidBookerReference,
+} from './validationChecks'
+
+describe('isValidBookerReference', () => {
+  it('valid', () => {
+    expect(isValidBookerReference('aaaa-bbbb-cccc')).toEqual(true)
+  })
+  it('invalid', () => {
+    expect(isValidBookerReference('abc123')).toEqual(false)
+  })
+  it('empty string', () => {
+    expect(isValidBookerReference('')).toEqual(false)
+  })
+})
 
 describe('isValidPrisonerNumber', () => {
   it('valid', () => {
