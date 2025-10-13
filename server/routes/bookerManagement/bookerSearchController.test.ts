@@ -123,9 +123,9 @@ describe('Booker management - search for booker by email', () => {
         .post(url)
         .send({ search: booker.email })
         .expect(302)
-        .expect('location', `/manage-bookers/booker-details/${booker.reference}`)
+        .expect('location', `/manage-bookers/${booker.reference}/booker-details`)
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith('user1', booker.email)
+          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
@@ -145,7 +145,7 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', '/manage-bookers/select-account')
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith('user1', booker.email)
+          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
@@ -164,7 +164,7 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', urlNoBookerFound)
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith('user1', booker.email)
+          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
