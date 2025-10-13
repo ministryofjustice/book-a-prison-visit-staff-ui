@@ -457,7 +457,7 @@ describe('orchestrationApiClient', () => {
     const email = 'booker@example.com'
 
     it('should return booker(s) for given email address', async () => {
-      const bookers = [TestData.bookerSearchResults()]
+      const bookers = [TestData.bookerSearchResult()]
 
       fakeOrchestrationApi
         .post('/public/booker/search', <SearchBookerDto>{ email })

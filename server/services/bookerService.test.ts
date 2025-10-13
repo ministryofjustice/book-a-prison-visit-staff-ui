@@ -27,7 +27,7 @@ describe('Booker service', () => {
   describe('getBookersByEmail', () => {
     it('should return booker(s) for given email address', async () => {
       const email = 'booker@example.com'
-      const bookers = [TestData.bookerSearchResults()]
+      const bookers = [TestData.bookerSearchResult()]
 
       orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
 

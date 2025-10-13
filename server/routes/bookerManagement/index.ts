@@ -26,6 +26,7 @@ export default function routes(services: Services): Router {
   router.post('/search', bookerSearchController.validate(), bookerSearchController.search())
 
   // TODO HERE select booker account routes
+  router.get('/select-account', (req, res) => res.send('<html><body><h1>Select booker account</h1></body></html>'))
 
   // middleware to ensure valid booker reference for all /manage-bookers/:reference routes
   router.use('/:reference', (req, res, next) => {

@@ -362,7 +362,7 @@ export default {
 
   stubGetBookersByEmail: ({
     email,
-    bookers = [TestData.bookerSearchResults()],
+    bookers = [TestData.bookerSearchResult()],
   }: {
     email: string
     bookers: BookerSearchResultsDto[]
