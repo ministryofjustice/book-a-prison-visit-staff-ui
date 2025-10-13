@@ -56,6 +56,7 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
       }
 
       const result: Partial<Visit> = {
@@ -69,12 +70,13 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.bookVisit(
+      const output = await orchestrationApiClient.bookVisit({
         applicationReference,
-        bookingOrchestrationRequestDto.applicationMethodType,
-        false,
-        'user1',
-      )
+        applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
+        allowOverBooking: false,
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
+        username: 'user1',
+      })
 
       expect(output).toStrictEqual(result)
     })
@@ -88,6 +90,7 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
       }
 
       const result: Partial<Visit> = {
@@ -101,12 +104,13 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.updateVisit(
+      const output = await orchestrationApiClient.updateVisit({
         applicationReference,
-        bookingOrchestrationRequestDto.applicationMethodType,
-        false,
-        'user1',
-      )
+        applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
+        allowOverBooking: false,
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
+        username: 'user1',
+      })
 
       expect(output).toStrictEqual(result)
     })

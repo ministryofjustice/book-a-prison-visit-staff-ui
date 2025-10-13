@@ -70,12 +70,14 @@ export default class CheckYourBooking {
             applicationReference: visitSessionData.applicationReference,
             applicationMethod: visitSessionData.requestMethod,
             allowOverBooking: visitSessionData.allowOverBooking,
+            visitors: visitSessionData.visitors,
           })
         : await this.visitService.bookVisit({
             username: res.locals.user.username,
             applicationReference: visitSessionData.applicationReference,
             applicationMethod: visitSessionData.requestMethod,
             allowOverBooking: visitSessionData.allowOverBooking,
+            visitors: visitSessionData.visitors,
           })
 
       visitSessionData.visitReference = bookedVisit.reference

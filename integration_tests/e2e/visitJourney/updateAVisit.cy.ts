@@ -20,9 +20,10 @@ context('Update a visit', () => {
   const prisoner = TestData.prisoner()
   const { prisonerNumber: offenderNo } = prisoner
 
+  const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
   const contacts = [
-    TestData.contact({ personId: 4321 }),
+    TestData.contact({ dateOfBirth: adultDob, personId: 4321 }),
     TestData.contact({
       personId: 4322,
       firstName: 'Bob',
@@ -182,6 +183,10 @@ context('Update a visit', () => {
       }),
       applicationMethod: 'PHONE',
       username: 'USER1',
+      visitorDetails: [
+        { visitorId: 4321, visitorAge: 18 },
+        { visitorId: 4322, visitorAge: 5 },
+      ],
     })
     checkYourBookingPage.submitBooking()
 
