@@ -157,7 +157,7 @@ export default class TestData {
     ],
   }: Partial<BookerDetailedInfoDto> = {}): BookerDetailedInfoDto => ({ reference, email, permittedPrisoners })
 
-  static bookerSearchResults = ({
+  static bookerSearchResult = ({
     reference = 'aaaa-bbbb-cccc',
     email = 'booker@example.com',
     createdTimestamp = '2025-10-09T12:00:00',
