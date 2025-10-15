@@ -1,3 +1,4 @@
+import { compareDesc } from 'date-fns'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import { BookerDetailedInfoDto, BookerSearchResultsDto } from '../data/orchestrationApiTypes'
 
@@ -7,11 +8,23 @@ export default class BookerService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getBookersByEmail({ username, email }: { username: string; email: string }): Promise<BookerSearchResultsDto[]> {
+  // get bookers by email address with most recently created (the active one) first
+  async getSortedBookersByEmail({
+    username,
+    email,
+  }: {
+    username: string
+    email: string
+  }): Promise<BookerSearchResultsDto[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getBookersByEmail(email)
+    const unsortedBookers = await orchestrationApiClient.getBookersByEmail(email)
+    const bookersByCreatedDesc = unsortedBookers.toSorted((a, b) =>
+      compareDesc(new Date(a.createdTimestamp), new Date(b.createdTimestamp)),
+    )
+
+    return bookersByCreatedDesc
   }
 
   async getBookerDetails({

@@ -24,16 +24,23 @@ describe('Booker service', () => {
     jest.resetAllMocks()
   })
 
-  describe('getBookersByEmail', () => {
-    it('should return booker(s) for given email address', async () => {
+  describe('getSortedBookersByEmail', () => {
+    it('should return booker(s) for given email address sorted by created date descending', async () => {
       const email = 'booker@example.com'
-      const bookers = [TestData.bookerSearchResult()]
+      const activeBookerAccount = TestData.bookerSearchResult({
+        reference: 'active-booker',
+        createdTimestamp: '2025-10-09T12:00:00',
+      })
+      const bookerWithEarlierCreatedDate = TestData.bookerSearchResult({
+        reference: 'old-booker-account',
+        createdTimestamp: '2024-10-09T12:00:00',
+      })
 
-      orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
+      orchestrationApiClient.getBookersByEmail.mockResolvedValue([bookerWithEarlierCreatedDate, activeBookerAccount])
 
-      const result = await bookerService.getBookersByEmail({ username, email })
+      const result = await bookerService.getSortedBookersByEmail({ username, email })
 
-      expect(result).toStrictEqual(bookers)
+      expect(result).toStrictEqual([activeBookerAccount, bookerWithEarlierCreatedDate])
       expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
     })
   })

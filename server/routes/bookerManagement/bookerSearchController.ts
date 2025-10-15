@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { compareDesc } from 'date-fns'
 import { AuditService, BookerService } from '../../services'
 
 export default class BookerSearchController {
@@ -36,7 +35,7 @@ export default class BookerSearchController {
 
       const { search } = matchedData<{ search: string }>(req) // field 'search' rather than 'email' to avoid browser autofill
       const { username } = res.locals.user
-      const bookers = await this.bookerService.getBookersByEmail({ username, email: search })
+      const bookers = await this.bookerService.getSortedBookersByEmail({ username, email: search })
 
       await this.auditService.bookerSearch({
         search,
@@ -52,16 +51,11 @@ export default class BookerSearchController {
 
       // single booker record found
       if (bookers.length === 1) {
-        req.session.matchedBookers = bookers
         return res.redirect(`/manage-bookers/${bookers[0].reference}/booker-details`)
       }
 
-      // multiple booker records found - sort by created date so most recent ('active') first
-      const bookersByCreatedDesc = bookers.toSorted((a, b) =>
-        compareDesc(new Date(a.createdTimestamp), new Date(b.createdTimestamp)),
-      )
-      req.session.matchedBookers = bookersByCreatedDesc
-
+      // multiple booker records
+      req.session.matchedBookers = bookers
       return res.redirect('/manage-bookers/select-account')
     }
   }
