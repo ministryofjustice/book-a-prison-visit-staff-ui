@@ -152,7 +152,15 @@ export default class TestData {
           convictedStatus: 'Convicted',
         },
         registeredPrison: { prisonCode: 'HEI', prisonName: 'Hewell (HMP)' },
-        permittedVisitors: [{ visitorId: 4321, firstName: 'Jeanette', lastName: 'Smith', dateOfBirth: '1986-07-28' }],
+        permittedVisitors: [
+          {
+            visitorId: 4321,
+            firstName: 'Jeanette',
+            lastName: 'Smith',
+            dateOfBirth: '1986-07-28',
+            relationshipDescription: 'Wife',
+          },
+        ],
       },
     ],
   }: Partial<BookerDetailedInfoDto> = {}): BookerDetailedInfoDto => ({ reference, email, permittedPrisoners })

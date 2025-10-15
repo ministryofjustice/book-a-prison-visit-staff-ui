@@ -2336,14 +2336,14 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      first?: boolean
+      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
       sort?: components['schemas']['SortObject']
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       numberOfElements?: number
       pageable?: components['schemas']['PageableObject']
@@ -2780,6 +2780,11 @@ export interface components {
        * @example 2000-01-31
        */
       dateOfBirth?: string
+      /**
+       * @description Description of relationship to Prisoner
+       * @example Mother
+       */
+      relationshipDescription?: string
     }
     CurrentIncentive: {
       /** @description Incentive level */
