@@ -2,6 +2,10 @@ import Page from '../page'
 
 export default class SelectBookerAccountPage extends Page {
   constructor() {
-    super('Select booker account', { axeTest: false }) // TODO remove axeTest skip when page complete
+    super('Select account to manage')
+  }
+
+  continue = (): void => {
+    cy.get('[data-test="continue"]').click()
   }
 }

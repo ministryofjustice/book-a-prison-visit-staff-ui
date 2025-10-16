@@ -65,6 +65,7 @@ context('Booker management', () => {
         email,
         createdTimestamp: '2025-08-01T14:00:00',
       })
+      const activeBookerDetails = TestData.bookerDetailedInfo({ email })
 
       cy.task('stubGetBookersByEmail', { email, bookers: [inactiveBookerSearchResult, activeBookerSearchResult] })
 
@@ -77,10 +78,19 @@ context('Booker management', () => {
       bookerSearchPage.enterEmail(email)
       bookerSearchPage.search()
 
-      // Select booker account page
-      Page.verifyOnPage(SelectBookerAccountPage)
+      cy.task('stubGetBookerDetails', { reference: activeBookerDetails.reference, booker: activeBookerDetails })
 
-      // TODO extend SelectBookerAccountPage - check active account is top radio, etc
+      // Select booker account page
+      const selectBookerAccountPage = Page.verifyOnPage(SelectBookerAccountPage)
+      selectBookerAccountPage.continue()
+
+      // Booker details page
+      const bookerDetailsPage = Page.verifyOnPage(BookerDetailsPage)
+      bookerDetailsPage.getMessages().contains('This account is active')
+      bookerDetailsPage.getBookerEmail().contains(email)
+      bookerDetailsPage.getBookerReference().contains(activeBookerDetails.reference)
+      bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
+      bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
     })
   })
 })
