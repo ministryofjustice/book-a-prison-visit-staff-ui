@@ -4,7 +4,6 @@ import { Services } from '../../services'
 import BookerSearchController from './bookerSearchController'
 import BookerDetailsController from './bookerDetailsController'
 import bapvUserRoles from '../../constants/bapvUserRoles'
-import config from '../../config'
 import { isValidBookerReference } from '../validationChecks'
 import SelectBookerAccountController from './selectBookerAccountController'
 
@@ -17,7 +16,7 @@ export default function routes(services: Services): Router {
 
   // Restrict booker management routes by role
   router.use((req, res, next) => {
-    if (res.locals.user.userRoles.includes(bapvUserRoles.BOOKER_ADMIN) || config.features.bookerManagement.enabled) {
+    if (res.locals.user.userRoles.includes(bapvUserRoles.BOOKER_ADMIN)) {
       return next()
     }
     return res.redirect('/authError')

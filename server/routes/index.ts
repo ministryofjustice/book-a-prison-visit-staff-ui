@@ -4,7 +4,6 @@ import { clearSession } from './visitorUtils'
 import { Services } from '../services'
 import { Prison } from '../@types/bapv'
 import bapvUserRoles from '../constants/bapvUserRoles'
-import config from '../config'
 
 export default function routes({ visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
@@ -20,8 +19,7 @@ export default function routes({ visitNotificationsService, visitRequestsService
 
     const reviewCount = (await visitNotificationsService.getNotificationCount(username, prison.prisonId)).count
 
-    const showBookerManagementTile =
-      userRoles.includes(bapvUserRoles.BOOKER_ADMIN) || config.features.bookerManagement.enabled
+    const showBookerManagementTile = userRoles.includes(bapvUserRoles.BOOKER_ADMIN)
 
     res.render('pages/index', { showRequestedVisitsTile, requestCount, reviewCount, showBookerManagementTile })
   })
