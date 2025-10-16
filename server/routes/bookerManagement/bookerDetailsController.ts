@@ -20,8 +20,15 @@ export default class BookerDetailsController {
         reference,
       })
 
-      const messages = this.getBookerDetailsMessages(active, emailHasMultipleAccounts)
+      const prisonerIds = booker.permittedPrisoners.map(prisoner => prisoner.prisoner.prisonerNumber)
+      await this.auditService.viewBooker({
+        reference,
+        prisonerIds,
+        username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
+      const messages = this.getBookerDetailsMessages(active, emailHasMultipleAccounts)
       res.render('pages/bookerManagement/bookerDetails', { messages, active, booker })
     }
   }

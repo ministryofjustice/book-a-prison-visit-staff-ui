@@ -401,4 +401,28 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a viewed booker audit message', async () => {
+    await auditService.viewBooker({
+      reference: 'aaaa-bbbb-cccc',
+      prisonerIds: ['A1234BC', 'A4567DE'],
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'VIEWED_BOOKER',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"reference":"aaaa-bbbb-cccc","prisonerIds":["A1234BC","A4567DE"]}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })
