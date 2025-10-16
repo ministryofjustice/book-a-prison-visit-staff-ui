@@ -34,8 +34,9 @@
           {# Prisoner #}
           {% set prisonerIndex = "prisoner-" + loop.index %}
           {% set prisonerName = (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName %}
+          {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
 
-          <h2 class="govuk-heading-l" data-test="{{ prisonerIndex }}">Visits to {{ prisonerName }} at {{ prisoner.registeredPrison.prisonName }}</h2>
+          <h2 class="govuk-heading-l" data-test="{{ prisonerIndex }}">Visits to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}</h2>
 
           {# Visitors #}
           {% if prisoner.permittedVisitors | length %}
@@ -58,7 +59,7 @@
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
                 ({
-                  html: '<a href="#">Unlink</a>',
+                  html: '<a href="/manage-bookers/' + booker.reference + '/prisoner/' + prisonerNumber + '/unlink-visitor/' + visitor.visitorId + '/notify">Unlink</a>',
                   attributes: { "data-test": visitorIndex + "-action" }
                 } if active)
                 ]), visitorRowItems) %}
@@ -85,12 +86,18 @@
           {% endif %}
 
           {# Link a visitor (if account is active) #}
-          {{ govukButton({
-            text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
-            classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
-            attributes: { "data-test": prisonerIndex + "-link-visitor" },
-            preventDoubleClick: true
-          }) if active }}
+          {% if active %}
+            <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/link-visitor" method="POST" novalidate>
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+              {{ govukButton({
+                text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
+                classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
+                attributes: { "data-test": prisonerIndex + "-link-visitor" },
+                preventDoubleClick: true
+              }) }}
+            </form>
+          {% endif %}
 
         {% endfor %}
       {% else %}

@@ -140,30 +140,59 @@ export default class TestData {
     email = 'booker@example.com',
     permittedPrisoners = [
       {
-        prisoner: {
-          prisonerNumber: 'A1234BC',
-          firstName: 'JOHN',
-          lastName: 'SMITH',
-          dateOfBirth: '1975-04-02',
-          prisonId: 'HEI',
-          prisonName: 'Hewell (HMP)',
-          cellLocation: '1-1-C-028',
-          locationDescription: 'Hewell (HMP)',
-          convictedStatus: 'Convicted',
-        },
-        registeredPrison: { prisonCode: 'HEI', prisonName: 'Hewell (HMP)' },
-        permittedVisitors: [
-          {
-            visitorId: 4321,
-            firstName: 'Jeanette',
-            lastName: 'Smith',
-            dateOfBirth: '1986-07-28',
-            relationshipDescription: 'Wife',
-          },
-        ],
+        prisoner: this.bookerPrisoner(),
+        registeredPrison: this.bookerPrisonerRegisteredPrison(),
+        permittedVisitors: [this.bookerPrisonerVisitor()],
       },
     ],
   }: Partial<BookerDetailedInfoDto> = {}): BookerDetailedInfoDto => ({ reference, email, permittedPrisoners })
+
+  static bookerPrisoner = ({
+    prisonerNumber = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    dateOfBirth = '1975-04-02',
+    prisonId = 'HEI',
+    prisonName = 'Hewell (HMP)',
+    cellLocation = '1-1-C-028',
+    locationDescription = 'Hewell (HMP)',
+    convictedStatus = 'Convicted',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['prisoner']
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['prisoner'] => ({
+    prisonerNumber,
+    firstName,
+    lastName,
+    dateOfBirth,
+    prisonId,
+    prisonName,
+    cellLocation,
+    locationDescription,
+    convictedStatus,
+  })
+
+  static bookerPrisonerRegisteredPrison = ({
+    prisonCode = 'HEI',
+    prisonName = 'Hewell (HMP)',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['registeredPrison']
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['registeredPrison'] => ({ prisonCode, prisonName })
+
+  static bookerPrisonerVisitor = ({
+    visitorId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    relationshipDescription = 'Wife',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['permittedVisitors'][0]
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['permittedVisitors'][0] => ({
+    visitorId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    relationshipDescription,
+  })
 
   static bookerSearchResult = ({
     reference = 'aaaa-bbbb-cccc',
