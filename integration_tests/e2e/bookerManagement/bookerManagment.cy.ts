@@ -31,7 +31,7 @@ context('Booker management', () => {
       cy.task('stubGetNotificationCount', {})
       cy.signIn()
     })
-    // TODO check no access without role
+
     const email = 'booker@example.com'
 
     it('should search for a booker and navigate to booker details page (single booker record)', () => {
@@ -50,9 +50,11 @@ context('Booker management', () => {
       bookerSearchPage.search()
 
       // Booker details page
-      Page.verifyOnPage(BookerDetailsPage)
-
-      // TODO extend BookerDetailsPage
+      const bookerDetailsPage = Page.verifyOnPage(BookerDetailsPage)
+      bookerDetailsPage.getBookerEmail().contains(email)
+      bookerDetailsPage.getBookerReference().contains(bookerDetails.reference)
+      bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
+      bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
     })
 
     it('should search for a booker and navigate to booker details page (multiple booker records)', () => {
