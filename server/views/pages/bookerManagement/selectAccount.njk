@@ -1,9 +1,10 @@
 {% extends "layout.njk" %}
-{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Select account to manage" %}
+{% set backLinkHref = '/manage-bookers/search' %}
+
 {% set accounts = [] %}
 
 {% for booker in matchedBookers %}
@@ -15,10 +16,6 @@
     }
   ), visitors) %}
 {% endfor %}
-
-{% block beforeContent %}
-  {{ breadcrumbs() }}
-{% endblock %}
 
 {% block content %}
   <div class="govuk-grid-row">

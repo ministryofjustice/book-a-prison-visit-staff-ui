@@ -51,8 +51,7 @@ describe('Booker management - select booker account when multiple accounts prese
           const $ = cheerio.load(res.text)
           // Page header
           expect($('title').text()).toMatch(/^Select account to manage -/)
-          expect($('.govuk-breadcrumbs li').length).toBe(2)
-          expect($('.govuk-back-link').length).toBe(0)
+          expect($('.govuk-back-link').attr('href')).toBe('/manage-bookers/search')
           expect($('h1').text().trim()).toBe('Select account to manage')
           expect($('[data-test=booker-email]').text()).toBe(booker1.email)
 
