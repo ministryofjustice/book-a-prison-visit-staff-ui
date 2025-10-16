@@ -13,7 +13,7 @@ export default function routes(services: Services): Router {
 
   const bookerSearchController = new BookerSearchController(services.auditService, services.bookerService)
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
-  const selectBookerAccountController = new SelectBookerAccountController(services.auditService, services.bookerService)
+  const selectBookerAccountController = new SelectBookerAccountController(services.bookerService)
 
   // Restrict booker management routes by role
   router.use((req, res, next) => {

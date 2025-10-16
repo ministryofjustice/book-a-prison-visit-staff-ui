@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
 import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
-import { createMockAuditService, createMockBookerService } from '../../services/testutils/mocks'
+import { createMockBookerService } from '../../services/testutils/mocks'
 import bapvUserRoles from '../../constants/bapvUserRoles'
 import TestData from '../testutils/testData'
 
@@ -12,12 +12,11 @@ let app: Express
 let flashData: FlashData
 let sessionData: SessionData
 
-const auditService = createMockAuditService()
 const bookerService = createMockBookerService()
 
 const url = '/manage-bookers/select-account'
-const booker = TestData.bookerSearchResult()
-const bookerWithEarlierCreatedDate = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
+const booker1 = TestData.bookerSearchResult()
+const booker2 = TestData.bookerSearchResult({ reference: 'bbbb-cccc-dddd', createdTimestamp: '2024-10-09T12:00:00' })
 
 beforeEach(() => {
   flashData = {}
@@ -25,7 +24,7 @@ beforeEach(() => {
 
   sessionData = {} as SessionData
   app = appWithAllRoutes({
-    services: { auditService, bookerService },
+    services: { bookerService },
     userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
     sessionData,
   })
@@ -35,15 +34,15 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('Booker management - select booker account when multiple options', () => {
+describe('Booker management - select booker account when multiple accounts present', () => {
   describe(`GET ${url}`, () => {
     it('should require booker admin role', () => {
-      app = appWithAllRoutes({ services: { auditService, bookerService }, sessionData })
+      app = appWithAllRoutes({ services: { bookerService }, sessionData })
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
     it('should render select booker page when at least 2 accounts present', () => {
-      sessionData.matchedBookers = [booker, booker]
+      sessionData.matchedBookers = [booker1, booker2]
 
       return request(app)
         .get(url)
@@ -58,19 +57,22 @@ describe('Booker management - select booker account when multiple options', () =
 
           // Form
           expect($('form').attr('action')).toBe(url)
-          expect($('input[name=reference]').val()).toBe(booker.reference)
+          expect($('input[name=reference]').eq(0).val()).toBe(booker1.reference)
+          expect($('label[for="reference"]').text().trim()).toBe('Created on 9 October 2025 at 12pm')
+          expect($('input[name=reference]').eq(1).val()).toBe(booker2.reference)
+          expect($('label[for="reference-2"]').text().trim()).toBe('Created on 9 October 2024 at 12pm')
           expect($('[data-test=continue]').text().trim()).toBe('Continue')
         })
     })
 
     it('should redirect to previous page, if only 1 booker account present', () => {
-      sessionData.matchedBookers = [booker]
+      sessionData.matchedBookers = [booker1]
 
-      return request(app).get(url).expect(302).expect('location', '/booker-management/search')
+      return request(app).get(url).expect(302).expect('location', '/manage-bookers/search')
     })
 
     it('should render validation error', () => {
-      sessionData.matchedBookers = [booker, booker]
+      sessionData.matchedBookers = [booker1, booker2]
       const missingReference = 'missing-reference'
       const validationError: FieldValidationError = {
         type: 'field',
@@ -95,25 +97,22 @@ describe('Booker management - select booker account when multiple options', () =
 
   describe(`POST ${url}`, () => {
     beforeEach(() => {
-      flashData = { errors: [], formValues: [] }
+      flashData = { errors: [] }
     })
 
     it('should require booker admin role', () => {
-      app = appWithAllRoutes({ services: { auditService, bookerService }, sessionData })
+      app = appWithAllRoutes({ services: { bookerService }, sessionData })
       return request(app).post(url).expect(302).expect('location', '/authError')
     })
 
-    it.skip('should navigate to the booker details page, for selected booker account', () => {
-      sessionData.matchedBookers = [booker, booker]
+    it('should redirect to the booker details page, for selected booker account', () => {
+      sessionData.matchedBookers = [booker1, booker2]
 
       return request(app)
         .post(url)
-        .send({ reference: booker.reference })
+        .send({ reference: booker1.reference })
         .expect(302)
-        .expect('location', `/manage-bookers/booker-details/${booker.reference}`)
-        .expect(() => {
-          // expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
-        })
+        .expect('location', `/manage-bookers/${booker1.reference}/booker-details`)
     })
 
     it('should set form validation errors and redirect to same page', () => {
