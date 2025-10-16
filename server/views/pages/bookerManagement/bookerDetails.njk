@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
@@ -9,6 +10,11 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
 
       <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
 
@@ -33,6 +39,7 @@
 
           {# Visitors #}
           {% if prisoner.permittedVisitors | length %}
+
             {# Build visitor table row items #}
             {% set visitorRowItems = [] %}
             {%- for visitor in prisoner.permittedVisitors %}
@@ -50,23 +57,23 @@
                   text : (visitor.dateOfBirth | formatDate('d/M/yyyy')) + " (" + (visitor.dateOfBirth | displayAge) + ")",
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
-                {
+                ({
                   html: '<a href="#">Unlink</a>',
                   attributes: { "data-test": visitorIndex + "-action" }
-                }
+                } if active) {# action column only if account active #}
                 ]), visitorRowItems) %}
             {% endfor -%}
 
             {{ govukTable({
               caption: "Linked visitors",
               captionClasses: "govuk-table__caption--m",
-              classes: "govuk-!-margin-top-6",
+              classes: "govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
               firstCellIsHeader: true,
               head: [
                 { text: "Name"},
                 { text: "Relationship to prisoner"},
                 { text: "Date of birth"},
-                { text: "Action"}
+                ({ text: "Action"} if active)
               ],
               rows: visitorRowItems
             }) }}
@@ -77,13 +84,13 @@
             </p>
           {% endif %}
 
-          {# Link a visitor #}
+          {# Link a visitor (if account is active) #}
           {{ govukButton({
             text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
             classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
             attributes: { "data-test": prisonerIndex + "-link-visitor" },
             preventDoubleClick: true
-          }) }}
+          }) if active }}
 
         {% endfor %}
       {% else %}

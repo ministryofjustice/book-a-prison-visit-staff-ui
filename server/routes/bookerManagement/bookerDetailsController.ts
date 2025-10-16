@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import { AuditService, BookerService } from '../../services'
+import { MoJAlert } from '../../@types/bapv'
 
 export default class BookerDetailsController {
   public constructor(
@@ -13,8 +14,41 @@ export default class BookerDetailsController {
       const { username } = res.locals.user
 
       const booker = await this.bookerService.getBookerDetails({ username, reference })
+      const { active, emailHasMultipleAccounts } = await this.bookerService.getBookerStatus({
+        username,
+        email: booker.email,
+        reference,
+      })
 
-      res.render('pages/bookerManagement/bookerDetails', { booker })
+      const messages = this.getBookerDetailsMessages(active, emailHasMultipleAccounts)
+
+      res.render('pages/bookerManagement/bookerDetails', { messages, active, booker })
     }
+  }
+
+  private getBookerDetailsMessages(active: boolean, emailHasMultipleAccounts: boolean): MoJAlert[] {
+    if (!emailHasMultipleAccounts) {
+      return []
+    }
+
+    if (active) {
+      return [
+        {
+          variant: 'information',
+          title: 'The booker’s email address has been used for more than one account',
+          showTitleAsHeading: true,
+          text: 'This account is active and can be used to book visits.',
+        },
+      ]
+    }
+
+    return [
+      {
+        variant: 'information',
+        title: 'This account is inactive',
+        showTitleAsHeading: true,
+        text: 'It can no longer be used to book visits.',
+      },
+    ]
   }
 }

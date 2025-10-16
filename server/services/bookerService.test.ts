@@ -1,6 +1,7 @@
 import TestData from '../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BookerService from './bookerService'
+import { BookerSearchResultsDto } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const username = 'user1'
@@ -57,5 +58,35 @@ describe('Booker service', () => {
       expect(result).toStrictEqual(booker)
       expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference)
     })
+  })
+
+  describe('getBookerStatus', () => {
+    const email = 'booker@example.com'
+    const activeBooker = TestData.bookerSearchResult({ reference: 'a' })
+    const inactiveBooker = TestData.bookerSearchResult({ reference: 'b' })
+
+    it.each([
+      ['single booker account', [activeBooker], 'a', true, false],
+      ['multiple booker accounts - active requested', [activeBooker, inactiveBooker], 'a', true, true],
+      ['multiple booker accounts - inactive requested', [activeBooker, inactiveBooker], 'b', false, true],
+      ['booker not found', [activeBooker], 'x', false, false],
+      ['no bookers', [], 'x', false, false],
+    ])(
+      'should handle %s',
+      async (
+        _: string,
+        bookers: BookerSearchResultsDto[],
+        reference: string,
+        expectedActive: boolean,
+        expectedMultipleAccounts: boolean,
+      ) => {
+        orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
+
+        const result = await bookerService.getBookerStatus({ username: 'user1', email, reference })
+
+        expect(result).toStrictEqual({ active: expectedActive, emailHasMultipleAccounts: expectedMultipleAccounts })
+        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
+      },
+    )
   })
 })

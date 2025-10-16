@@ -39,4 +39,20 @@ export default class BookerService {
 
     return orchestrationApiClient.getBookerDetails(reference)
   }
+
+  async getBookerStatus({
+    username,
+    email,
+    reference,
+  }: {
+    username: string
+    email: string
+    reference: string
+  }): Promise<{ active: boolean; emailHasMultipleAccounts: boolean }> {
+    const bookers = await this.getSortedBookersByEmail({ username, email })
+    const emailHasMultipleAccounts = bookers.length > 1
+    const active = bookers[0]?.reference === reference
+
+    return { active, emailHasMultipleAccounts }
+  }
 }
