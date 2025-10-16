@@ -1,4 +1,7 @@
 {% extends "layout.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Booker details" %}
 
@@ -8,7 +11,98 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
+
       <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+
+      {# Booker details #}
+      <dl class="govuk-list bapv-booker-details">
+        <dt>Email address:</dt>
+        <dd data-test="booker-email">{{ booker.email }}</dd>
+
+        <dt>Booker reference:</dt>
+        <dd data-test="booker-reference">{{ booker.reference }}</dd>
+      </dl>
+
+      {% if booker.permittedPrisoners | length %}
+        <p>Linking a visitor lets the booker select the visitor when booking online.</p>
+
+        {% for prisoner in booker.permittedPrisoners %}
+          {# Prisoner #}
+          {% set prisonerIndex = "prisoner-" + loop.index %}
+          {% set prisonerName = (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName %}
+          {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
+
+          <h2 class="govuk-heading-l" data-test="{{ prisonerIndex }}">Visits to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}</h2>
+
+          {# Visitors #}
+          {% if prisoner.permittedVisitors | length %}
+
+            {# Build visitor table row items #}
+            {% set visitorRowItems = [] %}
+            {%- for visitor in prisoner.permittedVisitors %}
+              {% set visitorIndex = prisonerIndex + "-visitor-" + loop.index %}
+              {% set visitorRowItems = (visitorRowItems.push([
+                {
+                  text: visitor.firstName + " " + visitor.lastName,
+                  attributes: { "data-test": visitorIndex + "-name" }
+                },
+                {
+                  text: visitor.relationshipDescription,
+                  attributes: { "data-test": visitorIndex + "-relationship" }
+                },
+                {
+                  text : (visitor.dateOfBirth | formatDate('d/M/yyyy')) + " (" + (visitor.dateOfBirth | displayAge) + ")",
+                  attributes: { "data-test": visitorIndex + "-dob" }
+                },
+                ({
+                  html: '<a href="/manage-bookers/' + booker.reference + '/prisoner/' + prisonerNumber + '/unlink-visitor/' + visitor.visitorId + '/notify">Unlink</a>',
+                  attributes: { "data-test": visitorIndex + "-action" }
+                } if active)
+                ]), visitorRowItems) %}
+            {% endfor -%}
+
+            {{ govukTable({
+              caption: "Linked visitors",
+              captionClasses: "govuk-table__caption--m",
+              classes: "govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
+              firstCellIsHeader: true,
+              head: [
+                { text: "Name"},
+                { text: "Relationship to prisoner"},
+                { text: "Date of birth"},
+                ({ text: "Action"} if active)
+              ],
+              rows: visitorRowItems
+            }) }}
+
+          {% else %}
+            <p data-test="{{ prisonerIndex }}-no-visitors">
+              There are no linked visitors for this prisoner.
+            </p>
+          {% endif %}
+
+          {# Link a visitor (if account is active) #}
+          {% if active %}
+            <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/link-visitor" method="POST" novalidate>
+              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+              {{ govukButton({
+                text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
+                classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
+                attributes: { "data-test": prisonerIndex + "-link-visitor" },
+                preventDoubleClick: true
+              }) }}
+            </form>
+          {% endif %}
+
+        {% endfor %}
+      {% else %}
+        <p data-test="booker-no-prisoners">This booker has no prisoners.</p>
+      {% endif %}
 
     </div>
   </div>

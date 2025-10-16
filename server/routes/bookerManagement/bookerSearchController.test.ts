@@ -18,7 +18,7 @@ const bookerService = createMockBookerService()
 const url = '/manage-bookers/search'
 const urlNoBookerFound = `${url}?no-booker-found`
 const booker = TestData.bookerSearchResult()
-const bookerWithEarlierCreatedDate = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
+const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
 
 beforeEach(() => {
   flashData = {}
@@ -44,7 +44,7 @@ describe('Booker management - search for booker by email', () => {
     })
 
     it('should render booker search page and clear any previously matched bookers from session', () => {
-      sessionData.matchedBookers = [booker]
+      sessionData.matchedBookers = [booker, inactiveBooker]
 
       return request(app)
         .get(url)
@@ -115,9 +115,9 @@ describe('Booker management - search for booker by email', () => {
       return request(app).post(url).expect(302).expect('location', '/authError')
     })
 
-    it('should save matched booker to session and redirect to booker details page if single booker found', () => {
-      sessionData.matchedBookers = [booker] // previous match which should be cleared
-      bookerService.getBookersByEmail.mockResolvedValue([booker])
+    it('should redirect to booker details page if single booker found', () => {
+      sessionData.matchedBookers = [booker, inactiveBooker] // previous match which should be cleared
+      bookerService.getSortedBookersByEmail.mockResolvedValue([booker])
 
       return request(app)
         .post(url)
@@ -125,19 +125,18 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', `/manage-bookers/${booker.reference}/booker-details`)
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
             operationId: undefined,
           })
-          expect(sessionData.matchedBookers).toStrictEqual([booker])
+          expect(sessionData.matchedBookers).toBeUndefined()
         })
     })
 
-    it('should sort matched bookers, save to session and redirect to select booker account page if multiple bookers found', () => {
-      // should end up sorted so 'booker' first element in array
-      bookerService.getBookersByEmail.mockResolvedValue([bookerWithEarlierCreatedDate, booker])
+    it('should save matched bookers to session and redirect to select booker account page if multiple bookers found', () => {
+      bookerService.getSortedBookersByEmail.mockResolvedValue([booker, inactiveBooker])
 
       return request(app)
         .post(url)
@@ -145,18 +144,18 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', '/manage-bookers/select-account')
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
             operationId: undefined,
           })
-          expect(sessionData.matchedBookers).toStrictEqual([booker, bookerWithEarlierCreatedDate])
+          expect(sessionData.matchedBookers).toStrictEqual([booker, inactiveBooker])
         })
     })
 
     it('should redirect back to booker search page with query param if no booker found', () => {
-      bookerService.getBookersByEmail.mockResolvedValue([])
+      bookerService.getSortedBookersByEmail.mockResolvedValue([])
 
       return request(app)
         .post(url)
@@ -164,7 +163,7 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', urlNoBookerFound)
         .expect(() => {
-          expect(bookerService.getBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
@@ -189,7 +188,7 @@ describe('Booker management - search for booker by email', () => {
         .expect(302)
         .expect('location', url)
         .expect(() => {
-          expect(bookerService.getBookersByEmail).not.toHaveBeenCalled()
+          expect(bookerService.getSortedBookersByEmail).not.toHaveBeenCalled()
           expect(auditService.bookerSearch).not.toHaveBeenCalled()
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { search: 'invalid-email' })

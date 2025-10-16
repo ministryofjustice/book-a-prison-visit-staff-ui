@@ -375,6 +375,25 @@ export default class AuditService {
     })
   }
 
+  async viewBooker({
+    reference,
+    prisonerIds,
+    username,
+    operationId,
+  }: {
+    reference: string
+    prisonerIds: string[]
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'VIEWED_BOOKER',
+      who: username,
+      operationId,
+      details: { reference, prisonerIds },
+    })
+  }
+
   private async sendAuditMessage({
     action,
     who,

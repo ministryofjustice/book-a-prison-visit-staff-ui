@@ -1,6 +1,7 @@
 import TestData from '../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BookerService from './bookerService'
+import { BookerSearchResultsDto } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const username = 'user1'
@@ -24,16 +25,23 @@ describe('Booker service', () => {
     jest.resetAllMocks()
   })
 
-  describe('getBookersByEmail', () => {
-    it('should return booker(s) for given email address', async () => {
+  describe('getSortedBookersByEmail', () => {
+    it('should return booker(s) for given email address sorted by created date descending', async () => {
       const email = 'booker@example.com'
-      const bookers = [TestData.bookerSearchResult()]
+      const activeBookerAccount = TestData.bookerSearchResult({
+        reference: 'active-booker',
+        createdTimestamp: '2025-10-09T12:00:00',
+      })
+      const bookerWithEarlierCreatedDate = TestData.bookerSearchResult({
+        reference: 'old-booker-account',
+        createdTimestamp: '2024-10-09T12:00:00',
+      })
 
-      orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
+      orchestrationApiClient.getBookersByEmail.mockResolvedValue([bookerWithEarlierCreatedDate, activeBookerAccount])
 
-      const result = await bookerService.getBookersByEmail({ username, email })
+      const result = await bookerService.getSortedBookersByEmail({ username, email })
 
-      expect(result).toStrictEqual(bookers)
+      expect(result).toStrictEqual([activeBookerAccount, bookerWithEarlierCreatedDate])
       expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
     })
   })
@@ -50,5 +58,35 @@ describe('Booker service', () => {
       expect(result).toStrictEqual(booker)
       expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference)
     })
+  })
+
+  describe('getBookerStatus', () => {
+    const email = 'booker@example.com'
+    const activeBooker = TestData.bookerSearchResult({ reference: 'a' })
+    const inactiveBooker = TestData.bookerSearchResult({ reference: 'b' })
+
+    it.each([
+      ['single booker account', [activeBooker], 'a', true, false],
+      ['multiple booker accounts - active requested', [activeBooker, inactiveBooker], 'a', true, true],
+      ['multiple booker accounts - inactive requested', [activeBooker, inactiveBooker], 'b', false, true],
+      ['booker not found', [activeBooker], 'x', false, false],
+      ['no bookers', [], 'x', false, false],
+    ])(
+      'should handle %s',
+      async (
+        _: string,
+        bookers: BookerSearchResultsDto[],
+        reference: string,
+        expectedActive: boolean,
+        expectedMultipleAccounts: boolean,
+      ) => {
+        orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
+
+        const result = await bookerService.getBookerStatus({ username: 'user1', email, reference })
+
+        expect(result).toStrictEqual({ active: expectedActive, emailHasMultipleAccounts: expectedMultipleAccounts })
+        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
+      },
+    )
   })
 })

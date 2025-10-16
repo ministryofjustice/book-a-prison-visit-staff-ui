@@ -300,3 +300,19 @@ p.bapv-visit-details__restriction--flagged {
 .prisoner-profile-visits .status--CANCELLED {
   color: $govuk-secondary-text-colour;
 }
+
+.bapv-booker-details {
+  @include govuk-font-size($size: 24);
+  display: grid;
+  grid-template-columns: max-content auto;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  margin-bottom: govuk-spacing(8);
+
+  & dt {
+    font-weight: $govuk-font-weight-bold;
+  }
+
+  & dd {
+    margin-left: 0;
+  }
+}
