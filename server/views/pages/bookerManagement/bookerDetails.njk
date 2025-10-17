@@ -45,9 +45,12 @@
             {% set visitorRowItems = [] %}
             {%- for visitor in prisoner.permittedVisitors %}
               {% set visitorIndex = prisonerIndex + "-visitor-" + loop.index %}
-              {% set visitorRowItems = (visitorRowItems.push([
+              {% set visitorUnlinkHref %}/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/unlink-visitor/{{ visitor.visitorId }}/notify{% endset %}
+              {% set visitorName %}{{ visitor.firstName }} {{ visitor.lastName }}{% endset %}
+
+              {%- set visitorRowItems = (visitorRowItems.push([
                 {
-                  text: visitor.firstName + " " + visitor.lastName,
+                  text: visitorName,
                   attributes: { "data-test": visitorIndex + "-name" }
                 },
                 {
@@ -59,7 +62,7 @@
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
                 ({
-                  html: '<a href="/manage-bookers/' + booker.reference + '/prisoner/' + prisonerNumber + '/unlink-visitor/' + visitor.visitorId + '/notify">Unlink</a>',
+                  html: '<a href="' + visitorUnlinkHref + '">Unlink<span class="govuk-visually-hidden"> ' + visitorName + '</span></a>',
                   attributes: { "data-test": visitorIndex + "-action" }
                 } if active)
                 ]), visitorRowItems) %}
