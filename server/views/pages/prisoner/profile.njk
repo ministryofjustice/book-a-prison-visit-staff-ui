@@ -313,13 +313,13 @@
               }
             },
             {
-              text: prisonerDetails.visitBalances.latestIepAdjustDate,
+              text: prisonerDetails.visitBalances.lastVoAllocationDate | formatDate,
               attributes: {
                 "data-test": "tab-vo-last-date"
               }
             },
             {
-              text: prisonerDetails.visitBalances.nextIepAdjustDate,
+              text: prisonerDetails.visitBalances.nextVoAllocationDate | formatDate,
               attributes: {
                 "data-test": "tab-vo-next-date"
               }
@@ -336,13 +336,13 @@
               }
             },
             {
-              text: prisonerDetails.visitBalances.latestPrivIepAdjustDate,
+              text: prisonerDetails.visitBalances.lastPvoAllocationDate | formatDate,
               attributes: {
                 "data-test": "tab-pvo-last-date"
               }
             },
             {
-              text: prisonerDetails.visitBalances.nextPrivIepAdjustDate,
+              text: prisonerDetails.visitBalances.nextPvoAllocationDate | formatDate,
               attributes: {
                 "data-test": "tab-pvo-next-date"
               }

@@ -2355,10 +2355,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      unpaged?: boolean
+      paged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -3154,14 +3154,24 @@ export interface components {
       remainingPvo: number
       /**
        * Format: date
-       * @description Date of last IEP adjustment for Visit orders
+       * @description Date of last VO allocation
        */
-      latestIepAdjustDate?: string
+      lastVoAllocationDate: string
       /**
        * Format: date
-       * @description Date of last IEP adjustment for Privilege Visit orders
+       * @description Date of next VO allocation
        */
-      latestPrivIepAdjustDate?: string
+      nextVoAllocationDate: string
+      /**
+       * Format: date
+       * @description Date of last PVO allocation, null if not allocated
+       */
+      lastPvoAllocationDate?: string
+      /**
+       * Format: date
+       * @description Date of next PVO allocation, null if not allocated
+       */
+      nextPvoAllocationDate?: string
     }
     /** @description Visit Summary */
     VisitSummaryDto: {

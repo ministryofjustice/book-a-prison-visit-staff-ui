@@ -1,6 +1,6 @@
 import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
-import { convertToTitleCase, nextIepAdjustDate, nextPrivIepAdjustDate, prisonerDateTimePretty } from '../utils/utils'
+import { convertToTitleCase, prisonerDateTimePretty } from '../utils/utils'
 import { Alert, Visit } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 
@@ -55,18 +55,6 @@ export default class PrisonerProfileService {
       category: prisonerProfile.category,
       incentiveLevel: prisonerProfile.incentiveLevel,
       visitBalances: prisonerProfile.convictedStatus === 'Convicted' ? prisonerProfile.visitBalances : null,
-    }
-
-    const { visitBalances } = prisonerDetails
-    if (visitBalances) {
-      if (visitBalances.latestIepAdjustDate) {
-        visitBalances.nextIepAdjustDate = nextIepAdjustDate(visitBalances.latestIepAdjustDate)
-        visitBalances.latestIepAdjustDate = prisonerDateTimePretty(visitBalances.latestIepAdjustDate)
-      }
-      if (visitBalances.latestPrivIepAdjustDate) {
-        visitBalances.nextPrivIepAdjustDate = nextPrivIepAdjustDate(visitBalances.latestPrivIepAdjustDate)
-        visitBalances.latestPrivIepAdjustDate = prisonerDateTimePretty(visitBalances.latestPrivIepAdjustDate)
-      }
     }
 
     return {
