@@ -10,7 +10,7 @@ export default class SelectBookerAccountController {
     return async (req, res) => {
       const { matchedBookers } = req.session
 
-      if (matchedBookers.length <= 1) {
+      if (!matchedBookers?.length) {
         return res.redirect('/manage-bookers/search')
       }
 

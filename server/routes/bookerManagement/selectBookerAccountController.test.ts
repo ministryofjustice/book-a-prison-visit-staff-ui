@@ -41,7 +41,7 @@ describe('Booker management - select booker account when multiple accounts prese
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
-    it('should render select booker page when at least 2 accounts present', () => {
+    it('should render select booker account page with accounts stored in session', () => {
       sessionData.matchedBookers = [booker1, booker2]
 
       return request(app)
@@ -65,9 +65,7 @@ describe('Booker management - select booker account when multiple accounts prese
         })
     })
 
-    it('should redirect to previous page, if only 1 booker account present', () => {
-      sessionData.matchedBookers = [booker1]
-
+    it('should redirect to booker search if no booker accounts in session', () => {
       return request(app).get(url).expect(302).expect('location', '/manage-bookers/search')
     })
 
@@ -105,7 +103,7 @@ describe('Booker management - select booker account when multiple accounts prese
       return request(app).post(url).expect(302).expect('location', '/authError')
     })
 
-    it('should redirect to the booker details page, for selected booker account', () => {
+    it('should redirect to the booker details page for selected booker account', () => {
       sessionData.matchedBookers = [booker1, booker2]
 
       return request(app)
