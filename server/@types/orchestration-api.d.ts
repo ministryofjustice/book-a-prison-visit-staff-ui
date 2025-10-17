@@ -3172,6 +3172,10 @@ export interface components {
        * @description Date of next PVO allocation, null if not allocated
        */
       nextPvoAllocationDate?: string
+
+      // FIXME temporarily adding old data format properties - remove when new API deployed
+      latestIepAdjustDate?: string
+      latestPrivIepAdjustDate?: string
     }
     /** @description Visit Summary */
     VisitSummaryDto: {

@@ -4,7 +4,7 @@ import {
   NotificationType,
   OffenderRestriction,
   PrisonDto,
-  PrisonerProfile,
+  PrisonerProfileDto,
   Visit,
   VisitorSupport,
   VisitSummary,
@@ -46,10 +46,10 @@ export type PrisonerProfilePage = {
     dateOfBirth: string
     cellLocation: string
     prisonName: string
-    convictedStatus: PrisonerProfile['convictedStatus']
+    convictedStatus: PrisonerProfileDto['convictedStatus']
     category: string
     incentiveLevel: string
-    visitBalances: PrisonerProfile['visitBalances']
+    visitBalances: PrisonerProfileDto['visitBalances']
   }
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }
