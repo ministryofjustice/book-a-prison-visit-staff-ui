@@ -49,10 +49,7 @@ export type PrisonerProfilePage = {
     convictedStatus: PrisonerProfile['convictedStatus']
     category: string
     incentiveLevel: string
-    visitBalances: PrisonerProfile['visitBalances'] & {
-      nextIepAdjustDate?: string
-      nextPrivIepAdjustDate?: string
-    }
+    visitBalances: PrisonerProfile['visitBalances']
   }
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }

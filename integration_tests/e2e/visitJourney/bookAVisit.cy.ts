@@ -237,16 +237,9 @@ context('Book a visit', () => {
 
   it('should allow VO balance override', () => {
     const prisonerDisplayName = 'Smith, John'
-    const prisonerRestrictions = [TestData.offenderRestriction()]
-    const profile = TestData.prisonerProfile({
-      visitBalances: {
-        remainingVo: 0,
-        remainingPvo: 0,
-        latestIepAdjustDate: '2021-04-21',
-        latestPrivIepAdjustDate: '2021-12-01',
-      },
-      prisonerRestrictions,
-    })
+    const profile = TestData.prisonerProfile()
+    profile.visitBalances.remainingVo = 0
+    profile.visitBalances.remainingPvo = 0
     const { prisonerId } = profile
 
     // Prisoner profile page

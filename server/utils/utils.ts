@@ -3,8 +3,6 @@ import {
   format,
   parseISO,
   addDays,
-  startOfMonth,
-  addMonths,
   isMonday,
   previousMonday,
   addWeeks,
@@ -120,14 +118,6 @@ const properCaseName = (name: string): string => (isBlank(name) ? '' : name.spli
 
 export const convertToTitleCase = (sentence: string): string =>
   isBlank(sentence) ? '' : sentence.split(' ').map(properCaseName).join(' ')
-
-export const nextIepAdjustDate = (latestIepAdjustDate: string): string => {
-  return format(addDays(parseISO(latestIepAdjustDate), 14), 'd MMMM yyyy')
-}
-
-export const nextPrivIepAdjustDate = (latestPrivIepAdjustDate: string): string => {
-  return format(addMonths(startOfMonth(parseISO(latestPrivIepAdjustDate)), 1), 'd MMMM yyyy')
-}
 
 export const formatVisitType = (visitType: string): string => properCase(visitType)
 
