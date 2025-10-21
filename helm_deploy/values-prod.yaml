@@ -18,6 +18,7 @@ generic-service:
     COMPONENT_API_URL: https://frontend-components.hmpps.service.justice.gov.uk
     DPS_URL: "https://dps.prison.service.justice.gov.uk/"
     DPS_PRISONER_URL: "https://prisoner.digital.prison.service.justice.gov.uk/"
+    ENVIRONMENT_NAME: prod
 
     REDIS_KEY: "bapv-staff-prod"
 
