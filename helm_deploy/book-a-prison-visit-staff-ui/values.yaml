@@ -30,7 +30,9 @@ generic-service:
     TOKEN_VERIFICATION_ENABLED: "true"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
     AUDIT_SERVICE_NAME: "book-a-prison-visit-staff-ui"
-    
+    MAINTENANCE_MODE: "false"
+    # Optional maintenance end date (in ISO format, YYYY-MM-DDTHH:MM)
+    MAINTENANCE_MODE_END_DATE_TIME: ""
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:

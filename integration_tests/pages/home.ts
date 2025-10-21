@@ -24,4 +24,6 @@ export default class HomePage extends Page {
   viewTimetableTile = (): PageElement => cy.get('[data-test="view-timetable"]')
 
   blockDatesTile = (): PageElement => cy.get('[data-test="block-dates"]')
+
+  bookerManagementTile = (): PageElement => cy.get('[data-test="booker-management"]')
 }

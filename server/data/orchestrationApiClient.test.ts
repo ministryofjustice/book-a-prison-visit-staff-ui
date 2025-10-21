@@ -15,6 +15,7 @@ import {
   PageVisitDto,
   PrisonDto,
   RejectVisitRequestBodyDto,
+  SearchBookerDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
@@ -55,6 +56,7 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
       }
 
       const result: Partial<Visit> = {
@@ -68,12 +70,13 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.bookVisit(
+      const output = await orchestrationApiClient.bookVisit({
         applicationReference,
-        bookingOrchestrationRequestDto.applicationMethodType,
-        false,
-        'user1',
-      )
+        applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
+        allowOverBooking: false,
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
+        username: 'user1',
+      })
 
       expect(output).toStrictEqual(result)
     })
@@ -87,6 +90,7 @@ describe('orchestrationApiClient', () => {
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
       }
 
       const result: Partial<Visit> = {
@@ -100,12 +104,13 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.updateVisit(
+      const output = await orchestrationApiClient.updateVisit({
         applicationReference,
-        bookingOrchestrationRequestDto.applicationMethodType,
-        false,
-        'user1',
-      )
+        applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
+        allowOverBooking: false,
+        visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
+        username: 'user1',
+      })
 
       expect(output).toStrictEqual(result)
     })
@@ -293,9 +298,11 @@ describe('orchestrationApiClient', () => {
   describe('changeVisitApplication', () => {
     it('should return a changed visit application given visit session data', async () => {
       const visitSessionData = <VisitSessionData>{
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -314,7 +321,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visits/application/${visitSessionData.applicationReference}/slot/change`, <ChangeApplicationDto>{
           applicationRestriction: visitSessionData.visitRestriction,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           visitContact: {
             name: visitSessionData.mainContact.contactName,
@@ -345,9 +352,11 @@ describe('orchestrationApiClient', () => {
         prisoner: {
           offenderNo: 'A1234BC',
         },
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -367,7 +376,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visits/application/${visitSessionData.visitReference}/change`, <CreateApplicationDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           applicationRestriction: visitSessionData.visitRestriction,
           visitContact: {
@@ -401,9 +410,11 @@ describe('orchestrationApiClient', () => {
         prisoner: {
           offenderNo: 'A1234BC',
         },
-        visitSlot: {
+        selectedVisitSession: {
+          date: '2022-02-14',
           sessionTemplateReference: 'v9d.7ed.7u',
-          startTimestamp: '2022-02-14T10:00:00',
+          startTime: '',
+          endTime: '',
         },
         visitRestriction: 'OPEN',
         visitors: [{ personId: 123 }],
@@ -421,7 +432,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .post('/visits/application/slot/reserve', <CreateApplicationDto>{
           prisonerId: visitSessionData.prisoner.offenderNo,
-          sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
           sessionDate: '2022-02-14',
           applicationRestriction: visitSessionData.visitRestriction,
           visitors: visitSessionData.visitors.map(visitor => {
@@ -439,6 +450,59 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.createVisitApplication(visitSessionData, 'user1')
 
       expect(output).toStrictEqual(result)
+    })
+  })
+
+  describe('getBookersByEmail', () => {
+    const email = 'booker@example.com'
+
+    it('should return booker(s) for given email address', async () => {
+      const bookers = [TestData.bookerSearchResult()]
+
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, bookers)
+
+      const output = await orchestrationApiClient.getBookersByEmail(email)
+
+      expect(output).toStrictEqual(bookers)
+    })
+
+    it('should return empty array if no booker for given email address (API 404)', async () => {
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404)
+
+      const output = await orchestrationApiClient.getBookersByEmail(email)
+
+      expect(output).toStrictEqual([])
+    })
+
+    it('should throw any other (non-404) API errors', async () => {
+      fakeOrchestrationApi
+        .post('/public/booker/search', <SearchBookerDto>{ email })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(500)
+
+      await expect(orchestrationApiClient.getBookersByEmail(email)).rejects.toThrow('Internal Server Error')
+    })
+  })
+
+  describe('getBookerDetails', () => {
+    it('should return booker details for given booker reference', async () => {
+      const booker = TestData.bookerDetailedInfo()
+      const { reference } = booker
+
+      fakeOrchestrationApi
+        .get(`/public/booker/${reference}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, booker)
+
+      const output = await orchestrationApiClient.getBookerDetails(reference)
+
+      expect(output).toStrictEqual(booker)
     })
   })
 
@@ -681,28 +745,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getVisitSessions', () => {
-    it('should return an array of Visit Sessions', async () => {
-      const results = [TestData.visitSession()]
-
-      fakeOrchestrationApi
-        .get('/visit-sessions')
-        .query({
-          prisonId: 'HEI',
-          prisonerId: 'A1234BC',
-          username: 'user1',
-          min: '2',
-          userType: 'STAFF',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getVisitSessions('A1234BC', prisonId, 'user1', 2)
-
-      expect(output).toEqual(results)
-    })
-  })
-
   describe('getSessionSchedule', () => {
     it('should return an array of scheduled sessions for the specified prison and date', async () => {
       const date = '2023-02-01'
@@ -778,6 +820,30 @@ describe('orchestrationApiClient', () => {
       )
 
       expect(output).toBeNull()
+    })
+  })
+
+  describe('getVisitSessionsAndSchedule', () => {
+    it('should return array of visit sessions and events for specified prisoner', async () => {
+      const visitSessionsAndScheduleDto = TestData.visitSessionsAndSchedule()
+      const prisonerId = 'A1234BC'
+      const minNumberOfDays = 2
+      const username = 'user1'
+
+      fakeOrchestrationApi
+        .get('/visit-sessions-and-schedule')
+        .query({ prisonId, prisonerId, min: minNumberOfDays, username })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitSessionsAndScheduleDto)
+
+      const output = await orchestrationApiClient.getVisitSessionsAndSchedule({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+      })
+
+      expect(output).toStrictEqual(visitSessionsAndScheduleDto)
     })
   })
 

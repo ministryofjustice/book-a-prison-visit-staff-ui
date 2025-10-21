@@ -10,6 +10,7 @@ let sessionApp: Express
 let flashData: FlashData
 
 let visitSessionData: VisitSessionData
+const prisonId = 'HEI'
 
 // run tests for booking and update journeys
 const testJourneys = [
@@ -37,18 +38,16 @@ testJourneys.forEach(journey => {
           offenderNo: 'A1234BC',
           location: 'location place',
         },
-        visitRestriction: 'OPEN',
-        visitSlot: {
-          id: '1',
+        prisonId,
+        selectedVisitSession: {
+          date: 'date',
           sessionTemplateReference: 'v9d.7ed.7u',
-          prisonId: 'HEI',
-          startTimestamp: '123',
-          endTimestamp: '456',
+          startTime: '123',
+          endTime: '456',
           availableTables: 1,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
+          capacity: 10,
         },
+        visitRestriction: 'OPEN',
         visitorIds: [123],
         visitors: [
           {
@@ -205,18 +204,16 @@ testJourneys.forEach(journey => {
           offenderNo: 'A1234BC',
           location: 'location place',
         },
-        visitRestriction: 'OPEN',
-        visitSlot: {
-          id: '1',
+        prisonId,
+        selectedVisitSession: {
+          date: 'date',
           sessionTemplateReference: 'v9d.7ed.7u',
-          prisonId: 'HEI',
-          startTimestamp: '123',
-          endTimestamp: '456',
+          startTime: '123',
+          endTime: '456',
           availableTables: 1,
-          capacity: 30,
-          visitRoom: 'room name',
-          visitRestriction: 'OPEN',
+          capacity: 10,
         },
+        visitRestriction: 'OPEN',
         visitorIds: [123],
         visitors: [
           {

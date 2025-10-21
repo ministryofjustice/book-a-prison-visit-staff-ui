@@ -2,6 +2,7 @@ import HomePage from '../pages/home'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 import AuthorisationErrorPage from '../pages/authorisationError'
+import bapvUserRoles from '../../server/constants/bapvUserRoles'
 
 context('SignIn', () => {
   beforeEach(() => {
@@ -53,7 +54,7 @@ context('SignIn', () => {
     Page.verifyOnPage(AuthSignInPage)
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubSignIn', { userToken: { name: 'bobby brown', roles: ['ROLE_MANAGE_PRISON_VISITS'] } })
+    cy.task('stubSignIn', { userToken: { name: 'bobby brown', roles: [bapvUserRoles.STAFF_USER] } })
 
     cy.signIn()
 

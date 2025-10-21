@@ -6,6 +6,7 @@ import { stubFor, getMatchingRequests } from './wiremock'
 import tokenVerification from './tokenVerification'
 import stubComponents from './componentApi'
 import TestData from '../../server/routes/testutils/testData'
+import bapvUserRoles from '../../server/constants/bapvUserRoles'
 
 interface UserToken {
   name?: string
@@ -119,7 +120,7 @@ export default {
   stubAuthPing: ping,
   stubAuthToken: token,
   stubSignIn: ({
-    userToken = { roles: ['ROLE_MANAGE_PRISON_VISITS'] },
+    userToken = { roles: [bapvUserRoles.STAFF_USER] },
     caseLoad = TestData.caseLoad(),
   }: {
     userToken?: UserToken

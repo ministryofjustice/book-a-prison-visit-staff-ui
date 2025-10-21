@@ -1,54 +1,15 @@
 {% extends "layout.njk" %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-{%- from "govuk/components/tag/macro.njk" import govukTag -%}
-{%- from "moj/components/banner/macro.njk" import mojBanner -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set pageHeaderTitle = "Select date and time of visit" %}
 
 {% set backLinkHref = urlPrefix + "/select-visitors" %}
-
-{% macro buildSlotsRadioItems(slotsList, radios) %}
-  {% for slot in slotsList %}
-
-    {%- set doubleBooked = slot.id != originalVisitSlot.id and (slot.sessionConflicts and "DOUBLE_BOOKING_OR_RESERVATION" in slot.sessionConflicts) %}
-    {%- set checked = true if formValues['visit-date-and-time'] and formValues['visit-date-and-time'] == slot.id else false %}
-
-    {%- set tableText %}
-      {% if (slot.id == originalVisitSlot.id) -%}
-        Time slot reserved by the original booking
-      {% elseif (checked and not originalVisitSlot) -%}
-        Time slot reserved for this booking
-      {% elseif (doubleBooked and not checked) -%}
-        Prisoner has a visit
-      {%- elseif slot.availableTables <= 0 -%}
-        {{ govukTag({
-          text: "Fully booked",
-          classes: "govuk-tag--red govuk-!-margin-top-1"
-        })}}
-      {%- else -%}
-        <span class="bapv-secondary-text">
-          {{ slot.availableTables }} {{ "table" | pluralise(slot.availableTables) }} available
-        </span>
-      {%- endif %}
-    {% endset %}
-
-    {%- set slotTimeString = slot.startTimestamp | formatTime + " to " + slot.endTimestamp | formatTime -%}
-    {%- set radios = (radios.push({
-      value: slot.id,
-      html: '<p class="bapv-radio-paragraph"><strong>' + slotTimeString + "</strong><br>" + slot.visitRoom + "<br>" + tableText + "</p>",
-      id: slot.id,
-      checked: checked,
-      disabled: (doubleBooked and not checked),
-      attributes: { "data-test": slot.startTimestamp | formatDate("yyyy-MM-dd") + " - " + slotTimeString }
-    }), radios) %}
-  {% endfor %}
-{% endmacro %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -63,129 +24,213 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p class="bapv-extraspacing bapv-date-time-information"><strong>Prisoner name:</strong> <span data-test="prisoner-name">{{ prisonerName }}</span> <strong>Location:</strong> <span data-test="visit-location">{{ location }}</span> <strong>Visit type:</strong> <span data-test="visit-restriction">{{ visitRestriction | capitalize }}</span></p>
-      {{ govukDetails({
-        summaryText: "What time slots are shown?",
-        html: "<p>Showing time slots:</p><ul><li>suitable for the prisoner’s location, category and incentive level</li><li>that do not have non-associations for the prisoner</li><li>over the next 28 days</li></ul>"
-      }) }}
+      {% include "partials/dateAndTimePrisonerInfo.njk" %}
 
-      {% if not whereaboutsAvailable %}
-        {% set whereaboutsUnavailable %}
-          {{ govukWarningText({
-            classes: "govuk-!-margin-bottom-0",
-            html: '<span class="govuk-!-font-size-24">The prisoner schedule is unavailable.' +
-              ' <br />Check NOMIS for court appearances. Prison number: ' + offenderNo + '</span>',
-            iconFallbackText: "Warning",
-            attributes: {
-              "data-test": "whereabouts-unavailable"
-            }
-          }) }}
-        {% endset %}
-        {{ mojBanner({
-          classes: "govuk-!-padding-left-4",
-          html: whereaboutsUnavailable
-        }) }}
+      {% if originalVisitSession %}
+        <p class="govuk-!-margin-top-5 govuk-!-margin-bottom-7">
+          <strong>Original booking:</strong>
+          <span data-test="original-booking-time-date">
+            {{- originalVisitSession | formatStartToEndTime }} on {{ originalVisitSession.date | formatDate -}}
+          </span>
+        </p>
       {% endif %}
 
-      {% if slotsPresent %}
+      {# Calendar key #}
+      {% call govukDetails({
+        summaryText: "Help with the calendar",
+        classes: "govuk-!-width-two-thirds govuk-!-margin-bottom-8"
+      }) %}
+        <p>
+          The calendar shows visit times for the next
+          <span data-test="booking-days-ahead">{{ policyNoticeDaysMax }}</span>
+          days that are suitable for the prisoner’s location, category and incentive level.
+          Visit times that have non-associations for the prisoner are not shown.
+          The colours mean:
+        </p>
 
-      <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-        {% for month, days in slotsList %}
-          <h2 class="govuk-heading-m" data-test="month">{{ month }}</h2>
-          {% set accordion = [] %}
-          {% for day in days %}
+        <ul class="govuk-list bapv-calendar__key">
+          <li>
+            <span><span class="bapv-calendar__key__colour--grey">Grey</span>:</span>
+            No visits on this day
+          </li>
+          <li>
+            <span><span class="bapv-calendar__key__colour--blue">Blue</span>:</span>
+            Available visit times
+          </li>
+          <li>
+            <span><span class="bapv-calendar__key__colour--orange">Orange</span>:</span>
+            There’s an issue with these visit times, but you can choose to book
+          </li>
+          <li>
+            <span><span class="bapv-calendar__key__colour--red">Red</span>:</span>
+            A visit cannot be booked for this prisoner
+          </li>
+        </ul>
+      {% endcall %}
 
-            {%- set morningSlotsList = [] %}
-            {{ buildSlotsRadioItems(day.slots.morning, morningSlotsList) }}
-            {%- set morningHtml %}
-              <div class="govuk-grid-row">
-                <div class="govuk-grid-column-one-quarter bapv-morning-slots">
-                  <h3 class="govuk-heading-s">Morning</h3>
-                  {{ govukRadios({
-                    name: "visit-date-and-time",
-                    items: morningSlotsList
-                  }) }}
-                </div>
-                <div class="govuk-grid-column-three-quarters">
-                  {% if day.prisonerEvents.morning | length %}
-                    <h3 class="govuk-heading-s">Prisoner schedule</h3>
-                    {% for event in day.prisonerEvents.morning %}
-                      <div class="bapv-prisoner-event govuk-grid-column-one-third">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
-                      <br>{{ event.description }}
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                </div>
-              </div>
-            {% endset %}
+      {# Calendar #}
+      <nav class="bapv-calendar govuk-!-width-one-half" aria-label="Visit date selection calendar" role="navigation">
 
-            {%- set afternoonSlotsList = [] %}
-            {{ buildSlotsRadioItems(day.slots.afternoon, afternoonSlotsList) }}
-            {%- set afternoonHtml %}
-              <div class="govuk-grid-row">
-                <div class="govuk-grid-column-one-quarter bapv-afternoon-slots">
-                  <h3 class="govuk-heading-s">Afternoon</h3>
-                  {{ govukRadios({
-                    name: "visit-date-and-time",
-                    items: afternoonSlotsList
-                  }) }}
-                </div>
-                <div class="govuk-grid-column-three-quarters">
-                  {% if day.prisonerEvents.afternoon | length %}
-                    {% if not morningSlotsList | length %}<h3 class="govuk-heading-s">Prisoner schedule</h3>{% endif %} 
-                    {% for event in day.prisonerEvents.afternoon %}
-                      <div class="bapv-prisoner-event govuk-grid-column-one-third{% if morningSlotsList | length %} bapv-prisoner-event--top-margin{% endif %}">{{ event.startTimestamp | formatTime }} to {{ event.endTimestamp | formatTime }}
-                        <br>{{ event.description }}
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                </div>
-              </div>
-            {% endset %}
+        {# Loop over months #}
+        {% for monthHeading, days in calendar | groupby("monthHeading") %}
+          <h2 class="govuk-heading-m">{{ monthHeading }}</h2>
 
-            {%- set slotsAvailable = (day.slots.morning | length) + (day.slots.afternoon | length) %}
-            {% set slotText %}
-              {% if slotsAvailable === 0 %}Fully booked{% else %}{{ slotsAvailable }} time {{ "slot" | pluralise(slotsAvailable) }}{% endif %}
-            {% endset %}
+          {# Day name headings on first month only - unless more than 2 months #}
+          {% if loop.first or loop.length > 2 %}
+            <ul class="govuk-list bapv-calendar__day-headings" aria-hidden="true">
+              <li>M<span>on</span></li>
+              <li>T<span>ue</span></li>
+              <li>W<span>ed</span></li>
+              <li>T<span>hu</span></li>
+              <li>F<span>ri</span></li>
+              <li>S<span>at</span></li>
+              <li>S<span>un</span></li>
+            </ul>
+          {% endif %}
 
-            {%- if (slotsAvailable > 0) %}
-            {% set accordion = (accordion.push({
-              heading: {
-                text: day.date
-              },
-              summary: {
-                text: slotText
-              },
-              content: {
-                html: (morningHtml if morningSlotsList | length) + (afternoonHtml if afternoonSlotsList | length)
-              },
-              expanded: (morningSlotsList | selectattr("checked") | length) or (afternoonSlotsList | selectattr("checked") | length)
-            }), accordion) %}
-            {% endif %}
-          {% endfor -%}
+          {# Days for this month #}
+          <ul class="govuk-list bapv-calendar__month">
+            {% for day in days %}
+              {%- set sessionCount = day.visitSessions | length -%}
+              <li data-date="{{ day.date }}" class="bapv-calendar__day
+                {#- add column offset class based on ISO day of week (1-7) -#}
+                {%- if loop.first %} bapv-calendar__day--start-col-{{ day.date | formatDate('i') }}{% endif -%}
+                {#- day style override classes -#}
+                {%- if day.colour %} bapv-calendar__day--{{ day.colour }}{% endif -%}
+                {%- if day.selected %} bapv-calendar__day--selected{%- endif -%}
+                {%- if day.outline %} bapv-calendar__day--outline{%- endif %}"
+                {%- if not sessionCount %} aria-hidden="true"{% endif -%}
+                >
 
-          {{- govukAccordion({
-            id: "slots-month-" + (month | replace(" ", "")),
-            rememberExpanded: false,
-            headingLevel: 3,
-            items: accordion
-          }) }}
+                {%- if sessionCount -%}
+                  <a id="day-link-{{ day.date }}" href="#day-group-{{ day.date }}">
+                    {{- day.date | formatDate("d") }}
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - {{ sessionCount }} visit {{ "time" | pluralise(sessionCount) }}</span>
+                  </a>
+                {% else -%}
+                    <span>{{ day.date | formatDate("d") }}</span>
+                    <span class="govuk-visually-hidden">{{ day.date | formatDate("MMMM - eeee") }} - no visit times</span>
+                {%- endif %}
+              </li>
+            {% endfor %}
+          </ul>
         {% endfor %}
-      
+      </nav>
+
+      {# Days / visit sessions #}
+      <form action="{{ urlPrefix }}/select-date-and-time" method="POST" novalidate class="disable-button-on-submit">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {# Days and visit sessions / schedule #}
+        {% for day in calendar %}
+          {# skip days with no visit sessions #}
+          {%- if day.visitSessions | length %}
+            <div class="govuk-form-group bapv-calendar__day-group" data-date="{{ day.date }}">
+
+              {% call govukFieldset({
+                attributes: { id: 'day-group-' + day.date },
+                legend: {
+                  text: day.date | formatDate("EEEE d MMMM yyyy"),
+                  classes: "govuk-fieldset__legend--m"
+                }
+              }) -%}
+
+              {# Scheduled events unavailable message #}
+              {%- if not scheduledEventsAvailable %}
+                {{ govukWarningText({
+                  text: "The prisoner schedule is unavailable. " +
+                    "Check NOMIS for court appearances, official visits and medical appointments.",
+                  iconFallbackText: "Warning",
+                  classes: "govuk-!-width-two-thirds govuk-!-margin-top-5 govuk-!-margin-bottom-4",
+                  attributes: { "data-test": "prisoner-schedule-unavailable" }
+                }) }}
+              {% endif -%}
+
+              {# morning and/or afternoon sections #}
+              {%- for sectionLabel, visitSessions in day.visitSessions | groupby("daySection") %}
+                <div class="govuk-grid-row">
+
+                  {# radio inputs #}
+                  <div class="govuk-grid-column-one-quarter">
+                    <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
+                      {# build radio items #}
+                      {% set visitSessionItems = [] %}
+                      {%- for visitSession in visitSessions %}
+                        {% set radioValue = day.date + "_" + visitSession.sessionTemplateReference %}
+
+                        {% set radioLabelHtml -%}
+                          <span class="govuk-!-font-weight-bold">{{ visitSession | formatStartToEndTime }}</span>
+                          <br>
+                          <span>{{ visitSession.visitRoom }}</span>
+                          <br>
+                          {% if visitSession.tag %}
+                            {{ govukTag({
+                              text: visitSession.tag.text,
+                              classes: visitSession.tag.classes
+                            }) }}
+                          {% else %}
+                            <span class="bapv-secondary-text">
+                              {{ visitSession.availableTables }} {{ "table" | pluralise(visitSession.availableTables) }} available
+                            </span>
+                          {% endif %}
+                        {%- endset %}
+                        {% set visitSessionItems = (visitSessionItems.push({
+                          value: radioValue,
+                          html: radioLabelHtml,
+                          disabled: visitSession.disabled
+                        }), visitSessionItems) %}
+                      {% endfor %}
+
+                      {%- set idPrefix = "date-" + day.date + "-" + sectionLabel -%}
+                      {{- govukRadios({
+                        name: "visitSessionId",
+                        idPrefix: idPrefix,
+                        items: visitSessionItems,
+                        value: formValues.visitSessionId,
+                        errorMessage: (errors | findError(firstVisitSessionRadioInputId)) if firstVisitSessionRadioInputId === idPrefix
+                      }) }}
+                  </div>
+
+                  {# prisoner schedule #}
+                  {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
+                  {% if scheduledEventsByDaySection[sectionLabel] | length %}
+                    <div class="govuk-grid-column-three-quarters">
+                      <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
+                      {% for event in scheduledEventsByDaySection[sectionLabel] %}
+                        <div class="bapv-calendar__event">
+                          {{ event | formatStartToEndTime }}
+                          <br>
+                          {{ event.description }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+
+              <p class="govuk-!-display-inline-block">
+                <a class="govuk-visually-hidden-focusable govuk-!-display-block govuk-!-margin-top-5" href="#day-link-{{ day.date }}">
+                  Choose a different date above
+                </a>
+              </p>
+
+              {%- endcall %}
+            </div>
+          {% endif %}
+        {% endfor %}
+
         {{ govukButton({
           text: "Continue",
           attributes: { "data-test": "submit" },
           preventDoubleClick: true
-        }) }} 
+        }) }}
       </form>
-
-      {% else %}
-      <p>There are no available time slots for this prisoner.</p>
-
-      {% include "partials/backToStartButton.njk" %}
-      {% endif %}
 
     </div>
   </div>
+{% endblock %}
+
+{% block pageScripts %}
+<script src="/assets/components/bapvCalendar.js"></script>
+<script src="/assets/disableButtonOnSubmit.js"></script>
 {% endblock %}

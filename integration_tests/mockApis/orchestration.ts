@@ -4,6 +4,9 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApplicationValidationErrorResponse,
+  BookerDetailedInfoDto,
+  BookerSearchResultsDto,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
@@ -19,7 +22,7 @@ import {
   VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
-  VisitSession,
+  VisitSessionsAndScheduleDto,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
@@ -29,11 +32,13 @@ export default {
     applicationMethod,
     username,
     allowOverBooking = false,
+    visitorDetails,
   }: {
     visit: Visit
     applicationMethod: ApplicationMethodType
     username: string
     allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -46,6 +51,7 @@ export default {
               allowOverBooking,
               actionedBy: username,
               userType: 'STAFF',
+              visitorDetails,
             },
           },
         ],
@@ -87,11 +93,13 @@ export default {
     applicationMethod,
     username,
     allowOverBooking = false,
+    visitorDetails,
   }: {
     visit: Visit
     applicationMethod: ApplicationMethodType
     username: string
     allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -104,6 +112,7 @@ export default {
               allowOverBooking,
               actionedBy: username,
               userType: 'STAFF',
+              visitorDetails,
             },
           },
         ],
@@ -347,6 +356,51 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: { totalElements: count },
+      },
+    })
+  },
+
+  stubGetBookersByEmail: ({
+    email,
+    bookers = [TestData.bookerSearchResult()],
+  }: {
+    email: string
+    bookers: BookerSearchResultsDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: '/orchestration/public/booker/search',
+        bodyPatterns: [
+          {
+            equalToJson: { email },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: bookers,
+      },
+    })
+  },
+
+  stubGetBookerDetails: ({
+    reference,
+    booker = TestData.bookerDetailedInfo(),
+  }: {
+    reference: string
+    booker: BookerDetailedInfoDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/public/booker/${reference}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: booker,
       },
     })
   },
@@ -620,31 +674,6 @@ export default {
     })
   },
 
-  stubVisitSessions: ({
-    prisonId,
-    offenderNo,
-    visitSessions,
-    username = 'USER1',
-    min = '3',
-  }: {
-    prisonId: string
-    offenderNo: string
-    visitSessions: VisitSession[]
-    username: string
-    min: string
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/visit-sessions?prisonId=${prisonId}&prisonerId=${offenderNo}&min=${min}&username=${username}&userType=STAFF`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitSessions,
-      },
-    })
-  },
   stubSessionSchedule: ({
     prisonId,
     date,
@@ -697,6 +726,39 @@ export default {
       },
     })
   },
+
+  stubGetVisitSessionsAndSchedule: ({
+    prisonId = 'HEI',
+    prisonerId,
+    minNumberOfDays = 3,
+    username = 'USER1',
+    visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+    visitSessionsAndSchedule: VisitSessionsAndScheduleDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/visit-sessions-and-schedule`,
+        queryParameters: {
+          prisonId: { equalTo: prisonId },
+          prisonerId: { equalTo: prisonerId },
+          min: { equalTo: minNumberOfDays.toString() },
+          username: { equalTo: username },
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitSessionsAndSchedule,
+      },
+    })
+  },
+
   stubPrisonerProfile: (profile: PrisonerProfile): SuperAgentRequest => {
     return stubFor({
       request: {

@@ -2,12 +2,16 @@ import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types
 import {
   Alert,
   ApplicationDto,
+  BookerDetailedInfoDto,
+  BookerSearchResultsDto,
   ExcludeDateDto,
   NotificationCount,
   OffenderRestriction,
   PrisonDto,
   PrisonerProfile,
+  PrisonerScheduledEventDto,
   SessionCapacity,
+  SessionsAndScheduleDto,
   SessionSchedule,
   Visit,
   VisitBookingDetails,
@@ -21,11 +25,12 @@ import {
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
+  VisitSessionsAndScheduleDto,
+  VisitSessionV2Dto,
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import { ScheduledEvent } from '../../data/whereaboutsApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
 
 export default class TestData {
@@ -129,6 +134,71 @@ export default class TestData {
       reserved,
       applicationStatus,
     }) as ApplicationDto
+
+  static bookerDetailedInfo = ({
+    reference = 'aaaa-bbbb-cccc',
+    email = 'booker@example.com',
+    permittedPrisoners = [
+      {
+        prisoner: this.bookerPrisoner(),
+        registeredPrison: this.bookerPrisonerRegisteredPrison(),
+        permittedVisitors: [this.bookerPrisonerVisitor()],
+      },
+    ],
+  }: Partial<BookerDetailedInfoDto> = {}): BookerDetailedInfoDto => ({ reference, email, permittedPrisoners })
+
+  static bookerPrisoner = ({
+    prisonerNumber = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    dateOfBirth = '1975-04-02',
+    prisonId = 'HEI',
+    prisonName = 'Hewell (HMP)',
+    cellLocation = '1-1-C-028',
+    locationDescription = 'Hewell (HMP)',
+    convictedStatus = 'Convicted',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['prisoner']
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['prisoner'] => ({
+    prisonerNumber,
+    firstName,
+    lastName,
+    dateOfBirth,
+    prisonId,
+    prisonName,
+    cellLocation,
+    locationDescription,
+    convictedStatus,
+  })
+
+  static bookerPrisonerRegisteredPrison = ({
+    prisonCode = 'HEI',
+    prisonName = 'Hewell (HMP)',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['registeredPrison']
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['registeredPrison'] => ({ prisonCode, prisonName })
+
+  static bookerPrisonerVisitor = ({
+    visitorId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    relationshipDescription = 'Wife',
+  }: Partial<
+    BookerDetailedInfoDto['permittedPrisoners'][0]['permittedVisitors'][0]
+  > = {}): BookerDetailedInfoDto['permittedPrisoners'][0]['permittedVisitors'][0] => ({
+    visitorId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    relationshipDescription,
+  })
+
+  static bookerSearchResult = ({
+    reference = 'aaaa-bbbb-cccc',
+    email = 'booker@example.com',
+    createdTimestamp = '2025-10-09T12:00:00',
+  }: Partial<BookerSearchResultsDto> = {}): BookerSearchResultsDto => ({ reference, email, createdTimestamp })
 
   static caseLoad = ({
     caseLoadId = 'HEI',
@@ -284,6 +354,20 @@ export default class TestData {
       visits,
     }) as PrisonerProfile
 
+  static prisonerScheduledEvent = ({
+    eventType = 'PRISON_ACT',
+    eventSubTypeDesc = 'Prison activities',
+    eventSourceDesc = 'Educational activity',
+    startTime = '10:00',
+    endTime = '11:00',
+  }: Partial<PrisonerScheduledEventDto> = {}): PrisonerScheduledEventDto => ({
+    eventType,
+    eventSubTypeDesc,
+    eventSourceDesc,
+    startTime,
+    endTime,
+  })
+
   // Visitor restrictions
   static restriction = ({
     restrictionId = 1,
@@ -303,20 +387,18 @@ export default class TestData {
     comment,
   })
 
-  static scheduledEvent = ({
-    bookingId = 12345,
-    startTime = '2022-02-14T10:00:00',
-    endTime = '2022-02-14T11:00:00',
-    eventSourceDesc = 'Educational activity',
-  }: Partial<ScheduledEvent> = {}): ScheduledEvent => ({
-    bookingId,
-    startTime,
-    endTime,
-    eventSourceDesc,
-  })
-
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed }) as SessionCapacity
+
+  static sessionsAndScheduleDto = ({
+    date = '2022-01-14',
+    visitSessions = [this.visitSessionV2()],
+    scheduledEvents = [this.prisonerScheduledEvent()],
+  }: Partial<SessionsAndScheduleDto> = {}): SessionsAndScheduleDto => ({
+    date,
+    visitSessions,
+    scheduledEvents,
+  })
 
   static sessionSchedule = ({
     sessionTemplateReference = '-afe.dcc.0f',
@@ -743,6 +825,36 @@ export default class TestData {
     startTimestamp,
     endTimestamp,
     sessionConflicts,
+  })
+
+  static visitSessionV2 = ({
+    sessionTemplateReference = 'v9d.7ed.7u',
+    visitRoom = 'Visit room 1',
+    openVisitCapacity = 20,
+    openVisitBookedCount = 2,
+    closedVisitCapacity = 2,
+    closedVisitBookedCount = 1,
+    startTime = '10:00',
+    endTime = '11:00',
+    sessionConflicts = [],
+  }: Partial<VisitSessionV2Dto> = {}): VisitSessionV2Dto => ({
+    sessionTemplateReference,
+    visitRoom,
+    openVisitCapacity,
+    openVisitBookedCount,
+    closedVisitCapacity,
+    closedVisitBookedCount,
+    startTime,
+    endTime,
+    sessionConflicts,
+  })
+
+  static visitSessionsAndSchedule = ({
+    scheduledEventsAvailable = true,
+    sessionsAndSchedule = [this.sessionsAndScheduleDto()],
+  }: Partial<VisitSessionsAndScheduleDto> = {}): VisitSessionsAndScheduleDto => ({
+    scheduledEventsAvailable,
+    sessionsAndSchedule,
   })
 
   static visitSummary = ({

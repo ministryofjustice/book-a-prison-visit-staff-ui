@@ -7,9 +7,9 @@ import {
   PrisonerProfile,
   Visit,
   VisitorSupport,
-  VisitSession,
   VisitSummary,
 } from '../data/orchestrationApiTypes'
+import type { CalendarVisitSession } from '../services/visitSessionsService'
 
 type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
@@ -57,42 +57,6 @@ export type PrisonerProfilePage = {
   visitsByMonth: Map<string, { upcomingCount: number; pastCount: number; visits: VisitSummary[] }>
 }
 
-// Visit slots, for representing data derived from VisitSessions
-export type VisitSlot = {
-  id: string
-  sessionTemplateReference: string
-  prisonId: string
-  startTimestamp: string
-  endTimestamp: string
-  availableTables: number
-  capacity: number
-  visitRoom: string
-  visitRestriction: 'OPEN' | 'CLOSED'
-  sessionConflicts?: VisitSession['sessionConflicts']
-}
-
-export type PrisonerEvent = {
-  startTimestamp: string
-  endTimestamp: string
-  description: string
-}
-
-export type VisitSlotsForDay = {
-  date: string
-  slots: {
-    morning: VisitSlot[]
-    afternoon: VisitSlot[]
-  }
-  prisonerEvents: {
-    morning: PrisonerEvent[]
-    afternoon: PrisonerEvent[]
-  }
-}
-
-export type VisitSlotList = {
-  [key: string]: VisitSlotsForDay[] // keyed on month value, e.g. 'February 2022'
-}
-
 export type VisitSessionData = {
   allowOverBooking: boolean
   prisoner: {
@@ -103,8 +67,23 @@ export type VisitSessionData = {
     alerts?: Alert[]
     restrictions?: OffenderRestriction[]
   }
-  visitSlot?: VisitSlot
-  originalVisitSlot?: VisitSlot
+  prisonId: string
+  allVisitSessions?: CalendarVisitSession[]
+  selectedVisitSession?: {
+    date: string
+    sessionTemplateReference: string
+    startTime: string
+    endTime: string
+    availableTables: number
+    capacity: number
+  }
+  originalVisitSession?: {
+    date: string
+    sessionTemplateReference: string
+    startTime: string
+    endTime: string
+    visitRestriction: 'OPEN' | 'CLOSED' | undefined // 'undefined' for migrated visits
+  }
   visitRestriction?: 'OPEN' | 'CLOSED'
   visitorIds?: number[]
   visitors?: VisitorListItem[]
@@ -181,4 +160,8 @@ export type CancelledVisitInfo = {
   endTimestamp: string
   hasEmailAddress: boolean
   hasMobileNumber: boolean
+}
+
+export type GOVUKTag = TextOrHtml & {
+  classes?: string
 }

@@ -20,6 +20,7 @@ jest.mock('../../applicationInfo', () => {
 import {
   AuditService,
   BlockedDatesService,
+  BookerService,
   PrisonerProfileService,
   PrisonerSearchService,
   PrisonerVisitorsService,
@@ -36,6 +37,8 @@ export const createMockAuditService = () => new AuditService(null) as jest.Mocke
 
 export const createMockBlockedDatesService = () =>
   new BlockedDatesService(null, null) as jest.Mocked<BlockedDatesService>
+
+export const createMockBookerService = () => new BookerService(null, null) as jest.Mocked<BookerService>
 
 export const createMockPrisonerProfileService = () =>
   new PrisonerProfileService(null, null) as jest.Mocked<PrisonerProfileService>
@@ -58,4 +61,4 @@ export const createMockVisitRequestsService = () =>
 export const createMockVisitService = () => new VisitService(null, null) as jest.Mocked<VisitService>
 
 export const createMockVisitSessionsService = () =>
-  new VisitSessionsService(null, null, null) as jest.Mocked<VisitSessionsService>
+  new VisitSessionsService(null, null) as jest.Mocked<VisitSessionsService>

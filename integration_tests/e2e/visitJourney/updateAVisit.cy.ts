@@ -1,10 +1,10 @@
-import { format, sub, addDays } from 'date-fns'
+import { format, sub, addDays, eachDayOfInterval } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
 import Page from '../../pages/page'
 import VisitDetailsPage from '../../pages/visit/visitDetails'
 import SelectVisitorsPage from '../../pages/visitJourney/selectVisitors'
 import ConfirmUpdatePage from '../../pages/visit/confirmUpdate'
-import { VisitSession } from '../../../server/data/orchestrationApiTypes'
+import { SessionsAndScheduleDto } from '../../../server/data/orchestrationApiTypes'
 import SelectVisitDateAndTime from '../../pages/visitJourney/selectVisitDateAndTime'
 import AdditionalSupportPage from '../../pages/visitJourney/additionalSupport'
 import MainContactPage from '../../pages/visitJourney/mainContact'
@@ -18,7 +18,20 @@ context('Update a visit', () => {
 
   const today = new Date()
   const prisoner = TestData.prisoner()
-  const { prisonerNumber: offenderNo, prisonId } = prisoner
+  const { prisonerNumber: offenderNo } = prisoner
+
+  const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
+  const childDob = format(sub(today, { years: 5 }), shortDateFormat)
+  const contacts = [
+    TestData.contact({ dateOfBirth: adultDob, personId: 4321 }),
+    TestData.contact({
+      personId: 4322,
+      firstName: 'Bob',
+      dateOfBirth: childDob,
+      relationshipCode: 'SON',
+      relationshipDescription: 'Son',
+    }),
+  ]
 
   beforeEach(() => {
     cy.task('reset')
@@ -30,44 +43,42 @@ context('Update a visit', () => {
   })
 
   it('should complete the update a visit journey', () => {
-    const visitSessions: VisitSession[] = [
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'10:00:00`),
-        endTimestamp: format(addDays(today, 7), `${shortDateFormat}'T'11:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
-        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
-      }),
+    // generate array of dates over next month and add some visit sessions and events
+    const dateIn7Days = format(addDays(today, 7), shortDateFormat)
+    const dateIn8Days = format(addDays(today, 8), shortDateFormat)
+    const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
+
+    const sessionsAndSchedule: SessionsAndScheduleDto[] = eachDateUntilNextMonth.map(date => {
+      return {
+        date: format(date, shortDateFormat),
+        visitSessions: [],
+        scheduledEvents: [],
+      }
+    })
+    sessionsAndSchedule.at(7).visitSessions = [
+      TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00', sessionTemplateReference: 'a' }),
     ]
+    sessionsAndSchedule.at(8).visitSessions = [
+      TestData.visitSessionV2({ startTime: '13:30', endTime: '15:00', sessionTemplateReference: 'b' }),
+    ]
+    const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({ sessionsAndSchedule })
+    const sessionIn7DaysStartTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].startTime}:00`
+    const sessionIn7DaysEndTimestamp = `${sessionsAndSchedule.at(7).date}T${sessionsAndSchedule.at(7).visitSessions[0].endTime}:00`
+    const sessionIn7DaysTemplateReference = sessionsAndSchedule.at(7).visitSessions[0].sessionTemplateReference
+    const sessionIn8DaysStartTimestamp = `${sessionsAndSchedule.at(8).date}T${sessionsAndSchedule.at(8).visitSessions[0].startTime}:00`
+    const sessionIn8DaysEndTimestamp = `${sessionsAndSchedule.at(8).date}T${sessionsAndSchedule.at(8).visitSessions[0].endTime}:00`
+    const sessionIn8DaysTemplateReference = sessionsAndSchedule.at(8).visitSessions[0].sessionTemplateReference
 
     const originalVisit = TestData.visitBookingDetailsRaw({
-      startTimestamp: visitSessions[0].startTimestamp,
-      endTimestamp: visitSessions[0].endTimestamp,
+      startTimestamp: sessionIn7DaysStartTimestamp,
+      endTimestamp: sessionIn7DaysEndTimestamp,
+      sessionTemplateReference: sessionIn7DaysTemplateReference,
+      visitors: [contacts[0]],
+
       visitorSupport: null,
     })
 
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact({ personId: 4321 }),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
-
-    cy.task(
-      'stubGetVisitDetailed',
-      TestData.visitBookingDetailsRaw({
-        startTimestamp: originalVisit.startTimestamp,
-        endTimestamp: originalVisit.endTimestamp,
-        visitors: [contacts[0]],
-        visitorSupport: originalVisit.visitorSupport,
-      }),
-    )
+    cy.task('stubGetVisitDetailed', originalVisit)
 
     // Visit details page
     cy.visit('/visit/ab-cd-ef-gh')
@@ -86,39 +97,30 @@ context('Update a visit', () => {
     selectVisitorsPage.getVisitor(contacts[1].personId).check()
 
     // Select date and time - current slot pre-selected
-    cy.task('stubVisitSessions', {
-      offenderNo,
-      prisonId,
-      visitSessions,
-    })
-    cy.task('stubOffenderEvents', {
-      offenderNo,
-      fromDate: format(today, shortDateFormat),
-      toDate: format(addDays(today, 8), shortDateFormat),
-      scheduledEvents: [],
-    })
+    cy.task('stubGetVisitSessionsAndSchedule', { prisonerId: offenderNo, visitSessionsAndSchedule })
     selectVisitorsPage.continueButton().click()
     const selectVisitDateAndTime = Page.verifyOnPage(SelectVisitDateAndTime)
-    selectVisitDateAndTime.expandAllSections()
-    selectVisitDateAndTime.getSlotById(1).should('be.checked')
+    selectVisitDateAndTime.getSessionLabel(dateIn7Days, 0).contains('Original booking')
 
     // Select date and time - choose different time
     const updatedApplication = TestData.application({
-      startTimestamp: visitSessions[1].startTimestamp,
-      endTimestamp: visitSessions[1].endTimestamp,
+      startTimestamp: sessionIn8DaysStartTimestamp,
+      endTimestamp: sessionIn8DaysEndTimestamp,
       visitors: [
         { nomisPersonId: 4321, visitContact: true },
         { nomisPersonId: 4322, visitContact: false },
       ],
       visitorSupport: { description: '' },
+      sessionTemplateReference: sessionIn8DaysTemplateReference,
     })
     updatedApplication.visitContact.email = 'visitor@example.com' // (may be present if visit originated in public servivce)
     cy.task('stubCreateVisitApplicationFromVisit', {
       visitReference: originalVisit.reference,
       application: updatedApplication,
     })
-    selectVisitDateAndTime.getSlotById(2).check()
-    selectVisitDateAndTime.continueButton().click()
+    selectVisitDateAndTime.clickCalendarDay(dateIn8Days)
+    selectVisitDateAndTime.selectSession(dateIn8Days, 0)
+    selectVisitDateAndTime.clickContinueButton()
 
     // Additional support - add details
     const additionalSupportPage = Page.verifyOnPage(AdditionalSupportPage)
@@ -136,15 +138,15 @@ context('Update a visit', () => {
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321', email: 'visitor@example.com' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
         ],
         visitorSupport: { description: 'Wheelchair ramp, Some extra help!' },
-        sessionTemplateReference: visitSessions[1].sessionTemplateReference,
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
       }),
     )
     mainContactPage.continueButton().click()
@@ -157,7 +159,7 @@ context('Update a visit', () => {
 
     // Check your booking page
     const checkYourBookingPage = Page.verifyOnPage(CheckYourBookingPage)
-    checkYourBookingPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
+    checkYourBookingPage.visitDate().contains(format(dateIn8Days, longDateFormat))
     checkYourBookingPage.visitTime().contains('1:30pm to 3pm')
     checkYourBookingPage.visitType().contains('Open')
     checkYourBookingPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -171,8 +173,8 @@ context('Update a visit', () => {
     cy.task('stubUpdateVisit', {
       visit: TestData.visit({
         visitStatus: 'BOOKED',
-        startTimestamp: visitSessions[1].startTimestamp,
-        endTimestamp: visitSessions[1].endTimestamp,
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -181,6 +183,10 @@ context('Update a visit', () => {
       }),
       applicationMethod: 'PHONE',
       username: 'USER1',
+      visitorDetails: [
+        { visitorId: 4321, visitorAge: 18 },
+        { visitorId: 4322, visitorAge: 5 },
+      ],
     })
     checkYourBookingPage.submitBooking()
 
@@ -189,7 +195,7 @@ context('Update a visit', () => {
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
-    confirmationPage.visitDate().contains(format(new Date(visitSessions[1].startTimestamp), longDateFormat))
+    confirmationPage.visitDate().contains(format(dateIn8Days, longDateFormat))
     confirmationPage.visitTime().contains('1:30pm to 3pm')
     confirmationPage.visitType().contains('Open')
     confirmationPage.visitorName(1).contains('Jeanette Smith (wife of the prisoner)')
@@ -200,34 +206,11 @@ context('Update a visit', () => {
   })
 
   it('should redirect to confirm update page if outside booking window limit', () => {
-    const visitSessions: VisitSession[] = [
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'10:00:00`),
-        endTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'11:00:00`),
-      }),
-      TestData.visitSession({
-        startTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'13:30:00`),
-        endTimestamp: format(addDays(today, 8), `${shortDateFormat}'T'15:00:00`),
-      }),
-    ]
-
     const originalVisit = TestData.visitBookingDetailsRaw({
-      startTimestamp: visitSessions[0].startTimestamp,
-      endTimestamp: visitSessions[0].endTimestamp,
+      startTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'10:00:00`),
+      endTimestamp: format(addDays(today, 1), `${shortDateFormat}'T'11:00:00`),
       visitorSupport: null,
     })
-
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-    const contacts = [
-      TestData.contact({ personId: 4321 }),
-      TestData.contact({
-        personId: 4322,
-        firstName: 'Bob',
-        dateOfBirth: childDob,
-        relationshipCode: 'SON',
-        relationshipDescription: 'Son',
-      }),
-    ]
 
     cy.task('stubGetVisitDetailed', originalVisit)
 

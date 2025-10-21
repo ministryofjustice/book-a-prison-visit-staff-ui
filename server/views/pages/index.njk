@@ -77,6 +77,19 @@
       <h2 class="govuk-heading-m govuk-!-margin-top-5">Admin</h2>
 
       <ul class="govuk-grid-row card-group">
+
+        {% if showBookerManagementTile %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              "href": "/manage-bookers/search",
+              "clickable": "true",
+              "heading": "Manage online bookers",
+              "description": "Link visitors to public booker accounts",
+              "id": "booker-management"
+            }) }}
+          </li>
+        {% endif %}
+
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
             "href": "/timetable",

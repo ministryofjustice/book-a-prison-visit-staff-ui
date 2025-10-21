@@ -6,7 +6,6 @@ import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import componentApi from './integration_tests/mockApis/componentApi'
 import orchestrationService from './integration_tests/mockApis/orchestration'
 import prisonerContactRegistry from './integration_tests/mockApis/prisonerContactRegistry'
-import whereaboutsOffenderEvents from './integration_tests/mockApis/whereabouts'
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
 
 export default defineConfig({
@@ -32,7 +31,6 @@ export default defineConfig({
         ...orchestrationService,
         ...prisonerContactRegistry,
         ...prisonerSearch,
-        ...whereaboutsOffenderEvents,
 
         // Log message to console
         log: (message: string) => {

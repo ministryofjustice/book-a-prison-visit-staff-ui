@@ -14,15 +14,12 @@ generic-service:
     ORCHESTRATION_API_URL: "https://hmpps-manage-prison-visits-orchestration.prison.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search.prison.service.justice.gov.uk"
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry.prison.service.justice.gov.uk"
-    WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     COMPONENT_API_URL: https://frontend-components.hmpps.service.justice.gov.uk
     DPS_URL: "https://dps.prison.service.justice.gov.uk/"
     DPS_PRISONER_URL: "https://prisoner.digital.prison.service.justice.gov.uk/"
     ENVIRONMENT_NAME: prod
 
     REDIS_KEY: "bapv-staff-prod"
-
-    FEATURE_VISIT_REQUEST: "true"
 
 generic-prometheus-alerts:
   alertSeverity: visits-alerts

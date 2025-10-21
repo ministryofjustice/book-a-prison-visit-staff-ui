@@ -1,0 +1,53 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Manage online bookers" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+
+      <p class="govuk-body-l">
+        Search for a booker. You can manage which prisoners and visitors they can book visits for.
+      </p>
+
+      <form action="/manage-bookers/search" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukInput({
+          label: {
+            text: "Enter the booker’s email address"
+          },
+          classes: "govuk-!-width-one-half",
+          name: "search",
+          autocomplete: "off",
+          value: formValues.search,
+          spellcheck: false,
+          errorMessage: errors | findError('search')
+        }) }}
+
+        {% if noBookerFound and formValues.search %}
+          <p data-test="no-booker-found">There is no match for this email address.</p>
+        {% endif %}
+
+        {{ govukButton({
+          text: "Search",
+          attributes: { "data-test": "search" },
+          classes: "govuk-!-margin-top-3",
+          preventDoubleClick: true
+        }) }} 
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

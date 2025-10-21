@@ -1,0 +1,194 @@
+.bapv-calendar__key {
+  & li > span {
+    display: inline-block;
+    width: 10%;
+  }
+}
+
+.bapv-calendar__key__colour--grey {
+  color: $govuk-secondary-text-colour;
+}
+
+.bapv-calendar__key__colour--blue {
+  @include govuk-link-decoration;
+  color: $govuk-link-colour;
+  font-weight: $govuk-font-weight-bold;
+}
+
+.bapv-calendar__key__colour--orange {
+  @include govuk-link-decoration;
+  color: $moj-warning-colour;
+  font-weight: $govuk-font-weight-bold;
+}
+
+.bapv-calendar__key__colour--red {
+  @include govuk-link-decoration;
+  color: govuk-colour("red");
+  font-weight: $govuk-font-weight-bold;
+}
+
+.bapv-calendar {
+  margin-bottom: govuk-spacing(9);
+}
+
+.bapv-calendar__month, .bapv-calendar__day-headings {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  row-gap: govuk-spacing(3);
+}
+
+.bapv-calendar__day-headings {
+  margin-top: govuk-spacing(3);
+
+  li {
+    width: 3rem;
+  }
+
+  // only show abbreviated weekday names on mobile
+  span {
+    @include govuk-media-query($until: tablet) {
+      display: none;
+    }
+  }
+}
+
+.bapv-calendar__day {
+  @include govuk-font-size($size: 24);
+  aspect-ratio: 1 / 1;
+  color: $govuk-secondary-text-colour;
+  position: relative;
+  width: 3rem;
+
+  a, span {
+    padding: govuk-spacing(1);
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  a {
+    @include govuk-link-style-no-visited-state;
+    font-weight: $govuk-font-weight-bold;
+    min-width: 1.5rem;
+  }
+}
+
+.bapv-calendar__day--orange a {
+  &:link, &:visited {
+    color: $moj-warning-colour;
+  }
+
+  &:hover {
+    color: govuk-shade($moj-warning-colour, 25);
+  }
+}
+
+.bapv-calendar__day--red a {
+  &:link, &:visited {
+    color: govuk-colour("red");
+  }
+
+  &:hover {
+    color: govuk-shade(govuk-colour("red"), 25);
+  }
+}
+
+.bapv-calendar__day--orange,
+.bapv-calendar__day--red {
+  & a:focus {
+    color: $govuk-focus-text-colour;
+  }
+}
+
+
+// generate classes to offset start day column
+@for $i from 2 through 7 {
+  .bapv-calendar__day--start-col-#{$i} {
+    grid-column-start: $i;
+  }
+}
+
+.bapv-calendar__day--outline {
+  border-radius: 50%;
+  outline: 2px solid govuk-colour("dark-grey");
+
+}
+
+.bapv-calendar__day--selected {
+  background-color: govuk-colour("blue");
+  &.bapv-calendar__day--orange {
+    background-color: $moj-warning-colour;
+  }
+  &.bapv-calendar__day--red {
+    background-color: govuk-colour("red");
+  }
+  border-radius: 50%;
+
+  .bapv-calendar__day--outline {
+    outline-color: govuk-colour("black");
+  }
+
+  &:has(a:focus) {
+    background-color: $govuk-focus-colour;
+    outline: none;
+  }
+
+  a {
+    @include govuk-link-style-inverse;
+    text-decoration: none;
+
+    &:focus {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+}
+
+.bapv-calendar__day-group {
+  display: none; // start with each day's form group of radios hidden
+  margin-bottom: govuk-spacing(2);
+
+  .govuk-heading-s {
+    margin-top: govuk-spacing(4)
+  }
+
+  .govuk-radios__item {
+    margin-top: govuk-spacing(6);
+  }
+
+  .govuk-label {
+    padding-top: 0;
+  }
+
+  .govuk-radios__input:disabled + .govuk-radios__label {
+    opacity: unset;
+
+    &::before, & span {
+      opacity: 0.5;
+    }
+  }
+
+  .govuk-tag {
+    margin-top: govuk-spacing(1);
+  }
+}
+
+.bapv-calendar__day-group--active {
+  display: block;
+}
+
+.bapv-calendar__event {
+  @include govuk-font($size: 19);
+  background-color: #e0eef8;
+  display: inline-block;
+  margin-bottom: govuk-spacing(2);
+  margin-top: govuk-spacing(1);
+  width: 29%;
+  padding: govuk-spacing(2);
+  vertical-align: top;
+  
+  &:not(:last-of-type) {
+    margin-right: govuk-spacing(2);
+  }
+}

@@ -4,7 +4,10 @@ import {
   ApplicationDto,
   ApplicationMethodType,
   ApproveVisitRequestBodyDto,
+  BookerDetailedInfoDto,
+  BookerSearchResultsDto,
   BookingOrchestrationRequestDto,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   ChangeApplicationDto,
   CreateApplicationDto,
@@ -20,6 +23,7 @@ import {
   PrisonDto,
   PrisonerProfile,
   RejectVisitRequestBodyDto,
+  SearchBookerDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -33,6 +37,7 @@ import {
   VisitRequestSummary,
   VisitRestriction,
   VisitSession,
+  VisitSessionsAndScheduleDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
 
@@ -51,6 +56,8 @@ export default class OrchestrationApiClient {
     'REQUESTED_VISIT',
     'REQUESTED_VISIT_APPROVED',
     'REQUESTED_VISIT_REJECTED',
+    'REQUESTED_VISIT_AUTO_REJECTED',
+    'REQUESTED_VISIT_WITHDRAWN',
     'IGNORE_VISIT_NOTIFICATIONS_EVENT',
     ...this.enabledRawNotifications,
   ]
@@ -61,12 +68,19 @@ export default class OrchestrationApiClient {
 
   // orchestration-visits-controller
 
-  async bookVisit(
-    applicationReference: string,
-    applicationMethod: ApplicationMethodType,
-    allowOverBooking: boolean,
-    username: string,
-  ): Promise<Visit> {
+  async bookVisit({
+    applicationReference,
+    applicationMethod,
+    allowOverBooking,
+    visitorDetails,
+    username,
+  }: {
+    applicationReference: string
+    applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
+    username: string
+  }): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/book`,
       data: <BookingOrchestrationRequestDto>{
@@ -74,16 +88,24 @@ export default class OrchestrationApiClient {
         allowOverBooking,
         actionedBy: username,
         userType: 'STAFF',
+        visitorDetails,
       },
     })
   }
 
-  async updateVisit(
-    applicationReference: string,
-    applicationMethod: ApplicationMethodType,
-    allowOverBooking: boolean,
-    username: string,
-  ): Promise<Visit> {
+  async updateVisit({
+    applicationReference,
+    applicationMethod,
+    allowOverBooking,
+    visitorDetails,
+    username,
+  }: {
+    applicationReference: string
+    applicationMethod: ApplicationMethodType
+    allowOverBooking: boolean
+    visitorDetails: BookingRequestVisitorDetailsDto[]
+    username: string
+  }): Promise<Visit> {
     return this.restClient.put({
       path: `/visits/${applicationReference}/update`,
       data: <BookingOrchestrationRequestDto>{
@@ -91,6 +113,7 @@ export default class OrchestrationApiClient {
         allowOverBooking,
         actionedBy: username,
         userType: 'STAFF',
+        visitorDetails,
       },
     })
   }
@@ -177,8 +200,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
       data: <ChangeApplicationDto>{
         applicationRestriction: visitSessionData.visitRestriction,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -199,8 +222,8 @@ export default class OrchestrationApiClient {
       path: `/visits/application/${visitSessionData.visitReference}/change`,
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitContact,
         visitors: visitSessionData.visitors.map(visitor => {
@@ -222,8 +245,8 @@ export default class OrchestrationApiClient {
       path: '/visits/application/slot/reserve',
       data: <CreateApplicationDto>{
         prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.visitSlot.sessionTemplateReference,
-        sessionDate: visitSessionData.visitSlot.startTimestamp.split('T')[0],
+        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+        sessionDate: visitSessionData.selectedVisitSession.date,
         applicationRestriction: visitSessionData.visitRestriction,
         visitors: visitSessionData.visitors.map(visitor => {
           return {
@@ -235,6 +258,25 @@ export default class OrchestrationApiClient {
         allowOverBooking: true,
       },
     })
+  }
+
+  // public-booker-controller
+  async getBookersByEmail(email: string): Promise<BookerSearchResultsDto[]> {
+    try {
+      return await this.restClient.post({
+        path: '/public/booker/search',
+        data: <SearchBookerDto>{ email },
+      })
+    } catch (error) {
+      if (error.status === 404) {
+        return []
+      }
+      throw error
+    }
+  }
+
+  async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {
+    return this.restClient.get({ path: `/public/booker/${reference}` })
   }
 
   // visit notification controller
@@ -348,24 +390,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getVisitSessions(
-    offenderNo: string,
-    prisonId: string,
-    username: string,
-    minNumberOfDays?: number,
-  ): Promise<VisitSession[]> {
-    return this.restClient.get({
-      path: '/visit-sessions',
-      query: new URLSearchParams({
-        prisonId,
-        prisonerId: offenderNo,
-        min: minNumberOfDays.toString(),
-        username,
-        userType: 'STAFF',
-      }).toString(),
-    })
-  }
-
   async getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
     return this.restClient.get({
       path: '/visit-sessions/schedule',
@@ -390,6 +414,28 @@ export default class OrchestrationApiClient {
     } catch {
       return null
     }
+  }
+
+  async getVisitSessionsAndSchedule({
+    prisonId,
+    prisonerId,
+    minNumberOfDays,
+    username,
+  }: {
+    prisonId: string
+    prisonerId: string
+    minNumberOfDays: number
+    username: string
+  }): Promise<VisitSessionsAndScheduleDto> {
+    return this.restClient.get({
+      path: '/visit-sessions-and-schedule',
+      query: new URLSearchParams({
+        prisonId,
+        prisonerId,
+        min: minNumberOfDays.toString(),
+        username,
+      }).toString(),
+    })
   }
 
   // prisoner-profile-controller

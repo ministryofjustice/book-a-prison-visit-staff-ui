@@ -14,7 +14,6 @@ export default function routes(services: Services): Router {
     services.visitService,
   )
   const unblockVisitDateController = new UnblockVisitDateController(services.auditService, services.blockedDatesService)
-
   router.get('/', blockVisitDatesController.view())
   router.post('/', blockVisitDatesController.validate(), blockVisitDatesController.submit())
 

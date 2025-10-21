@@ -31,6 +31,7 @@ export type IgnoreVisitNotificationsDto = components['schemas']['IgnoreVisitNoti
 
 export type ApplicationMethodType = components['schemas']['BookingOrchestrationRequestDto']['applicationMethodType']
 export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']
+export type BookingRequestVisitorDetailsDto = components['schemas']['BookingRequestVisitorDetailsDto']
 
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
@@ -64,6 +65,12 @@ export type VisitNotifications = Omit<VisitNotificationsRaw, 'notifications'> & 
   notifications: (Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType })[]
 }
 
+// Visit sessions and scheduled events (calendar)
+export type VisitSessionsAndScheduleDto = components['schemas']['VisitSessionsAndScheduleDto']
+export type SessionsAndScheduleDto = components['schemas']['SessionsAndScheduleDto']
+export type VisitSessionV2Dto = components['schemas']['VisitSessionV2Dto']
+export type PrisonerScheduledEventDto = components['schemas']['PrisonerScheduledEventDto']
+
 export type PrisonDto = components['schemas']['PrisonDto']
 
 export type ExcludeDateDto = components['schemas']['ExcludeDateDto']
@@ -77,3 +84,8 @@ export type VisitRequestSummary = components['schemas']['OrchestrationVisitReque
 export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']
 
 export type ApplicationValidationErrorResponse = components['schemas']['ApplicationValidationErrorResponse']
+
+// Booker management
+export type BookerDetailedInfoDto = components['schemas']['BookerDetailedInfoDto']
+export type BookerSearchResultsDto = components['schemas']['BookerSearchResultsDto']
+export type SearchBookerDto = components['schemas']['SearchBookerDto']

@@ -45,7 +45,6 @@ COMPONENT_API_URL="https://frontend-components-dev.hmpps.service.justice.gov.uk"
 ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
 PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
 PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
-WHEREABOUTS_API_URL="https://whereabouts-api-dev.service.justice.gov.uk"
 ```
 
 And then, to build the assets and start the app with nodemon:
@@ -143,7 +142,57 @@ To download and update all the API types and tidy up the files, run:
 ```
 
 ## Maintenance page
-See the [maintenance page README](./maintenance_page/README.md) for how to turn this on/off and update the content.
+The application has a maintenance page with a service unavailable message. It can also optionally show a date when the service will be available again. The maintenance page is served for all requests except:
+* the 'health check' ones (`/health, /info, /ping`) (`/info` will return an `HTTP 503` if orchestration and/or visit scheduler services are unavailable)
+* HMPPS Auth related ones (e.g. `/sign-in`)
+Logged in users will still see the DPS header and footer. 
+
+This behaviour is controlled by two environment variables. Default values are in Helm config:
+```
+  MAINTENANCE_MODE: "false"
+  # Optional maintenance end date (in ISO format, YYYY-MM-DDTHH:MM)
+  MAINTENANCE_MODE_END_DATE_TIME: ""
+```
+
+To see the current state of these variables, use this command:
+```
+# example is for 'dev' namespace; replace with 'prod' as appropriate
+
+kubectl -n visit-someone-in-prison-frontend-svc-dev set env deployment/book-a-prison-visit-staff-ui --list
+```
+
+Maintenance mode can be turned on by either:
+* changing the values for an environment (e.g. prod) in Helm config, committing and deploying
+* manually changing the values for an environment and restarting the pods
+
+
+### Manually enabling maintenance mode
+To turn on maintenance mode, use one of these commands (depending on whether an end date and time should be shown):
+```
+# examples are for 'dev' namespace; replace with 'prod' as appropriate
+
+# Enable maintenance with no end date and time displayed
+kubectl -n visit-someone-in-prison-frontend-svc-dev set env deployment/book-a-prison-visit-staff-ui MAINTENANCE_MODE=true
+
+# Enable maintenance page that includes an end date and time
+kubectl -n visit-someone-in-prison-frontend-svc-dev set env deployment/book-a-prison-visit-staff-ui MAINTENANCE_MODE=true MAINTENANCE_MODE_END_DATE_TIME=2025-10-01T14:00
+```
+
+This will update the environment variables and restart the pods. To see the status of pods, use:
+```
+kubectl -n visit-someone-in-prison-frontend-svc-dev get pods
+```
+Once these are restarted, the maintenance page will be active.
+
+
+### Manually disabling maintenance mode
+To turn off maintenance mode, run this command:
+```
+# example is for 'dev' namespace; replace with 'prod' as appropriate
+
+kubectl -n visit-someone-in-prison-frontend-svc-dev set env deployment/book-a-prison-visit-staff-ui MAINTENANCE_MODE=false
+```
+This will update the environment variables and restart the pods. Once these are restarted, the maintenance page will be turned off.
 
 
 ## User audit

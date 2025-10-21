@@ -25,12 +25,12 @@ parameters:
 
   node-version:
     type: string
-    default: 22.17-browsers
+    default: 22.20-browsers
 
 jobs:
   acceptance_tests_staff_playwright-e2e:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.51.0-jammy
+      - image: mcr.microsoft.com/playwright:v1.55.0-jammy
     circleci_ip_ranges: true
     steps:
       - run:

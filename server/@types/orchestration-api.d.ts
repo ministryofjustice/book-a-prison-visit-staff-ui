@@ -331,6 +331,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Search for booker(s) via email
+     * @description Search for all booker accounts that are registered to email
+     */
+    post: operations['searchForBooker']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visits/{reference}': {
     parameters: {
       query?: never
@@ -668,6 +688,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-sessions-and-schedule': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Returns all visit sessions and prisoner schedule for a specified prisoner
+     * @description Retrieve all visit sessions and schedule for a specified prisoner
+     */
+    get: operations['getVisitSessionsAndSchedule']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/queue-admin/get-dlq-messages/{dlqName}': {
     parameters: {
       query?: never
@@ -676,6 +716,26 @@ export interface paths {
       cookie?: never
     }
     get: operations['getDlqMessages']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/public/booker/{bookerReference}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get detailed information for a booker (including prisoners and visitors) via booker reference.
+     * @description Returns detailed information for a booker (including prisoners and visitors) via booker reference.
+     */
+    get: operations['getBookerDetails']
     put?: never
     post?: never
     delete?: never
@@ -796,6 +856,26 @@ export interface paths {
      * @description Get permitted visitors for a prisoner associated with that booker.
      */
     get: operations['getPermittedVisitorsForPrisoner']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/public/booker/{bookerReference}/audit': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get audit entries for a booker.
+     * @description Get audit entries for a booker.
+     */
+    get: operations['getBookerAudit']
     put?: never
     post?: never
     delete?: never
@@ -1298,6 +1378,9 @@ export interface components {
         | 'APPLICATION_INVALID_VISIT_ALREADY_BOOKED'
         | 'APPLICATION_INVALID_NO_VO_BALANCE'
         | 'APPLICATION_INVALID_NO_SLOT_CAPACITY'
+        | 'APPLICATION_INVALID_VISIT_DATE_BLOCKED'
+        | 'APPLICATION_INVALID_SESSION_DATE_BLOCKED'
+        | 'APPLICATION_INVALID_USER_TYPE'
       )[]
     }
     BookingOrchestrationRequestDto: {
@@ -1324,6 +1407,21 @@ export interface components {
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /** @description flag to determine if visit should be a request or instant booking */
       isRequestBooking?: boolean
+      /** @description Set of visitor details - includes Person ID (nomis) of the visitor and their age (in years) at the time of booking */
+      visitorDetails?: components['schemas']['BookingRequestVisitorDetailsDto'][]
+    }
+    /** @description Visitor Details passed while making a booking */
+    BookingRequestVisitorDetailsDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       */
+      visitorId: number
+      /**
+       * Format: int32
+       * @description Age of the visitor while making the booking, null if not available
+       */
+      visitorAge?: number
     }
     RejectVisitRequestBodyDto: {
       /** @description Reference of the visit for rejection */
@@ -1575,6 +1673,23 @@ export interface components {
        */
       prisonId: string
     }
+    /** @description Find a booker via search criteria */
+    SearchBookerDto: {
+      /** @description auth email */
+      email: string
+    }
+    /** @description Details of a found booker via booker search */
+    BookerSearchResultsDto: {
+      /** @description This is the booker reference, unique per booker */
+      reference: string
+      /** @description email registered to booker */
+      email: string
+      /**
+       * Format: date-time
+       * @description The time the booker account was created
+       */
+      createdTimestamp: string
+    }
     /** @description An address */
     AddressDto: {
       /**
@@ -1756,6 +1871,7 @@ export interface components {
         | 'CANCELLED_NON_ASSOCIATION_VISIT_EVENT'
         | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
         | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
+        | 'COURT_VIDEO_APPOINTMENT_CREATED_OR_UPDATED_EVENT'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -2084,7 +2200,12 @@ export interface components {
        * @example VISITOR_RESTRICTION
        * @enum {string}
        */
-      attributeName: 'VISITOR_RESTRICTION' | 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'PAIRED_VISIT'
+      attributeName:
+        | 'VISITOR_RESTRICTION'
+        | 'VISITOR_RESTRICTION_ID'
+        | 'VISITOR_ID'
+        | 'PAIRED_VISIT'
+        | 'APPOINTMENT_INSTANCE_ID'
       /**
        * @description Value of the attribute associated with the notification event
        * @example BAN
@@ -2234,10 +2355,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -2514,6 +2635,97 @@ export interface components {
        */
       sessionRestriction: 'OPEN' | 'CLOSED'
     }
+    PrisonerScheduledEventDto: {
+      /** @description Type of scheduled event (as a code) */
+      eventType?: string
+      /** @description Description of scheduled event sub type */
+      eventSubTypeDesc?: string
+      /** @description Source-specific description for type or nature of the event */
+      eventSourceDesc?: string
+      /**
+       * Format: HH:mm
+       * @description Date and time at which event starts
+       * @example 13:45
+       */
+      startTime?: string
+      /**
+       * Format: HH:mm
+       * @description Date and time at which event ends
+       * @example 13:45
+       */
+      endTime?: string
+    }
+    SessionsAndScheduleDto: {
+      /**
+       * Format: date
+       * @description Session date
+       * @example 2020-11-01
+       */
+      date: string
+      /** @description Visit sessions */
+      visitSessions: components['schemas']['VisitSessionV2Dto'][]
+      /** @description Visit sessions */
+      scheduledEvents: components['schemas']['PrisonerScheduledEventDto'][]
+    }
+    VisitSessionV2Dto: {
+      /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /**
+       * @description Visit Room
+       * @example Visits Main Hall
+       */
+      visitRoom: string
+      /**
+       * Format: int32
+       * @description The number of concurrent visits which may take place within this session
+       * @example 1
+       */
+      openVisitCapacity: number
+      /**
+       * Format: int32
+       * @description The count of open visit bookings already reserved or booked for this session
+       * @example 1
+       */
+      openVisitBookedCount?: number
+      /**
+       * Format: int32
+       * @description The number of closed visits which may take place within this session
+       * @example 1
+       */
+      closedVisitCapacity: number
+      /**
+       * Format: int32
+       * @description The count of closed visit bookings already reserved or booked for this session
+       * @example 1
+       */
+      closedVisitBookedCount?: number
+      /**
+       * Format: HH:mm
+       * @description The start time of the visit session
+       * @example 10:30
+       */
+      startTime: string
+      /**
+       * Format: HH:mm
+       * @description The end time of the visit session
+       * @example 11:30
+       */
+      endTime: string
+      /** @description Session conflicts */
+      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION')[]
+    }
+    VisitSessionsAndScheduleDto: {
+      /**
+       * @description If scheduled events are available
+       * @example true
+       */
+      scheduledEventsAvailable: boolean
+      /** @description List of visit sessions and prisoner schedules */
+      sessionsAndSchedule: components['schemas']['SessionsAndScheduleDto'][]
+    }
     DlqMessage: {
       body: {
         [key: string]: unknown
@@ -2526,6 +2738,144 @@ export interface components {
       /** Format: int32 */
       messagesReturnedCount: number
       messages: components['schemas']['DlqMessage'][]
+    }
+    /** @description Detailed information of a booker */
+    BookerDetailedInfoDto: {
+      /** @description This is the booker reference, unique per booker */
+      reference: string
+      /** @description email registered to booker */
+      email: string
+      /** @description Permitted prisoners list */
+      permittedPrisoners: components['schemas']['BookerPrisonerDetailedInfoDto'][]
+    }
+    BookerPrisonerDetailedInfoDto: {
+      /** @description Prisoner Details */
+      prisoner: components['schemas']['PrisonerDto']
+      /** @description Current prison code for the prison that the booker registered the prisoner with */
+      registeredPrison: components['schemas']['RegisteredPrisonDto']
+      /** @description Permitted visitors list */
+      permittedVisitors: components['schemas']['BookerPrisonerVisitorDetailedInfoDto'][]
+    }
+    /** @description A detailed view of a visitor for a prisoner */
+    BookerPrisonerVisitorDetailedInfoDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 2000-01-31
+       */
+      dateOfBirth?: string
+      /**
+       * @description Description of relationship to Prisoner
+       * @example Mother
+       */
+      relationshipDescription?: string
+    }
+    CurrentIncentive: {
+      /** @description Incentive level */
+      level: components['schemas']['IncentiveLevel']
+      /**
+       * Format: date-time
+       * @description Date time of the incentive
+       * @example 2022-11-10T15:47:24
+       */
+      dateTime: string
+      /**
+       * Format: date
+       * @description Schedule new review date
+       * @example 2022-11-10
+       */
+      nextReviewDate: string
+    }
+    IncentiveLevel: {
+      /**
+       * @description code
+       * @example STD
+       */
+      code?: string
+      /**
+       * @description description
+       * @example Standard
+       */
+      description: string
+    }
+    PrisonerDto: {
+      /**
+       * @description Prisoner Number
+       * @example A1234AA
+       */
+      prisonerNumber: string
+      /**
+       * @description First Name
+       * @example Robert
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Larsen
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of Birth
+       * @example 1975-04-02
+       */
+      dateOfBirth: string
+      /**
+       * @description Prison ID
+       * @example MDI
+       */
+      prisonId?: string
+      /**
+       * @description Prison Name
+       * @example HMP Leeds
+       */
+      prisonName?: string
+      /**
+       * @description In prison cell location
+       * @example A-1-002
+       */
+      cellLocation?: string
+      /** @description Incentive level */
+      currentIncentive?: components['schemas']['CurrentIncentive']
+      /**
+       * @description current prison or outside with last movement information.
+       * @example Outside - released from Leeds
+       */
+      locationDescription?: string
+      /**
+       * @description Convicted Status
+       * @example Convicted
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
+    }
+    RegisteredPrisonDto: {
+      /**
+       * @description prison code
+       * @example MDI
+       */
+      prisonCode: string
+      /**
+       * @description prison name
+       * @example MDI
+       */
+      prisonName: string
     }
     /** @description Visit */
     OrchestrationVisitDto: {
@@ -2657,97 +3007,6 @@ export interface components {
       /** @description Current prison code for the prison that the booker registered the prisoner with */
       registeredPrison: components['schemas']['RegisteredPrisonDto']
     }
-    CurrentIncentive: {
-      /** @description Incentive level */
-      level: components['schemas']['IncentiveLevel']
-      /**
-       * Format: date-time
-       * @description Date time of the incentive
-       * @example 2022-11-10T15:47:24
-       */
-      dateTime: string
-      /**
-       * Format: date
-       * @description Schedule new review date
-       * @example 2022-11-10
-       */
-      nextReviewDate: string
-    }
-    IncentiveLevel: {
-      /**
-       * @description code
-       * @example STD
-       */
-      code?: string
-      /**
-       * @description description
-       * @example Standard
-       */
-      description: string
-    }
-    PrisonerDto: {
-      /**
-       * @description Prisoner Number
-       * @example A1234AA
-       */
-      prisonerNumber: string
-      /**
-       * @description First Name
-       * @example Robert
-       */
-      firstName: string
-      /**
-       * @description Last name
-       * @example Larsen
-       */
-      lastName: string
-      /**
-       * Format: date
-       * @description Date of Birth
-       * @example 1975-04-02
-       */
-      dateOfBirth: string
-      /**
-       * @description Prison ID
-       * @example MDI
-       */
-      prisonId?: string
-      /**
-       * @description Prison Name
-       * @example HMP Leeds
-       */
-      prisonName?: string
-      /**
-       * @description In prison cell location
-       * @example A-1-002
-       */
-      cellLocation?: string
-      /** @description Incentive level */
-      currentIncentive?: components['schemas']['CurrentIncentive']
-      /**
-       * @description current prison or outside with last movement information.
-       * @example Outside - released from Leeds
-       */
-      locationDescription?: string
-      /**
-       * @description Convicted Status
-       * @example Convicted
-       * @enum {string}
-       */
-      convictedStatus?: 'Convicted' | 'Remand'
-    }
-    RegisteredPrisonDto: {
-      /**
-       * @description prison code
-       * @example MDI
-       */
-      prisonCode: string
-      /**
-       * @description prison name
-       * @example MDI
-       */
-      prisonName: string
-    }
     BookerPrisonerValidationErrorResponse: {
       /** Format: int32 */
       status: number
@@ -2803,6 +3062,21 @@ export interface components {
        * @example 2029-12-31
        */
       expiryDate?: string
+    }
+    /** @description Combined visits and booker registry audit entries for a public booker. */
+    BookerHistoryAuditDto: {
+      /**
+       * @description Audit Type
+       * @example PRISONER_REGISTERED
+       */
+      auditType: string
+      /** @description Audit summary */
+      text?: string
+      /**
+       * Format: date-time
+       * @description Timestamp of booker audit entry
+       */
+      createdTimestamp: string
     }
     PrisonerProfileDto: {
       /**
@@ -4332,6 +4606,48 @@ export interface operations {
       }
     }
   }
+  searchForBooker: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SearchBookerDto']
+      }
+    }
+    responses: {
+      /** @description Booker(s) found successfully */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerSearchResultsDto'][]
+        }
+      }
+      /** @description Incorrect request to search for booker(s) */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getVisitsByReference: {
     parameters: {
       query?: never
@@ -5368,6 +5684,65 @@ export interface operations {
       }
     }
   }
+  getVisitSessionsAndSchedule: {
+    parameters: {
+      query: {
+        /**
+         * @description Query by NOMIS Prison Identifier
+         * @example MDI
+         */
+        prisonId: string
+        /**
+         * @description Filter results by prisoner id
+         * @example A12345DC
+         */
+        prisonerId: string
+        /**
+         * @description Override the default minimum number of days notice from the current date
+         * @example 2
+         */
+        min?: number
+        /**
+         * @description Username for the user making the request. Used to exclude user's pending applications from session capacity count. Optional, ignored if not passed in.
+         * @example user-1
+         */
+        username?: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Visit sessions and schedule information returned for a prisoner */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitSessionsAndScheduleDto']
+        }
+      }
+      /** @description Incorrect request to get visit sessions and schedule information for a prisoner  */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getDlqMessages: {
     parameters: {
       query?: {
@@ -5388,6 +5763,55 @@ export interface operations {
         }
         content: {
           '*/*': components['schemas']['GetDlqResult']
+        }
+      }
+    }
+  }
+  getBookerDetails: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return details */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerDetailedInfoDto']
+        }
+      }
+      /** @description Incorrect request to get booker details */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get booker details */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
@@ -5700,6 +6124,55 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get permitted visitors for a prisoner associated with that booker */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getBookerAudit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return all audit entries for booker */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['BookerHistoryAuditDto'][]
+        }
+      }
+      /** @description Incorrect request to get audit entries for a booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get audit entries for a booker */
       403: {
         headers: {
           [name: string]: unknown

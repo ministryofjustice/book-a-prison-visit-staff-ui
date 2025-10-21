@@ -2,12 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from './testutils/appSetup'
+import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 import { Prison } from '../@types/bapv'
-import { setFeature } from '../data/testutils/mockFeature'
+import populateCurrentUser from '../middleware/populateCurrentUser'
+import bapvUserRoles from '../constants/bapvUserRoles'
 
 let app: Express
 
@@ -25,8 +26,7 @@ describe('GET /', () => {
   let notificationCount = TestData.notificationCount()
 
   beforeEach(() => {
-    setFeature('visitRequest', false)
-
+    populateCurrentUser()
     selectedEstablishment = TestData.prison()
     sessionData = { selectedEstablishment } as SessionData
 
@@ -71,9 +71,7 @@ describe('GET /', () => {
   })
 
   describe('Requested visits tile', () => {
-    // requires feature to be enabled and PUBLIC prison
     beforeEach(() => {
-      setFeature('visitRequest', true)
       selectedEstablishment.clients.push({ userType: 'PUBLIC', active: true })
     })
 
@@ -152,6 +150,39 @@ describe('GET /', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="need-review-count"]').text()).toBe('99+')
+        })
+    })
+  })
+
+  describe('Booker management tile', () => {
+    it('should not render tile if role is missing from user', () => {
+      return request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.card').length).toBe(5)
+
+          expect($('[data-test="booker-management"] .card__link').text()).toBe('')
+          expect($('[data-test="booker-management"] .card__link').attr('href')).toBe(undefined)
+        })
+    })
+
+    it('should render tile if role is present', () => {
+      app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
+        services: { visitNotificationsService, visitRequestsService },
+        sessionData,
+      })
+      return request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.card').length).toBe(6)
+
+          expect($('[data-test="booker-management"] .card__link').text()).toBe('Manage online bookers')
+          expect($('[data-test="booker-management"] .card__link').attr('href')).toBe('/manage-bookers/search')
         })
     })
   })

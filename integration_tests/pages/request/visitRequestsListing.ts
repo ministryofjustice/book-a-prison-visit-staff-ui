@@ -18,4 +18,6 @@ export default class VisitRequestsListingPage extends Page {
   getAction = (row: number): PageElement => cy.get(`[data-test="action-${row}"] a`)
 
   getNoRequestsMessage = (): PageElement => cy.get('[data-test="no-visit-requests"]')
+
+  getBeforeDaysMessage = (): PageElement => cy.get(`[data-test="check-before-days"]`)
 }

@@ -21,7 +21,9 @@ import setUpWebSession from './middleware/setUpWebSession'
 import indexRoutes from './routes'
 import visitJourneyRoutes from './routes/visitJourney'
 import blockVisitDatesRoutes from './routes/blockVisitDates'
+import bookerManagementRoutes from './routes/bookerManagement'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
+import maintenancePageRoute from './routes/maintenancePageRoute'
 import prisonerRoutes from './routes/prisoner/prisoner'
 import requestRoutes from './routes/request'
 import reviewRoutes from './routes/review'
@@ -32,6 +34,7 @@ import visitsByDateRoutes from './routes/visitsByDate/visitsByDate'
 import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
+import bapvUserRoles from './constants/bapvUserRoles'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -47,7 +50,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware(['ROLE_MANAGE_PRISON_VISITS']))
+  app.use(authorisationMiddleware([bapvUserRoles.STAFF_USER]))
   app.use(setUpCsrf())
   app.get(
     '*any',
@@ -58,6 +61,9 @@ export default function createApp(services: Services): express.Application {
     }),
   )
   app.use(setUpCurrentUser())
+
+  app.use(maintenancePageRoute())
+
   app.use(populateSelectedEstablishment(services))
   app.use(appInsightsOperationId)
 
@@ -66,6 +72,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
   app.use('/block-visit-dates', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
+  app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))

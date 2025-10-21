@@ -1,0 +1,55 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Select account to manage" %}
+{% set backLinkHref = '/manage-bookers/search' %}
+
+{% set accounts = [] %}
+
+{% for booker in matchedBookers %}
+  {% set accounts = (accounts.push(
+    {
+      value: booker.reference,
+      text: "Created on " + (booker.createdTimestamp | formatDate)  + " at " + (booker.createdTimestamp | formatTime),
+      checked: true if loop.first else false
+    }
+  ), visitors) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+
+      <p class="bapv-secondary-text">
+        This email address (<span data-test="booker-email">{{ matchedBookers[0].email }}</span>) has been used for more than one booker account.
+      </p>
+
+      <p class="bapv-secondary-text govuk-!-margin-bottom-6">
+        Only the most recent account is active and can be used to book visits.
+      </p>
+
+      <form action="/manage-bookers/select-account" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukRadios({
+          name: "reference",
+          items: accounts,
+          errorMessage: errors | findError('reference')
+        }) }}
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "continue" },
+          classes: "govuk-!-margin-top-3",
+          preventDoubleClick: true
+        }) }} 
+      </form>
+
+    </div>
+  </div>
+{% endblock %}

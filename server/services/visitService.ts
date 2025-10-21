@@ -1,8 +1,10 @@
 import { NotFound } from 'http-errors'
-import { VisitInformation, VisitSessionData } from '../@types/bapv'
+import { intervalToDuration, isValid, parseISO } from 'date-fns'
+import { VisitInformation, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import {
   ApplicationDto,
   ApplicationMethodType,
+  BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
   Visit,
   VisitBookingDetails,
@@ -23,21 +25,26 @@ export default class VisitService {
     applicationReference,
     applicationMethod,
     allowOverBooking,
+    visitors,
   }: {
     username: string
     applicationReference: string
     applicationMethod: ApplicationMethodType
     allowOverBooking: boolean
+    visitors: VisitorListItem[]
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.bookVisit(
+    const visitorDetails = this.buildVisitorDetails(visitors)
+
+    const visit = await orchestrationApiClient.bookVisit({
       applicationReference,
       applicationMethod,
       allowOverBooking,
+      visitorDetails,
       username,
-    )
+    })
     return visit
   }
 
@@ -46,21 +53,26 @@ export default class VisitService {
     applicationReference,
     applicationMethod,
     allowOverBooking,
+    visitors,
   }: {
     username: string
     applicationReference: string
     applicationMethod: ApplicationMethodType
     allowOverBooking: boolean
+    visitors: VisitorListItem[]
   }): Promise<Visit> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const visit = await orchestrationApiClient.updateVisit(
+    const visitorDetails = this.buildVisitorDetails(visitors)
+
+    const visit = await orchestrationApiClient.updateVisit({
       applicationReference,
       applicationMethod,
       allowOverBooking,
+      visitorDetails,
       username,
-    )
+    })
     return visit
   }
 
@@ -213,5 +225,28 @@ export default class VisitService {
       visitTime,
       visitStatus: visit.visitStatus,
     }
+  }
+
+  private buildVisitorDetails(visitors: VisitorListItem[]): BookingRequestVisitorDetailsDto[] {
+    const now = new Date()
+    return visitors.map(visitor => {
+      const { personId: visitorId } = visitor
+
+      let visitorAge: number
+      try {
+        const visitorDoB = parseISO(visitor.dateOfBirth)
+
+        if (isValid(visitorDoB)) {
+          const ageAsDuration = intervalToDuration({ start: visitorDoB, end: now })
+          visitorAge = ageAsDuration?.years ?? 0
+        } else {
+          visitorAge = null
+        }
+      } catch {
+        visitorAge = null
+      }
+
+      return { visitorId, visitorAge }
+    })
   }
 }
