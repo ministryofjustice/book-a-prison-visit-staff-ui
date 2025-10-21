@@ -12,6 +12,14 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
   throw new Error(`Missing env var ${name}`)
 }
 
+function translateEnvironment(gitHubEnvironmentName: string = ''): string {
+  if (gitHubEnvironmentName === 'staging') {
+    return gitHubEnvironmentName.toUpperCase()
+  }
+
+  return ''
+}
+
 const requiredInProduction = { requireInProduction: true }
 
 export class AgentConfig {
@@ -131,7 +139,7 @@ export default {
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
-  environmentName: get('ENVIRONMENT_NAME', ''),
+  environmentName: translateEnvironment(get('ENVIRONMENT_NAME', '')),
   maintenance: {
     enabled: get('MAINTENANCE_MODE', 'false') === 'true',
     endDateTime: get('MAINTENANCE_MODE_END_DATE_TIME', ''), // ISO format e.g. YYYY-MM-DDTHH:MM
