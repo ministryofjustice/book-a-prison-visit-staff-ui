@@ -296,8 +296,7 @@ p.bapv-visit-details__restriction--flagged {
   }
 }
 
-.prisoner-profile-visits .status--REJECTED,
-.prisoner-profile-visits .status--CANCELLED {
+.prisoner-profile-visits .status--secondary {
   color: $govuk-secondary-text-colour;
 }
 

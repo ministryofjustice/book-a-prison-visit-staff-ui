@@ -119,6 +119,7 @@ export type VisitInformation = {
   visitDate: string
   visitTime: string
   visitStatus: Visit['visitStatus']
+  visitSubStatus: Visit['visitSubStatus']
 }
 
 export type VisitsPageSideNavItem = {
