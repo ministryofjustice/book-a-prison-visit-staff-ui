@@ -28,6 +28,17 @@ describe('combinedVisitStatus(visitSubStatus, visitStatus) macro', () => {
     expect($.text()).toBe('Booked')
   })
 
+  it('should output visit status if sub status not present', () => {
+    viewContext = {
+      visitSubStatus: undefined,
+      visitStatus: 'BOOKED',
+    }
+    const nunjucksString = '{{ combinedVisitStatus(visitSubStatus, visitStatus)  }}'
+    compiledTemplate = nunjucks.compile(nunjucksBaseString + nunjucksString, njkEnv)
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+    expect($.text()).toBe('Booked')
+  })
+
   it('should output visit status if sub status is invalid', () => {
     viewContext = {
       visitSubStatus: 'NOT_A_STATUS',

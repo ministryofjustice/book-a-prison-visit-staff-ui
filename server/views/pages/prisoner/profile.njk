@@ -147,10 +147,7 @@
 
             {% set visitStatus = combinedVisitStatus(visit.visitSubStatus, visit.visitStatus) %}
             
-            {% set visitRowsClass = '' %}
-            {% if (visitStatus == 'Rejected') or (visitStatus == 'Cancelled') %}
-              {% set visitRowsClass = 'status--secondary' %}
-            {% endif %}
+            {% set visitRowsClass = 'bapv-secondary-text' if (visitStatus == 'Rejected') or (visitStatus == 'Cancelled') else '' %}
 
             {% set visitRows = (visitRows.push([
               {
