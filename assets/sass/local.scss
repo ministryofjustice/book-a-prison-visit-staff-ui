@@ -296,11 +296,6 @@ p.bapv-visit-details__restriction--flagged {
   }
 }
 
-.prisoner-profile-visits .status--REJECTED,
-.prisoner-profile-visits .status--CANCELLED {
-  color: $govuk-secondary-text-colour;
-}
-
 .bapv-booker-details {
   @include govuk-font-size($size: 24);
   display: grid;

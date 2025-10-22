@@ -257,6 +257,7 @@ describe('Booking search page', () => {
     visitDate: '12 Nov 2021',
     visitTime: '1pm -2pm',
     visitStatus: 'BOOKED',
+    visitSubStatus: 'APPROVED',
   }
 
   describe('GET /search/visit', () => {
@@ -318,6 +319,7 @@ describe('Booking search page', () => {
           expect(res.text).toContain('id="search-results-true"')
           expect($('[data-test=search-by-prisoner]').length).toBe(0)
           expect($('[data-test=prisoner-name]').text()).toBe('John Smith')
+          expect($('[data-test=visit-status]').text()).toBe('Booked')
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
             username: 'user1',

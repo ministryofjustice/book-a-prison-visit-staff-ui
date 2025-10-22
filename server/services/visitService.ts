@@ -224,6 +224,7 @@ export default class VisitService {
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
       visitTime,
       visitStatus: visit.visitStatus,
+      visitSubStatus: visit.visitSubStatus,
     }
   }
 

@@ -7,6 +7,7 @@
 {%- from "moj/components/sub-navigation/macro.njk" import mojSubNavigation -%}
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "components/combinedVisitStatus.njk" import combinedVisitStatus %}
 
 {% set pageHeaderTitle = "View visits by date" %}
 
@@ -34,7 +35,7 @@
 
       {% set visitsRows = [] %}
       {% for visit in visitsSection.visits %}
-        {% set visitStatus = "REQUESTED" if (visit.visitSubStatus == "REQUESTED") else "BOOKED" %}
+        {% set visitStatus = combinedVisitStatus(visit.visitSubStatus, visit.visitStatus) %}
         {% set visitsRows = (visitsRows.push([
           {
             text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
@@ -53,7 +54,7 @@
             }
           },
           {
-            text: visitStatus | capitalize,
+            text: visitStatus,
             attributes: { "data-test": "visit-status" }
           },
           {

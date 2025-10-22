@@ -1,0 +1,13 @@
+{% macro combinedVisitStatus(visitSubStatus, visitStatus) %}
+  {%- if (visitSubStatus == "APPROVED") or (visitSubStatus == "AUTO_APPROVED") -%}
+    Booked
+  {%- elif (visitSubStatus == "REQUESTED") -%}
+    Requested
+  {%- elif (visitSubStatus == "REJECTED") or (visitSubStatus == "AUTO_REJECTED") -%}
+    Rejected
+  {%- elif (visitSubStatus == "CANCELLED") or (visitSubStatus == "WITHDRAWN") -%}
+    Cancelled
+  {%- else -%}
+    {{ visitStatus | capitalize }}
+  {%- endif -%}
+{% endmacro %}

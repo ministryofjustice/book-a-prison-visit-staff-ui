@@ -2,8 +2,10 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "moj/components/pagination/macro.njk" import mojPagination %}
+{% from "components/combinedVisitStatus.njk" import combinedVisitStatus %}
 
 {% set pageHeaderTitle = "Search for a booking" %}
+{% set visitStatus = combinedVisitStatus(results[0].visitSubStatus, results[0].visitStatus) %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}
@@ -79,7 +81,7 @@
                 }
               },
               {
-                text: results[0].visitStatus | capitalize,
+                text: visitStatus,
                  attributes: {
                   "data-test": "visit-status"
                 }
