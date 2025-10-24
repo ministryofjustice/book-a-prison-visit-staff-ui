@@ -82,6 +82,7 @@ export default class CancelVisitController {
       })
 
       req.session.cancelledVisitInfo = {
+        prisonerId: visit.prisonerId,
         startTimestamp: visit.startTimestamp,
         endTimestamp: visit.endTimestamp,
         hasEmailAddress: !!visit.visitContact.email?.length,

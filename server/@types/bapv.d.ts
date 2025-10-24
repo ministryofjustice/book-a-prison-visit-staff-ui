@@ -154,6 +154,7 @@ export type FilterField = {
 export type BookOrUpdate = 'book' | 'update'
 
 export type CancelledVisitInfo = {
+  prisonerId: string
   startTimestamp: string
   endTimestamp: string
   hasEmailAddress: boolean

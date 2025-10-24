@@ -232,7 +232,7 @@ context('Book a visit', () => {
     confirmationPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     confirmationPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     confirmationPage.mainContactNumber().contains('01234 567890')
-    confirmationPage.bookAnotherVisitButton(offenderNo)
+    confirmationPage.viewPrisonersProfileButton(offenderNo)
   })
 
   it('should allow VO balance override', () => {

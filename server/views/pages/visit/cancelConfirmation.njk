@@ -22,7 +22,19 @@
     {% if hasEmailAddress or hasMobileNumber %}
       <p data-test="contact-method-text">The main contact for this visit will get {{ contactMethodText(hasEmailAddress, hasMobileNumber) }} to confirm it has been cancelled.</p>
     {% endif %}
-    {% include "partials/backToStartButton.njk" %}
+
+    <div>
+      {% include "partials/backToStartButton.njk" %}
+    </div>
+    <div>
+      {{ govukButton({
+        classes: "govuk-!-margin-bottom-6 govuk-button--secondary",
+        text: "View this prisoner’s profile",
+        attributes: { "data-test": "go-to-prisoner" },
+        href: "/prisoner/" + prisonerId,
+        preventDoubleClick: true
+      }) }}
+    </div>
   </div>
 </div>
 {% endblock %}

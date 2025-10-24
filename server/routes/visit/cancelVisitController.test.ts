@@ -37,6 +37,7 @@ afterEach(() => {
 describe('GET /visit/:reference/cancelled', () => {
   it('should render the booking cancelled page with details of the visit retrieved from session', () => {
     sessionData.cancelledVisitInfo = {
+      prisonerId: 'A1234BC',
       startTimestamp: '2022-02-09T10:15:00',
       endTimestamp: '2022-02-09T11:00:00',
       hasEmailAddress: true,
@@ -52,6 +53,7 @@ describe('GET /visit/:reference/cancelled', () => {
         expect($('h1').text().trim()).toBe('Booking cancelled')
         expect($('[data-test="visit-details"]').text().trim()).toBe('10:15am to 11am on Wednesday 9 February 2022')
         expect($('[data-test="back-to-start"]').attr('href')).toBe('/back-to-start')
+        expect($('[data-test="go-to-prisoner"]').attr('href')).toBe('/prisoner/A1234BC')
       })
   })
 
@@ -173,6 +175,7 @@ describe('POST /visit/:reference/cancel', () => {
           operationId: undefined,
         })
         expect(sessionData.cancelledVisitInfo).toStrictEqual<CancelledVisitInfo>({
+          prisonerId: cancelledVisit.prisonerId,
           startTimestamp: cancelledVisit.startTimestamp,
           endTimestamp: cancelledVisit.endTimestamp,
           hasEmailAddress: true,
