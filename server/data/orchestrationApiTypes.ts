@@ -41,7 +41,7 @@ export type VisitSession = components['schemas']['VisitSessionDto']
 export type Alert = components['schemas']['AlertDto']
 export type OffenderRestriction = components['schemas']['OffenderRestrictionDto']
 
-export type PrisonerProfile = components['schemas']['PrisonerProfileDto']
+export type PrisonerProfileDto = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
 
 // Raw local/global visitor restrictions mapped to VISITOR_RESTRICTION as described above

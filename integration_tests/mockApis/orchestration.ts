@@ -12,7 +12,7 @@ import {
   IgnoreVisitNotificationsDto,
   NotificationCount,
   PrisonDto,
-  PrisonerProfile,
+  PrisonerProfileDto,
   SessionCapacity,
   SessionSchedule,
   Visit,
@@ -759,7 +759,7 @@ export default {
     })
   },
 
-  stubPrisonerProfile: (profile: PrisonerProfile): SuperAgentRequest => {
+  stubPrisonerProfile: (profile: PrisonerProfileDto): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

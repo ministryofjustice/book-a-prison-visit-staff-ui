@@ -58,10 +58,10 @@ describe('Prisoner profile service', () => {
           visitBalances: {
             remainingVo: 1,
             remainingPvo: 2,
-            latestIepAdjustDate: '21 April 2021',
-            latestPrivIepAdjustDate: '1 December 2021',
-            nextIepAdjustDate: '5 May 2021',
-            nextPrivIepAdjustDate: '1 January 2022',
+            lastVoAllocationDate: '2021-04-21',
+            nextVoAllocationDate: '2021-05-05',
+            lastPvoAllocationDate: '2021-12-01',
+            nextPvoAllocationDate: '2022-01-01',
           },
         },
       }

@@ -8,7 +8,7 @@ import {
   NotificationCount,
   OffenderRestriction,
   PrisonDto,
-  PrisonerProfile,
+  PrisonerProfileDto,
   PrisonerScheduledEventDto,
   SessionCapacity,
   SessionsAndScheduleDto,
@@ -332,11 +332,13 @@ export default class TestData {
     visitBalances = {
       remainingVo: 1,
       remainingPvo: 2,
-      latestIepAdjustDate: '2021-04-21',
-      latestPrivIepAdjustDate: '2021-12-01',
+      lastVoAllocationDate: '2021-04-21',
+      nextVoAllocationDate: '2021-05-05',
+      lastPvoAllocationDate: '2021-12-01',
+      nextPvoAllocationDate: '2022-01-01',
     },
     visits = [],
-  }: Partial<PrisonerProfile> = {}): PrisonerProfile =>
+  }: Partial<PrisonerProfileDto> = {}): PrisonerProfileDto =>
     ({
       prisonerId,
       prisonId,
@@ -352,7 +354,7 @@ export default class TestData {
       prisonerRestrictions,
       visitBalances,
       visits,
-    }) as PrisonerProfile
+    }) as PrisonerProfileDto
 
   static prisonerScheduledEvent = ({
     eventType = 'PRISON_ACT',
