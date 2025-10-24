@@ -27,9 +27,9 @@ export default class ConfirmationPage extends Page {
 
   mainContactNumber = (): PageElement => cy.get('.test-main-contact-number')
 
-  bookAnotherVisitButton = (offenderNo): void => {
+  viewPrisonersProfileButton = (offenderNo): void => {
     cy.get('[data-test=go-to-prisoner]')
-      .contains('Book another visit for this prisoner')
+      .contains('View this prisoner’s profile')
       .should('have.attr', 'href', `/prisoner/${offenderNo}`)
   }
 }

@@ -39,6 +39,7 @@ describe('clearSession', () => {
     visitSessionData: { allowOverBooking: false, prisoner: undefined, prisonId: '' },
     selectedEstablishment: TestData.prison(),
     cancelledVisitInfo: {
+      prisonerId: '',
       startTimestamp: '',
       endTimestamp: '',
       hasEmailAddress: undefined,
