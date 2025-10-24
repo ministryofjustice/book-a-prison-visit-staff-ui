@@ -6,7 +6,7 @@ generic-service:
   productId: "DPS035"
 
   image:
-    repository: quay.io/hmpps/book-a-prison-visit-staff-ui
+    repository: ghcr.io/ministryofjustice/book-a-prison-visit-staff-ui
     tag: app_version # override at deployment time
     port: 3000
 
