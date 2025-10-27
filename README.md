@@ -1,6 +1,7 @@
 # book-a-prison-visit-staff-ui
-[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fbook-a-prison-visit-staff-ui)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#book-a-prison-visit-staff-ui "Link to report")
-[![CircleCI](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/book-a-prison-visit-staff-ui)
+[![Ministry of Justice Repository Compliance Badge](https://github-community.service.justice.gov.uk/repository-standards/api/book-a-prison-visit-staff-ui/badge?style=flat)](https://github-community.service.justice.gov.uk/repository-standards/book-a-prison-visit-staff-ui)
+[![pipeline](https://github.com/ministryofjustice/book-a-prison-visit-staff-ui/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/book-a-prison-visit-staff-ui)
+[![Docker Repository on ghcr](https://img.shields.io/badge/ghcr.io-repository-2496ED.svg?logo=docker)](https://ghcr.io/ministryofjustice/book-a-prison-visit-staff-ui)
 
 Staff UI for new Manage a Prison Visit project.
 
