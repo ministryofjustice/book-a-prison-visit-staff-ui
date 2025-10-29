@@ -6,7 +6,6 @@ import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
-import { Prison } from '../@types/bapv'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
 
