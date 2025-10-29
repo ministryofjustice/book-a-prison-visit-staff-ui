@@ -18,7 +18,7 @@ afterEach(() => {
 
 describe('GET /', () => {
   let sessionData: SessionData
-  let selectedEstablishment: Prison
+  let selectedEstablishment: SessionData['selectedEstablishment']
 
   const visitNotificationsService = createMockVisitNotificationsService()
   const visitRequestsService = createMockVisitRequestsService()
@@ -27,7 +27,7 @@ describe('GET /', () => {
 
   beforeEach(() => {
     populateCurrentUser()
-    selectedEstablishment = TestData.prison()
+    selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 
     app = appWithAllRoutes({ services: { visitNotificationsService, visitRequestsService }, sessionData })
@@ -72,7 +72,7 @@ describe('GET /', () => {
 
   describe('Requested visits tile', () => {
     beforeEach(() => {
-      selectedEstablishment.clients.push({ userType: 'PUBLIC', active: true })
+      selectedEstablishment.isEnabledForPublic = true
     })
 
     it('should render badge with visit request count', () => {

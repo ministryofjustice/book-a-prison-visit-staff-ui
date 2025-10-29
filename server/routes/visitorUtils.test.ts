@@ -37,7 +37,7 @@ describe('clearSession', () => {
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     visitSessionData: { allowOverBooking: false, prisoner: undefined, prisonId: '' },
-    selectedEstablishment: TestData.prison(),
+    selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
     cancelledVisitInfo: {
       prisonerId: '',
       startTimestamp: '',
@@ -56,7 +56,7 @@ describe('clearSession', () => {
       returnTo: '/url',
       nowInMinutes: 123456,
       cookie: undefined,
-      selectedEstablishment: TestData.prison(),
+      selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
     })
   })
 })

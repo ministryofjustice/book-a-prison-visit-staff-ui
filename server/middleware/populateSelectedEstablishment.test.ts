@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { SessionData } from 'express-session'
 import TestData from '../routes/testutils/testData'
 import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
@@ -16,6 +17,8 @@ const res = {
 const next = jest.fn()
 
 const prison = TestData.prison()
+
+const selectedEstablishment: SessionData['selectedEstablishment'] = { ...prison, isEnabledForPublic: true }
 
 describe('populateSelectedEstablishment', () => {
   beforeEach(() => {
@@ -46,17 +49,17 @@ describe('populateSelectedEstablishment', () => {
   describe('when selected establishment and active case load both set', () => {
     it('should populate res.locals and call next() when they match', () => {
       user.activeCaseLoadId = prison.prisonId
-      req.session.selectedEstablishment = prison
+      req.session.selectedEstablishment = selectedEstablishment
 
       populateSelectedEstablishment(services)(req, res, next)
 
-      expect(res.locals.selectedEstablishment).toStrictEqual(prison)
+      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
       expect(next).toHaveBeenCalled()
     })
 
     it('should clear selected establishment and redirect to /back-to-start when they do not match', () => {
       user.activeCaseLoadId = 'XYZ'
-      req.session.selectedEstablishment = prison
+      req.session.selectedEstablishment = selectedEstablishment
 
       populateSelectedEstablishment(services)(req, res, next)
 
@@ -70,18 +73,18 @@ describe('populateSelectedEstablishment', () => {
   describe('when selected establishment is set but active case load is not set', () => {
     it('should populate res.locals and call next()', () => {
       user.activeCaseLoadId = undefined
-      req.session.selectedEstablishment = prison
+      req.session.selectedEstablishment = selectedEstablishment
 
       populateSelectedEstablishment(services)(req, res, next)
 
-      expect(res.locals.selectedEstablishment).toStrictEqual(prison)
+      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
       expect(next).toHaveBeenCalled()
     })
   })
 
   // e.g. new session or after case load change detected
   describe('when selected establishment is not set but active case load is set', () => {
-    it('should populate selected establishment when active case load is a supported prison', () => {
+    it('should populate selected establishment when active case load is a supported prison (public enabled)', () => {
       user.activeCaseLoadId = prison.prisonId
       req.session.selectedEstablishment = undefined
 
@@ -93,8 +96,32 @@ describe('populateSelectedEstablishment', () => {
       expect(() => {
         expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', prison.prisonId)
         expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith('user1', prison.prisonId)
-        expect(req.session.selectedEstablishment).toStrictEqual(prison)
-        expect(res.locals.selectedEstablishment).toStrictEqual(prison)
+        expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+        expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+        expect(next).toHaveBeenCalled()
+      })
+    })
+
+    it('should populate selected establishment when active case load is a supported prison (not public enabled)', () => {
+      user.activeCaseLoadId = prison.prisonId
+      req.session.selectedEstablishment = undefined
+
+      supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
+      supportedPrisonsService.getPrison.mockResolvedValue({
+        ...prison,
+        clients: [
+          { userType: 'STAFF', active: true },
+          { userType: 'PUBLIC', active: false },
+        ],
+      })
+
+      populateSelectedEstablishment(services)(req, res, next)
+
+      expect(() => {
+        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', prison.prisonId)
+        expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith('user1', prison.prisonId)
+        expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: false })
+        expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: false })
         expect(next).toHaveBeenCalled()
       })
     })

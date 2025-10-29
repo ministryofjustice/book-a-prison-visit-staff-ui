@@ -12,7 +12,7 @@ export declare module 'express-session' {
     visitorList: { visitors: VisitorListItem[] } // TODO move into VisitSessionData
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
     visitSessionData: VisitSessionData
-    selectedEstablishment: Prison
+    selectedEstablishment: Prison & { isEnabledForPublic: boolean }
     visitBlockDate?: string // format YYYY-MM-DD
     cancelledVisitInfo?: CancelledVisitInfo
 

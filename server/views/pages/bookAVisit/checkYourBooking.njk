@@ -139,7 +139,8 @@
           },
           value: {
             html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' +
-              mainContact.phoneNumber | d("No phone number provided", true) | escape + "</span></p>"
+              mainContact.phoneNumber | d("No phone number provided", true) | escape + '</span><br><span class="test-main-contact-email">' +
+              mainContact.email | escape + '</span></p>'
           },
           actions: {
             items: [

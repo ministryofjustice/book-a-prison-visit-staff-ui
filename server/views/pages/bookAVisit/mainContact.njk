@@ -117,6 +117,24 @@
           errorMessage: errors | findError('phoneNumber')
         }) }}
 
+        {% if showEmailField %}
+          {{ govukInput({
+            label: {
+              text: "What is their email address? (optional)",
+              classes: "govuk-fieldset__legend--m"
+            },
+            hint: {
+              text: "We will send an email with the visit reference and visit details"
+            },
+            id: "email",
+            name: "email",
+            type: "text",
+            value: formValues.email,
+            autocomplete: "off",
+            errorMessage: errors | findError('email')
+          }) }}
+        {% endif %}
+
         {{ govukButton({
           text: "Continue",
           attributes: { "data-test": "submit" },
