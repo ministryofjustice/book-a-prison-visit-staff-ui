@@ -2355,10 +2355,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      unpaged?: boolean
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean
@@ -3172,10 +3172,6 @@ export interface components {
        * @description Date of next PVO allocation, null if not allocated
        */
       nextPvoAllocationDate?: string
-
-      // FIXME temporarily adding old data format properties - remove when new API deployed
-      latestIepAdjustDate?: string
-      latestPrivIepAdjustDate?: string
     }
     /** @description Visit Summary */
     VisitSummaryDto: {
@@ -5298,7 +5294,7 @@ export interface operations {
           '*/*': components['schemas']['VisitSessionDto'][]
         }
       }
-      /** @description Incorrect request to Get visit sessions  */
+      /** @description Incorrect request to Get visit sessions */
       400: {
         headers: {
           [name: string]: unknown
@@ -5479,7 +5475,7 @@ export interface operations {
           '*/*': components['schemas']['AvailableVisitSessionDto'][]
         }
       }
-      /** @description Incorrect request to Get visit sessions  */
+      /** @description Incorrect request to Get visit sessions */
       400: {
         headers: {
           [name: string]: unknown
@@ -5538,7 +5534,7 @@ export interface operations {
           '*/*': components['schemas']['SessionCapacityDto']
         }
       }
-      /** @description Incorrect request  */
+      /** @description Incorrect request */
       400: {
         headers: {
           [name: string]: unknown
@@ -5556,7 +5552,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponse']
         }
       }
-      /** @description Capacity not found  */
+      /** @description Capacity not found */
       404: {
         headers: {
           [name: string]: unknown
@@ -5629,7 +5625,7 @@ export interface operations {
           '*/*': components['schemas']['AvailableVisitSessionDto'][]
         }
       }
-      /** @description Incorrect request to Get visit sessions  */
+      /** @description Incorrect request to Get visit sessions */
       400: {
         headers: {
           [name: string]: unknown
@@ -5737,7 +5733,7 @@ export interface operations {
           '*/*': components['schemas']['VisitSessionsAndScheduleDto']
         }
       }
-      /** @description Incorrect request to get visit sessions and schedule information for a prisoner  */
+      /** @description Incorrect request to get visit sessions and schedule information for a prisoner */
       400: {
         headers: {
           [name: string]: unknown
@@ -6441,10 +6437,12 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          /** @example [
+          /**
+           * @example [
            *       "HEI",
            *       "MDI"
-           *     ] */
+           *     ]
+           */
           'application/json': string[]
         }
       }

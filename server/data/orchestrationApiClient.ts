@@ -1,4 +1,3 @@
-import { addDays, addMonths, format, parseISO, startOfMonth } from 'date-fns'
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
 import {
@@ -445,21 +444,6 @@ export default class OrchestrationApiClient {
     const profile = await this.restClient.get<PrisonerProfileDto>({
       path: `/prisoner/${prisonId}/${prisonerId}/profile`,
     })
-
-    // FIXME workaround for old => new data format - remove when new API deployed
-    if (profile.visitBalances?.latestIepAdjustDate) {
-      profile.visitBalances = {
-        remainingVo: profile.visitBalances.remainingVo,
-        remainingPvo: profile.visitBalances.remainingPvo,
-        lastVoAllocationDate: profile.visitBalances.latestIepAdjustDate,
-        nextVoAllocationDate: format(addDays(parseISO(profile.visitBalances.latestIepAdjustDate), 14), 'yyyy-MM-dd'),
-        lastPvoAllocationDate: profile.visitBalances.latestPrivIepAdjustDate,
-        nextPvoAllocationDate: format(
-          addMonths(startOfMonth(parseISO(profile.visitBalances.latestPrivIepAdjustDate)), 1),
-          'yyyy-MM-dd',
-        ),
-      }
-    }
     return profile
   }
 
