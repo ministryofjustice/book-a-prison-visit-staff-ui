@@ -14,7 +14,6 @@ import {
   IgnoreVisitNotificationsDto,
   PageVisitDto,
   PrisonDto,
-  PrisonerProfileDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionSchedule,
