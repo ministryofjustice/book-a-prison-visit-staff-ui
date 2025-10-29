@@ -861,34 +861,6 @@ describe('orchestrationApiClient', () => {
 
       expect(output).toStrictEqual(prisonerProfile)
     })
-
-    // FIXME to remove when new API deployed
-    it('should handle old visit balance data format and convert to new', async () => {
-      const prisonerProfile = TestData.prisonerProfile({
-        visitBalances: {
-          remainingVo: 1,
-          remainingPvo: 2,
-          latestIepAdjustDate: '2021-04-21',
-          latestPrivIepAdjustDate: '2021-12-01',
-        } as PrisonerProfileDto['visitBalances'],
-      })
-
-      fakeOrchestrationApi
-        .get(`/prisoner/${prisonId}/${prisonerProfile.prisonerId}/profile`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, prisonerProfile)
-
-      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerProfile.prisonerId)
-
-      expect(output.visitBalances).toStrictEqual({
-        remainingVo: 1,
-        remainingPvo: 2,
-        lastVoAllocationDate: '2021-04-21',
-        nextVoAllocationDate: '2021-05-05',
-        lastPvoAllocationDate: '2021-12-01',
-        nextPvoAllocationDate: '2022-01-01',
-      })
-    })
   })
 
   describe('getSupportedPrisonIds', () => {
