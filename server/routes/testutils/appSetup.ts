@@ -88,7 +88,7 @@ function appSetup(
     // set default 'selectedEstablishment' unless explicitly set with corresponding service for 'populateSelectedEstablishment()'
     if (!sessionData.selectedEstablishment && !services.supportedPrisonsService) {
       // eslint-disable-next-line no-param-reassign
-      sessionData.selectedEstablishment = TestData.prison()
+      sessionData.selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: true }
     }
 
     req.session = sessionData as Session & Partial<SessionData>

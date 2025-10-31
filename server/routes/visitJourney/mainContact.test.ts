@@ -6,11 +6,13 @@ import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockVisitService } from '../../services/testutils/mocks'
 import { ApplicationDto } from '../../data/orchestrationApiTypes'
+import TestData from '../testutils/testData'
 
 let sessionApp: Express
 let flashData: FlashData
 
 let visitSessionData: VisitSessionData
+let selectedEstablishment: SessionData['selectedEstablishment']
 
 // run tests for booking and update journeys
 const testJourneys = [
@@ -99,11 +101,14 @@ testJourneys.forEach(journey => {
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
       }
 
+      selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: true }
+
       sessionApp = appWithAllRoutes({
         sessionData: {
           adultVisitors,
           visitorList,
           visitSessionData,
+          selectedEstablishment,
         } as SessionData,
       })
     })
@@ -123,13 +128,15 @@ testJourneys.forEach(journey => {
             expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
             expect($('#someoneElseName').prop('value')).toBeFalsy()
             expect($('#phoneNumberInput').prop('value')).toBeFalsy()
+            expect($('#email').prop('value')).toBeFalsy()
           })
       })
 
-      it('should render the main contact page, pre-populated with session data for contact choice and phone number', () => {
+      it('should render the main contact page, pre-populated with session data for contact choice, phone number and email', () => {
         visitSessionData.mainContact = {
           contactId: 123,
           phoneNumber: '0114 1234 567',
+          email: 'test@example.com',
         }
 
         return request(sessionApp)
@@ -144,14 +151,16 @@ testJourneys.forEach(journey => {
             expect($('input[value="123"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBeFalsy()
             expect($('#phoneNumberInput').prop('value')).toBe('0114 1234 567')
+            expect($('#email').prop('value')).toBe('test@example.com')
           })
       })
 
-      it('should render the main contact page, pre-populated with session data for custom contact name and phone number', () => {
+      it('should render the main contact page, pre-populated with session data for custom contact name, phone number and email', () => {
         visitSessionData.mainContact = {
           contactId: undefined,
           contactName: 'another person',
           phoneNumber: '0114 1122 333',
+          email: 'test@example.com',
         }
 
         return request(sessionApp)
@@ -166,13 +175,35 @@ testJourneys.forEach(journey => {
             expect($('input[value="someoneElse"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBe('another person')
             expect($('#phoneNumberInput').prop('value')).toBe('0114 1122 333')
+            expect($('#email').prop('value')).toBe('test@example.com')
           })
       })
 
-      it('should render validation errors from flash data for when no data entered', () => {
+      it('should render the main contact page, without the email field, if prison not enabled for public', () => {
+        selectedEstablishment.isEnabledForPublic = false
+        visitSessionData.mainContact = {
+          contactId: undefined,
+          contactName: 'another person',
+          phoneNumber: '0114 1122 333',
+          email: 'test@example.com',
+        }
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/select-main-contact`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+            expect($('#email').prop('value')).toBeFalsy()
+          })
+      })
+
+      it('should render validation errors from flash data for when no data or invalid email entered', () => {
         flashData.errors = [
           { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
           { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: undefined },
+          { location: 'body', msg: 'Enter a valid email address', path: 'email', type: 'field', value: 'notAnEmail' },
         ]
 
         return request(sessionApp)
@@ -186,6 +217,8 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body a').eq(0).attr('href')).toBe('#contact-error')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
             expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#phoneNumberInput-error')
+            expect($('.govuk-error-summary__body').text()).toContain('Enter a valid email address')
+            expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#email-error')
             expect($('#contact-error').text()).toContain('No main contact selected')
             expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
             expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -194,7 +227,7 @@ testJourneys.forEach(journey => {
           })
       })
 
-      it('should render validation errors from flash data for when no data entered', () => {
+      it('should render validation errors from flash data for when no data or incorrect email entered', () => {
         flashData.errors = [
           {
             location: 'body',
@@ -204,9 +237,10 @@ testJourneys.forEach(journey => {
             value: '',
           },
           { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: '' },
+          { location: 'body', msg: 'Enter a valid email address', path: 'email', type: 'field', value: 'notAnEmail' },
         ]
 
-        flashData.formValues = [{ contact: 'someoneElse' }]
+        flashData.formValues = [{ contact: 'someoneElse', email: 'notAnEmail' }]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-main-contact`)
@@ -217,8 +251,10 @@ testJourneys.forEach(journey => {
             expect($('h1').text().trim()).toContain('Who is the main contact for this booking?')
             expect($('.govuk-error-summary__body').text()).toContain('Enter the name of the main contact')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
+            expect($('.govuk-error-summary__body').text()).toContain('Enter a valid email address')
             expect($('#someoneElseName-error').text()).toContain('Enter the name of the main contact')
             expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
+            expect($('#email-error').text()).toContain('Enter a valid email address')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -299,6 +335,7 @@ testJourneys.forEach(journey => {
             someoneElseName: '  another person  ',
             phoneNumber: 'hasPhoneNumber',
             phoneNumberInput: '0114 7654 321',
+            email: 'visitor@example.com',
           })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)

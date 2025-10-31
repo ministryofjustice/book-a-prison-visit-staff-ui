@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express'
 import { Services } from '../services'
 import logger from '../../logger'
+import { Prison } from '../@types/bapv'
 
 export default function populateSelectedEstablishment({ supportedPrisonsService }: Services): RequestHandler {
   return async (req, res, next) => {
@@ -29,14 +30,18 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       activeCaseLoadId &&
       (await supportedPrisonsService.isSupportedPrison(res.locals.user.username, activeCaseLoadId))
     ) {
-      req.session.selectedEstablishment = await supportedPrisonsService.getPrison(
-        res.locals.user.username,
-        activeCaseLoadId,
-      )
+      const prison = await supportedPrisonsService.getPrison(res.locals.user.username, activeCaseLoadId)
+
+      req.session.selectedEstablishment = { ...prison, isEnabledForPublic: isPrisonEnabledForPublic(prison) }
+
       res.locals.selectedEstablishment = req.session.selectedEstablishment
       return next()
     }
 
     return res.redirect('/establishment-not-supported')
   }
+}
+
+function isPrisonEnabledForPublic(prison: Prison): boolean {
+  return prison.clients.some(client => client.userType === 'PUBLIC' && client.active)
 }

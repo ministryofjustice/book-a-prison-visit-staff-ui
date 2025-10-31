@@ -15,6 +15,7 @@ export default class MainContact {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
+    const { isEnabledForPublic } = req.session.selectedEstablishment
 
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
       formValues.contact = visitSessionData.mainContact.contactId
@@ -25,12 +26,14 @@ export default class MainContact {
       formValues.someoneElseName = visitSessionData.mainContact.contactId
         ? undefined
         : visitSessionData.mainContact.contactName
+      formValues.email = visitSessionData.mainContact?.email
     }
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
       reference: visitSessionData.visitReference ?? '',
       adultVisitors: req.session.adultVisitors?.adults,
       formValues,
+      showEmailField: isEnabledForPublic,
       urlPrefix: getUrlPrefix(isUpdate),
     })
   }
@@ -52,14 +55,11 @@ export default class MainContact {
       (visitor: VisitorListItem) => req.body.contact === visitor.personId.toString(),
     )
 
-    // email not collected in this service but need to preserve it as it may have been entered in public service
-    const email = visitSessionData.mainContact?.email
-
     visitSessionData.mainContact = {
       contactId: selectedContact?.personId,
       relationshipDescription: selectedContact?.relationshipDescription,
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
-      email,
+      email: req.body.email,
       contactName: selectedContact?.name ?? req.body.someoneElseName,
     }
 
@@ -104,6 +104,7 @@ export default class MainContact {
           }
           return true
         }),
+      body('email', 'Enter a valid email address').trim().isEmail().optional({ values: 'falsy' }),
     ]
   }
 }
