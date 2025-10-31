@@ -33,11 +33,19 @@ context('Update a visit', () => {
     }),
   ]
 
+  const prison = TestData.prisonDto({
+    clients: [
+      { userType: 'STAFF', active: true },
+      { userType: 'PUBLIC', active: true },
+    ],
+  })
+
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubSignIn')
     cy.task('stubSupportedPrisonIds')
-    cy.task('stubGetPrison')
+    cy.task('stubGetPrison', prison)
+    cy.task('stubGetVisitRequestCount', { visitRequestCount: TestData.visitRequestCount({ count: 1 }) })
     cy.task('stubGetNotificationCount', {})
     cy.signIn()
   })
@@ -106,6 +114,7 @@ context('Update a visit', () => {
     const updatedApplication = TestData.application({
       startTimestamp: sessionIn8DaysStartTimestamp,
       endTimestamp: sessionIn8DaysEndTimestamp,
+      visitContact: { telephone: '01234 567890', email: 'visitor@example.com', name: 'Jeanette Smith' },
       visitors: [
         { nomisPersonId: 4321, visitContact: true },
         { nomisPersonId: 4322, visitContact: false },
@@ -135,12 +144,14 @@ context('Update a visit', () => {
     mainContactPage.getFirstContact().should('be.checked')
     mainContactPage.getPhoneNumber().should('have.value', originalVisit.visitContact.telephone)
     mainContactPage.enterPhoneNumber('09876 543 321')
+    mainContactPage.getEmail().should('have.value', originalVisit.visitContact.email)
+    mainContactPage.enterEmail('otherEmail@test.com')
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
         endTimestamp: sessionIn8DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321', email: 'visitor@example.com' },
+        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321', email: 'otherEmail@test.com' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -167,6 +178,7 @@ context('Update a visit', () => {
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
     checkYourBookingPage.mainContactNumber().contains('09876 543 321')
+    checkYourBookingPage.mainContactEmail().contains('otherEmail@test.com')
     checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Submit booking

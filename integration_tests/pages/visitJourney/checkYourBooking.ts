@@ -27,6 +27,8 @@ export default class CheckYourBookingPage extends Page {
 
   mainContactNumber = (): PageElement => cy.get('.test-main-contact-number')
 
+  mainContactEmail = (): PageElement => cy.get('.test-main-contact-email')
+
   changeMainContact = (): PageElement => cy.get('[data-test="change-main-contact"]')
 
   requestMethod = (): PageElement => cy.get('.test-request-method')
