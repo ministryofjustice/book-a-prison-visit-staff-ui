@@ -25,7 +25,7 @@ jobs:
         with:
           node-version-file: ${{ inputs.node_version_file }}
       - name: download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: npm_build_artifacts
       - name: restore cache
@@ -54,7 +54,7 @@ jobs:
           npm run int-test
       - name: upload results
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: npm_integration_test_artifacts
           path: |
