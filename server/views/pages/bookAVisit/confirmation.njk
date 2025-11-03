@@ -158,7 +158,7 @@
       },
       value: {
         html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' +
-          mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p>'
+          mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p><p class="test-main-contact-email">' + mainContact.email | escape + '</p>'
       }
     }
   ), displayRows) %}

@@ -201,6 +201,7 @@ testJourneys.forEach(journey => {
             expect($('.test-additional-support').text()).toContain('None.')
             expect($('.test-main-contact-name').text()).toContain('abc')
             expect($('.test-main-contact-number').text()).toContain('No phone number provided')
+            expect($('.test-main-contact-email').text()).toContain('test@test.net')
             expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
             expect($('[data-test=contact-method-text]').text()).toBe(
               journey.isUpdate

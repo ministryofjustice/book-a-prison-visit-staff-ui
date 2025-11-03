@@ -26,7 +26,7 @@ export default class MainContact {
       formValues.someoneElseName = visitSessionData.mainContact.contactId
         ? undefined
         : visitSessionData.mainContact.contactName
-      formValues.email = visitSessionData.mainContact.email ?? ''
+      formValues.emAddr = visitSessionData.mainContact.email ?? '' // emAddr to avoid auto-complete
     }
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
@@ -59,7 +59,7 @@ export default class MainContact {
       contactId: selectedContact?.personId,
       relationshipDescription: selectedContact?.relationshipDescription,
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
-      email: req.body.email,
+      email: req.body.emAddr, // emAddr to avoid auto-complete
       contactName: selectedContact?.name ?? req.body.someoneElseName,
     }
 
@@ -104,7 +104,7 @@ export default class MainContact {
           }
           return true
         }),
-      body('email', 'Enter a valid email address').trim().isEmail().optional({ values: 'falsy' }),
+      body('emAddr', 'Enter a valid email address').trim().isEmail().optional({ values: 'falsy' }),
     ]
   }
 }

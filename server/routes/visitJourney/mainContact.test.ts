@@ -128,7 +128,7 @@ testJourneys.forEach(journey => {
             expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
             expect($('#someoneElseName').prop('value')).toBeFalsy()
             expect($('#phoneNumberInput').prop('value')).toBeFalsy()
-            expect($('#email').prop('value')).toBeFalsy()
+            expect($('#emAddr').prop('value')).toBeFalsy()
           })
       })
 
@@ -151,7 +151,7 @@ testJourneys.forEach(journey => {
             expect($('input[value="123"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBeFalsy()
             expect($('#phoneNumberInput').prop('value')).toBe('0114 1234 567')
-            expect($('#email').prop('value')).toBe('test@example.com')
+            expect($('#emAddr').prop('value')).toBe('test@example.com')
           })
       })
 
@@ -175,7 +175,7 @@ testJourneys.forEach(journey => {
             expect($('input[value="someoneElse"]').prop('checked')).toBe(true)
             expect($('#someoneElseName').prop('value')).toBe('another person')
             expect($('#phoneNumberInput').prop('value')).toBe('0114 1122 333')
-            expect($('#email').prop('value')).toBe('test@example.com')
+            expect($('#emAddr').prop('value')).toBe('test@example.com')
           })
       })
 
@@ -195,7 +195,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
-            expect($('#email').length).toBe(0)
+            expect($('#emAddr').length).toBe(0)
           })
       })
 
@@ -203,7 +203,7 @@ testJourneys.forEach(journey => {
         flashData.errors = [
           { location: 'body', msg: 'No main contact selected', path: 'contact', type: 'field', value: undefined },
           { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: undefined },
-          { location: 'body', msg: 'Enter a valid email address', path: 'email', type: 'field', value: 'notAnEmail' },
+          { location: 'body', msg: 'Enter a valid email address', path: 'emAddr', type: 'field', value: 'notAnEmail' },
         ]
 
         return request(sessionApp)
@@ -218,7 +218,7 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body').text()).toContain('Enter a phone number')
             expect($('.govuk-error-summary__body a').eq(1).attr('href')).toBe('#phoneNumberInput-error')
             expect($('.govuk-error-summary__body').text()).toContain('Enter a valid email address')
-            expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#email-error')
+            expect($('.govuk-error-summary__body a').eq(2).attr('href')).toBe('#emAddr-error')
             expect($('#contact-error').text()).toContain('No main contact selected')
             expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
             expect(flashProvider).toHaveBeenCalledWith('errors')
@@ -237,10 +237,10 @@ testJourneys.forEach(journey => {
             value: '',
           },
           { location: 'body', msg: 'Enter a phone number', path: 'phoneNumberInput', type: 'field', value: '' },
-          { location: 'body', msg: 'Enter a valid email address', path: 'email', type: 'field', value: 'notAnEmail' },
+          { location: 'body', msg: 'Enter a valid email address', path: 'emAddr', type: 'field', value: 'notAnEmail' },
         ]
 
-        flashData.formValues = [{ contact: 'someoneElse', email: 'notAnEmail' }]
+        flashData.formValues = [{ contact: 'someoneElse', emAddr: 'notAnEmail' }]
 
         return request(sessionApp)
           .get(`${journey.urlPrefix}/select-main-contact`)
@@ -254,7 +254,7 @@ testJourneys.forEach(journey => {
             expect($('.govuk-error-summary__body').text()).toContain('Enter a valid email address')
             expect($('#someoneElseName-error').text()).toContain('Enter the name of the main contact')
             expect($('#phoneNumberInput-error').text()).toContain('Enter a phone number')
-            expect($('#email-error').text()).toContain('Enter a valid email address')
+            expect($('#emAddr-error').text()).toContain('Enter a valid email address')
             expect(flashProvider).toHaveBeenCalledWith('errors')
             expect(flashProvider).toHaveBeenCalledWith('formValues')
             expect(flashProvider).toHaveBeenCalledTimes(2)
@@ -335,7 +335,7 @@ testJourneys.forEach(journey => {
             someoneElseName: '  another person  ',
             phoneNumber: 'hasPhoneNumber',
             phoneNumberInput: '0114 7654 321',
-            email: 'visitor@example.com',
+            emAddr: 'visitor@example.com',
           })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
@@ -419,7 +419,7 @@ testJourneys.forEach(journey => {
             contact: 'non-existent',
             phoneNumber: 'hasPhoneNumber',
             phoneNumberInput: 'abc123',
-            email: 'notAnEmail',
+            emAddr: 'notAnEmail',
           })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
@@ -435,7 +435,7 @@ testJourneys.forEach(journey => {
               {
                 location: 'body',
                 msg: 'Enter a valid email address',
-                path: 'email',
+                path: 'emAddr',
                 type: 'field',
                 value: 'notAnEmail',
               },
@@ -445,7 +445,7 @@ testJourneys.forEach(journey => {
               phoneNumber: 'hasPhoneNumber',
               phoneNumberInput: 'abc123',
               someoneElseName: '',
-              email: 'notAnEmail',
+              emAddr: 'notAnEmail',
             })
 
             expect(visitService.changeVisitApplication).not.toHaveBeenCalled()
