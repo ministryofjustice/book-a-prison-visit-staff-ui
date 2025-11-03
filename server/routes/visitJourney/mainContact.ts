@@ -26,7 +26,7 @@ export default class MainContact {
       formValues.someoneElseName = visitSessionData.mainContact.contactId
         ? undefined
         : visitSessionData.mainContact.contactName
-      formValues.email = visitSessionData.mainContact?.email
+      formValues.email = visitSessionData.mainContact.email ?? ''
     }
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),

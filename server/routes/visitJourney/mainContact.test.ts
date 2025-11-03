@@ -195,7 +195,7 @@ testJourneys.forEach(journey => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
-            expect($('#email').prop('value')).toBeFalsy()
+            expect($('#email').length).toBe(0)
           })
       })
 
@@ -416,9 +416,10 @@ testJourneys.forEach(journey => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
           .send({
-            contact: 'non-existant',
+            contact: 'non-existent',
             phoneNumber: 'hasPhoneNumber',
             phoneNumberInput: 'abc123',
+            email: 'notAnEmail',
           })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/select-main-contact`)
@@ -431,12 +432,20 @@ testJourneys.forEach(journey => {
                 type: 'field',
                 value: 'abc123',
               },
+              {
+                location: 'body',
+                msg: 'Enter a valid email address',
+                path: 'email',
+                type: 'field',
+                value: 'notAnEmail',
+              },
             ])
             expect(flashProvider).toHaveBeenCalledWith('formValues', {
-              contact: 'non-existant',
+              contact: 'non-existent',
               phoneNumber: 'hasPhoneNumber',
               phoneNumberInput: 'abc123',
               someoneElseName: '',
+              email: 'notAnEmail',
             })
 
             expect(visitService.changeVisitApplication).not.toHaveBeenCalled()

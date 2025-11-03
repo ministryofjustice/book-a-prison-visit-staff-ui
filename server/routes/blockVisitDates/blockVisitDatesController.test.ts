@@ -163,7 +163,7 @@ describe('Block visit dates listing page', () => {
         ['partial date', '1/2', '1/2'],
         ['wrong format y/m/d', '2000/2/1', '2000/2/1'],
         ['wrong format m/d/y', '1/13/2000', '1/13/2000'],
-        ['non-existant date', '31/2/2000', '31/2/2000'],
+        ['non-existent date', '31/2/2000', '31/2/2000'],
       ])('%s', (_: string, input: string, expected: string) => {
         const expectedValidationError: FieldValidationError = {
           location: 'body',
