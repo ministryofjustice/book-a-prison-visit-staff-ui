@@ -89,4 +89,18 @@ describe('Booker service', () => {
       },
     )
   })
+
+  describe('unlinkBookerVisitor', () => {
+    it('should unlink visitor from booker account', async () => {
+      const reference = 'aaa-bbb-ccc'
+      const prisonerId = 'A1234BC'
+      const visitorId = 123
+
+      orchestrationApiClient.unlinkBookerVisitor.mockResolvedValue()
+
+      await bookerService.unlinkBookerVisitor({ username: 'user1', reference, prisonerId, visitorId })
+
+      expect(orchestrationApiClient.unlinkBookerVisitor).toHaveBeenCalledWith({ reference, prisonerId, visitorId })
+    })
+  })
 })
