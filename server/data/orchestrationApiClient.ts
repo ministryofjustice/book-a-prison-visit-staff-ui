@@ -279,6 +279,27 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/public/booker/${reference}` })
   }
 
+  async unlinkBookerVisitor({
+    reference,
+    prisonerId,
+    visitorId,
+  }: {
+    reference: string
+    prisonerId: string
+    visitorId: number
+  }): Promise<void> {
+    try {
+      await this.restClient.delete({
+        path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
+      })
+    } catch (error) {
+      // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
+      if (error.status !== 404) {
+        throw error
+      }
+    }
+  }
+
   // visit notification controller
   async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
     return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })

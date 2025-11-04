@@ -1084,6 +1084,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors/{visitorId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * unlink booker prisoner visitor
+     * @description unlink booker prisoner visitor
+     */
+    delete: operations['unlinkBookerPrisonerVisitor']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -2355,9 +2375,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -6708,6 +6728,55 @@ export interface operations {
         }
       }
       /** @description Prison not found on visit-scheduler */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  unlinkBookerPrisonerVisitor: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        prisonerId: string
+        visitorId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successfully unlinked booker prisoner visitor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description visitor not found */
       404: {
         headers: {
           [name: string]: unknown
