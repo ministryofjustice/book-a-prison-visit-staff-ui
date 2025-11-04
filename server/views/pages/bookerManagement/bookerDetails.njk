@@ -43,8 +43,19 @@
             {% set visitorRowItems = [] %}
             {%- for visitor in prisoner.permittedVisitors %}
               {% set visitorIndex = prisonerIndex + "-visitor-" + loop.index %}
-              {% set visitorUnlinkHref %}/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/unlink-visitor/{{ visitor.visitorId }}/notify{% endset %}
               {% set visitorName %}{{ visitor.firstName }} {{ visitor.lastName }}{% endset %}
+
+              {%- set unlinkVisitorHtml -%}
+                <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/unlink-visitor/{{ visitor.visitorId }}" method="POST" novalidate>
+                  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                  {{ govukButton({
+                    html: 'Unlink<span class="govuk-visually-hidden"> ' + visitorName + '</span>',
+                    classes: "bapv-link-button",
+                    preventDoubleClick: true,
+                    attributes: { "data-test": visitorIndex + "-unlink" }
+                  }) }}
+                </form>
+              {%- endset %}
 
               {%- set visitorRowItems = (visitorRowItems.push([
                 {
@@ -60,8 +71,7 @@
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
                 ({
-                  html: '<a href="' + visitorUnlinkHref + '">Unlink<span class="govuk-visually-hidden"> ' + visitorName + '</span></a>',
-                  attributes: { "data-test": visitorIndex + "-action" }
+                  html: unlinkVisitorHtml
                 } if active)
                 ]), visitorRowItems) %}
             {% endfor -%}

@@ -66,9 +66,9 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
-          expect($('[data-test=prisoner-1-visitor-1-action]').text()).toBe('Unlink Jeanette Smith')
-          expect($('[data-test=prisoner-1-visitor-1-action] a').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321/notify',
+          expect($('[data-test=prisoner-1-visitor-1-unlink]').text().trim()).toBe('Unlink Jeanette Smith')
+          expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
           )
 
           // Link visitor
@@ -124,8 +124,8 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
-          expect($('[data-test=prisoner-1-visitor-1-action] a').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321/notify',
+          expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
           )
           // Link visitor
           expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
@@ -139,8 +139,8 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
-          expect($('[data-test=prisoner-2-visitor-1-action] a').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322/notify',
+          expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322',
           )
           // Link visitor
           expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
@@ -195,8 +195,8 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
-          expect($('[data-test=prisoner-1-visitor-1-action] a').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321/notify',
+          expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
           )
           // Link visitor
           expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
@@ -210,8 +210,8 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
-          expect($('[data-test=prisoner-2-visitor-1-action] a').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322/notify',
+          expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322',
           )
           // Link visitor
           expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
