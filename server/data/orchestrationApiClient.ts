@@ -441,10 +441,9 @@ export default class OrchestrationApiClient {
   // prisoner-profile-controller
 
   async getPrisonerProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfileDto> {
-    const profile = await this.restClient.get<PrisonerProfileDto>({
+    return this.restClient.get({
       path: `/prisoner/${prisonId}/${prisonerId}/profile`,
     })
-    return profile
   }
 
   // orchestration-prisons-config-controller
