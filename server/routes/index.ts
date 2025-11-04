@@ -2,7 +2,6 @@ import { Router } from 'express'
 
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
-import { Prison } from '../@types/bapv'
 import bapvUserRoles from '../constants/bapvUserRoles'
 
 export default function routes({ visitNotificationsService, visitRequestsService }: Services): Router {
@@ -12,7 +11,7 @@ export default function routes({ visitNotificationsService, visitRequestsService
     const prison = req.session.selectedEstablishment
     const { username, userRoles } = res.locals.user
 
-    const showRequestedVisitsTile = isPrisonEnabledForPublic(prison)
+    const showRequestedVisitsTile = prison.isEnabledForPublic
     const requestCount = showRequestedVisitsTile
       ? (await visitRequestsService.getVisitRequestCount(username, prison.prisonId)).count
       : null
@@ -30,8 +29,4 @@ export default function routes({ visitNotificationsService, visitRequestsService
   })
 
   return router
-}
-
-function isPrisonEnabledForPublic(prison: Prison): boolean {
-  return prison.clients.some(client => client.userType === 'PUBLIC' && client.active)
 }

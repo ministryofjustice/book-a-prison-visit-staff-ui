@@ -20,5 +20,12 @@ export default class MainContactPage extends Page {
 
   getPhoneNumber = (): PageElement => cy.get('#phoneNumberInput')
 
+  enterEmail = (email: string): void => {
+    cy.get('#email').clear()
+    cy.get('#email').type(email)
+  }
+
+  getEmail = (): PageElement => cy.get('#email')
+
   continueButton = (): PageElement => cy.get('[data-test=submit]')
 }

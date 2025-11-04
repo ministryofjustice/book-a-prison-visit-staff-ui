@@ -6,7 +6,6 @@ import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
-import { Prison } from '../@types/bapv'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
 
@@ -18,7 +17,7 @@ afterEach(() => {
 
 describe('GET /', () => {
   let sessionData: SessionData
-  let selectedEstablishment: Prison
+  let selectedEstablishment: SessionData['selectedEstablishment']
 
   const visitNotificationsService = createMockVisitNotificationsService()
   const visitRequestsService = createMockVisitRequestsService()
@@ -27,7 +26,7 @@ describe('GET /', () => {
 
   beforeEach(() => {
     populateCurrentUser()
-    selectedEstablishment = TestData.prison()
+    selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 
     app = appWithAllRoutes({ services: { visitNotificationsService, visitRequestsService }, sessionData })
@@ -72,7 +71,7 @@ describe('GET /', () => {
 
   describe('Requested visits tile', () => {
     beforeEach(() => {
-      selectedEstablishment.clients.push({ userType: 'PUBLIC', active: true })
+      selectedEstablishment.isEnabledForPublic = true
     })
 
     it('should render badge with visit request count', () => {

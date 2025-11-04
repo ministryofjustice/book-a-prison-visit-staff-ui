@@ -3,6 +3,7 @@ import { Cookie } from 'express-session'
 import { VisitSessionData } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
 import TestData from '../routes/testutils/testData'
+import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 
 const prisonId = 'HEI'
 
@@ -28,7 +29,7 @@ const visitorsData: VisitSessionData['visitors'] = [
         globalRestriction: true,
         comment: 'abc',
       },
-    ],
+    ] as Restriction[],
     banned: false,
   },
 ]
@@ -59,7 +60,7 @@ describe('sessionCheckMiddleware', () => {
         save: jest.fn(),
         touch: jest.fn(),
         cookie: new Cookie(),
-        selectedEstablishment: TestData.prison(),
+        selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
       },
     }
     mockResponse = {
@@ -74,10 +75,13 @@ describe('sessionCheckMiddleware', () => {
   })
 
   it('should redirect to the start page if prisonId in visit session date does not match selected establishment', () => {
-    req.session.selectedEstablishment = TestData.prison({
-      prisonId: 'BLI',
-      prisonName: 'Bristol (HMP)',
-    })
+    req.session.selectedEstablishment = {
+      ...TestData.prison({
+        prisonId: 'BLI',
+        prisonName: 'Bristol (HMP)',
+      }),
+      isEnabledForPublic: true,
+    }
     req.session.visitSessionData = { prisonId } as VisitSessionData
 
     sessionCheckMiddleware({ stage: 1 })(req as Request, mockResponse as Response, next)

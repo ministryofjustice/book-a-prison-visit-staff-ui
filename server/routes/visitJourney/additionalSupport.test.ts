@@ -223,6 +223,7 @@ testJourneys.forEach(journey => {
             relationshipDescription: 'relate',
             restrictions: [
               {
+                restrictionId: 1,
                 restrictionType: 'AVS',
                 restrictionTypeDescription: 'AVS desc',
                 startDate: '123',
