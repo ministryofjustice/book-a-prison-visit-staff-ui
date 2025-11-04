@@ -527,7 +527,7 @@ testJourneys.forEach(journey => {
               expiryDate: '2023-12-14',
               comment: 'Ban details',
             },
-          ],
+          ] as Restriction[],
           banned: false,
         },
         {
@@ -545,7 +545,7 @@ testJourneys.forEach(journey => {
               expiryDate: '2022-07-31',
               comment: 'Ban details',
             },
-          ],
+          ] as Restriction[],
           banned: true,
         },
         {
@@ -601,7 +601,7 @@ testJourneys.forEach(journey => {
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-01',
             },
-          ],
+          ] as Restriction[],
           banned: false,
         },
       ],
@@ -675,7 +675,7 @@ testJourneys.forEach(journey => {
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-01',
             },
-          ],
+          ] as Restriction[],
           banned: false,
         },
       ]
@@ -718,7 +718,7 @@ testJourneys.forEach(journey => {
               restrictionTypeDescription: 'Closed',
               startDate: '2022-01-01',
             },
-          ],
+          ] as Restriction[],
           banned: false,
         },
       ]
@@ -792,7 +792,7 @@ testJourneys.forEach(journey => {
             expiryDate: '2023-12-14',
             comment: 'Ban details',
           },
-        ],
+        ] as Restriction[],
         banned: false,
       }
 

@@ -3,6 +3,7 @@ import { Cookie } from 'express-session'
 import { VisitSessionData } from '../@types/bapv'
 import sessionCheckMiddleware from './sessionCheckMiddleware'
 import TestData from '../routes/testutils/testData'
+import { Restriction } from '../data/prisonerContactRegistryApiTypes'
 
 const prisonId = 'HEI'
 
@@ -28,7 +29,7 @@ const visitorsData: VisitSessionData['visitors'] = [
         globalRestriction: true,
         comment: 'abc',
       },
-    ],
+    ] as Restriction[],
     banned: false,
   },
 ]

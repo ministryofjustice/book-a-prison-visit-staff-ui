@@ -11,6 +11,7 @@ import {
 } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
 import { ApplicationDto } from '../../data/orchestrationApiTypes'
+import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 let sessionApp: Express
 let flashData: FlashData
@@ -279,7 +280,7 @@ testJourneys.forEach(journey => {
                 globalRestriction: false,
                 comment: 'comment',
               },
-            ],
+            ] as Restriction[],
             address: '123 Street',
             banned: false,
           },

@@ -5,6 +5,7 @@ import * as cheerio from 'cheerio'
 import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import * as visitorUtils from '../visitorUtils'
+import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 let sessionApp: Express
 let flashData: FlashData
@@ -65,7 +66,7 @@ testJourneys.forEach(journey => {
                 globalRestriction: false,
                 comment: 'comment',
               },
-            ],
+            ] as Restriction[],
             address: '123 Street,\nTest Town,\nS1 2QZ',
             banned: false,
           },
@@ -159,7 +160,7 @@ testJourneys.forEach(journey => {
                   globalRestriction: false,
                   comment: 'comment',
                 },
-              ],
+              ] as Restriction[],
               address: '123 Street,\nTest Town,\nS1 2QZ',
               banned: false,
             },

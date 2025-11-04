@@ -7,6 +7,7 @@ import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetu
 import { ApplicationValidationErrorResponse, Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { SanitisedError } from '../../sanitisedError'
+import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 let sessionApp: Express
 let flashData: FlashData
@@ -66,7 +67,7 @@ testJourneys.forEach(journey => {
                 globalRestriction: false,
                 comment: 'comment',
               },
-            ],
+            ] as Restriction[],
             address: '123 Street,\nTest Town,\nS1 2QZ',
             banned: false,
           },
