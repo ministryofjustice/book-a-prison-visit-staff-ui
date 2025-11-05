@@ -94,6 +94,23 @@ describe('Booker management - booker details', () => {
         })
     })
 
+    it('should render any alert messages set in flash', () => {
+      const booker = TestData.bookerDetailedInfo()
+      bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
+
+      flashData.messages = [TestData.mojAlert({ title: 'test alert message' })]
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect($('.moj-alert').text()).toContain('test alert message')
+        })
+    })
+
     it('should render booker details page - booker with multiple prisoners', () => {
       const booker = TestData.bookerDetailedInfo({
         permittedPrisoners: [
