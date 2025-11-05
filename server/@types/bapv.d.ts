@@ -106,6 +106,7 @@ export type MoJAlert = {
   variant: 'information' | 'success' | 'warning' | 'error'
   title: string
   showTitleAsHeading?: boolean
+  dismissible?: boolean
   classes?: string
 } & TextOrHtml
 

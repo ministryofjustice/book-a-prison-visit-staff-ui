@@ -55,4 +55,21 @@ export default class BookerService {
 
     return { active, emailHasMultipleAccounts }
   }
+
+  async unlinkBookerVisitor({
+    username,
+    reference,
+    prisonerId,
+    visitorId,
+  }: {
+    username: string
+    reference: string
+    prisonerId: string
+    visitorId: number
+  }): Promise<void> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+  }
 }

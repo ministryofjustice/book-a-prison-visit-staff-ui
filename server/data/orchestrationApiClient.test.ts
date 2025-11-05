@@ -498,11 +498,50 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .get(`/public/booker/${reference}`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, booker)
+        .reply(200, booker)
 
       const output = await orchestrationApiClient.getBookerDetails(reference)
 
       expect(output).toStrictEqual(booker)
+    })
+  })
+
+  describe('unlinkBookerVisitor', () => {
+    const reference = 'aaa-bbb-ccc'
+    const prisonerId = 'A1234BC'
+    const visitorId = 123
+
+    it('should unlink a visitor from a booker account', async () => {
+      fakeOrchestrationApi
+        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+
+    it('should catch 404 API error and handle as success', async () => {
+      fakeOrchestrationApi
+        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(404)
+
+      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+
+    it('should throw other API errors', async () => {
+      fakeOrchestrationApi
+        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(400)
+
+      await expect(orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })).rejects.toThrow(
+        'Bad Request',
+      )
     })
   })
 

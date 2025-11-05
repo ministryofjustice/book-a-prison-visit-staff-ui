@@ -405,6 +405,28 @@ export default {
     })
   },
 
+  stubUnlinkBookerVisitor: ({
+    reference,
+    prisonerId,
+    visitorId,
+  }: {
+    reference: string
+    prisonerId: string
+    visitorId: number
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'DELETE',
+        url: `/orchestration//public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {},
+      },
+    })
+  },
+
   stubIgnoreNotifications: ({
     ignoreVisitNotificationsDto,
     visit,
