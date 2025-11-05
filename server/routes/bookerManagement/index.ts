@@ -7,6 +7,8 @@ import bapvUserRoles from '../../constants/bapvUserRoles'
 import { isValidBookerReference } from '../validationChecks'
 import SelectBookerAccountController from './selectBookerAccountController'
 import BookerUnlinkVisitorController from './bookerUnlinkVisitorController'
+import BookerLinkVisitorListController from './bookerLinkVisitorList'
+import BookerLinkVisitorController from './bookerLinkVisitor'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -14,6 +16,8 @@ export default function routes(services: Services): Router {
   const bookerSearchController = new BookerSearchController(services.auditService, services.bookerService)
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
   const selectBookerAccountController = new SelectBookerAccountController(services.bookerService)
+  const bookerLinkVisitorListController = new BookerLinkVisitorListController(services.bookerService)
+  const bookerLinkVisitorController = new BookerLinkVisitorController(services.auditService, services.bookerService)
   const bookerUnlinkVisitorController = new BookerUnlinkVisitorController(services.auditService, services.bookerService)
 
   // Restrict booker management routes by role
@@ -46,6 +50,11 @@ export default function routes(services: Services): Router {
 
   // Booker details
   router.get('/:reference/booker-details', bookerDetailsController.view())
+
+  // Link visitor
+  router.get(':reference/prisoner/:prisonerId/link-visitor', bookerLinkVisitorListController.view()) // TODO add validation handler
+  router.get(':reference/prisoner/:prisonerId/link-visitor/:visitorId/notify', bookerLinkVisitorController.view()) // TODO add validation handler
+  router.post(':reference/prisoner/:prisonerId/link-visitor/:visitorId', bookerLinkVisitorController.submit()) // TODO add validation handler
 
   // Unlink visitor
   router.post(

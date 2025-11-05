@@ -97,6 +97,7 @@
           {% endif %}
 
           {# Link a visitor (if account is active) #}
+          {# TODO make this button a link to this URL #}
           {% if active %}
             <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/link-visitor" method="POST" novalidate>
               <input type="hidden" name="_csrf" value="{{ csrfToken }}">
