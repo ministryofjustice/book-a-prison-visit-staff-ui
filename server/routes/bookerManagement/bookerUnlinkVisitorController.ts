@@ -39,7 +39,13 @@ export default class BookerUnlinkVisitorController {
           dismissible: true,
         })
 
-        // TODO send audit
+        this.auditService.unlinkedBookerVisitor({
+          reference,
+          prisonerId,
+          visitorId: visitorIdString,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
       } catch (error) {
         logger.error(
           error,
