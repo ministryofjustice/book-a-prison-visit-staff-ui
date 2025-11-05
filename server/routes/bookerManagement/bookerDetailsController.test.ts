@@ -2,12 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, user } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
 import { createMockAuditService, createMockBookerService } from '../../services/testutils/mocks'
 import bapvUserRoles from '../../constants/bapvUserRoles'
 import TestData from '../testutils/testData'
 
 let app: Express
+let flashData: FlashData
 let sessionData: SessionData
 
 const auditService = createMockAuditService()
@@ -20,7 +21,11 @@ const fakeDateTime = new Date('2025-10-01T09:00')
 beforeEach(() => {
   jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDateTime) })
 
+  flashData = { messages: [] }
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
   sessionData = {} as SessionData
+
   app = appWithAllRoutes({
     services: { auditService, bookerService },
     userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
