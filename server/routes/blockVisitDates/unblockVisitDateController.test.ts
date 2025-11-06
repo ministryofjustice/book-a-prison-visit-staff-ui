@@ -1,6 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
 import { createMockAuditService, createMockBlockedDatesService } from '../../services/testutils/mocks'
 import { MoJAlert } from '../../@types/bapv'
 
@@ -22,15 +22,6 @@ afterEach(() => {
 
 describe('Unblock visit date', () => {
   describe(`POST ${url}`, () => {
-    let flashData: FlashData
-
-    beforeEach(() => {
-      flashData = { errors: [], formValues: [] }
-      flashProvider.mockImplementation((key: keyof FlashData) => {
-        return flashData[key]
-      })
-    })
-
     it('should unblock the date, set success message and redirect to blocked dates listing page', () => {
       blockedDatesService.unblockVisitDate.mockResolvedValue()
       const unblockedDateSuccessMessage: MoJAlert = {

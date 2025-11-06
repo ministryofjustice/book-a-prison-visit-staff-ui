@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { param, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../services'
-import logger from '../../../logger'
 import { isValidPrisonerNumber } from '../validationChecks'
 
 export default class BookerUnlinkVisitorController {
@@ -14,6 +13,8 @@ export default class BookerUnlinkVisitorController {
     return async (req, res) => {
       const { reference, prisonerId, visitorId: visitorIdString } = req.params
       const visitorId = parseInt(visitorIdString, 10)
+      const { username } = res.locals.user
+
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
 
       const errors = validationResult(req)
@@ -21,13 +22,12 @@ export default class BookerUnlinkVisitorController {
         return res.redirect(bookerDetailsPageUrl)
       }
 
-      const { username } = res.locals.user
-      try {
-        const booker = await this.bookerService.getBookerDetails({ username, reference })
-        const visitorToUnlink = booker.permittedPrisoners
-          .find(prisoner => prisoner.prisoner.prisonerNumber === prisonerId)
-          .permittedVisitors.find(visitor => visitor.visitorId === visitorId) // TODO check how this handles undefined errors
+      const booker = await this.bookerService.getBookerDetails({ username, reference })
+      const visitorToUnlink = booker.permittedPrisoners
+        .find(prisoner => prisoner.prisoner.prisonerNumber === prisonerId)
+        ?.permittedVisitors.find(visitor => visitor.visitorId === visitorId)
 
+      if (visitorToUnlink) {
         const visitorName = `${visitorToUnlink.firstName} ${visitorToUnlink.lastName}`
 
         await this.bookerService.unlinkBookerVisitor({ username, reference, prisonerId, visitorId })
@@ -46,11 +46,6 @@ export default class BookerUnlinkVisitorController {
           username,
           operationId: res.locals.appInsightsOperationId,
         })
-      } catch (error) {
-        logger.error(
-          error,
-          `Could not unlink visitor ${visitorId} for prisoner ${prisonerId} for booker ${reference} (user - ${username})`,
-        )
       }
 
       return res.redirect(bookerDetailsPageUrl)

@@ -73,7 +73,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').text().trim()).toBe('Unlink Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
 
           // Link visitor
@@ -147,7 +147,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
           // Link visitor
           expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
@@ -162,7 +162,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322',
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
           // Link visitor
           expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
@@ -218,7 +218,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/unlink-visitor/4321',
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
           // Link visitor
           expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
@@ -233,7 +233,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/unlink-visitor/4322',
+            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
           // Link visitor
           expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
