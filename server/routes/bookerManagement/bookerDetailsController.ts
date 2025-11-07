@@ -31,7 +31,7 @@ export default class BookerDetailsController {
       const backLinkHref = req.session.matchedBookers?.length
         ? '/manage-bookers/select-account'
         : '/manage-bookers/search'
-      // TODO test flash messages
+
       const messages = [...req.flash('messages'), ...this.getBookerDetailsMessages(active, emailHasMultipleAccounts)]
 
       res.render('pages/bookerManagement/bookerDetails', { backLinkHref, messages, active, booker })

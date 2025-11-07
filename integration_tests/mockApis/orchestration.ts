@@ -417,7 +417,7 @@ export default {
     return stubFor({
       request: {
         method: 'DELETE',
-        url: `/orchestration//public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
+        url: `/orchestration/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
       },
       response: {
         status: 200,

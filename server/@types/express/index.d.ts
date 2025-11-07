@@ -48,6 +48,7 @@ export declare global {
     interface Locals {
       user: PrisonUser
       feComponentsMeta?: HeaderFooterMeta
+      appInsightsOperationId?: string
     }
   }
 }
