@@ -425,4 +425,29 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a unlinked booker visitor audit message', async () => {
+    await auditService.unlinkedBookerVisitor({
+      reference: 'aaaa-bbbb-cccc',
+      prisonerId: 'A1234BC',
+      visitorId: '1234',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UNLINKED_BOOKER_VISITOR',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"reference":"aaaa-bbbb-cccc","prisonerId":"A1234BC","visitorId":"1234"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })

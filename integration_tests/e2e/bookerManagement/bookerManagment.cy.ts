@@ -92,5 +92,38 @@ context('Booker management', () => {
       bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
       bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
     })
+
+    it('should unlink a visitor from a booker account', () => {
+      const bookerSearchResult = TestData.bookerSearchResult({ email })
+      const bookerDetails = TestData.bookerDetailedInfo({ email })
+      cy.task('stubGetBookersByEmail', { email, bookers: [bookerSearchResult] })
+      cy.task('stubGetBookerDetails', { reference: bookerDetails.reference, booker: bookerDetails })
+
+      // Home page - select booker management tile
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookerManagementTile().click()
+
+      // Search for booker by email
+      const bookerSearchPage = Page.verifyOnPage(BookerSearchPage)
+      bookerSearchPage.enterEmail(email)
+      bookerSearchPage.search()
+
+      // Booker details page
+      const bookerDetailsPage = Page.verifyOnPage(BookerDetailsPage)
+      bookerDetailsPage.getBookerEmail().contains(email)
+      bookerDetailsPage.getBookerReference().contains(bookerDetails.reference)
+      bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
+      bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
+
+      // Unlink visitor
+      cy.task('stubUnlinkBookerVisitor', {
+        reference: bookerDetails.reference,
+        prisonerId: bookerDetails.permittedPrisoners[0].prisoner.prisonerNumber,
+        visitorId: bookerDetails.permittedPrisoners[0].permittedVisitors[0].visitorId,
+      })
+      bookerDetailsPage.unlinkPrisonerVisitor(1, 1)
+      bookerDetailsPage.checkOnPage()
+      bookerDetailsPage.getMessages().contains('Jeanette Smith has been unlinked from this booker.')
+    })
   })
 })
