@@ -14,6 +14,7 @@ describe('Prisoner visitor service', () => {
 
   describe('getVisitors', () => {
     const offenderNo = 'A1234BC'
+    const policyNoticeDaysMax = 28
 
     beforeEach(() => {
       PrisonerContactRegistryApiClientFactory.mockReturnValue(prisonerContactRegistryApiClient)
@@ -141,7 +142,7 @@ describe('Prisoner visitor service', () => {
 
       prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue(contacts)
 
-      const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
+      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax, 'user')
 
       expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([
@@ -212,7 +213,7 @@ describe('Prisoner visitor service', () => {
     it('should handle prisoner having no contacts', async () => {
       prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue([])
 
-      const results = await prisonerVisitorsService.getVisitors(offenderNo, 'user')
+      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax, 'user')
       expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([])
     })
