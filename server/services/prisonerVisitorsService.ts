@@ -8,7 +8,7 @@ export default class PrisonerVisitorsService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getVisitors(offenderNo: string, username: string): Promise<VisitorListItem[]> {
+  async getVisitors(offenderNo: string, policyNoticeDaysMax: number, username: string): Promise<VisitorListItem[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const prisonerContactRegistryApiClient = this.prisonerContactRegistryApiClientFactory(token)
 
@@ -16,7 +16,7 @@ export default class PrisonerVisitorsService {
 
     const visitorList: VisitorListItem[] = []
     socialContacts.forEach(contact => {
-      visitorList.push(buildVisitorListItem(contact))
+      visitorList.push(buildVisitorListItem(contact, policyNoticeDaysMax))
     })
 
     return visitorList

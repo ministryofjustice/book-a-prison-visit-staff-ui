@@ -5,9 +5,7 @@ import { isAdult } from './utils'
 
 type BanStatus = { isBanned: boolean; numDays?: number }
 
-const MAX_BOOKING_DAYS_AHEAD = 28
-
-export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
+export const buildVisitorListItem = (visitor: Contact, policyNoticeDaysMax: number): VisitorListItem => {
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
@@ -16,7 +14,7 @@ export const buildVisitorListItem = (visitor: Contact): VisitorListItem => {
     relationshipDescription: visitor.relationshipDescription,
     address: getAddressToDisplay(visitor.addresses),
     restrictions: visitor.restrictions,
-    banned: getBanStatus(visitor.restrictions).isBanned,
+    banned: getBanStatus(visitor.restrictions, policyNoticeDaysMax).isBanned,
   }
 }
 
@@ -46,7 +44,7 @@ export const getFormattedAddress = (address: Address): string => {
   return formattedAddress
 }
 
-export const getBanStatus = (restrictions: Restriction[]): BanStatus => {
+export const getBanStatus = (restrictions: Restriction[], policyNoticeDaysMax: number): BanStatus => {
   const banned = restrictions.filter(restriction => restriction.restrictionType === 'BAN')
 
   if (banned.length === 0) {
@@ -64,7 +62,7 @@ export const getBanStatus = (restrictions: Restriction[]): BanStatus => {
     (acc, { expiryDate }) => {
       const banExpiresInDays = differenceInDays(new Date(expiryDate), new Date()) + 1
       acc.numDays = Math.max(banExpiresInDays, acc.numDays ?? 0)
-      acc.isBanned = acc.numDays > MAX_BOOKING_DAYS_AHEAD
+      acc.isBanned = acc.numDays > policyNoticeDaysMax
       return acc
     },
     { isBanned: undefined },
