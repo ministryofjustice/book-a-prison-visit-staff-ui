@@ -20,7 +20,7 @@ const stubComponents = ({ username, caseLoad }: { username: string; caseLoad: Ca
     allocationJobResponsibilities: [],
   }
 
-  const componentsResponse: { header: Component; footer: Component; meta: HeaderFooterSharedData } = {
+  const componentsResponse: { header: Component; footer: Component; sharedData: { meta: HeaderFooterSharedData } } = {
     header: {
       html: customHeaderHtml,
       css: [],
@@ -31,7 +31,9 @@ const stubComponents = ({ username, caseLoad }: { username: string; caseLoad: Ca
       css: [],
       javascript: [],
     },
-    meta,
+    sharedData: {
+      meta,
+    },
   }
 
   return stubFor({
