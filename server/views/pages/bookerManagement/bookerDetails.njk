@@ -46,7 +46,7 @@
               {% set visitorName %}{{ visitor.firstName }} {{ visitor.lastName }}{% endset %}
 
               {%- set unlinkVisitorHtml -%}
-                <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/unlink-visitor/{{ visitor.visitorId }}" method="POST" novalidate>
+                <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/visitor/{{ visitor.visitorId }}/unlink" method="POST" novalidate>
                   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                   {{ govukButton({
                     html: 'Unlink<span class="govuk-visually-hidden"> ' + visitorName + '</span>',

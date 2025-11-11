@@ -59,7 +59,7 @@ export default function routes(services: Services): Router {
 
   // Unlink visitor
   router.post(
-    '/:reference/prisoner/:prisonerId/unlink-visitor/:visitorId',
+    '/:reference/prisoner/:prisonerId/visitor/:visitorId/unlink',
     bookerUnlinkVisitorController.validate(),
     bookerUnlinkVisitorController.unlink(),
   )
