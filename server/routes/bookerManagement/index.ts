@@ -52,9 +52,10 @@ export default function routes(services: Services): Router {
   router.get('/:reference/booker-details', bookerDetailsController.view())
 
   // Link visitor
-  router.get(':reference/prisoner/:prisonerId/link-visitor', bookerLinkVisitorListController.view()) // TODO add validation handler
-  router.get(':reference/prisoner/:prisonerId/link-visitor/:visitorId/notify', bookerLinkVisitorController.view()) // TODO add validation handler
-  router.post(':reference/prisoner/:prisonerId/link-visitor/:visitorId', bookerLinkVisitorController.submit()) // TODO add validation handler
+  router.get('/:reference/prisoner/:prisonerId/link-visitor', bookerLinkVisitorListController.view()) // TODO add validation handler
+  router.post('/:reference/prisoner/:prisonerId/link-visitor', bookerLinkVisitorListController.submit()) // TODO add validation handler
+  router.get('/:reference/prisoner/:prisonerId/link-visitor/:visitorId/notify', bookerLinkVisitorController.view()) // TODO add validation handler
+  router.post('/:reference/prisoner/:prisonerId/link-visitor/:visitorId', bookerLinkVisitorController.submit()) // TODO add validation handler
 
   // Unlink visitor
   router.post(

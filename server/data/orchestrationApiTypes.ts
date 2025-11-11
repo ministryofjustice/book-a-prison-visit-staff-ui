@@ -89,3 +89,7 @@ export type ApplicationValidationErrorResponse = components['schemas']['Applicat
 export type BookerDetailedInfoDto = components['schemas']['BookerDetailedInfoDto']
 export type BookerSearchResultsDto = components['schemas']['BookerSearchResultsDto']
 export type SearchBookerDto = components['schemas']['SearchBookerDto']
+export type SocialContactsDto = components['schemas']['SocialContactsDto']
+export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
+export type PermittedVisitorsForPermittedPrisonerBookerDto =
+  components['schemas']['PermittedVisitorsForPermittedPrisonerBookerDto']

@@ -506,6 +506,24 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getNonLinkedSocialContacts', () => {
+    it('should return all non-linked social contacts for given prisoner number and booker reference', async () => {
+      const { reference, permittedPrisoners } = TestData.bookerDetailedInfo()
+      const socialContacts = [TestData.socialContact()]
+
+      const prisonerId = permittedPrisoners[0].prisoner.prisonId
+
+      fakeOrchestrationApi
+        .get(`/public/booker/${reference}/prisoners/${prisonerId}/social-contacts`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, socialContacts)
+
+      const output = await orchestrationApiClient.getNonLinkedSocialContacts(reference, prisonerId)
+
+      expect(output).toStrictEqual(socialContacts)
+    })
+  })
+
   describe('unlinkBookerVisitor', () => {
     const reference = 'aaa-bbb-ccc'
     const prisonerId = 'A1234BC'

@@ -20,12 +20,15 @@ import {
   NotificationType,
   NotificationTypeRaw,
   PageVisitDto,
+  PermittedVisitorsForPermittedPrisonerBookerDto,
   PrisonDto,
   PrisonerProfileDto,
+  RegisterVisitorForBookerPrisonerDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionCapacity,
   SessionSchedule,
+  SocialContactsDto,
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
@@ -277,6 +280,31 @@ export default class OrchestrationApiClient {
 
   async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {
     return this.restClient.get({ path: `/public/booker/${reference}` })
+  }
+
+  async getNonLinkedSocialContacts(reference: string, prisonerId: string): Promise<SocialContactsDto[]> {
+    return this.restClient.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` })
+  }
+
+  async linkBookerVisitor({
+    reference,
+    prisonerId,
+    visitorId,
+    sendNotificationFlag,
+  }: {
+    reference: string
+    prisonerId: string
+    visitorId: number
+    sendNotificationFlag: boolean
+  }): Promise<PermittedVisitorsForPermittedPrisonerBookerDto> {
+    return this.restClient.post({
+      path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
+      data: <RegisterVisitorForBookerPrisonerDto>{
+        visitorId,
+        active: true,
+        sendNotificationFlag,
+      },
+    })
   }
 
   async unlinkBookerVisitor({

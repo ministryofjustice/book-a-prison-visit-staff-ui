@@ -97,18 +97,14 @@
           {% endif %}
 
           {# Link a visitor (if account is active) #}
-          {# TODO make this button a link to this URL #}
           {% if active %}
-            <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/link-visitor" method="POST" novalidate>
-              <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-              {{ govukButton({
-                text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
-                classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
-                attributes: { "data-test": prisonerIndex + "-link-visitor" },
-                preventDoubleClick: true
-              }) }}
-            </form>
+            {{ govukButton({
+              text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
+              href: "/manage-bookers/" + booker.reference + "/prisoner/" + prisonerNumber + "/link-visitor",
+              classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
+              attributes: { "data-test": prisonerIndex + "-link-visitor" },
+              preventDoubleClick: true
+            }) }}
           {% endif %}
 
         {% endfor %}
