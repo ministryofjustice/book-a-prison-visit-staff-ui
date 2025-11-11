@@ -1,5 +1,5 @@
 import Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
-import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import { stubFor } from './wiremock'
 import { convertToTitleCase, initialiseName } from '../../server/utils/utils'
@@ -13,13 +13,14 @@ const stubComponents = ({ username, caseLoad }: { username: string; caseLoad: Ca
   const formattedUserName = initialiseName(convertToTitleCase(username))
   const customHeaderHtml = headerHtml.replace('USER-NAME', formattedUserName)
 
-  const meta: HeaderFooterMeta = {
+  const meta: HeaderFooterSharedData = {
     activeCaseLoad: caseLoad,
     caseLoads: [caseLoad],
     services: [],
+    allocationJobResponsibilities: [],
   }
 
-  const componentsResponse: { header: Component; footer: Component; meta: HeaderFooterMeta } = {
+  const componentsResponse: { header: Component; footer: Component; meta: HeaderFooterSharedData } = {
     header: {
       html: customHeaderHtml,
       css: [],

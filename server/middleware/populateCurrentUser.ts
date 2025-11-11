@@ -30,7 +30,8 @@ export default function populateCurrentUser(): RequestHandler {
 
       // feComponentsMeta only populated on GET requests, so fall back to already selected establishment
       res.locals.user.activeCaseLoadId =
-        res.locals.feComponentsMeta?.activeCaseLoad.caseLoadId ?? req.session.selectedEstablishment?.prisonId
+        res.locals.feComponentsMeta?.sharedData?.activeCaseLoad.caseLoadId ??
+        req.session.selectedEstablishment?.prisonId
 
       next()
     } catch (error) {

@@ -1,4 +1,4 @@
-import HeaderFooterMeta from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterMeta'
+import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import { ValidationError } from 'express-validator'
 import { PrisonUser } from '../../interfaces/hmppsUser'
 import { CancelledVisitInfo, FlashFormValues, MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
@@ -47,7 +47,9 @@ export declare global {
 
     interface Locals {
       user: PrisonUser
-      feComponentsMeta?: HeaderFooterMeta
+      feComponentsMeta?: {
+        sharedData?: HeaderFooterSharedData
+      }
       appInsightsOperationId?: string
     }
   }
