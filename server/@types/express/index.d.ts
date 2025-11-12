@@ -47,7 +47,7 @@ export declare global {
 
     interface Locals {
       user: PrisonUser
-      feComponentsMeta?: {
+      feComponents?: {
         sharedData?: HeaderFooterSharedData
       }
       appInsightsOperationId?: string

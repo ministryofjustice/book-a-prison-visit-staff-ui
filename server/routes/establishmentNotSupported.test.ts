@@ -21,7 +21,7 @@ describe('Establishment not supported page', () => {
     app = appWithAllRoutes({
       userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
       services: { supportedPrisonsService },
-      feComponentsMeta: {
+      feComponents: {
         sharedData: {
           activeCaseLoad: unsupportedCaseLoad,
           caseLoads: [unsupportedCaseLoad],
@@ -60,7 +60,7 @@ describe('Establishment not supported page', () => {
 
     app = appWithAllRoutes({
       services: { supportedPrisonsService },
-      feComponentsMeta: {
+      feComponents: {
         sharedData: {
           activeCaseLoad: caseLoad,
           caseLoads: [caseLoad],

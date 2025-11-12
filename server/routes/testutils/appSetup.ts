@@ -68,7 +68,7 @@ function appSetup(
   production: boolean,
   userSupplier: () => PrisonUser,
   sessionData: SessionData,
-  feComponentsMeta: {
+  feComponents: {
     sharedData?: HeaderFooterSharedData
   },
 ): Express {
@@ -82,7 +82,7 @@ function appSetup(
     req.flash = flashProvider
     res.locals = {
       user: { ...req.user } as PrisonUser,
-      feComponentsMeta,
+      feComponents,
     }
 
     // res.locals.appInsightsOperationId = 'operationId' // FIXME
@@ -130,16 +130,16 @@ export function appWithAllRoutes({
   services = {},
   userSupplier = () => user,
   sessionData = {} as SessionData,
-  feComponentsMeta = undefined as { sharedData?: HeaderFooterSharedData },
+  feComponents = undefined as { sharedData?: HeaderFooterSharedData },
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => PrisonUser
   sessionData?: SessionData
-  feComponentsMeta?: {
+  feComponents?: {
     sharedData?: HeaderFooterSharedData
   }
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
-  return appSetup(services as Services, production, userSupplier, sessionData, feComponentsMeta)
+  return appSetup(services as Services, production, userSupplier, sessionData, feComponents)
 }
