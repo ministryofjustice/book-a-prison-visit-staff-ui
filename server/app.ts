@@ -57,7 +57,7 @@ export default function createApp(services: Services): express.Application {
     dpsComponents.getPageComponents({
       dpsUrl: config.dpsHome,
       logger,
-      includeMeta: true,
+      includeSharedData: true,
     }),
   )
   app.use(setUpCurrentUser())

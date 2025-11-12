@@ -6,7 +6,7 @@ export default function routes({ supportedPrisonsService }: Services): Router {
   const router = Router()
 
   router.get('/', async (req, res) => {
-    const activeCaseLoad = res.locals.feComponentsMeta?.activeCaseLoad
+    const activeCaseLoad = res.locals.feComponents?.sharedData?.activeCaseLoad
 
     if (
       !activeCaseLoad ||
