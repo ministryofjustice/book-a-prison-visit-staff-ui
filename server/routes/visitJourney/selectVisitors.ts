@@ -17,8 +17,13 @@ export default class SelectVisitors {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
+    const { policyNoticeDaysMax } = req.session.selectedEstablishment
 
-    const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, res.locals.user.username)
+    const visitorList = await this.prisonerVisitorsService.getVisitors(
+      offenderNo,
+      policyNoticeDaysMax,
+      res.locals.user.username,
+    )
     if (!req.session.visitorList) {
       req.session.visitorList = { visitors: [] }
     }
@@ -96,8 +101,9 @@ export default class SelectVisitors {
     )
 
     const allSelectedVisitorBans = selectedVisitors.flatMap(visitor => visitor.restrictions)
+    const { policyNoticeDaysMax } = req.session.selectedEstablishment
 
-    const banStatus = getBanStatus(allSelectedVisitorBans)
+    const banStatus = getBanStatus(allSelectedVisitorBans, policyNoticeDaysMax)
     visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined
 
     return !closedVisitVisitors && closedVisitPrisoner
