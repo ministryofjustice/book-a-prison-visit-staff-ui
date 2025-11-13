@@ -2,10 +2,11 @@ import type { Router } from 'express'
 import express from 'express'
 import passport from 'passport'
 import flash from 'connect-flash'
-import dpsComponents from '@ministryofjustice/hmpps-connect-dps-components'
+import { getFrontendComponents } from '@ministryofjustice/hmpps-connect-dps-components'
 import config from '../config'
 import auth from '../authentication/auth'
 import { PrisonUser } from '../interfaces/hmppsUser'
+import logger from '../../logger'
 
 const router = express.Router()
 
@@ -16,10 +17,19 @@ export default function setUpAuth(): Router {
   router.use(passport.session())
   router.use(flash())
 
-  router.get('/autherror', dpsComponents.getPageComponents({ dpsUrl: config.dpsHome }), (req, res) => {
-    res.status(401)
-    return res.render('pages/autherror')
-  })
+  router.get(
+    '/autherror',
+    getFrontendComponents({
+      dpsUrl: config.dpsHome,
+      logger,
+      componentApiConfig: config.apis.componentApi,
+      requestOptions: { includeSharedData: true },
+    }),
+    (req, res) => {
+      res.status(401)
+      return res.render('pages/autherror')
+    },
+  )
 
   router.get('/sign-in', passport.authenticate('oauth2'))
 
