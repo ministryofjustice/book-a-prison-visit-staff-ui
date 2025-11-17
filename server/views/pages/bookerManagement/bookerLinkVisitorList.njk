@@ -2,11 +2,11 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set pageHeaderTitle = "Link a visitor" %}
 {% set backLinkHref = '/TODO' %}
 
-{# TODO - fix disabled button #}
 {% set contactRows = [] %}
 {% for contact in allContacts %}
   {% set contactRows = (contactRows.push([
@@ -43,11 +43,18 @@
 
       <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
 
-      <h2 class="govuk-heading-l">Approved visitors for {{ (prisoner.firstName + " " + prisoner.lastName) | properCaseFullName}}</h2>
+      <h2 class="govuk-heading-l">Approved visitors for {{ (prisoner.firstName + " " + prisoner.lastName) | properCaseFullName }}</h2>
 
       <p class="bapv-secondary-text govuk-!-margin-bottom-6">
         Visitors already linked to this booker are not shown.
       </p>
+
+      {% if showNoDobWarning %} {# If at least one visitor has no DOB #}
+        {{ govukWarningText({
+          text: "Contacts must have a date of birth before they can be added as a visitor.",
+          iconFallbackText: "Warning"
+        }) }}
+      {% endif %}
 
       <form action="/manage-bookers/{{ reference }}/prisoner/{{ prisoner.prisonerNumber }}/link-visitor" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
