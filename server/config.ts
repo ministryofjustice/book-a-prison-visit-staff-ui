@@ -123,6 +123,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('ORCHESTRATION_API_TIMEOUT_RESPONSE', 10000))),
     },
+    componentApi: {
+      url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('COMPONENT_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('COMPONENT_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('COMPONENT_TIMEOUT_DEADLINE', 10000))),
+    },
   },
   visit: {
     // Max number of days AFTER a visit that it can be marked CANCELLED

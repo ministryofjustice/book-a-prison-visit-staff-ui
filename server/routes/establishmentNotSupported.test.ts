@@ -21,7 +21,14 @@ describe('Establishment not supported page', () => {
     app = appWithAllRoutes({
       userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
       services: { supportedPrisonsService },
-      feComponentsMeta: { activeCaseLoad: unsupportedCaseLoad, caseLoads: [unsupportedCaseLoad], services: [] },
+      feComponents: {
+        sharedData: {
+          activeCaseLoad: unsupportedCaseLoad,
+          caseLoads: [unsupportedCaseLoad],
+          services: [],
+          allocationJobResponsibilities: [],
+        },
+      },
     })
 
     return request(app)
@@ -53,7 +60,14 @@ describe('Establishment not supported page', () => {
 
     app = appWithAllRoutes({
       services: { supportedPrisonsService },
-      feComponentsMeta: { activeCaseLoad: caseLoad, caseLoads: [caseLoad], services: [] },
+      feComponents: {
+        sharedData: {
+          activeCaseLoad: caseLoad,
+          caseLoads: [caseLoad],
+          services: [],
+          allocationJobResponsibilities: [],
+        },
+      },
     })
 
     return request(app)
