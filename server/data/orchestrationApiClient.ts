@@ -292,6 +292,7 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` })
   }
 
+  // TODO add test
   async linkBookerVisitor({
     reference,
     prisonerId,

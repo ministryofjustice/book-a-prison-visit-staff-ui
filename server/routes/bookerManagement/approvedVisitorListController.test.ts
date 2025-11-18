@@ -47,7 +47,7 @@ describe('Booker management - approved visitor list', () => {
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
-    it('should render non-linked approved visitor list page', () => {
+    it('should render non-linked approved visitor list page and save data to session', () => {
       const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
       bookerService.getNonLinkedSocialContacts.mockResolvedValue([socialContact])
@@ -84,6 +84,12 @@ describe('Booker management - approved visitor list', () => {
             username: 'user1',
             reference: booker.reference,
             prisonerId: prisoner.prisonerNumber,
+          })
+
+          expect(sessionData.bookerLinkVisitor).toStrictEqual({
+            reference: booker.reference,
+            prisonerId: prisoner.prisonerNumber,
+            nonLinkedContacts: [socialContact],
           })
         })
     })

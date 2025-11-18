@@ -27,6 +27,8 @@ export default class ApprovedVisitorListController {
       const nonLinkedContacts = await this.bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
       const showNoDobWarning = nonLinkedContacts.some(contact => contact.dateOfBirth === null)
 
+      req.session.bookerLinkVisitor = { reference, prisonerId, nonLinkedContacts }
+
       return res.render('pages/bookerManagement/approvedVisitorList', {
         backLinkHref: bookerDetailsPageUrl,
         errors: req.flash('errors'),

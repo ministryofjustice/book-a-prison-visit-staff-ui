@@ -2,7 +2,7 @@ import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-compone
 import { ValidationError } from 'express-validator'
 import { PrisonUser } from '../../interfaces/hmppsUser'
 import { CancelledVisitInfo, FlashFormValues, MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
-import { BookerSearchResultsDto } from '../../data/orchestrationApiTypes'
+import { BookerSearchResultsDto, SocialContactsDto } from '../../data/orchestrationApiTypes'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -19,6 +19,13 @@ export declare module 'express-session' {
     // Booker management
     // matched booker accounts from an email search (sorted, most recent 'active' account first)
     matchedBookers?: BookerSearchResultsDto[]
+
+    // non-linked approved visitors for linking to a booker's prisoner
+    bookerLinkVisitor?: {
+      reference: string
+      prisonerId: string
+      nonLinkedContacts: SocialContactsDto[]
+    }
   }
 }
 
