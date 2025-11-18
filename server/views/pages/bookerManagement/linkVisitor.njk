@@ -3,7 +3,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set pageHeaderTitle = "Notify the booker about the linked visitor" %}
-{% set backLinkHref = '/manage-bookers/search' %}
+{% set backLinkHref = "/manage-bookers/" + reference + "/prisoner/" + prisonerId + "/link-visitor" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -11,11 +11,12 @@
 
       <h1 class="govuk-heading-xl">Do you want to notify the booker?</h1>
 
-      <p class="bapv-secondary-text">
-        An automated email will be sent to tell the booker that they can book for {{ (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName }}
+      <p>
+        An automated email will be sent to tell the booker that they can book for
+        <span data-test="visitor-name">{{ visitor.firstName }} {{ visitor.lastName }}</span>.
       </p>
 
-      <form action="/manage-bookers/{{ reference }}/prisoner/{{ prisoner.prisonerNumber }}/link-visitor/{{ visitorId }}/notify" method="POST" novalidate>
+      <form action="/manage-bookers/{{ reference }}/prisoner/{{ prisonerId }}/link-visitor/{{ visitor.visitorId }}/notify" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({
@@ -23,7 +24,8 @@
           items: [
             {
               value: "yes",
-              text: "Yes, send an email"
+              text: "Yes, send an email",
+              checked: true
             },
             {
               value: "no",

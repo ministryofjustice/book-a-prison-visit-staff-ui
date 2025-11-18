@@ -91,5 +91,3 @@ export type BookerSearchResultsDto = components['schemas']['BookerSearchResultsD
 export type SearchBookerDto = components['schemas']['SearchBookerDto']
 export type SocialContactsDto = components['schemas']['SocialContactsDto']
 export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
-export type PermittedVisitorsForPermittedPrisonerBookerDto =
-  components['schemas']['PermittedVisitorsForPermittedPrisonerBookerDto']

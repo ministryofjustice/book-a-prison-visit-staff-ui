@@ -20,7 +20,6 @@ import {
   NotificationType,
   NotificationTypeRaw,
   PageVisitDto,
-  PermittedVisitorsForPermittedPrisonerBookerDto,
   PrisonDto,
   PrisonerProfileDto,
   RegisterVisitorForBookerPrisonerDto,
@@ -303,8 +302,8 @@ export default class OrchestrationApiClient {
     prisonerId: string
     visitorId: number
     sendNotificationFlag: boolean
-  }): Promise<PermittedVisitorsForPermittedPrisonerBookerDto> {
-    return this.restClient.post({
+  }): Promise<void> {
+    await this.restClient.post({
       path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
       data: <RegisterVisitorForBookerPrisonerDto>{
         visitorId,

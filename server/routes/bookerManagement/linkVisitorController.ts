@@ -1,5 +1,9 @@
 import { RequestHandler } from 'express'
+import { body, matchedData, param, ValidationChain, validationResult } from 'express-validator'
+import { SessionData } from 'express-session'
 import { AuditService, BookerService } from '../../services'
+import { isValidPrisonerNumber } from '../validationChecks'
+import { SocialContactsDto } from '../../data/orchestrationApiTypes'
 
 export default class LinkVisitorController {
   public constructor(
@@ -8,24 +12,24 @@ export default class LinkVisitorController {
   ) {}
 
   public view(): RequestHandler {
-    return async (req, res) => { return res.send('HERE')
+    return async (req, res) => {
       const { reference, prisonerId, visitorId } = req.params
-      const { username } = res.locals.user
+      const { bookerLinkVisitor } = req.session
 
-      // TODO sort out - this is prisoner; need visitor info
-      // duplication *necessary?* from bookerLinkVisitorListController
-      const booker = await this.bookerService.getBookerDetails({ username, reference })
-      const prisoner = booker.permittedPrisoners.find(
-        permittedPrisoner => permittedPrisoner.prisoner.prisonerNumber === prisonerId,
-      )?.prisoner
-
-      if (!prisoner) {
+      if (!validationResult(req).isEmpty() || !bookerLinkVisitor) {
         return res.redirect(`/manage-bookers/${reference}/booker-details`)
       }
 
+      const visitor = this.getVisitor(bookerLinkVisitor, visitorId)
+
+      if (prisonerId !== bookerLinkVisitor.prisonerId || !visitor) {
+        return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonerId}/link-visitor`)
+      }
+
       return res.render('pages/bookerManagement/linkVisitor', {
-        prisoner,
-        visitorId,
+        reference,
+        prisonerId,
+        visitor,
       })
     }
   }
@@ -33,21 +37,51 @@ export default class LinkVisitorController {
   public submit(): RequestHandler {
     return async (req, res) => {
       const { reference, prisonerId, visitorId } = req.params
+      const { bookerLinkVisitor } = req.session
       const { username } = res.locals.user
-      const { notifyBooker }: { notifyBooker: string } = req.body
 
-      const permittedVisitor = await this.bookerService.linkBookerVisitor({
+      if (!validationResult(req).isEmpty() || !bookerLinkVisitor) {
+        return res.redirect(`/manage-bookers/${reference}/booker-details`)
+      }
+
+      const visitor = this.getVisitor(bookerLinkVisitor, visitorId)
+
+      if (prisonerId !== bookerLinkVisitor.prisonerId || !visitor || visitor.dateOfBirth === null) {
+        return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonerId}/link-visitor`)
+      }
+
+      const { notifyBooker } = matchedData<{ notifyBooker: 'yes' | 'no' }>(req)
+
+      await this.bookerService.linkBookerVisitor({
         username,
         reference,
         prisonerId,
-        visitorId, // needs to be converted to number
-        notifyBooker,
+        visitorId: parseInt(visitorId, 10),
+        sendNotificationFlag: notifyBooker === 'yes',
+      })
+
+      // TODO send audit
+
+      req.flash('messages', {
+        variant: 'success',
+        title: `${visitor.firstName} ${visitor.lastName} has been linked to this booker.`,
+        text: '',
+        dismissible: true,
       })
 
       return res.redirect(`/manage-bookers/${reference}/booker-details`)
     }
   }
 
-  // TODO validations for req.params (both routes)?
-  // need to check visitor IDs are valid and have DoB
+  public validateView(): ValidationChain[] {
+    return [param('prisonerId').custom(prisonerId => isValidPrisonerNumber(prisonerId)), param('visitorId').isInt()]
+  }
+
+  public validateSubmit(): ValidationChain[] {
+    return [...this.validateView(), body('notifyBooker').isIn(['yes', 'no'])]
+  }
+
+  private getVisitor(bookerLinkVisitor: SessionData['bookerLinkVisitor'], visitorId: string): SocialContactsDto {
+    return bookerLinkVisitor.nonLinkedContacts.find(contact => contact.visitorId.toString() === visitorId)
+  }
 }
