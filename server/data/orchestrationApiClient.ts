@@ -282,7 +282,13 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/public/booker/${reference}` })
   }
 
-  async getNonLinkedSocialContacts(reference: string, prisonerId: string): Promise<SocialContactsDto[]> {
+  async getNonLinkedSocialContacts({
+    reference,
+    prisonerId,
+  }: {
+    reference: string
+    prisonerId: string
+  }): Promise<SocialContactsDto[]> {
     return this.restClient.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` })
   }
 

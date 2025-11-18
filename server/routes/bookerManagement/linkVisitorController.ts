@@ -1,17 +1,18 @@
 import { RequestHandler } from 'express'
 import { AuditService, BookerService } from '../../services'
 
-export default class BookerLinkVisitorController {
+export default class LinkVisitorController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly bookerService: BookerService,
   ) {}
 
   public view(): RequestHandler {
-    return async (req, res) => {
+    return async (req, res) => { return res.send('HERE')
       const { reference, prisonerId, visitorId } = req.params
       const { username } = res.locals.user
 
+      // TODO sort out - this is prisoner; need visitor info
       // duplication *necessary?* from bookerLinkVisitorListController
       const booker = await this.bookerService.getBookerDetails({ username, reference })
       const prisoner = booker.permittedPrisoners.find(
@@ -22,7 +23,7 @@ export default class BookerLinkVisitorController {
         return res.redirect(`/manage-bookers/${reference}/booker-details`)
       }
 
-      return res.render('pages/bookerManagement/bookerLinkVisitor', {
+      return res.render('pages/bookerManagement/linkVisitor', {
         prisoner,
         visitorId,
       })
@@ -48,4 +49,5 @@ export default class BookerLinkVisitorController {
   }
 
   // TODO validations for req.params (both routes)?
+  // need to check visitor IDs are valid and have DoB
 }

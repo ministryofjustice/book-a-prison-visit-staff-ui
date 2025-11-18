@@ -518,7 +518,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, socialContacts)
 
-      const output = await orchestrationApiClient.getNonLinkedSocialContacts(reference, prisonerId)
+      const output = await orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
 
       expect(output).toStrictEqual(socialContacts)
     })

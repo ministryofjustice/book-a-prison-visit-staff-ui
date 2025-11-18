@@ -91,6 +91,12 @@ describe('Booker management - booker details', () => {
             email: booker.email,
             reference: booker.reference,
           })
+          expect(auditService.viewBooker).toHaveBeenCalledWith({
+            reference: booker.reference,
+            prisonerIds: [booker.permittedPrisoners[0].prisoner.prisonerNumber],
+            username: 'user1',
+            operationId: undefined,
+          })
         })
     })
 

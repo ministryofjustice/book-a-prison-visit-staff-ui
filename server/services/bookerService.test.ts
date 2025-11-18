@@ -60,6 +60,22 @@ describe('Booker service', () => {
     })
   })
 
+  describe('getNonLinkedSocialContacts', () => {
+    it('should return all non-linked social contacts for given prisoner number and booker reference', async () => {
+      const booker = TestData.bookerDetailedInfo()
+      const { reference } = booker
+      const prisonerId = booker.permittedPrisoners[0].prisoner.prisonerNumber
+      const socialContacts = [TestData.socialContact()]
+
+      orchestrationApiClient.getNonLinkedSocialContacts.mockResolvedValue(socialContacts)
+
+      const result = await bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
+
+      expect(result).toStrictEqual(socialContacts)
+      expect(orchestrationApiClient.getNonLinkedSocialContacts).toHaveBeenCalledWith({ reference, prisonerId })
+    })
+  })
+
   describe('getBookerStatus', () => {
     const email = 'booker@example.com'
     const activeBooker = TestData.bookerSearchResult({ reference: 'a' })

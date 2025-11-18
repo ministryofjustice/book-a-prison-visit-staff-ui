@@ -444,7 +444,7 @@ export default class TestData {
     firstName = 'Jeanette',
     lastName = 'Smith',
     dateOfBirth = '1986-07-28',
-    lastApprovedForVisitDate = '2025-10-10',
+    lastApprovedForVisitDate = '2025-10-11',
   }: Partial<SocialContactsDto> = {}): SocialContactsDto => ({
     visitorId,
     firstName,

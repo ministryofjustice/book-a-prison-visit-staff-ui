@@ -57,7 +57,7 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getNonLinkedSocialContacts(reference, prisonerId)
+    return orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
   }
 
   async getBookerStatus({

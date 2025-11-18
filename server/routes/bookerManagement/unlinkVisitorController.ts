@@ -3,7 +3,7 @@ import { param, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../services'
 import { isValidPrisonerNumber } from '../validationChecks'
 
-export default class BookerUnlinkVisitorController {
+export default class UnlinkVisitorController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly bookerService: BookerService,
