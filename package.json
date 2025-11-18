@@ -34,7 +34,7 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.929.0",
+    "@aws-sdk/client-sqs": "^3.932.0",
     "@ministryofjustice/frontend": "^7.1.0",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.2.0",
     "@ministryofjustice/hmpps-rest-client": "^1.0.0",
@@ -63,9 +63,9 @@
     "superagent": "^10.2.3"
   },
   "devDependencies": {
-    "@aws-sdk/types": "^3.922.0",
+    "@aws-sdk/types": "^3.930.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.1",
-    "@tsconfig/node24": "^24.0.1",
+    "@tsconfig/node24": "^24.0.2",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",
