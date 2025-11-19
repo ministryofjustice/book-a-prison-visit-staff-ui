@@ -13,6 +13,7 @@ import {
   SessionCapacity,
   SessionsAndScheduleDto,
   SessionSchedule,
+  SocialContactsDto,
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
@@ -436,6 +437,20 @@ export default class TestData {
     weeklyFrequency,
     visitType,
     visitRoom,
+  })
+
+  static socialContact = ({
+    visitorId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    lastApprovedForVisitDate = '2025-10-11',
+  }: Partial<SocialContactsDto> = {}): SocialContactsDto => ({
+    visitorId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    lastApprovedForVisitDate,
   })
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds

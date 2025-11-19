@@ -77,10 +77,10 @@ describe('Booker management - booker details', () => {
           )
 
           // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
+          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             username: 'user1',
@@ -90,6 +90,12 @@ describe('Booker management - booker details', () => {
             username: 'user1',
             email: booker.email,
             reference: booker.reference,
+          })
+          expect(auditService.viewBooker).toHaveBeenCalledWith({
+            reference: booker.reference,
+            prisonerIds: [booker.permittedPrisoners[0].prisoner.prisonerNumber],
+            username: 'user1',
+            operationId: undefined,
           })
         })
     })
@@ -150,10 +156,10 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
           // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
+          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
 
           // Prisoner #2
           // Prisoner and visitors
@@ -165,10 +171,10 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
           // Link visitor
-          expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
+          expect($('[data-test=prisoner-2-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/link-visitor',
           )
-          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             username: 'user1',
@@ -221,10 +227,10 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
           // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
+          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
 
           // Prisoner #2
           // Prisoner and visitors
@@ -236,10 +242,10 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
           // Link visitor
-          expect($('[data-test=prisoner-2-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
+          expect($('[data-test=prisoner-2-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/link-visitor',
           )
-          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
         })
     })
 
@@ -279,11 +285,10 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1]').text()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-no-visitors]').text()).toContain('no linked visitors')
 
-          // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').parent('form').attr('action')).toBe(
+          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
+          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
         })
     })
 

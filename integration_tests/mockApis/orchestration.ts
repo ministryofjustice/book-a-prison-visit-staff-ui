@@ -15,6 +15,7 @@ import {
   PrisonerProfileDto,
   SessionCapacity,
   SessionSchedule,
+  SocialContactsDto,
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
@@ -401,6 +402,61 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: booker,
+      },
+    })
+  },
+
+  stubGetNonLinkedSocialContacts: ({
+    reference,
+    prisonerId,
+    socialContacts,
+  }: {
+    reference: string
+    prisonerId: string
+    socialContacts: [SocialContactsDto]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/public/booker/${reference}/prisoners/${prisonerId}/social-contacts`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: socialContacts,
+      },
+    })
+  },
+
+  stubLinkBookerVisitor: ({
+    reference,
+    prisonerId,
+    visitorId,
+    sendNotification,
+  }: {
+    reference: string
+    prisonerId: string
+    visitorId: number
+    sendNotification: boolean
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: `/orchestration/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              visitorId,
+              active: true,
+              sendNotificationFlag: sendNotification,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {},
       },
     })
   },

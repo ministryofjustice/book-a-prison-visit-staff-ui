@@ -6,7 +6,9 @@ import BookerDetailsController from './bookerDetailsController'
 import bapvUserRoles from '../../constants/bapvUserRoles'
 import { isValidBookerReference } from '../validationChecks'
 import SelectBookerAccountController from './selectBookerAccountController'
-import BookerUnlinkVisitorController from './bookerUnlinkVisitorController'
+import UnlinkVisitorController from './unlinkVisitorController'
+import ApprovedVisitorListController from './approvedVisitorListController'
+import LinkVisitorController from './linkVisitorController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -14,7 +16,9 @@ export default function routes(services: Services): Router {
   const bookerSearchController = new BookerSearchController(services.auditService, services.bookerService)
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
   const selectBookerAccountController = new SelectBookerAccountController(services.bookerService)
-  const bookerUnlinkVisitorController = new BookerUnlinkVisitorController(services.auditService, services.bookerService)
+  const approvedVisitorListController = new ApprovedVisitorListController(services.bookerService)
+  const linkVisitorController = new LinkVisitorController(services.auditService, services.bookerService)
+  const unlinkVisitorController = new UnlinkVisitorController(services.auditService, services.bookerService)
 
   // Restrict booker management routes by role
   router.use((req, res, next) => {
@@ -47,11 +51,31 @@ export default function routes(services: Services): Router {
   // Booker details
   router.get('/:reference/booker-details', bookerDetailsController.view())
 
+  // Link visitor - approved visitor list
+  router.get('/:reference/prisoner/:prisonerId/link-visitor', approvedVisitorListController.view())
+  router.post(
+    '/:reference/prisoner/:prisonerId/link-visitor',
+    approvedVisitorListController.validate(),
+    approvedVisitorListController.submit(),
+  )
+
+  // Link visitor - confirm and notify
+  router.get(
+    '/:reference/prisoner/:prisonerId/link-visitor/:visitorId/notify',
+    linkVisitorController.validateView(),
+    linkVisitorController.view(),
+  )
+  router.post(
+    '/:reference/prisoner/:prisonerId/link-visitor/:visitorId/notify',
+    linkVisitorController.validateSubmit(),
+    linkVisitorController.submit(),
+  )
+
   // Unlink visitor
   router.post(
     '/:reference/prisoner/:prisonerId/visitor/:visitorId/unlink',
-    bookerUnlinkVisitorController.validate(),
-    bookerUnlinkVisitorController.unlink(),
+    unlinkVisitorController.validate(),
+    unlinkVisitorController.unlink(),
   )
 
   return router

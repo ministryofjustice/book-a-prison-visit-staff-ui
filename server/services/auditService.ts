@@ -394,6 +394,27 @@ export default class AuditService {
     })
   }
 
+  async linkedBookerVisitor({
+    reference,
+    prisonerId,
+    visitorId,
+    username,
+    operationId,
+  }: {
+    reference: string
+    prisonerId: string
+    visitorId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'LINKED_BOOKER_VISITOR',
+      who: username,
+      operationId,
+      details: { reference, prisonerId, visitorId },
+    })
+  }
+
   async unlinkedBookerVisitor({
     reference,
     prisonerId,

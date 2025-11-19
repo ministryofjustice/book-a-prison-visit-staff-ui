@@ -1,6 +1,6 @@
 import { compareDesc } from 'date-fns'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import { BookerDetailedInfoDto, BookerSearchResultsDto } from '../data/orchestrationApiTypes'
+import { BookerDetailedInfoDto, BookerSearchResultsDto, SocialContactsDto } from '../data/orchestrationApiTypes'
 
 export default class BookerService {
   constructor(
@@ -40,6 +40,21 @@ export default class BookerService {
     return orchestrationApiClient.getBookerDetails(reference)
   }
 
+  async getNonLinkedSocialContacts({
+    username,
+    reference,
+    prisonerId,
+  }: {
+    username: string
+    reference: string
+    prisonerId: string
+  }): Promise<SocialContactsDto[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
+  }
+
   async getBookerStatus({
     username,
     email,
@@ -54,6 +69,25 @@ export default class BookerService {
     const active = bookers[0]?.reference === reference
 
     return { active, emailHasMultipleAccounts }
+  }
+
+  async linkBookerVisitor({
+    username,
+    reference,
+    prisonerId,
+    visitorId,
+    sendNotification,
+  }: {
+    username: string
+    reference: string
+    prisonerId: string
+    visitorId: number
+    sendNotification: boolean
+  }): Promise<void> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification })
   }
 
   async unlinkBookerVisitor({

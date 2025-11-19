@@ -60,6 +60,22 @@ describe('Booker service', () => {
     })
   })
 
+  describe('getNonLinkedSocialContacts', () => {
+    it('should return all non-linked social contacts for given prisoner number and booker reference', async () => {
+      const booker = TestData.bookerDetailedInfo()
+      const { reference } = booker
+      const prisonerId = booker.permittedPrisoners[0].prisoner.prisonerNumber
+      const socialContacts = [TestData.socialContact()]
+
+      orchestrationApiClient.getNonLinkedSocialContacts.mockResolvedValue(socialContacts)
+
+      const result = await bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
+
+      expect(result).toStrictEqual(socialContacts)
+      expect(orchestrationApiClient.getNonLinkedSocialContacts).toHaveBeenCalledWith({ reference, prisonerId })
+    })
+  })
+
   describe('getBookerStatus', () => {
     const email = 'booker@example.com'
     const activeBooker = TestData.bookerSearchResult({ reference: 'a' })
@@ -88,6 +104,26 @@ describe('Booker service', () => {
         expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
       },
     )
+  })
+
+  describe('linkBookerVisitor', () => {
+    it('should link visitor to booker account for given prisoner', async () => {
+      const reference = 'aaa-bbb-ccc'
+      const prisonerId = 'A1234BC'
+      const visitorId = 123
+      const sendNotification = true
+
+      orchestrationApiClient.linkBookerVisitor.mockResolvedValue()
+
+      await bookerService.linkBookerVisitor({ username: 'user1', reference, prisonerId, visitorId, sendNotification })
+
+      expect(orchestrationApiClient.linkBookerVisitor).toHaveBeenCalledWith({
+        reference,
+        prisonerId,
+        visitorId,
+        sendNotification,
+      })
+    })
   })
 
   describe('unlinkBookerVisitor', () => {

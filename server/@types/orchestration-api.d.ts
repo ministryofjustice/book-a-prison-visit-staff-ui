@@ -311,6 +311,30 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get permitted visitors for a prisoner associated with that booker.
+     * @description Get permitted visitors for a prisoner associated with that booker.
+     */
+    get: operations['getPermittedVisitorsForPrisoner']
+    put?: never
+    /**
+     * Register visitor, for a booker's prisoner
+     * @description Register visitor, for a booker's prisoner
+     */
+    post: operations['registerVisitor']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/public/booker/{bookerReference}/permitted/prisoners/register': {
     parameters: {
       query?: never
@@ -804,6 +828,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/prisoners/{prisonerId}/social-contacts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get social contacts (not already registered to the booker) for a prisoner associated with that booker.
+     * @description Return social contacts that have not already been registered against the booker given a prison number and booker reference.
+     */
+    get: operations['getSocialContactsForPrisoner']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/public/booker/{bookerReference}/permitted/prisoners': {
     parameters: {
       query?: never
@@ -836,26 +880,6 @@ export interface paths {
      * @description Validates prisoner associated with a booker
      */
     get: operations['validatePrisoner']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
-  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get permitted visitors for a prisoner associated with that booker.
-     * @description Get permitted visitors for a prisoner associated with that booker.
-     */
-    get: operations['getPermittedVisitorsForPrisoner']
     put?: never
     post?: never
     delete?: never
@@ -1664,6 +1688,39 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
+    /** @description Details to register a visitor to a booker's prisoner. */
+    RegisterVisitorForBookerPrisonerDto: {
+      /**
+       * Format: int64
+       * @description Visitor Id
+       * @example 12345
+       */
+      visitorId: number
+      /**
+       * @description Active / Inactive permitted visitor
+       * @example true
+       */
+      active: boolean
+      /**
+       * @description Flag to determine if the booker should be notified of the registration
+       * @example true
+       */
+      sendNotificationFlag: boolean
+    }
+    /** @description Permitted visitor associated with the permitted prisoner. */
+    PermittedVisitorsForPermittedPrisonerBookerDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description Active / Inactive permitted visitor
+       * @example true
+       */
+      active: boolean
+    }
     /** @description Details to register a prisoner to a booker. */
     RegisterPrisonerForBookerDto: {
       /**
@@ -2375,9 +2432,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -3008,6 +3065,37 @@ export interface components {
        * @example James
        */
       lastName?: string
+    }
+    /** @description Social Contact */
+    SocialContactsDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 2000-01-31
+       */
+      dateOfBirth?: string
+      /**
+       * Format: date
+       * @description Date when visitor was last approved for a visit (approved / auto-approved)
+       * @example 2025-09-12
+       */
+      lastApprovedForVisitDate?: string
     }
     BookerPrisonerInfoDto: {
       /** @description Prisoner Details */
@@ -4585,6 +4673,105 @@ export interface operations {
       }
     }
   }
+  getPermittedVisitorsForPrisoner: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        /**
+         * @description Prisoner Id for whom visitors need to be returned.
+         * @example A12345DC
+         */
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Returned permitted permitted visitors for a prisoner associated with that booker */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitorInfoDto'][]
+        }
+      }
+      /** @description Incorrect request to get permitted visitors for a prisoner associated with that booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get permitted visitors for a prisoner associated with that booker */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  registerVisitor: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterVisitorForBookerPrisonerDto']
+      }
+    }
+    responses: {
+      /** @description Registration successful */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PermittedVisitorsForPermittedPrisonerBookerDto']
+        }
+      }
+      /** @description Incorrect request to register a visitor, for a booker's prisoner */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   registerPrisoner: {
     parameters: {
       query?: never
@@ -6005,6 +6192,65 @@ export interface operations {
       }
     }
   }
+  getSocialContactsForPrisoner: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return social contacts (not already registered) for a prisoner associated with that booker */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['SocialContactsDto'][]
+        }
+      }
+      /** @description Incorrect request to get social contacts (not already registered) for a prisoner associated with that booker */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get social contacts */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Booker not authorised / not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getPermittedPrisonersForBooker: {
     parameters: {
       query?: never
@@ -6106,60 +6352,6 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['BookerPrisonerValidationErrorResponse']
-        }
-      }
-    }
-  }
-  getPermittedVisitorsForPrisoner: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        bookerReference: string
-        /**
-         * @description Prisoner Id for whom visitors need to be returned.
-         * @example A12345DC
-         */
-        prisonerId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Returned permitted permitted visitors for a prisoner associated with that booker */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          '*/*': components['schemas']['VisitorInfoDto'][]
-        }
-      }
-      /** @description Incorrect request to get permitted visitors for a prisoner associated with that booker */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to get permitted visitors for a prisoner associated with that booker */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
         }
       }
     }
