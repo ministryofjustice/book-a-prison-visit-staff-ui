@@ -49,6 +49,7 @@ export default class LinkVisitorController {
       if (prisonerId !== bookerLinkVisitor.prisonerId || !visitor || visitor.dateOfBirth === null) {
         return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonerId}/link-visitor`)
       }
+      delete req.session.bookerLinkVisitor
 
       const { notifyBooker } = matchedData<{ notifyBooker: 'yes' | 'no' }>(req)
 
