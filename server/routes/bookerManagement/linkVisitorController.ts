@@ -60,13 +60,19 @@ export default class LinkVisitorController {
         sendNotification: notifyBooker === 'yes',
       })
 
-      // TODO send audit
-
       req.flash('messages', {
         variant: 'success',
         title: `${visitor.firstName} ${visitor.lastName} has been linked to this booker.`,
         text: '',
         dismissible: true,
+      })
+
+      this.auditService.linkedBookerVisitor({
+        reference,
+        prisonerId,
+        visitorId: visitor.visitorId.toString(),
+        username,
+        operationId: res.locals.appInsightsOperationId,
       })
 
       return res.redirect(`/manage-bookers/${reference}/booker-details`)
