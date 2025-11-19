@@ -14,6 +14,7 @@ import {
   IgnoreVisitNotificationsDto,
   PageVisitDto,
   PrisonDto,
+  RegisterVisitorForBookerPrisonerDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionSchedule,
@@ -521,6 +522,26 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
 
       expect(output).toStrictEqual(socialContacts)
+    })
+  })
+
+  describe('linkBookerVisitor', () => {
+    it('should link a visitor to a booker account for given prisoner', async () => {
+      const reference = 'aaa-bbb-ccc'
+      const prisonerId = 'A1234BC'
+      const visitorId = 123
+      const sendNotification = true
+
+      fakeOrchestrationApi
+        .post(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`, <
+          RegisterVisitorForBookerPrisonerDto
+        >{ visitorId, active: true, sendNotificationFlag: sendNotification })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
     })
   })
 

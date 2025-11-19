@@ -71,24 +71,23 @@ export default class BookerService {
     return { active, emailHasMultipleAccounts }
   }
 
-  // TODO add test
   async linkBookerVisitor({
     username,
     reference,
     prisonerId,
     visitorId,
-    sendNotificationFlag,
+    sendNotification,
   }: {
     username: string
     reference: string
     prisonerId: string
     visitorId: number
-    sendNotificationFlag: boolean
+    sendNotification: boolean
   }): Promise<void> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotificationFlag })
+    await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification })
   }
 
   async unlinkBookerVisitor({

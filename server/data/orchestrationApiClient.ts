@@ -291,24 +291,23 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` })
   }
 
-  // TODO add test
   async linkBookerVisitor({
     reference,
     prisonerId,
     visitorId,
-    sendNotificationFlag,
+    sendNotification,
   }: {
     reference: string
     prisonerId: string
     visitorId: number
-    sendNotificationFlag: boolean
+    sendNotification: boolean
   }): Promise<void> {
     await this.restClient.post({
       path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
       data: <RegisterVisitorForBookerPrisonerDto>{
         visitorId,
         active: true,
-        sendNotificationFlag,
+        sendNotificationFlag: sendNotification,
       },
     })
   }

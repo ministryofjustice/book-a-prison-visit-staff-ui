@@ -57,7 +57,7 @@ export default class LinkVisitorController {
         reference,
         prisonerId,
         visitorId: parseInt(visitorId, 10),
-        sendNotificationFlag: notifyBooker === 'yes',
+        sendNotification: notifyBooker === 'yes',
       })
 
       // TODO send audit
