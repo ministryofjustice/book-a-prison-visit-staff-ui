@@ -1,8 +1,10 @@
 import bapvUserRoles from '../../../server/constants/bapvUserRoles'
 import TestData from '../../../server/routes/testutils/testData'
 import AuthorisationErrorPage from '../../pages/authorisationError'
+import ApprovedVisitorListPage from '../../pages/bookerManagement/approvedVisitorList'
 import BookerDetailsPage from '../../pages/bookerManagement/bookerDetails'
 import BookerSearchPage from '../../pages/bookerManagement/bookerSearch'
+import LinkVisitorPage from '../../pages/bookerManagement/linkVisitor'
 import SelectBookerAccountPage from '../../pages/bookerManagement/selectBookerAccount'
 import HomePage from '../../pages/home'
 import Page from '../../pages/page'
@@ -91,6 +93,66 @@ context('Booker management', () => {
       bookerDetailsPage.getBookerReference().contains(activeBookerDetails.reference)
       bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
       bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
+    })
+
+    it('should link a visitor to a booker account', () => {
+      const bookerSearchResult = TestData.bookerSearchResult({ email })
+      const bookerDetails = TestData.bookerDetailedInfo({ email })
+      cy.task('stubGetBookersByEmail', { email, bookers: [bookerSearchResult] })
+      cy.task('stubGetBookerDetails', { reference: bookerDetails.reference, booker: bookerDetails })
+
+      // Home page - select booker management tile
+      const homePage = Page.verifyOnPage(HomePage)
+      homePage.bookerManagementTile().click()
+
+      // Search for booker by email
+      const bookerSearchPage = Page.verifyOnPage(BookerSearchPage)
+      bookerSearchPage.enterEmail(email)
+      bookerSearchPage.search()
+
+      // Booker details page
+      const bookerDetailsPage = Page.verifyOnPage(BookerDetailsPage)
+      bookerDetailsPage.getBookerEmail().contains(email)
+      bookerDetailsPage.getBookerReference().contains(bookerDetails.reference)
+      bookerDetailsPage.getPrisonerHeading(1).contains('Visits to John Smith (A1234BC) at Hewell (HMP)')
+      bookerDetailsPage.getPrisonerVisitorName(1, 1).contains('Jeanette Smith')
+
+      const unlinkedContact = TestData.socialContact({
+        firstName: 'Keith',
+        lastName: 'Williams',
+        visitorId: 1021,
+        dateOfBirth: '1999-01-01',
+      })
+      // List unlinked contacts
+      cy.task('stubGetNonLinkedSocialContacts', {
+        reference: bookerDetails.reference,
+        prisonerId: bookerDetails.permittedPrisoners[0].prisoner.prisonerNumber,
+        socialContacts: [unlinkedContact],
+      })
+      bookerDetailsPage.linkPrisonerVisitor(1)
+      const approvedVisitorListPage = Page.verifyOnPage(ApprovedVisitorListPage)
+      approvedVisitorListPage.getVisitorName(1).contains('Keith Williams')
+      approvedVisitorListPage.getVisitorDob(1).contains('1/1/1999')
+      approvedVisitorListPage.getVisitorLastVisitDate(1).contains('11/10/2025')
+      approvedVisitorListPage.getVisitor(1021).click()
+      approvedVisitorListPage.linkVisitor().click()
+
+      // Link visitor page
+      const linkVisitorPage = Page.verifyOnPage(LinkVisitorPage)
+      linkVisitorPage.getVisitorName().contains('Keith Williams')
+      linkVisitorPage.notifyBooker(2).click()
+
+      cy.task('stubLinkBookerVisitor', {
+        reference: bookerDetails.reference,
+        prisonerId: bookerDetails.permittedPrisoners[0].prisoner.prisonerNumber,
+        visitorId: unlinkedContact.visitorId,
+        sendNotification: false,
+      })
+      linkVisitorPage.submit()
+
+      // booker details page
+      bookerDetailsPage.checkOnPage()
+      bookerDetailsPage.getMessages().contains('Keith Williams has been linked to this booker.')
     })
 
     it('should unlink a visitor from a booker account', () => {
