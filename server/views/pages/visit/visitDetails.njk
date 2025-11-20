@@ -153,9 +153,7 @@
         <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
         <h3 class="govuk-heading-m">
           <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
-          <span class="govuk-body" >
-            (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
-          </span>
+          (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
         </h3>
         <dl class="govuk-list">
           <dt>Location</dt>
