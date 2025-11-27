@@ -514,9 +514,9 @@ export default {
     prisonId = 'HEI',
     notificationCount = TestData.notificationCount(),
   }: {
-    prisonId: string
-    notificationCount: NotificationCount
-  }): SuperAgentRequest => {
+    prisonId?: string
+    notificationCount?: NotificationCount
+  } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

@@ -2,18 +2,20 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  stubTokenVerificationPing: (status = 200): SuperAgentRequest =>
+  // TODO rename 'stubPing' to match template when Cypress removed
+  stubTokenVerificationPing: (httpStatus = 200): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'GET',
         urlPattern: '/verification/health/ping',
       },
       response: {
-        status,
+        status: httpStatus,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: { status: 'UP' },
+        jsonBody: { status: httpStatus === 200 ? 'UP' : 'DOWN' },
       },
     }),
+
   stubVerifyToken: (active = true): SuperAgentRequest =>
     stubFor({
       request: {

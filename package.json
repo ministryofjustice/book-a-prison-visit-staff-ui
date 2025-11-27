@@ -27,6 +27,9 @@
     "int-test": "cypress run --config video=false",
     "int-test-single": "cypress run --config video=false --spec ",
     "int-test-ui": "cypress open",
+    "int-test-playwright": "npx playwright test",
+    "int-test-playwright-ui": "npx playwright test --ui",
+    "int-test-playwright-init:ci": "npx playwright install",
     "clean": "rm -rf dist build node_modules stylesheets"
   },
   "engines": {
@@ -65,6 +68,7 @@
   "devDependencies": {
     "@aws-sdk/types": "^3.936.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.1",
+    "@playwright/test": "^1.57.0",
     "@tsconfig/node24": "^24.0.3",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",

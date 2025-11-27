@@ -1,0 +1,33 @@
+import { Page } from '@playwright/test'
+import tokenVerification from './mockApis/tokenVerification'
+import hmppsAuth, { type UserToken } from './mockApis/hmppsAuth'
+import { resetStubs } from './mockApis/wiremock'
+import bapvUserRoles from '../server/constants/bapvUserRoles'
+import stubComponents from './mockApis/componentApi'
+import TestData from '../server/routes/testutils/testData'
+
+export { resetStubs }
+
+const DEFAULT_ROLES = [`ROLE_${bapvUserRoles.STAFF_USER}`] // TODO sort out ROLE_ prefix
+
+export const attemptHmppsAuthLogin = async (page: Page) => {
+  await page.goto('/')
+  page.locator('h1', { hasText: 'Sign in' })
+  const url = await hmppsAuth.getSignInUrl()
+  await page.goto(url)
+}
+
+export const login = async (
+  page: Page,
+  { name, roles = DEFAULT_ROLES, active = true, authSource = 'nomis' }: UserToken & { active?: boolean } = {},
+) => {
+  await Promise.all([
+    hmppsAuth.favicon(),
+    hmppsAuth.stubSignInPage(),
+    hmppsAuth.stubSignOutPage(),
+    hmppsAuth.token({ name, roles, authSource }),
+    tokenVerification.stubVerifyToken(active),
+    stubComponents({ username: name, caseLoad: TestData.caseLoad() }),
+  ])
+  await attemptHmppsAuthLogin(page)
+}
