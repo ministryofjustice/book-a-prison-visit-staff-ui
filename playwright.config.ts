@@ -39,7 +39,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: process.env.CI ? 'off' : 'on',
     ...devices['Desktop Chrome'],
-    testIdAttribute: 'data-qa',
+    testIdAttribute: 'data-test',
     baseURL: 'http://localhost:3007',
   },
 

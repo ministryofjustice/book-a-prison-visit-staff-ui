@@ -736,9 +736,9 @@ export default {
     prisonId = 'HEI',
     visitRequestCount = TestData.visitRequestCount(),
   }: {
-    prisonId: string
-    visitRequestCount: VisitRequestsCountDto
-  }): SuperAgentRequest => {
+    prisonId?: string
+    visitRequestCount?: VisitRequestsCountDto
+  } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

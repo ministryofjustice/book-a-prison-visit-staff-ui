@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import hmppsAuth from '../mockApis/hmppsAuth'
-// import exampleApi from '../mockApis/exampleApi'
 import orchestrationApi from '../mockApis/orchestration'
 
 import { login, resetStubs } from '../testUtils'
@@ -8,7 +7,6 @@ import HomePage from '../pages-playwright/homePage'
 
 test.describe('SignIn', () => {
   test.beforeEach(async () => {
-    // await exampleApi.stubExampleTime()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
