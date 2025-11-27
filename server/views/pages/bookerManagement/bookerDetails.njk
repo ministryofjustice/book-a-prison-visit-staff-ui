@@ -49,7 +49,7 @@
                 <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/visitor/{{ visitor.visitorId }}/unlink" method="POST" novalidate>
                   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                   {{ govukButton({
-                    html: 'Unlink<span class="govuk-visually-hidden"> ' + visitorName + '</span>',
+                    html: 'Unlink<span class="govuk-visually-hidden"> ' + (visitorName | safe) + '</span>',
                     classes: "bapv-link-button",
                     preventDoubleClick: true,
                     attributes: { "data-test": visitorIndex + "-unlink" }
@@ -59,7 +59,7 @@
 
               {%- set visitorRowItems = (visitorRowItems.push([
                 {
-                  text: visitorName,
+                  text: visitorName | safe,
                   attributes: { "data-test": visitorIndex + "-name" }
                 },
                 {
