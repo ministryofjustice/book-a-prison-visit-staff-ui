@@ -46,7 +46,7 @@ test.describe('Home page', () => {
   test('should render the index page with the booker management tile', async ({ page }) => {
     await orchestrationApi.stubGetPrison(prisonStaffOnly)
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
-    await login(page, { roles: [`ROLE_${bapvUserRoles.STAFF_USER}`, `ROLE_${bapvUserRoles.BOOKER_ADMIN}`] })
+    await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
 
     const homePage = await HomePage.verifyOnPage(page)
 
@@ -57,7 +57,7 @@ test.describe('Home page', () => {
     await orchestrationApi.stubGetPrison(prisonStaffAndPublic)
     await orchestrationApi.stubGetVisitRequestCount({ visitRequestCount })
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
-    await login(page, { roles: [`ROLE_${bapvUserRoles.STAFF_USER}`, `ROLE_${bapvUserRoles.BOOKER_ADMIN}`] })
+    await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
 
     const homePage = await HomePage.verifyOnPage(page)
 

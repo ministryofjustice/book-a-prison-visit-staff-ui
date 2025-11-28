@@ -8,12 +8,14 @@ export interface UserToken {
 }
 
 function createToken(userToken: UserToken) {
+  // authorities in the user token will always be prefixed by ROLE_
+  const authorities = userToken.roles?.map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`)) || []
   const payload = {
     name: userToken.name || 'john smith',
     user_name: 'USER1',
     scope: ['read', 'write'],
     auth_source: 'nomis',
-    authorities: userToken.roles,
+    authorities,
     jti: 'a610a10-cca6-41db-985f-e87efb303aaf',
     client_id: 'clientid',
   }
