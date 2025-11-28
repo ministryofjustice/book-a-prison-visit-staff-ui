@@ -70,7 +70,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1]').text()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
+          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').text().trim()).toBe('Unlink Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
@@ -151,7 +151,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1]').text()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
+          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
@@ -166,7 +166,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2]').text()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
+          expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
@@ -222,7 +222,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1]').text()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
+          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
@@ -237,7 +237,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2]').text()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23/7/1990 (35 years old)')
+          expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
@@ -327,7 +327,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1]').text()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
+          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-action]').length).toBe(0)
 
           // Link visitor - no button

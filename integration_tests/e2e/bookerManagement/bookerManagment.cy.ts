@@ -132,8 +132,8 @@ context('Booker management', () => {
       bookerDetailsPage.linkPrisonerVisitor(1)
       const approvedVisitorListPage = Page.verifyOnPage(ApprovedVisitorListPage)
       approvedVisitorListPage.getVisitorName(1).contains('Keith Williams')
-      approvedVisitorListPage.getVisitorDob(1).contains('1/1/1999')
-      approvedVisitorListPage.getVisitorLastVisitDate(1).contains('11/10/2025')
+      approvedVisitorListPage.getVisitorDob(1).contains('1 January 1999')
+      approvedVisitorListPage.getVisitorLastVisitDate(1).contains('11 October 2025')
       approvedVisitorListPage.getVisitor(1021).click()
       approvedVisitorListPage.linkVisitor().click()
 
