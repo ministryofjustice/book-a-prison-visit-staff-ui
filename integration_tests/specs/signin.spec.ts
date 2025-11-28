@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 import hmppsAuth from '../mockApis/hmppsAuth'
 import orchestrationApi from '../mockApis/orchestration'
 
-import { login, resetStubs } from '../testUtils'
-import HomePage from '../pages-playwright/homePage'
+import { login, resetStubs } from './testUtils'
+import HomePage from './pages-playwright/homePage'
 
 test.describe('SignIn', () => {
   test.beforeEach(async () => {
