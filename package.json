@@ -24,12 +24,11 @@
     "test": "jest",
     "test:ci": "jest --runInBand --coverage",
     "security_audit": "npx audit-ci --config audit-ci.json",
-    "int-test": "cypress run --config video=false",
-    "int-test-single": "cypress run --config video=false --spec ",
-    "int-test-ui": "cypress open",
-    "int-test-playwright": "npx playwright test",
-    "int-test-playwright-ui": "npx playwright test --ui",
-    "int-test-playwright-init:ci": "npx playwright install",
+    "int-test-cypress": "cypress run --config video=false",
+    "int-test-cypress-ui": "cypress open",
+    "int-test": "npx playwright test",
+    "int-test-ui": "npx playwright test --ui",
+    "int-test-init:ci": "npx playwright install",
     "clean": "rm -rf dist build node_modules stylesheets"
   },
   "engines": {
