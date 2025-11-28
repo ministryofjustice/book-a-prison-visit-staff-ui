@@ -67,7 +67,7 @@
                   attributes: { "data-test": visitorIndex + "-relationship" }
                 },
                 {
-                  text : (visitor.dateOfBirth | formatDate('d/M/yyyy')) + " (" + (visitor.dateOfBirth | displayAge) + ")",
+                  text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
                 ({

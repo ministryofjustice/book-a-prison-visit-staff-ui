@@ -30,14 +30,14 @@
       attributes: { "data-test": "visitor-" + loop.index + "-name" }
     },
     {
-      html: (contact.dateOfBirth | formatDate('d/M/yyyy') +
+      html: (contact.dateOfBirth | formatDate +
         " (" + contact.dateOfBirth | displayAge + ")") if contact.dateOfBirth
         else "Not entered",
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-dob" }
     },
     {
-      text: contact.lastApprovedForVisitDate | formatDate('d/M/yyyy') if contact.lastApprovedForVisitDate else "None",
+      text: contact.lastApprovedForVisitDate | formatDate if contact.lastApprovedForVisitDate else "None",
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-last-visit" }
     }

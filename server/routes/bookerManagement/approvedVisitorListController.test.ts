@@ -67,8 +67,8 @@ describe('Booker management - approved visitor list', () => {
           expect($('[data-test=no-dob-warning]').length).toBe(0)
           expect($('[data-test=visitor-1-select] input').val()).toBe('4321')
           expect($('[data-test=visitor-1-name]').text()).toBe('Jeanette Smith')
-          expect($('[data-test=visitor-1-dob]').text()).toBe('28/7/1986 (39 years old)')
-          expect($('[data-test=visitor-1-last-visit]').text()).toBe('11/10/2025')
+          expect($('[data-test=visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
+          expect($('[data-test=visitor-1-last-visit]').text()).toBe('11 October 2025')
 
           expect($('[data-test=link-visitor]').parent('form').attr('action')).toBe(
             `/manage-bookers/${booker.reference}/prisoner/${prisoner.prisonerNumber}/link-visitor`,
