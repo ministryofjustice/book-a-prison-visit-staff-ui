@@ -8,8 +8,7 @@ import TestData from '../server/routes/testutils/testData'
 
 export { resetStubs }
 
-const DEFAULT_ROLES = [`ROLE_${bapvUserRoles.STAFF_USER}`] // TODO sort out ROLE_ prefix
-const DEFAULT_NAME = 'john smith'
+const DEFAULT_ROLES = [bapvUserRoles.STAFF_USER]
 
 export const attemptHmppsAuthLogin = async (page: Page) => {
   await page.goto('/')
@@ -20,12 +19,7 @@ export const attemptHmppsAuthLogin = async (page: Page) => {
 
 export const login = async (
   page: Page,
-  {
-    name = DEFAULT_NAME,
-    roles = DEFAULT_ROLES,
-    active = true,
-    authSource = 'nomis',
-  }: UserToken & { active?: boolean } = {},
+  { name, roles = DEFAULT_ROLES, active = true, authSource = 'nomis' }: UserToken & { active?: boolean } = {},
 ) => {
   await Promise.all([
     hmppsAuth.favicon(),
