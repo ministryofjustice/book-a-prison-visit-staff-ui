@@ -1,10 +1,10 @@
 import { Page } from '@playwright/test'
-import tokenVerification from './mockApis/tokenVerification'
-import hmppsAuth, { type UserToken } from './mockApis/hmppsAuth'
-import { resetStubs } from './mockApis/wiremock'
-import bapvUserRoles from '../server/constants/bapvUserRoles'
-import stubComponents from './mockApis/componentApi'
-import TestData from '../server/routes/testutils/testData'
+import tokenVerification from '../mockApis/tokenVerification'
+import hmppsAuth, { type UserToken } from '../mockApis/hmppsAuth'
+import { resetStubs } from '../mockApis/wiremock'
+import bapvUserRoles from '../../server/constants/bapvUserRoles'
+import stubComponents from '../mockApis/componentApi'
+import TestData from '../../server/routes/testutils/testData'
 
 export { resetStubs }
 
