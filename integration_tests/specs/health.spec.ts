@@ -37,7 +37,7 @@ test.describe('Health', () => {
     })
 
     test('Info is accessible and should contain activeAgencies', async ({ page }) => {
-      await orchestrationApi.stubSupportedPrisonIds()
+      await Promise.all([hmppsAuth.token({}), orchestrationApi.stubSupportedPrisonIds()])
 
       const response = await page.request.get('/info')
       const payload = await response.json()
@@ -46,7 +46,7 @@ test.describe('Health', () => {
     })
 
     test('Info returns 503 Service unavailable if there is an error getting activeAgencies', async ({ page }) => {
-      await orchestrationApi.stubSupportedPrisonIdsError()
+      await Promise.all([hmppsAuth.token({}), orchestrationApi.stubSupportedPrisonIdsError()])
 
       const response = await page.request.get('/info')
       expect(response.status()).toBe(503)
