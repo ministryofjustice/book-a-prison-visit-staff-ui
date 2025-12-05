@@ -150,6 +150,9 @@ export default {
         ).split(',')
       ),
     },
+    visitorRequests: {
+      enabled: get('FEATURE_VISITOR_REQUESTS', 'false') === 'true',
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: translateEnvironment(get('ENVIRONMENT_NAME', '')),

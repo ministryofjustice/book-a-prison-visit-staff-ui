@@ -333,6 +333,11 @@ export default class OrchestrationApiClient {
     }
   }
 
+  async getVisitorRequestCount(_prisonId: string): Promise<{ count: number }> {
+    // TODO add test and real API when it's implemented
+    return { count: 1 }
+  }
+
   // visit notification controller
   async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
     return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })

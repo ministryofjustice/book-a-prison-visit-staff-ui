@@ -139,4 +139,17 @@ describe('Booker service', () => {
       expect(orchestrationApiClient.unlinkBookerVisitor).toHaveBeenCalledWith({ reference, prisonerId, visitorId })
     })
   })
+
+  describe('getVisitorRequestCount', () => {
+    it('should return count of visitor requests awaiting approval', async () => {
+      const prisonId = 'HEI'
+      const count = 2
+      orchestrationApiClient.getVisitorRequestCount.mockResolvedValue({ count })
+
+      const result = await bookerService.getVisitorRequestCount({ username, prisonId })
+
+      expect(result).toBe(count)
+      expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId)
+    })
+  })
 })

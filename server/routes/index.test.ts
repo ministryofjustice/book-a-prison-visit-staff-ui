@@ -4,10 +4,15 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
-import { createMockVisitNotificationsService, createMockVisitRequestsService } from '../services/testutils/mocks'
+import {
+  createMockBookerService,
+  createMockVisitNotificationsService,
+  createMockVisitRequestsService,
+} from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
+import { setFeature } from '../data/testutils/mockFeature'
 
 let app: Express
 
@@ -19,20 +24,27 @@ describe('GET /', () => {
   let sessionData: SessionData
   let selectedEstablishment: SessionData['selectedEstablishment']
 
+  const bookerService = createMockBookerService()
   const visitNotificationsService = createMockVisitNotificationsService()
   const visitRequestsService = createMockVisitRequestsService()
-  let visitRequestCount = TestData.visitRequestCount()
-  let notificationCount = TestData.notificationCount()
+
+  const visitorRequestCount = 10
+  const notificationCount = TestData.notificationCount()
+  const visitRequestCount = TestData.visitRequestCount()
 
   beforeEach(() => {
     populateCurrentUser()
     selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 
-    app = appWithAllRoutes({ services: { visitNotificationsService, visitRequestsService }, sessionData })
+    app = appWithAllRoutes({
+      services: { bookerService, visitNotificationsService, visitRequestsService },
+      sessionData,
+    })
 
-    visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+    bookerService.getVisitorRequestCount.mockResolvedValue(visitorRequestCount)
     visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
+    visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
   })
 
   it('should render the home page cards', () => {
@@ -61,6 +73,7 @@ describe('GET /', () => {
         expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
         expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
 
+        expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
         expect(visitRequestsService.getVisitRequestCount).not.toHaveBeenCalled()
         expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(
           'user1',
@@ -89,8 +102,7 @@ describe('GET /', () => {
     })
 
     it('should not render badge if visit request count is zero', () => {
-      visitRequestCount = TestData.visitRequestCount({ count: 0 })
-      visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(TestData.visitRequestCount({ count: 0 }))
 
       return request(app)
         .get('/')
@@ -102,8 +114,7 @@ describe('GET /', () => {
     })
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
-      visitRequestCount = TestData.visitRequestCount({ count: 100 })
-      visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(TestData.visitRequestCount({ count: 100 }))
 
       return request(app)
         .get('/')
@@ -127,8 +138,7 @@ describe('GET /', () => {
     })
 
     it('should not render badge if review count is zero', () => {
-      notificationCount = TestData.notificationCount({ count: 0 })
-      visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
+      visitNotificationsService.getNotificationCount.mockResolvedValue(TestData.notificationCount({ count: 0 }))
 
       return request(app)
         .get('/')
@@ -140,8 +150,7 @@ describe('GET /', () => {
     })
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
-      notificationCount = TestData.notificationCount({ count: 100 })
-      visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
+      visitNotificationsService.getNotificationCount.mockResolvedValue(TestData.notificationCount({ count: 100 }))
 
       return request(app)
         .get('/')
@@ -164,15 +173,19 @@ describe('GET /', () => {
 
           expect($('[data-test="booker-management"] .card__link').text()).toBe('')
           expect($('[data-test="booker-management"] .card__link').attr('href')).toBe(undefined)
+          expect($('[data-test="visitor-request-count"]').text()).toBe('')
+
+          expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
         })
     })
 
     it('should render tile if role is present', () => {
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
-        services: { visitNotificationsService, visitRequestsService },
+        services: { bookerService, visitNotificationsService, visitRequestsService },
         sessionData,
       })
+
       return request(app)
         .get('/')
         .expect('Content-Type', /html/)
@@ -182,6 +195,31 @@ describe('GET /', () => {
 
           expect($('[data-test="booker-management"] .card__link').text()).toBe('Manage online bookers')
           expect($('[data-test="booker-management"] .card__link').attr('href')).toBe('/manage-bookers/search')
+          expect($('[data-test="visitor-request-count"]').text()).toBe('')
+
+          expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should render tile with visitor request count badge if feature enabled and role is present', () => {
+      setFeature('visitorRequests', { enabled: true })
+
+      app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
+        services: { bookerService, visitNotificationsService, visitRequestsService },
+        sessionData,
+      })
+
+      return request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.card').length).toBe(6)
+
+          expect($('[data-test="visitor-request-count"]').text()).toBe('10')
+
+          expect(bookerService.getVisitorRequestCount).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
         })
     })
   })

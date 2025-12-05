@@ -22,6 +22,8 @@ generic-service:
     REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
 
+    FEATURE_VISITOR_REQUESTS: "true"
+
   allowlist:
     groups:
       - internal

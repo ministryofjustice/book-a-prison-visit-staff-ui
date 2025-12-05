@@ -26,50 +26,50 @@
       <ul class="govuk-grid-row card-group">
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/search/prisoner",
-            "clickable": "true",
-            "heading": "Book or change a visit",
-            "description": "Create, update or cancel a booking",
-            "id": "book-or-change-visit"
+            href: "/search/prisoner",
+            clickable: "true",
+            heading: "Book or change a visit",
+            description: "Create, update or cancel a booking",
+            id: "book-or-change-visit"
           }) }}
         </li>
 
         {% if showRequestedVisitsTile %}
           <li class="govuk-grid-column-one-third card-group__item">
             {{ card({
-              "href": "/requested-visits",
-              "clickable": "true",
-              "heading":
+              href: "/requested-visits",
+              clickable: "true",
+              heading:
                 '<span class="bapv-nowrap">Requested visits' +
-                  notificationCountBadge(requestCount, "visit-request-count") +
+                  notificationCountBadge(visitRequestCount, "visit-request-count") +
                   "</span>" +
                 "</span>",
-              "description": "Check requests from online bookers",
-              "id": "visit-requests"
+              description: "Check requests from online bookers",
+              id: "visit-requests"
             }) }}
           </li>
         {% endif %}
 
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/review",
-            "clickable": "true",
-            "heading":
+            href: "/review",
+            clickable: "true",
+            heading:
               '<span class="bapv-nowrap">Visits that need review' +
-                notificationCountBadge(reviewCount, "need-review-count") +
+                notificationCountBadge(visitReviewCount, "need-review-count") +
               "</span>",
-            "description": "Review visits where details have changed since approval",
-            "id": "need-review"
+            description: "Review visits where details have changed since approval",
+            id: "need-review"
           }) }}
         </li>
 
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/visits",
-            "clickable": "true",
-            "heading": "View visits by date",
-            "description": "Select a date and see bookings",
-            "id": "view-visits-by-date"
+            href: "/visits",
+            clickable: "true",
+            heading: "View visits by date",
+            description: "Select a date and see bookings",
+            id: "view-visits-by-date"
           }) }}
         </li>
       </ul>
@@ -81,32 +81,35 @@
         {% if showBookerManagementTile %}
           <li class="govuk-grid-column-one-third card-group__item">
             {{ card({
-              "href": "/manage-bookers/search",
-              "clickable": "true",
-              "heading": "Manage online bookers",
-              "description": "Link visitors to public booker accounts",
-              "id": "booker-management"
+              href: "/manage-bookers/search",
+              clickable: "true",
+              heading:
+                '<span class="bapv-nowrap">Manage online bookers' +
+                  notificationCountBadge(visitorRequestCount, "visitor-request-count") +
+                "</span>",
+              description: "Link visitors to public booker accounts",
+              id: "booker-management"
             }) }}
           </li>
         {% endif %}
 
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/timetable",
-            "clickable": "true",
-            "heading": "Visits timetable",
-            "description": "Check and request changes to the social visits timetable",
-            "id": "view-timetable"
+            href: "/timetable",
+            clickable: "true",
+            heading: "Visits timetable",
+            description: "Check and request changes to the social visits timetable",
+            id: "view-timetable"
           }) }}
         </li>
 
         <li class="govuk-grid-column-one-third card-group__item">
           {{ card({
-            "href": "/block-visit-dates",
-            "clickable": "true",
-            "heading": "Block visit dates",
-            "description": "Block or unblock dates for social visits",
-            "id": "block-dates"
+            href: "/block-visit-dates",
+            clickable: "true",
+            heading: "Block visit dates",
+            description: "Block or unblock dates for social visits",
+            id: "block-dates"
           }) }}
         </li>
       </ul>
