@@ -179,7 +179,7 @@ describe('GET /', () => {
         })
     })
 
-    it('should render tile if role is present', () => {
+    it('should render tile if role is present and with no count for a non-public-enabled prison', () => {
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
         services: { bookerService, visitNotificationsService, visitRequestsService },
@@ -201,8 +201,9 @@ describe('GET /', () => {
         })
     })
 
-    it('should render tile with visitor request count badge if feature enabled and role is present', () => {
+    it('should render tile with visitor request count badge if feature enabled, prison is public-enabled and role is present', () => {
       setFeature('visitorRequests', { enabled: true })
+      selectedEstablishment.isEnabledForPublic = true
 
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
@@ -215,7 +216,7 @@ describe('GET /', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.card').length).toBe(6)
+          expect($('.card').length).toBe(7)
 
           expect($('[data-test="visitor-request-count"]').text()).toBe('10')
 
