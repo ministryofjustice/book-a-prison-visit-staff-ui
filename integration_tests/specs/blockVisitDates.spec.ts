@@ -37,10 +37,10 @@ test.describe('Block visit dates', () => {
     await blockedDatesPage.verifyHeading('Blocked dates', 2)
     await expect(blockedDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
 
-    // select first available date in next month
+    // select the 1st day of next month
     await blockedDatesPage.datePicker.toggleCalendar()
     await blockedDatesPage.datePicker.goToNextMonth()
-    await blockedDatesPage.datePicker.selectFirstAvailableDay()
+    await blockedDatesPage.datePicker.selectDay(1)
 
     // Stub booked visits count
     await orchestrationApi.stubGetBookedVisitCountByDate({

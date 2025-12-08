@@ -1,7 +1,7 @@
-import { Locator, Page, expect } from '@playwright/test'
+import { Locator, Page } from '@playwright/test'
 
 export default class DatePickerComponent {
-  private page: Page
+  constructor(private page: Page) {}
 
   private inputSelector = '.moj-js-datepicker-input'
 
@@ -9,7 +9,7 @@ export default class DatePickerComponent {
 
   private cancelSelector = '.moj-js-datepicker-cancel'
 
-  private daySelector = 'button.moj-datepicker__button.moj-datepicker__calendar-day'
+  private daySelector = 'button.moj-datepicker__button.moj-datepicker__calendar-day:visible'
 
   private prevMonthSelector = '.moj-js-datepicker-prev-month'
 
@@ -19,12 +19,14 @@ export default class DatePickerComponent {
 
   private nextYearSelector = '.moj-js-datepicker-next-year'
 
-  constructor(page: Page) {
-    this.page = page
-  }
+  private calendarDialogSelector = 'dialog[role="dialog"]'
 
+  /** Enter date manually into the input */
   async enterDate(date: string): Promise<void> {
-    await this.page.locator(this.cancelSelector).click({ force: true })
+    const cancelBtn = this.page.locator(this.cancelSelector)
+    if (await cancelBtn.isVisible()) {
+      await cancelBtn.click({ force: true })
+    }
     const input = this.page.locator(this.inputSelector)
     await input.fill('')
     await input.type(date)
@@ -35,44 +37,45 @@ export default class DatePickerComponent {
     return this.page.locator(this.inputSelector)
   }
 
-  // Select a specific day number
-  async selectDay(day: number): Promise<void> {
-    const dayButton = this.page.locator(this.daySelector, { hasText: new RegExp(`^${day}$`) }).first()
+  async toggleCalendar(): Promise<void> {
+    const calendarTitle = this.page.locator('#datepicker-title-date')
 
-    await dayButton.waitFor({ state: 'visible' })
-    await expect(dayButton).toBeEnabled()
-    await dayButton.click()
+    // Only click toggle if the calendar is not visible
+    if (!(await calendarTitle.isVisible())) {
+      // Click the toggle button to open the calendar
+      await this.page.locator(this.toggleSelector).click({ force: true })
+
+      // Wait for the title of the calendar to appear, indicating that the dialog is visible
+      await calendarTitle.waitFor({ state: 'visible', timeout: 5000 })
+    }
   }
 
-  // Select the first enabled day in the current visible calendar
-  async selectFirstAvailableDay(): Promise<void> {
-    const firstEnabled = this.page.locator(`${this.daySelector}:not([disabled])`).first()
-    await firstEnabled.waitFor({ state: 'visible' })
-    await firstEnabled.click()
-  }
-
+  /** Navigate calendar */
   async goToPreviousMonth(): Promise<void> {
     await this.page.locator(this.prevMonthSelector).click()
-    await this.page.waitForTimeout(150)
-  }
-
-  async goToNextMonth(): Promise<void> {
-    await this.page.locator(this.nextMonthSelector).click()
-    await this.page.waitForTimeout(150)
   }
 
   async goToPreviousYear(): Promise<void> {
     await this.page.locator(this.prevYearSelector).click()
-    await this.page.waitForTimeout(150)
   }
 
   async goToNextYear(): Promise<void> {
     await this.page.locator(this.nextYearSelector).click()
-    await this.page.waitForTimeout(150)
   }
 
-  async toggleCalendar(): Promise<void> {
-    await this.page.locator(this.toggleSelector).click()
-    await this.page.waitForTimeout(100) // allow calendar to render
+  async selectDay(day: number): Promise<void> {
+    const dayButton = this.page.locator(this.daySelector, { hasText: `${day}` }).first()
+
+    // Wait for the button to be visible (this is crucial in case the calendar takes time to render)
+    await dayButton.waitFor({ state: 'visible', timeout: 10000 })
+
+    // Simply click on the button
+    await dayButton.click()
+  }
+
+  async goToNextMonth(): Promise<void> {
+    const btn = this.page.locator(this.nextMonthSelector)
+    await btn.waitFor({ state: 'visible' })
+    await btn.click()
   }
 }
