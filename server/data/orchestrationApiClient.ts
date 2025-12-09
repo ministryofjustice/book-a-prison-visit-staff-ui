@@ -33,6 +33,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitorRequestsCountByPrisonCodeDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestsCountDto,
@@ -333,9 +334,12 @@ export default class OrchestrationApiClient {
     }
   }
 
-  async getVisitorRequestCount(_prisonId: string): Promise<{ count: number }> {
-    // TODO add test and real API when it's implemented
-    return { count: 1 }
+  async getVisitorRequestCount(prisonId: string): Promise<number> {
+    return (
+      await this.restClient.get<VisitorRequestsCountByPrisonCodeDto>({
+        path: `/prison/${prisonId}/visitor-requests/count`,
+      })
+    ).count
   }
 
   // visit notification controller

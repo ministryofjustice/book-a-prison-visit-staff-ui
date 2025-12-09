@@ -111,6 +111,6 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return (await orchestrationApiClient.getVisitorRequestCount(prisonId)).count
+    return orchestrationApiClient.getVisitorRequestCount(prisonId)
   }
 }
