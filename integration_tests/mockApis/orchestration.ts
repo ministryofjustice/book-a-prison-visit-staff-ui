@@ -614,7 +614,7 @@ export default {
     prisonId = 'HEI',
     blockedDates = [],
   }: {
-    prisonId: string
+    prisonId?: string
     blockedDates: ExcludeDateDto[]
   }): SuperAgentRequest => {
     return stubFor({

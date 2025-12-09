@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test'
 import { format } from 'date-fns'
-import orchestrationApi from '../mockApis/orchestration'
-import { login, resetStubs } from '../testUtils'
-import HomePage from '../pages-playwright/homePage'
-import BlockVisitDateConfirmationPage from '../pages-playwright/blockVisitConfirmationPage'
-import BlockVisitDatesPage from '../pages-playwright/blockVisitDatesPage'
-import TestData from '../../server/routes/testutils/testData'
+import orchestrationApi from '../../mockApis/orchestration'
+import { login, resetStubs } from '../../testUtils'
+import HomePage from '../../pages-playwright/homePage'
+import BlockVisitDateConfirmationPage from '../../pages-playwright/blockVisitDates/blockVisitConfirmationPage'
+import BlockVisitDatesPage from '../../pages-playwright/blockVisitDates/blockVisitDatesPage'
+import TestData from '../../../server/routes/testutils/testData'
 
 test.describe('Block visit dates', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -27,7 +27,7 @@ test.describe('Block visit dates', () => {
   })
 
   test('should block a new date', async ({ page }) => {
-    await orchestrationApi.stubGetFutureBlockedDates({ prisonId: 'HEI', blockedDates: [] })
+    await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] })
     await login(page)
     const homePage = await HomePage.verifyOnPage(page)
     await homePage.blockDatesTile.click()

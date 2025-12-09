@@ -19,7 +19,7 @@ export default class DatePickerComponent {
 
   private nextYearSelector = '.moj-js-datepicker-next-year'
 
-  private calendarDialogSelector = 'dialog[role="dialog"]'
+  // private calendarDialogSelector = 'dialog[role="dialog"]'
 
   /** Enter date manually into the input */
   async enterDate(date: string): Promise<void> {
@@ -29,7 +29,7 @@ export default class DatePickerComponent {
     }
     const input = this.page.locator(this.inputSelector)
     await input.fill('')
-    await input.type(date)
+    await input.fill(date)
     await this.toggleCalendar()
   }
 

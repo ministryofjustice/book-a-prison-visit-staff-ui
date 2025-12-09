@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test'
-import AbstractPage from './abstractPage'
-import DatePickerComponent from './components-playwright/datePicker'
+import AbstractPage from '../abstractPage'
+import DatePickerComponent from '../components-playwright/datePicker'
 
 export default class BlockVisitDatesPage extends AbstractPage {
   readonly datePicker: DatePickerComponent
