@@ -144,7 +144,7 @@ describe('Booker service', () => {
     it('should return count of visitor requests awaiting approval', async () => {
       const prisonId = 'HEI'
       const count = 2
-      orchestrationApiClient.getVisitorRequestCount.mockResolvedValue({ count })
+      orchestrationApiClient.getVisitorRequestCount.mockResolvedValue(count)
 
       const result = await bookerService.getVisitorRequestCount({ username, prisonId })
 

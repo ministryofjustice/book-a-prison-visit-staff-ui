@@ -1,10 +1,5 @@
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import {
-  IgnoreVisitNotificationsDto,
-  NotificationCount,
-  Visit,
-  VisitNotifications,
-} from '../data/orchestrationApiTypes'
+import { IgnoreVisitNotificationsDto, Visit, VisitNotifications } from '../data/orchestrationApiTypes'
 
 export default class VisitNotificationsService {
   constructor(
@@ -12,7 +7,7 @@ export default class VisitNotificationsService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getNotificationCount(username: string, prisonId: string): Promise<NotificationCount> {
+  async getNotificationCount(username: string, prisonId: string): Promise<number> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 

@@ -24,7 +24,7 @@ context('Bookings review listing page', () => {
     }),
   ]
 
-  const notificationCount = TestData.notificationCount({ count: visitNotifications.length })
+  const notificationCount = visitNotifications.length
 
   beforeEach(() => {
     cy.task('reset')
@@ -40,7 +40,7 @@ context('Bookings review listing page', () => {
 
     // 'Need review' tile and count
     homePage.needReviewTile().contains('Visits that need review')
-    homePage.needReviewBadgeCount().contains(notificationCount.count)
+    homePage.needReviewBadgeCount().contains(notificationCount)
 
     // booking review listing page
     cy.task('stubGetVisitNotifications', { visitNotifications })

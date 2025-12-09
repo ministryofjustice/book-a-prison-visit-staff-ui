@@ -1,5 +1,5 @@
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import { VisitRequestResponse, VisitRequestsCountDto, VisitRequestSummary } from '../data/orchestrationApiTypes'
+import { VisitRequestResponse, VisitRequestSummary } from '../data/orchestrationApiTypes'
 
 export default class VisitRequestsService {
   constructor(
@@ -28,7 +28,7 @@ export default class VisitRequestsService {
     return orchestrationApiClient.getVisitRequests(prisonId)
   }
 
-  async getVisitRequestCount(username: string, prisonId: string): Promise<VisitRequestsCountDto> {
+  async getVisitRequestCount(username: string, prisonId: string): Promise<number> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 

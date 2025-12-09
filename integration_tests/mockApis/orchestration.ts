@@ -10,7 +10,6 @@ import {
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
-  NotificationCount,
   PrisonDto,
   PrisonerProfileDto,
   SessionCapacity,
@@ -21,7 +20,6 @@ import {
   VisitNotificationsRaw,
   VisitPreview,
   VisitRequestResponse,
-  VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSessionsAndScheduleDto,
 } from '../../server/data/orchestrationApiTypes'
@@ -483,6 +481,26 @@ export default {
     })
   },
 
+  stubGetVisitorRequestCount: ({
+    prisonId = 'HEI',
+    visitorRequestCount = 4,
+  }: {
+    prisonId?: string
+    visitorRequestCount?: number
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/prison/${prisonId}/visitor-requests/count`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: { count: visitorRequestCount },
+      },
+    })
+  },
+
   stubIgnoreNotifications: ({
     ignoreVisitNotificationsDto,
     visit,
@@ -512,10 +530,10 @@ export default {
   },
   stubGetNotificationCount: ({
     prisonId = 'HEI',
-    notificationCount = TestData.notificationCount(),
+    notificationCount = 5,
   }: {
     prisonId?: string
-    notificationCount?: NotificationCount
+    notificationCount?: number
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -525,7 +543,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: notificationCount,
+        jsonBody: { count: notificationCount },
       },
     })
   },
@@ -734,10 +752,10 @@ export default {
 
   stubGetVisitRequestCount: ({
     prisonId = 'HEI',
-    visitRequestCount = TestData.visitRequestCount(),
+    visitRequestCount = 3,
   }: {
     prisonId?: string
-    visitRequestCount?: VisitRequestsCountDto
+    visitRequestCount?: number
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -747,7 +765,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitRequestCount,
+        jsonBody: { count: visitRequestCount },
       },
     })
   },
