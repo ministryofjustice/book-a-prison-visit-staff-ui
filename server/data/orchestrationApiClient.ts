@@ -347,11 +347,13 @@ export default class OrchestrationApiClient {
     return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })
   }
 
-  async getNotificationCount(prisonId: string): Promise<NotificationCount> {
-    return this.restClient.get({
-      path: `/visits/notification/${prisonId}/count`,
-      query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
-    })
+  async getNotificationCount(prisonId: string): Promise<number> {
+    return (
+      await this.restClient.get<NotificationCount>({
+        path: `/visits/notification/${prisonId}/count`,
+        query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+      })
+    ).count
   }
 
   async getVisitNotifications(prisonId: string): Promise<VisitNotifications[]> {
@@ -432,8 +434,8 @@ export default class OrchestrationApiClient {
     return this.restClient.get({ path: `/visits/requests/${prisonCode}` })
   }
 
-  async getVisitRequestCount(prisonCode: string): Promise<VisitRequestsCountDto> {
-    return this.restClient.get({ path: `/visits/requests/${prisonCode}/count` })
+  async getVisitRequestCount(prisonCode: string): Promise<number> {
+    return (await this.restClient.get<VisitRequestsCountDto>({ path: `/visits/requests/${prisonCode}/count` })).count
   }
 
   // orchestration-sessions-controller

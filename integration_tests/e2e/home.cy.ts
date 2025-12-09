@@ -12,8 +12,8 @@ context('Home page', () => {
     ],
   })
 
-  const visitRequestCount = TestData.visitRequestCount()
-  const notificationCount = TestData.notificationCount()
+  const visitRequestCount = 3
+  const notificationCount = 5
 
   beforeEach(() => {
     cy.task('reset')
@@ -31,7 +31,7 @@ context('Home page', () => {
     homePage.bookOrChangeVisitTile().contains('Book or change a visit')
     homePage.visitRequestsTile().should('not.exist')
     homePage.needReviewTile().contains('Visits that need review')
-    homePage.needReviewBadgeCount().contains(notificationCount.count)
+    homePage.needReviewBadgeCount().contains(notificationCount)
     homePage.viewVisitsTile().contains('View visits by date')
     homePage.viewTimetableTile().contains('Visits timetable')
     homePage.blockDatesTile().contains('Block visit dates')
@@ -68,9 +68,9 @@ context('Home page', () => {
 
     homePage.bookOrChangeVisitTile().contains('Book or change a visit')
     homePage.visitRequestsTile().contains('Requested visits')
-    homePage.visitRequestsBadgeCount().contains(visitRequestCount.count)
+    homePage.visitRequestsBadgeCount().contains(visitRequestCount)
     homePage.needReviewTile().contains('Visits that need review')
-    homePage.needReviewBadgeCount().contains(notificationCount.count)
+    homePage.needReviewBadgeCount().contains(notificationCount)
     homePage.viewVisitsTile().contains('View visits by date')
     homePage.viewTimetableTile().contains('Visits timetable')
     homePage.blockDatesTile().contains('Block visit dates')

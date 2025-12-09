@@ -15,8 +15,9 @@ test.describe('Home page', () => {
     ],
   })
 
-  const visitRequestCount = TestData.visitRequestCount()
-  const notificationCount = TestData.notificationCount()
+  const visitRequestCount = 3
+  const visitorRequestCount = 3
+  const notificationCount = 5
 
   test.beforeEach(async () => {
     await orchestrationApi.stubSupportedPrisonIds()
@@ -36,7 +37,7 @@ test.describe('Home page', () => {
     await expect(homePage.bookOrChangeVisitTile).toContainText('Book or change a visit')
     await expect(homePage.visitRequestsTile).toHaveCount(0)
     await expect(homePage.needReviewTile).toContainText('Visits that need review')
-    await expect(homePage.needReviewBadgeCount).toContainText(notificationCount.count.toString())
+    await expect(homePage.needReviewBadgeCount).toContainText(notificationCount.toString())
     await expect(homePage.viewVisitsTile).toContainText('View visits by date')
     await expect(homePage.viewTimetableTile).toContainText('Visits timetable')
     await expect(homePage.bookerManagementTile).toHaveCount(0)
@@ -56,6 +57,7 @@ test.describe('Home page', () => {
   test('should render the index page with the correct tiles (inc visit requests) - PUBLIC prison', async ({ page }) => {
     await orchestrationApi.stubGetPrison(prisonStaffAndPublic)
     await orchestrationApi.stubGetVisitRequestCount({ visitRequestCount })
+    await orchestrationApi.stubGetVisitorRequestCount({ visitorRequestCount })
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
     await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
 
@@ -63,9 +65,9 @@ test.describe('Home page', () => {
 
     await expect(homePage.bookOrChangeVisitTile).toContainText('Book or change a visit')
     await expect(homePage.visitRequestsTile).toContainText('Requested visits')
-    await expect(homePage.visitRequestsBadgeCount).toContainText(visitRequestCount.count.toString())
+    await expect(homePage.visitRequestsBadgeCount).toContainText(visitRequestCount.toString())
     await expect(homePage.needReviewTile).toContainText('Visits that need review')
-    await expect(homePage.needReviewBadgeCount).toContainText(notificationCount.count.toString())
+    await expect(homePage.needReviewBadgeCount).toContainText(notificationCount.toString())
     await expect(homePage.viewVisitsTile).toContainText('View visits by date')
     await expect(homePage.viewTimetableTile).toContainText('Visits timetable')
     await expect(homePage.bookerManagementTile).toContainText('Manage online bookers')

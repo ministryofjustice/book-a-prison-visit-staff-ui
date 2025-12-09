@@ -29,8 +29,8 @@ describe('GET /', () => {
   const visitRequestsService = createMockVisitRequestsService()
 
   const visitorRequestCount = 10
-  const notificationCount = TestData.notificationCount()
-  const visitRequestCount = TestData.visitRequestCount()
+  const notificationCount = 5
+  const visitRequestCount = 3
 
   beforeEach(() => {
     populateCurrentUser()
@@ -93,7 +93,7 @@ describe('GET /', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="visit-request-count"]').text()).toBe(visitRequestCount.count.toString())
+          expect($('[data-test="visit-request-count"]').text()).toBe(visitRequestCount.toString())
           expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(
             'user1',
             selectedEstablishment.prisonId,
@@ -102,7 +102,7 @@ describe('GET /', () => {
     })
 
     it('should not render badge if visit request count is zero', () => {
-      visitRequestsService.getVisitRequestCount.mockResolvedValue(TestData.visitRequestCount({ count: 0 }))
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(0)
 
       return request(app)
         .get('/')
@@ -114,7 +114,7 @@ describe('GET /', () => {
     })
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
-      visitRequestsService.getVisitRequestCount.mockResolvedValue(TestData.visitRequestCount({ count: 100 }))
+      visitRequestsService.getVisitRequestCount.mockResolvedValue(100)
 
       return request(app)
         .get('/')
@@ -133,12 +133,12 @@ describe('GET /', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="need-review-count"]').text()).toBe(notificationCount.count.toString())
+          expect($('[data-test="need-review-count"]').text()).toBe(notificationCount.toString())
         })
     })
 
     it('should not render badge if review count is zero', () => {
-      visitNotificationsService.getNotificationCount.mockResolvedValue(TestData.notificationCount({ count: 0 }))
+      visitNotificationsService.getNotificationCount.mockResolvedValue(0)
 
       return request(app)
         .get('/')
@@ -150,7 +150,7 @@ describe('GET /', () => {
     })
 
     it('should render badge with value of "99+" if review count is greater than 99', () => {
-      visitNotificationsService.getNotificationCount.mockResolvedValue(TestData.notificationCount({ count: 100 }))
+      visitNotificationsService.getNotificationCount.mockResolvedValue(100)
 
       return request(app)
         .get('/')

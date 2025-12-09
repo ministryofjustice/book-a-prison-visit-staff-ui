@@ -23,8 +23,6 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationEvent,
   VisitNotificationEventRaw,
-  VisitorRequestsCountByPrisonCodeDto,
-  VisitRequestsCountDto,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
@@ -587,12 +585,12 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitorRequestCount', () => {
     it('should return visitor request count for given prison', async () => {
-      const requestCount: VisitorRequestsCountByPrisonCodeDto = { count: 2 }
+      const count = 2
 
       fakeOrchestrationApi
         .get(`/prison/${prisonId}/visitor-requests/count`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, requestCount)
+        .reply(200, { count })
 
       const result = await orchestrationApiClient.getVisitorRequestCount(prisonId)
       expect(result).toBe(2)
@@ -623,18 +621,18 @@ describe('orchestrationApiClient', () => {
 
   describe('getNotificationCount', () => {
     it('should return notification count for given prison for enabled notification types', async () => {
-      const notificationCount = TestData.notificationCount()
+      const count = 5
       const { enabledRawNotifications } = config.features.notificationTypes
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/count`)
         .query(new URLSearchParams({ types: enabledRawNotifications }))
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, notificationCount)
+        .reply(200, { count })
 
       const output = await orchestrationApiClient.getNotificationCount(prisonId)
 
-      expect(output).toEqual(notificationCount)
+      expect(output).toBe(count)
     })
   })
 
@@ -800,16 +798,16 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitRequestCount', () => {
     it('should count of visit requests for given prison', async () => {
-      const count: VisitRequestsCountDto = { count: 1 }
+      const count = 1
 
       fakeOrchestrationApi
         .get(`/visits/requests/${prisonId}/count`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, count)
+        .reply(200, { count })
 
       const output = await orchestrationApiClient.getVisitRequestCount(prisonId)
 
-      expect(output).toStrictEqual(count)
+      expect(output).toBe(count)
     })
   })
 

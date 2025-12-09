@@ -64,13 +64,13 @@ describe('Visit requests service', () => {
 
   describe('getVisitRequestCount', () => {
     it('should return visit request count for given prison', async () => {
-      const visitRequestCount = TestData.visitRequestCount()
+      const visitRequestCount = 3
       orchestrationApiClient.getVisitRequestCount.mockResolvedValue(visitRequestCount)
 
       const result = await visitRequestsService.getVisitRequestCount('user', prisonId)
 
       expect(orchestrationApiClient.getVisitRequestCount).toHaveBeenCalledWith(prisonId)
-      expect(result).toStrictEqual(visitRequestCount)
+      expect(result).toBe(visitRequestCount)
     })
   })
 })

@@ -21,8 +21,8 @@ context('Process a visit Request', () => {
     cy.task('stubSupportedPrisonIds')
     cy.task('stubGetPrison', prisonStaffAndPublic)
 
-    cy.task('stubGetVisitRequestCount', { visitRequestCount: TestData.visitRequestCount({ count: 1 }) })
-    cy.task('stubGetNotificationCount', { notificationCount: TestData.notificationCount({ count: 0 }) })
+    cy.task('stubGetVisitRequestCount', { visitRequestCount: 1 })
+    cy.task('stubGetNotificationCount', { notificationCount: 0 })
     cy.signIn()
   })
 

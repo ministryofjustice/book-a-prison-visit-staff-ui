@@ -15,11 +15,11 @@ export default function routes({ bookerService, visitNotificationsService, visit
     // Requested visits tile and count (public-enabled prisons only)
     const showRequestedVisitsTile = prison.isEnabledForPublic
     const visitRequestCount = showRequestedVisitsTile
-      ? (await visitRequestsService.getVisitRequestCount(username, prison.prisonId)).count
+      ? await visitRequestsService.getVisitRequestCount(username, prison.prisonId)
       : null
 
     // Visits needing review count (all prisons)
-    const visitReviewCount = (await visitNotificationsService.getNotificationCount(username, prison.prisonId)).count
+    const visitReviewCount = await visitNotificationsService.getNotificationCount(username, prison.prisonId)
 
     // Manage online bookers tile (users with ADMIN role) and visitor requests count (pubic-enabled prisons only)
     const showBookerManagementTile = userRoles.includes(bapvUserRoles.BOOKER_ADMIN)

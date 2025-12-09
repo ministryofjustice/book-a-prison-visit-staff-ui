@@ -5,7 +5,6 @@ import {
   BookerDetailedInfoDto,
   BookerSearchResultsDto,
   ExcludeDateDto,
-  NotificationCount,
   OffenderRestriction,
   PrisonDto,
   PrisonerProfileDto,
@@ -23,7 +22,6 @@ import {
   VisitNotificationsRaw,
   VisitPreview,
   VisitRequestResponse,
-  VisitRequestsCountDto,
   VisitRequestSummary,
   VisitSession,
   VisitSessionsAndScheduleDto,
@@ -273,8 +271,6 @@ export default class TestData {
           showTitleAsHeading,
           text,
         }
-
-  static notificationCount = ({ count = 5 }: Partial<NotificationCount> = {}): NotificationCount => ({ count })
 
   static offenderRestriction = ({
     restrictionId = 0,
@@ -797,8 +793,6 @@ export default class TestData {
     prisonerFirstName,
     prisonerLastName,
   })
-
-  static visitRequestCount = ({ count = 3 }: Partial<VisitRequestsCountDto> = {}): VisitRequestsCountDto => ({ count })
 
   static visitRequestSummary = ({
     visitReference = 'ab-cd-ef-gh',
