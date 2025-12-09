@@ -1,4 +1,4 @@
-import { type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page, expect } from '@playwright/test'
 
 export default class AbstractPage {
   readonly page: Page
@@ -29,5 +29,11 @@ export default class AbstractPage {
 
   async clickManageUserDetails() {
     await this.manageUserDetails.first().click()
+  }
+
+  // Verify that the page heading matches expected text
+  async verifyHeading(expectedHeading: string, level: 1 | 2 = 1): Promise<void> {
+    const header = this.page.locator(`h${level}`, { hasText: expectedHeading })
+    await expect(header).toBeVisible()
   }
 }
