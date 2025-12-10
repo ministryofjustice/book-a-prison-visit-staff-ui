@@ -58,7 +58,7 @@ describe('Booker management - booker details', () => {
           // Page header
           expect($('title').text()).toMatch(/^Booker details -/)
           expect($('.govuk-breadcrumbs li').length).toBe(0)
-          expect($('.govuk-back-link').attr('href')).toBe('/manage-bookers/search')
+          expect($('.govuk-back-link').attr('href')).toBe('/manage-bookers')
           expect($('.moj-alert').length).toBe(0)
           expect($('h1').text().trim()).toBe('Booker details')
 
