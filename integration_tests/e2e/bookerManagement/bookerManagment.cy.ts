@@ -31,6 +31,7 @@ context('Booker management', () => {
       cy.task('stubSupportedPrisonIds')
       cy.task('stubGetPrison')
       cy.task('stubGetNotificationCount', {})
+      cy.task('stubGetVisitorRequests')
       cy.signIn()
     })
 
