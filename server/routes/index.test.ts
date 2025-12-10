@@ -194,7 +194,7 @@ describe('GET /', () => {
           expect($('.card').length).toBe(6)
 
           expect($('[data-test="booker-management"] .card__link').text()).toBe('Manage online bookers')
-          expect($('[data-test="booker-management"] .card__link').attr('href')).toBe('/manage-bookers/search')
+          expect($('[data-test="booker-management"] .card__link').attr('href')).toBe('/manage-bookers')
           expect($('[data-test="visitor-request-count"]').text()).toBe('')
 
           expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()

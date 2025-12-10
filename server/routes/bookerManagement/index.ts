@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { BadRequest } from 'http-errors'
 import { Services } from '../../services'
-import BookerSearchController from './bookerSearchController'
+import ManageBookersController from './manageBookersController'
 import BookerDetailsController from './bookerDetailsController'
 import bapvUserRoles from '../../constants/bapvUserRoles'
 import { isValidBookerReference } from '../validationChecks'
@@ -13,7 +13,7 @@ import LinkVisitorController from './linkVisitorController'
 export default function routes(services: Services): Router {
   const router = Router()
 
-  const bookerSearchController = new BookerSearchController(services.auditService, services.bookerService)
+  const manageBookersController = new ManageBookersController(services.auditService, services.bookerService)
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
   const selectBookerAccountController = new SelectBookerAccountController(services.bookerService)
   const approvedVisitorListController = new ApprovedVisitorListController(services.bookerService)
@@ -28,9 +28,9 @@ export default function routes(services: Services): Router {
     return res.redirect('/authError')
   })
 
-  // Booker search
-  router.get('/search', bookerSearchController.view())
-  router.post('/search', bookerSearchController.validate(), bookerSearchController.search())
+  // Booker management (search and visitor requests)
+  router.get('/', manageBookersController.view())
+  router.post('/', manageBookersController.validate(), manageBookersController.search())
 
   router.get('/select-account', selectBookerAccountController.view())
   router.post(

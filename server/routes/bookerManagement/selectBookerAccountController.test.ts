@@ -51,7 +51,7 @@ describe('Booker management - select booker account when multiple accounts prese
           const $ = cheerio.load(res.text)
           // Page header
           expect($('title').text()).toMatch(/^Select account to manage -/)
-          expect($('.govuk-back-link').attr('href')).toBe('/manage-bookers/search')
+          expect($('.govuk-back-link').attr('href')).toBe('/manage-bookers')
           expect($('h1').text().trim()).toBe('Select account to manage')
           expect($('[data-test=booker-email]').text()).toBe(booker1.email)
 
@@ -66,7 +66,7 @@ describe('Booker management - select booker account when multiple accounts prese
     })
 
     it('should redirect to booker search if no booker accounts in session', () => {
-      return request(app).get(url).expect(302).expect('location', '/manage-bookers/search')
+      return request(app).get(url).expect(302).expect('location', '/manage-bookers')
     })
 
     it('should render validation error', () => {

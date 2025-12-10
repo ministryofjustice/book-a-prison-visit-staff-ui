@@ -11,7 +11,7 @@ export default class SelectBookerAccountController {
       const { matchedBookers } = req.session
 
       if (!matchedBookers?.length) {
-        return res.redirect('/manage-bookers/search')
+        return res.redirect('/manage-bookers')
       }
 
       return res.render('pages/bookerManagement/selectAccount.njk', {

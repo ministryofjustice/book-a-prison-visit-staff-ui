@@ -16,7 +16,7 @@ let sessionData: SessionData
 const auditService = createMockAuditService()
 const bookerService = createMockBookerService()
 
-const url = '/manage-bookers/search'
+const url = '/manage-bookers'
 const urlNoBookerFound = `${url}?no-booker-found`
 const booker = TestData.bookerSearchResult()
 const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })

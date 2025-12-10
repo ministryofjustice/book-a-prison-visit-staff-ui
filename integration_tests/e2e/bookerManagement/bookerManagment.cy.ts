@@ -19,7 +19,7 @@ context('Booker management', () => {
       cy.task('stubGetNotificationCount', {})
       cy.signIn({ failOnStatusCode: false })
 
-      cy.visit('/manage-bookers/search', { failOnStatusCode: false })
+      cy.visit('/manage-bookers', { failOnStatusCode: false })
       Page.verifyOnPage(AuthorisationErrorPage)
     })
   })

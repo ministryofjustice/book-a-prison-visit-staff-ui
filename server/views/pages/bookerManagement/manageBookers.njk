@@ -60,7 +60,7 @@
       {# Booker search #}
       <h2 class="govuk-heading-m">Search for a booker</h2>
 
-      <form action="/manage-bookers/search" method="POST" novalidate>
+      <form action="/manage-bookers" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukInput({

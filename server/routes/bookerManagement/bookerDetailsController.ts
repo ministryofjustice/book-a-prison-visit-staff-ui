@@ -28,9 +28,7 @@ export default class BookerDetailsController {
         operationId: res.locals.appInsightsOperationId,
       })
 
-      const backLinkHref = req.session.matchedBookers?.length
-        ? '/manage-bookers/select-account'
-        : '/manage-bookers/search'
+      const backLinkHref = req.session.matchedBookers?.length ? '/manage-bookers/select-account' : '/manage-bookers'
 
       const messages = [...req.flash('messages'), ...this.getBookerDetailsMessages(active, emailHasMultipleAccounts)]
 

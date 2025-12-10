@@ -3,7 +3,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { AuditService, BookerService } from '../../services'
 import config from '../../config'
 
-export default class BookerSearchController {
+export default class ManageBookersController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly bookerService: BookerService,
@@ -21,7 +21,7 @@ export default class BookerSearchController {
         ? await this.bookerService.getVisitorRequests({ username, prisonId })
         : []
 
-      res.render('pages/bookerManagement/bookerSearch', {
+      res.render('pages/bookerManagement/manageBookers', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
         noBookerFound,
@@ -38,7 +38,7 @@ export default class BookerSearchController {
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
         req.flash('formValues', matchedData(req, { onlyValidData: false }))
-        return res.redirect('/manage-bookers/search')
+        return res.redirect('/manage-bookers')
       }
 
       const { search } = matchedData<{ search: string }>(req) // field 'search' rather than 'email' to avoid browser autofill
@@ -54,7 +54,7 @@ export default class BookerSearchController {
       // booker not found
       if (bookers.length === 0) {
         req.flash('formValues', { search })
-        return res.redirect('/manage-bookers/search?no-booker-found')
+        return res.redirect('/manage-bookers?no-booker-found')
       }
 
       // single booker record found
