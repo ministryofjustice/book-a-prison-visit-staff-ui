@@ -88,7 +88,8 @@ export type ApplicationValidationErrorResponse = components['schemas']['Applicat
 // Booker management
 export type BookerDetailedInfoDto = components['schemas']['BookerDetailedInfoDto']
 export type BookerSearchResultsDto = components['schemas']['BookerSearchResultsDto']
+export type PrisonVisitorRequestDto = components['schemas']['PrisonVisitorRequestDto']
+export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
 export type SearchBookerDto = components['schemas']['SearchBookerDto']
 export type SocialContactsDto = components['schemas']['SocialContactsDto']
-export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
 export type VisitorRequestsCountByPrisonCodeDto = components['schemas']['VisitorRequestsCountByPrisonCodeDto']

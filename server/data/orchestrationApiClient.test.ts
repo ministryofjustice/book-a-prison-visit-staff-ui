@@ -583,6 +583,20 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVisitorRequests', () => {
+    it('should return all visitor requests for given prison', async () => {
+      const visitRequests = TestData.prisonVisitorRequest()
+
+      fakeOrchestrationApi
+        .get(`/prison/${prisonId}/visitor-requests`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitRequests)
+
+      const result = await orchestrationApiClient.getVisitorRequests(prisonId)
+      expect(result).toStrictEqual(visitRequests)
+    })
+  })
+
   describe('getVisitorRequestCount', () => {
     it('should return visitor request count for given prison', async () => {
       const count = 2

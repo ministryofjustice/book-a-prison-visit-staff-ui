@@ -140,6 +140,19 @@ describe('Booker service', () => {
     })
   })
 
+  describe('getVisitorRequests', () => {
+    it('should return visitor requests awaiting approval', async () => {
+      const prisonId = 'HEI'
+      const visitorRequests = [TestData.prisonVisitorRequest()]
+      orchestrationApiClient.getVisitorRequests.mockResolvedValue(visitorRequests)
+
+      const result = await bookerService.getVisitorRequests({ username, prisonId })
+
+      expect(result).toStrictEqual(visitorRequests)
+      expect(orchestrationApiClient.getVisitorRequests).toHaveBeenCalledWith(prisonId)
+    })
+  })
+
   describe('getVisitorRequestCount', () => {
     it('should return count of visitor requests awaiting approval', async () => {
       const prisonId = 'HEI'
