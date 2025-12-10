@@ -87,42 +87,44 @@
         }) }} 
       </form>
 
-      {# Visitor requests #}
-      <h2 class="govuk-heading-m">Requests to link visitors</h2>
+      {% if features.visitorRequests.enabled %}
+        {# Visitor requests #}
+        <h2 class="govuk-heading-m">Requests to link visitors</h2>
 
-      {% if visitorRequestRows | length %}
+        {% if visitorRequestRows | length %}
 
-        {{ govukTable({
-          attributes: {
-            "data-module": "moj-sortable-table",
-            "data-test": "visit-requests"
-          },
-          head: [
-            {
-              text: "Prisoner name",
-              attributes: { "aria-sort": "none" }
+          {{ govukTable({
+            attributes: {
+              "data-module": "moj-sortable-table",
+              "data-test": "visit-requests"
             },
-            {
-              text: "Booker email",
-              attributes: { "aria-sort": "none" }
-            },
-            {
-              text: "Visitor name",
-              attributes: { "aria-sort": "none" }
-            },
-            {
-              text: "Requested on",
-              attributes: { "aria-sort": "ascending" }
-            },
-            {
-              text: "Action"
-            }
-          ],
-          rows: visitorRequestRows
-        }) }}
+            head: [
+              {
+                text: "Prisoner name",
+                attributes: { "aria-sort": "none" }
+              },
+              {
+                text: "Booker email",
+                attributes: { "aria-sort": "none" }
+              },
+              {
+                text: "Visitor name",
+                attributes: { "aria-sort": "none" }
+              },
+              {
+                text: "Requested on",
+                attributes: { "aria-sort": "ascending" }
+              },
+              {
+                text: "Action"
+              }
+            ],
+            rows: visitorRequestRows
+          }) }}
 
-      {% else %}
-        <p data-test="no-visitor-requests">There are no requests to link visitors.</p>
+        {% else %}
+          <p data-test="no-visitor-requests">There are no requests to link visitors.</p>
+        {% endif %}
       {% endif %}
     </div>
   </div>

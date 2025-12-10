@@ -7,6 +7,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/a
 import { createMockAuditService, createMockBookerService } from '../../services/testutils/mocks'
 import bapvUserRoles from '../../constants/bapvUserRoles'
 import TestData from '../testutils/testData'
+import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
@@ -22,6 +23,8 @@ const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-
 const visitorRequest = TestData.prisonVisitorRequest()
 
 beforeEach(() => {
+  setFeature('visitorRequests', { enabled: true })
+
   flashData = {}
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
@@ -42,6 +45,27 @@ describe('Booker management - search for booker by email and visitor request lis
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService }, sessionData })
       return request(app).get(url).expect(302).expect('location', '/authError')
+    })
+
+    it('should not render visitor requests if FEATURE_VISITOR_REQUESTS not enabled', () => {
+      setFeature('visitorRequests', { enabled: false })
+      app = appWithAllRoutes({
+        services: { auditService, bookerService },
+        userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
+        sessionData,
+      })
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          // Visitor requests
+          expect($('h2').length).toBe(1)
+          expect($('[data-test=no-visitor-requests]').length).toBe(0)
+          expect($('[data-test=prisoner-name-1]').length).toBe(0)
+          expect(bookerService.getVisitorRequests).not.toHaveBeenCalledWith()
+        })
     })
 
     it('should render booker search, visitor requests and clear any previously matched bookers from session', () => {
