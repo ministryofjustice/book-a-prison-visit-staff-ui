@@ -592,6 +592,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visitor-requests/{requestReference}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a single visitor request for review
+     * @description Returns a single visitor request, with prisoner's approved visitor list
+     */
+    get: operations['getSingleVisitorRequestForReview']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visit-sessions': {
     parameters: {
       query?: never
@@ -2504,10 +2524,10 @@ export interface components {
         | 'CANCELLED'
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2627,6 +2647,96 @@ export interface components {
     NotificationCountDto: {
       /** Format: int32 */
       count: number
+    }
+    SingleVisitorRequestForReviewDto: {
+      /**
+       * @description Visitor Request reference
+       * @example abc-def-ghi
+       */
+      reference: string
+      /**
+       * @description Booker reference
+       * @example wwe-egg-wwf
+       */
+      bookerReference: string
+      /**
+       * @description Booker email
+       * @example test@test.com
+       */
+      bookerEmail: string
+      /**
+       * @description Prisoner ID for whom visitor was requested
+       * @example A1234AA
+       */
+      prisonerId: string
+      /**
+       * @description Prisoner first name
+       * @example John
+       */
+      prisonerFirstName: string
+      /**
+       * @description Prisoner last name
+       * @example Smith
+       */
+      prisonerLastName: string
+      /**
+       * @description First Name, as entered on visitor request
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last Name, as entered on visitor request
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth, as entered on visitor request
+       * @example 2000-01-01
+       */
+      dateOfBirth: string
+      /**
+       * Format: date
+       * @description Date request was submitted
+       * @example 2025-10-28
+       */
+      requestedOn: string
+      /**
+       * @description Date request was submitted
+       * @example 2025-10-28
+       */
+      socialContacts: components['schemas']['SocialContactsDto'][]
+    }
+    /** @description Social Contact */
+    SocialContactsDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 2000-01-31
+       */
+      dateOfBirth?: string
+      /**
+       * Format: date
+       * @description Date when visitor was last approved for a visit (approved / auto-approved)
+       * @example 2025-09-12
+       */
+      lastApprovedForVisitDate?: string
     }
     /** @description Visit Session */
     VisitSessionDto: {
@@ -3161,37 +3271,6 @@ export interface components {
        */
       lastName?: string
     }
-    /** @description Social Contact */
-    SocialContactsDto: {
-      /**
-       * Format: int64
-       * @description Identifier for this contact (Person in NOMIS)
-       * @example 5871791
-       */
-      visitorId: number
-      /**
-       * @description First name
-       * @example John
-       */
-      firstName: string
-      /**
-       * @description Last name
-       * @example Smith
-       */
-      lastName: string
-      /**
-       * Format: date
-       * @description Date of birth
-       * @example 2000-01-31
-       */
-      dateOfBirth?: string
-      /**
-       * Format: date
-       * @description Date when visitor was last approved for a visit (approved / auto-approved)
-       * @example 2025-09-12
-       */
-      lastApprovedForVisitDate?: string
-    }
     BookerPrisonerVisitorRequestDto: {
       /**
        * @description Visitor Request reference
@@ -3491,7 +3570,7 @@ export interface components {
        */
       lastName?: string
     }
-    PrisonVisitorRequestDto: {
+    PrisonVisitorRequestListEntryDto: {
       /**
        * @description Visitor Request reference
        * @example abc-def-ghi
@@ -3512,6 +3591,16 @@ export interface components {
        * @example A1234AA
        */
       prisonerId: string
+      /**
+       * @description Prisoner first name
+       * @example John
+       */
+      prisonerFirstName: string
+      /**
+       * @description Prisoner last name
+       * @example Smith
+       */
+      prisonerLastName: string
       /**
        * @description First Name, as entered on visitor request
        * @example John
@@ -5690,6 +5779,64 @@ export interface operations {
       }
     }
   }
+  getSingleVisitorRequestForReview: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        requestReference: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successfully return a single visitor request and prisoner's approved visitor list */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['SingleVisitorRequestForReviewDto']
+        }
+      }
+      /** @description Incorrect request to get a single visitor request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get a single visitor request */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Booker not found or Visitor request not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getVisitSessions: {
     parameters: {
       query: {
@@ -6768,7 +6915,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          '*/*': components['schemas']['PrisonVisitorRequestDto'][]
+          '*/*': components['schemas']['PrisonVisitorRequestListEntryDto'][]
         }
       }
       /** @description Incorrect request to get list of active visitor requests for prison. */

@@ -1,6 +1,11 @@
 import { compareDesc } from 'date-fns'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
-import { BookerDetailedInfoDto, BookerSearchResultsDto, SocialContactsDto } from '../data/orchestrationApiTypes'
+import {
+  BookerDetailedInfoDto,
+  BookerSearchResultsDto,
+  PrisonVisitorRequestListEntryDto,
+  SocialContactsDto,
+} from '../data/orchestrationApiTypes'
 
 export default class BookerService {
   constructor(
@@ -105,6 +110,19 @@ export default class BookerService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+  }
+
+  async getVisitorRequests({
+    username,
+    prisonId,
+  }: {
+    username: string
+    prisonId: string
+  }): Promise<PrisonVisitorRequestListEntryDto[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitorRequests(prisonId)
   }
 
   async getVisitorRequestCount({ username, prisonId }: { username: string; prisonId: string }): Promise<number> {

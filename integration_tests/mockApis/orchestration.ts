@@ -12,6 +12,7 @@ import {
   IgnoreVisitNotificationsDto,
   PrisonDto,
   PrisonerProfileDto,
+  PrisonVisitorRequestListEntryDto,
   SessionCapacity,
   SessionSchedule,
   SocialContactsDto,
@@ -477,6 +478,26 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: {},
+      },
+    })
+  },
+
+  stubGetVisitorRequests: ({
+    prisonId = 'HEI',
+    visitorRequests = [TestData.prisonVisitorRequest()],
+  }: {
+    prisonId?: string
+    visitorRequests?: PrisonVisitorRequestListEntryDto[]
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/prison/${prisonId}/visitor-requests`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitorRequests,
       },
     })
   },
