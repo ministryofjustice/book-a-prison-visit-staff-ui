@@ -11,13 +11,18 @@ export default class BookerSearchController {
   public view(): RequestHandler {
     return async (req, res) => {
       delete req.session.matchedBookers
+      const { prisonId } = req.session.selectedEstablishment
+      const { username } = res.locals.user
 
       const noBookerFound = req.query['no-booker-found'] === ''
+
+      const visitorRequests = await this.bookerService.getVisitorRequests({ username, prisonId })
 
       res.render('pages/bookerManagement/bookerSearch', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
         noBookerFound,
+        visitorRequests,
       })
     }
   }

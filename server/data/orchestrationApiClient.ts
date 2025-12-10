@@ -22,7 +22,7 @@ import {
   PageVisitDto,
   PrisonDto,
   PrisonerProfileDto,
-  PrisonVisitorRequestDto,
+  PrisonVisitorRequestListEntryDto,
   RegisterVisitorForBookerPrisonerDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
@@ -335,7 +335,7 @@ export default class OrchestrationApiClient {
     }
   }
 
-  async getVisitorRequests(prisonId: string): Promise<PrisonVisitorRequestDto[]> {
+  async getVisitorRequests(prisonId: string): Promise<PrisonVisitorRequestListEntryDto[]> {
     return this.restClient.get({ path: `/prison/${prisonId}/visitor-requests` })
   }
 

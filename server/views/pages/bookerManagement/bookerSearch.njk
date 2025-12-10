@@ -2,6 +2,7 @@
 {% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% set pageHeaderTitle = "Manage online bookers" %}
 
@@ -9,17 +10,55 @@
   {{ breadcrumbs() }}
 {% endblock %}
 
+{% set visitorRequestRows = [] %}
+{% for visitorRequest in visitorRequests %}
+  {% set prisonerName = (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName %}
+
+  {% set visitorRequestRows = (visitorRequestRows.push([
+    {
+      attributes: { "data-test": "prisoner-name-" + loop.index },
+      text: prisonerName
+    },
+    {
+      attributes: {
+        "data-test": "booker-email-" + loop.index,
+        "data-sort-value": visitorRequest.bookerEmail
+      },
+      classes: "bapv-force-overflow",
+      text: visitorRequest.bookerEmail
+    },
+    {
+      attributes: {
+        "data-test": "visitor-name-" + loop.index,
+        "data-sort-value": visitorRequest.lastName
+      },
+      text: visitorRequest.firstName + " " + visitorRequest.lastName
+    },
+    {
+      attributes: {
+        "data-test": "requested-date-" + loop.index,
+        "data-sort-value": visitorRequest.requestedOn | formatDate("t")
+      },
+      text: visitorRequest.requestedOn | formatDate("d/M/yyyy")
+    },
+    {
+      attributes: { "data-test": "action-" + loop.index },
+      html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + visitorRequest.reference + '/link-visitor" >' +
+        'View<span class="govuk-visually-hidden"> visitor request for ' + (prisonerName | escape) + '</span></a>'
+    }
+  ]), visitorRequestRows) %}
+{% endfor %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
       {% include "partials/errorSummary.njk" %}
 
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p class="govuk-body-l">
-        Search for a booker. You can manage which prisoners and visitors they can book visits for.
-      </p>
+      {# Booker search #}
+      <h2 class="govuk-heading-m">Search for a booker</h2>
 
       <form action="/manage-bookers/search" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -48,6 +87,43 @@
         }) }} 
       </form>
 
+      {# Visitor requests #}
+      <h2 class="govuk-heading-m">Requests to link visitors</h2>
+
+      {% if visitorRequestRows | length %}
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table",
+            "data-test": "visit-requests"
+          },
+          head: [
+            {
+              text: "Prisoner name",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Booker email",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Visitor name",
+              attributes: { "aria-sort": "none" }
+            },
+            {
+              text: "Requested on",
+              attributes: { "aria-sort": "ascending" }
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: visitorRequestRows
+        }) }}
+
+      {% else %}
+        <p data-test="no-visitor-requests">There are no requests to link visitors.</p>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

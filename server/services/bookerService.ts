@@ -3,7 +3,7 @@ import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../d
 import {
   BookerDetailedInfoDto,
   BookerSearchResultsDto,
-  PrisonVisitorRequestDto,
+  PrisonVisitorRequestListEntryDto,
   SocialContactsDto,
 } from '../data/orchestrationApiTypes'
 
@@ -118,7 +118,7 @@ export default class BookerService {
   }: {
     username: string
     prisonId: string
-  }): Promise<PrisonVisitorRequestDto[]> {
+  }): Promise<PrisonVisitorRequestListEntryDto[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 

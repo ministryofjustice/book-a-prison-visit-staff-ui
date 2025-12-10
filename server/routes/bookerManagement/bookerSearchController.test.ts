@@ -19,6 +19,7 @@ const url = '/manage-bookers/search'
 const urlNoBookerFound = `${url}?no-booker-found`
 const booker = TestData.bookerSearchResult()
 const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
+const visitorRequest = TestData.prisonVisitorRequest()
 
 beforeEach(() => {
   flashData = {}
@@ -36,15 +37,16 @@ afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('Booker management - search for booker by email', () => {
+describe('Booker management - search for booker by email and visitor request listing', () => {
   describe(`GET ${url}`, () => {
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService }, sessionData })
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
-    it('should render booker search page and clear any previously matched bookers from session', () => {
+    it('should render booker search, visitor requests and clear any previously matched bookers from session', () => {
       sessionData.matchedBookers = [booker, inactiveBooker]
+      bookerService.getVisitorRequests.mockResolvedValue([visitorRequest])
 
       return request(app)
         .get(url)
@@ -57,13 +59,26 @@ describe('Booker management - search for booker by email', () => {
           expect($('.govuk-back-link').length).toBe(0)
           expect($('h1').text().trim()).toBe('Manage online bookers')
 
-          // Form
+          // Booker search
+          expect($('h2').eq(0).text().trim()).toBe('Search for a booker')
           expect($('form').attr('action')).toBe(url)
           expect($('input[name=search]').val()).toBeUndefined()
           expect($('[data-test=no-booker-found]').length).toBe(0)
           expect($('[data-test=search]').text().trim()).toBe('Search')
 
+          // Visitor requests
+          expect($('h2').eq(1).text().trim()).toBe('Requests to link visitors')
+          expect($('[data-test=no-visitor-requests]').length).toBe(0)
+          expect($('[data-test=prisoner-name-1]').text()).toBe('John Smith')
+          expect($('[data-test=booker-email-1]').text()).toBe('booker@example.com')
+          expect($('[data-test=visitor-name-1]').text()).toBe('Mike Jones')
+          expect($('[data-test=requested-date-1]').text()).toBe('10/12/2025')
+          expect($('[data-test=action-1] a').attr('href')).toBe(
+            '/manage-bookers/visitor-request/dddd-eeee-ffff/link-visitor',
+          )
+
           expect(sessionData.matchedBookers).toBeUndefined()
+          expect(bookerService.getVisitorRequests).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
         })
     })
 
@@ -101,6 +116,18 @@ describe('Booker management - search for booker by email', () => {
           expect($('#search-error').text()).toContain(validationError.msg)
           expect($('input[name=search]').val()).toBe(invalidEmail)
           expect($('[data-test=no-booker-found]').length).toBe(0)
+        })
+    })
+
+    it('should render show message when no visitor requests to review', () => {
+      bookerService.getVisitorRequests.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=no-visitor-requests]').text()).toContain('There are no requests')
         })
     })
   })
