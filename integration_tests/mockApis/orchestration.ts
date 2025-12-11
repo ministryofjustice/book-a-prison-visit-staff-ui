@@ -19,6 +19,7 @@ import {
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
+  VisitorRequestForReviewDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -381,6 +382,22 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: bookers,
+      },
+    })
+  },
+
+  stubGetVisitorRequestForReview: (
+    visitorRequest: VisitorRequestForReviewDto = TestData.visitorRequestForReview(),
+  ): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/visitor-requests/${visitorRequest.reference}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitorRequest,
       },
     })
   },

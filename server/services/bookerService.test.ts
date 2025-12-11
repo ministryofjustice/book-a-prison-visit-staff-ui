@@ -165,4 +165,19 @@ describe('Booker service', () => {
       expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId)
     })
   })
+
+  describe('getVisitorRequestForReview', () => {
+    it('should return visitor request for review', async () => {
+      const visitorRequest = TestData.visitorRequestForReview()
+      orchestrationApiClient.getVisitorRequestForReview.mockResolvedValue(visitorRequest)
+
+      const result = await bookerService.getVisitorRequestForReview({
+        username,
+        requestReference: visitorRequest.reference,
+      })
+
+      expect(result).toStrictEqual(visitorRequest)
+      expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(visitorRequest.reference)
+    })
+  })
 })

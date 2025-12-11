@@ -34,6 +34,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitorRequestForReviewDto,
   VisitorRequestsCountByPrisonCodeDto,
   VisitPreview,
   VisitRequestResponse,
@@ -277,6 +278,10 @@ export default class OrchestrationApiClient {
       }
       throw error
     }
+  }
+
+  async getVisitorRequestForReview(requestReference: string): Promise<VisitorRequestForReviewDto> {
+    return this.restClient.get({ path: `/visitor-requests/${requestReference}` })
   }
 
   async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {

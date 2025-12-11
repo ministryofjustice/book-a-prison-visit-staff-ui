@@ -21,6 +21,7 @@ import {
   VisitNotificationEventRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitorRequestForReviewDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -783,6 +784,32 @@ export default class TestData {
     bookedByName,
     visitDate,
     notifications,
+  })
+
+  static visitorRequestForReview = ({
+    reference = 'dddd-eeee-ffff',
+    bookerReference = 'aaaa-bbbb-cccc',
+    bookerEmail = 'booker@example.com',
+    prisonerId = 'A1234BC',
+    prisonerFirstName = 'JOHN',
+    prisonerLastName = 'SMITH',
+    firstName = 'Mike',
+    lastName = 'Jones',
+    dateOfBirth = '1999-11-10',
+    requestedOn = '2025-12-10',
+    socialContacts = [this.socialContact()],
+  }: Partial<VisitorRequestForReviewDto> = {}): VisitorRequestForReviewDto => ({
+    reference,
+    bookerReference,
+    bookerEmail,
+    prisonerId,
+    prisonerFirstName,
+    prisonerLastName,
+    firstName,
+    lastName,
+    dateOfBirth,
+    requestedOn,
+    socialContacts,
   })
 
   static visitPreview = ({

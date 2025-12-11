@@ -93,3 +93,4 @@ export type RegisterVisitorForBookerPrisonerDto = components['schemas']['Registe
 export type SearchBookerDto = components['schemas']['SearchBookerDto']
 export type SocialContactsDto = components['schemas']['SocialContactsDto']
 export type VisitorRequestsCountByPrisonCodeDto = components['schemas']['VisitorRequestsCountByPrisonCodeDto']
+export type VisitorRequestForReviewDto = components['schemas']['SingleVisitorRequestForReviewDto']
