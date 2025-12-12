@@ -4,6 +4,7 @@ import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
 import {
   ApplicationDto,
+  ApproveVisitorRequestDto,
   ApproveVisitRequestBodyDto,
   BookingOrchestrationRequestDto,
   CancelVisitOrchestrationDto,
@@ -453,6 +454,23 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('approveVisitorRequest', () => {
+    it('should call approve visitor request endpoint and return approved request', async () => {
+      const visitorRequest = TestData.visitorRequest()
+      const requestReference = visitorRequest.reference
+      const visitorId = 123
+
+      fakeOrchestrationApi
+        .put(`/visitor-requests/${requestReference}/approve`, <ApproveVisitorRequestDto>{ visitorId })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(201, visitorRequest)
+
+      const output = await orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
+
+      expect(output).toStrictEqual(visitorRequest)
+    })
+  })
+
   describe('getBookersByEmail', () => {
     const email = 'booker@example.com'
 
@@ -462,7 +480,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .post('/public/booker/search', <SearchBookerDto>{ email })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, bookers)
+        .reply(200, bookers)
 
       const output = await orchestrationApiClient.getBookersByEmail(email)
 
@@ -600,15 +618,15 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitorRequests', () => {
     it('should return all visitor requests for given prison', async () => {
-      const visitRequests = TestData.prisonVisitorRequest()
+      const visitorRequests = [TestData.visitorRequestListEntry()]
 
       fakeOrchestrationApi
         .get(`/prison/${prisonId}/visitor-requests`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, visitRequests)
+        .reply(200, visitorRequests)
 
       const result = await orchestrationApiClient.getVisitorRequests(prisonId)
-      expect(result).toStrictEqual(visitRequests)
+      expect(result).toStrictEqual(visitorRequests)
     })
   })
 

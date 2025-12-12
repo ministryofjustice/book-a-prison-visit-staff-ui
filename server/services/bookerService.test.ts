@@ -143,7 +143,7 @@ describe('Booker service', () => {
   describe('getVisitorRequests', () => {
     it('should return visitor requests awaiting approval', async () => {
       const prisonId = 'HEI'
-      const visitorRequests = [TestData.prisonVisitorRequest()]
+      const visitorRequests = [TestData.visitorRequestListEntry()]
       orchestrationApiClient.getVisitorRequests.mockResolvedValue(visitorRequests)
 
       const result = await bookerService.getVisitorRequests({ username, prisonId })
@@ -178,6 +178,24 @@ describe('Booker service', () => {
 
       expect(result).toStrictEqual(visitorRequest)
       expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(visitorRequest.reference)
+    })
+  })
+
+  describe('approveVisitorRequest', () => {
+    it('should call approve visitor request endpoint and return approved request', async () => {
+      const visitorRequest = TestData.visitorRequest()
+      const requestReference = visitorRequest.reference
+      const visitorId = 123
+      orchestrationApiClient.approveVisitorRequest.mockResolvedValue(visitorRequest)
+
+      const result = await bookerService.approveVisitorRequest({
+        username,
+        requestReference,
+        visitorId,
+      })
+
+      expect(result).toStrictEqual(visitorRequest)
+      expect(orchestrationApiClient.approveVisitorRequest).toHaveBeenCalledWith({ requestReference, visitorId })
     })
   })
 })

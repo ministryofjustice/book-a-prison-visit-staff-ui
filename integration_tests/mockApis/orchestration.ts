@@ -12,6 +12,7 @@ import {
   IgnoreVisitNotificationsDto,
   PrisonDto,
   PrisonerProfileDto,
+  PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SessionCapacity,
   SessionSchedule,
@@ -361,6 +362,33 @@ export default {
     })
   },
 
+  stubApproveVisitorRequest: ({
+    visitorId = 4321,
+    requestReference = TestData.visitorRequest().reference,
+    visitorRequest = TestData.visitorRequest(),
+  }: {
+    visitorId?: number
+    requestReference?: string
+    visitorRequest?: PrisonVisitorRequestDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visitor-requests/${requestReference}/approve`,
+        bodyPatterns: [
+          {
+            equalToJson: { visitorId },
+          },
+        ],
+      },
+      response: {
+        status: 201,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitorRequest,
+      },
+    })
+  },
+
   stubGetBookersByEmail: ({
     email,
     bookers = [TestData.bookerSearchResult()],
@@ -501,7 +529,7 @@ export default {
 
   stubGetVisitorRequests: ({
     prisonId = 'HEI',
-    visitorRequests = [TestData.prisonVisitorRequest()],
+    visitorRequests = [TestData.visitorRequestListEntry()],
   }: {
     prisonId?: string
     visitorRequests?: PrisonVisitorRequestListEntryDto[]

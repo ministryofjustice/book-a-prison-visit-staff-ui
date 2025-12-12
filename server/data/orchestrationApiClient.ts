@@ -3,6 +3,7 @@ import config, { ApiConfig } from '../config'
 import {
   ApplicationDto,
   ApplicationMethodType,
+  ApproveVisitorRequestDto,
   ApproveVisitRequestBodyDto,
   BookerDetailedInfoDto,
   BookerSearchResultsDto,
@@ -22,6 +23,7 @@ import {
   PageVisitDto,
   PrisonDto,
   PrisonerProfileDto,
+  PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   RegisterVisitorForBookerPrisonerDto,
   RejectVisitRequestBodyDto,
@@ -266,6 +268,19 @@ export default class OrchestrationApiClient {
   }
 
   // public-booker-controller
+  async approveVisitorRequest({
+    requestReference,
+    visitorId,
+  }: {
+    requestReference: string
+    visitorId: number
+  }): Promise<PrisonVisitorRequestDto> {
+    return this.restClient.put({
+      path: `/visitor-requests/${requestReference}/approve`,
+      data: <ApproveVisitorRequestDto>{ visitorId },
+    })
+  }
+
   async getBookersByEmail(email: string): Promise<BookerSearchResultsDto[]> {
     try {
       return await this.restClient.post({
