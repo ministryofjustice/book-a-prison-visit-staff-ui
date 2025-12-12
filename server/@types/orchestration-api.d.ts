@@ -146,6 +146,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visitor-requests/{requestReference}/approve': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Approve visitor request and link visitor to booker's prisoner.
+     * @description Approve visitor request and link visitor to booker's prisoner.
+     */
+    put: operations['approveVisitorRequest']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/queue-admin/retry-dlq/{dlqName}': {
     parameters: {
       query?: never
@@ -1754,6 +1774,58 @@ export interface components {
       actionedBy: string
       /** @description allow over booking */
       allowOverBooking: boolean
+    }
+    ApproveVisitorRequestDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact you wish to approve and link (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+    }
+    PrisonVisitorRequestDto: {
+      /**
+       * @description Visitor Request reference
+       * @example abc-def-ghi
+       */
+      reference: string
+      /**
+       * @description Booker reference
+       * @example wwe-egg-wwf
+       */
+      bookerReference: string
+      /**
+       * @description Booker email
+       * @example test@test.com
+       */
+      bookerEmail: string
+      /**
+       * @description Prisoner ID for whom visitor was requested
+       * @example A1234AA
+       */
+      prisonerId: string
+      /**
+       * @description First Name, as entered on visitor request
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Last Name, as entered on visitor request
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth, as entered on visitor request
+       * @example 2000-01-01
+       */
+      dateOfBirth: string
+      /**
+       * Format: date
+       * @description Date request was submitted
+       * @example 2025-10-28
+       */
+      requestedOn: string
     }
     RetryDlqResult: {
       /** Format: int32 */
@@ -4222,6 +4294,68 @@ export interface operations {
       }
       /** @description Incorrect permissions to change a visit */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  approveVisitorRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        requestReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ApproveVisitorRequestDto']
+      }
+    }
+    responses: {
+      /** @description Visit request approved and visitor linked to booker's prisoner */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PrisonVisitorRequestDto']
+        }
+      }
+      /** @description Incorrect request to approve visitor request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to approve visitor request */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Booker or visitor request not found */
+      404: {
         headers: {
           [name: string]: unknown
         }

@@ -11,8 +11,8 @@
   {# Radio input markup or blank for contacts with no DoB #}
   {% set selectContactInputHtml %}
     <div class="govuk-radios__item">
-      <input class="govuk-radios__input" id="visitor-{{ contact.visitorId }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
-      <label class="govuk-label govuk-radios__label" for="visitor-{{ contact.visitorId }}">
+      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
+      <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
         <span class="govuk-visually-hidden">Select {{ contact.firstName }} {{ contact.lastName }}</span>
       </label>
     </div>

@@ -9,6 +9,7 @@ import {
   PrisonDto,
   PrisonerProfileDto,
   PrisonerScheduledEventDto,
+  PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SessionCapacity,
   SessionsAndScheduleDto,
@@ -503,30 +504,6 @@ export default class TestData {
       clients,
     }) as PrisonDto
 
-  static prisonVisitorRequest = ({
-    reference = 'dddd-eeee-ffff',
-    bookerReference = 'aaaa-bbbb-cccc',
-    bookerEmail = 'booker@example.com',
-    prisonerId = 'A1234BC',
-    prisonerFirstName = 'JOHN',
-    prisonerLastName = 'SMITH',
-    firstName = 'Mike',
-    lastName = 'Jones',
-    dateOfBirth = '1999-11-10',
-    requestedOn = '2025-12-10',
-  }: Partial<PrisonVisitorRequestListEntryDto> = {}): PrisonVisitorRequestListEntryDto => ({
-    reference,
-    bookerReference,
-    bookerEmail,
-    prisonerId,
-    prisonerFirstName,
-    prisonerLastName,
-    firstName,
-    lastName,
-    dateOfBirth,
-    requestedOn,
-  })
-
   static visit = ({
     applicationReference = 'aaa-bbb-ccc',
     reference = 'ab-cd-ef-gh',
@@ -786,6 +763,26 @@ export default class TestData {
     notifications,
   })
 
+  static visitorRequest = ({
+    reference = 'dddd-eeee-ffff',
+    bookerReference = 'aaaa-bbbb-cccc',
+    bookerEmail = 'booker@example.com',
+    prisonerId = 'A1234BC',
+    firstName = 'Mike',
+    lastName = 'Jones',
+    dateOfBirth = '1999-11-10',
+    requestedOn = '2025-12-10',
+  }: Partial<PrisonVisitorRequestDto> = {}): PrisonVisitorRequestDto => ({
+    reference,
+    bookerReference,
+    bookerEmail,
+    prisonerId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    requestedOn,
+  })
+
   static visitorRequestForReview = ({
     reference = 'dddd-eeee-ffff',
     bookerReference = 'aaaa-bbbb-cccc',
@@ -810,6 +807,30 @@ export default class TestData {
     dateOfBirth,
     requestedOn,
     socialContacts,
+  })
+
+  static visitorRequestListEntry = ({
+    reference = 'dddd-eeee-ffff',
+    bookerReference = 'aaaa-bbbb-cccc',
+    bookerEmail = 'booker@example.com',
+    prisonerId = 'A1234BC',
+    prisonerFirstName = 'JOHN',
+    prisonerLastName = 'SMITH',
+    firstName = 'Mike',
+    lastName = 'Jones',
+    dateOfBirth = '1999-11-10',
+    requestedOn = '2025-12-10',
+  }: Partial<PrisonVisitorRequestListEntryDto> = {}): PrisonVisitorRequestListEntryDto => ({
+    reference,
+    bookerReference,
+    bookerEmail,
+    prisonerId,
+    prisonerFirstName,
+    prisonerLastName,
+    firstName,
+    lastName,
+    dateOfBirth,
+    requestedOn,
   })
 
   static visitPreview = ({

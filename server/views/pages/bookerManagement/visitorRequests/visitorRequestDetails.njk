@@ -1,0 +1,147 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageHeaderTitle = "Link a visitor" %}
+{% set backLinkHref = '/manage-bookers' %}
+
+{% set contactRows = [] %}
+{% for contact in visitorRequest.socialContacts %}
+  {# Radio input markup or blank for contacts with no DoB #}
+  {% set selectContactInputHtml %}
+    <div class="govuk-radios__item">
+      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
+      <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
+        <span class="govuk-visually-hidden">Select {{ contact.firstName }} {{ contact.lastName }}</span>
+      </label>
+    </div>
+  {% endset %}
+
+  {% set contactRows = (contactRows.push([
+    {
+      html: selectContactInputHtml if contact.dateOfBirth,
+      classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6" if not contact.dateOfBirth,
+      attributes: { "data-test": "visitor-" + loop.index + "-select" }
+    },
+    {
+      text: contact.firstName + " " + contact.lastName,
+      classes: "govuk-!-font-weight-bold bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-name" }
+    },
+    {
+      html: (contact.dateOfBirth | formatDate +
+        " (" + contact.dateOfBirth | displayAge + ")") if contact.dateOfBirth
+        else "Not entered",
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-dob" }
+    },
+    {
+      text: contact.lastApprovedForVisitDate | formatDate if contact.lastApprovedForVisitDate else "None",
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-last-visit" }
+    }
+  ]), contactRows)%}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+
+      <p class="govuk-body-l">
+        <span data-test="booker-email">{{ visitorRequest.bookerEmail }}</span> has requested to link:
+      </p>
+      <p class="govuk-body-l">
+        <span data-test="visitor-name" class="govuk-!-font-weight-bold">{{ visitorRequest.firstName }} {{ visitorRequest.lastName }}</span>,
+        born on
+        <span data-test="visitor-dob" class="govuk-!-font-weight-bold">{{ visitorRequest.dateOfBirth | formatDate }}</span>
+      </p>
+
+      <h2 class="govuk-heading-l">
+        <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>’s visitors
+      </h2>
+
+      <p>Visitors already linked to this prisoner are not shown.</p>
+
+      {{ govukWarningText({
+        text: "Contacts must have a date of birth before they can be added as a visitor.",
+        iconFallbackText: "Warning",
+        attributes: { "data-test": "no-dob-warning" }
+      }) if showNoDobWarning }}
+
+      {{ govukWarningText({
+        text: "The prisoner does not have any visitors that are not already linked to the booker’s account. " +
+          "Any new visitors will need to be added as social contacts before they can be linked.",
+        iconFallbackText: "Warning",
+        classes: "govuk-!-width-two-thirds",
+        attributes: { "data-test": "no-visitors-warning" }
+      }) if not contactRows | length }}
+
+      <form action="/manage-bookers/visitor-request/{{ visitorRequest.reference }}/link-visitor" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {% if errors | length %}
+          <p id="visitorId-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+          </p>
+        {% endif %}
+
+        {% if contactRows | length %}
+          <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
+            {{ govukTable({
+              head: [
+                {
+                  text: "Select"
+                },
+                {
+                  text: "Name"
+                },
+                {
+                  text: "Date of birth"
+                },
+                {
+                  text: "Last visit approved on"
+                }
+              ],
+              rows: contactRows
+            }) }}
+
+            {# Add 'None' option #}
+            {% if atLeastOneSelectableContact %}
+              <div class="govuk-radios__divider">or</div>
+
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="visitor-none" name="visitorId" type="radio" value="none">
+                <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="visitor-none">
+                  None of the above
+                </label>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% if atLeastOneSelectableContact %}
+          {{ govukButton({
+            text: "Confirm",
+            attributes: { "data-test": "link-visitor" },
+            classes: "govuk-!-margin-top-3",
+            preventDoubleClick: true
+          }) }}
+        {% else %}
+          {{ govukButton({
+            text: "Check linked visitors",
+            href: "/manage-bookers/visitor-request/" + visitorRequest.reference + "/check-linked-visitors",
+            attributes: { "data-test": "check-linked-visitors" },
+            classes: "govuk-!-margin-top-3",
+            preventDoubleClick: true
+          }) }}
+        {% endif %}
+      </form>
+    </div>
+  </div>
+{% endblock %}

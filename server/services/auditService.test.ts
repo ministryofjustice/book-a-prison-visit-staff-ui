@@ -475,4 +475,28 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends an approved visitor request audit message', async () => {
+    await auditService.approvedVisitorRequest({
+      requestReference: 'cccc-dddd-eeee',
+      visitorId: '1234',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'APPROVED_VISITOR_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"requestReference":"cccc-dddd-eeee","visitorId":"1234"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })

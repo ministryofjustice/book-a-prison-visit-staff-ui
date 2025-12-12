@@ -3,6 +3,7 @@ import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../d
 import {
   BookerDetailedInfoDto,
   BookerSearchResultsDto,
+  PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SocialContactsDto,
   VisitorRequestForReviewDto,
@@ -144,5 +145,20 @@ export default class BookerService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getVisitorRequestForReview(requestReference)
+  }
+
+  async approveVisitorRequest({
+    username,
+    requestReference,
+    visitorId,
+  }: {
+    username: string
+    requestReference: string
+    visitorId: number
+  }): Promise<PrisonVisitorRequestDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
   }
 }

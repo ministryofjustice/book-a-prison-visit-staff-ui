@@ -26,6 +26,15 @@ export declare module 'express-session' {
       prisonerId: string
       nonLinkedContacts: SocialContactsDto[]
     }
+
+    visitorRequest?: {
+      requestReference: string
+      bookerEmail: string
+      firstName: string
+      lastName: string
+      dateOfBirth: string
+      nonLinkedContactIds: number[]
+    }
   }
 }
 

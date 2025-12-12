@@ -436,6 +436,25 @@ export default class AuditService {
     })
   }
 
+  async approvedVisitorRequest({
+    requestReference,
+    visitorId,
+    username,
+    operationId,
+  }: {
+    requestReference: string
+    visitorId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'APPROVED_VISITOR_REQUEST',
+      who: username,
+      operationId,
+      details: { requestReference, visitorId },
+    })
+  }
+
   private async sendAuditMessage({
     action,
     who,
