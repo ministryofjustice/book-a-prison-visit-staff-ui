@@ -20,7 +20,7 @@ const url = '/manage-bookers'
 const urlNoBookerFound = `${url}?no-booker-found`
 const booker = TestData.bookerSearchResult()
 const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
-const visitorRequest = TestData.prisonVisitorRequest()
+const visitorRequestListEntry = TestData.visitorRequestListEntry()
 
 beforeEach(() => {
   setFeature('visitorRequests', { enabled: true })
@@ -70,7 +70,7 @@ describe('Booker management - search for booker by email and visitor request lis
 
     it('should render booker search, visitor requests and clear any previously matched bookers from session', () => {
       sessionData.matchedBookers = [booker, inactiveBooker]
-      bookerService.getVisitorRequests.mockResolvedValue([visitorRequest])
+      bookerService.getVisitorRequests.mockResolvedValue([visitorRequestListEntry])
 
       return request(app)
         .get(url)

@@ -618,15 +618,15 @@ describe('orchestrationApiClient', () => {
 
   describe('getVisitorRequests', () => {
     it('should return all visitor requests for given prison', async () => {
-      const visitorRequests = [TestData.visitorRequestListEntry()]
+      const visitorRequestListEntries = [TestData.visitorRequestListEntry()]
 
       fakeOrchestrationApi
         .get(`/prison/${prisonId}/visitor-requests`)
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, visitorRequests)
+        .reply(200, visitorRequestListEntries)
 
       const result = await orchestrationApiClient.getVisitorRequests(prisonId)
-      expect(result).toStrictEqual(visitorRequests)
+      expect(result).toStrictEqual(visitorRequestListEntries)
     })
   })
 

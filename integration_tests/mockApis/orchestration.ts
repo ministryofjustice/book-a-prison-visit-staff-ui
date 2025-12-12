@@ -529,10 +529,10 @@ export default {
 
   stubGetVisitorRequests: ({
     prisonId = 'HEI',
-    visitorRequests = [TestData.visitorRequestListEntry()],
+    visitorRequestListEntries = [TestData.visitorRequestListEntry()],
   }: {
     prisonId?: string
-    visitorRequests?: PrisonVisitorRequestListEntryDto[]
+    visitorRequestListEntries?: PrisonVisitorRequestListEntryDto[]
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -542,7 +542,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitorRequests,
+        jsonBody: visitorRequestListEntries,
       },
     })
   },

@@ -31,8 +31,8 @@ export default function routes(services: Services): Router {
     selectBookerAccountController.selectAccount(),
   )
 
-  router.use('/', bookerRoutes(services))
   router.use('/visitor-request', visitorRequestRoutes(services))
+  router.use('/', bookerRoutes(services))
 
   return router
 }
