@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, param, ValidationChain, validationResult } from 'express-validator'
 import { SessionData } from 'express-session'
-import { AuditService, BookerService } from '../../services'
-import { isValidPrisonerNumber } from '../validationChecks'
-import { SocialContactsDto } from '../../data/orchestrationApiTypes'
+import { AuditService, BookerService } from '../../../services'
+import { isValidPrisonerNumber } from '../../validationChecks'
+import { SocialContactsDto } from '../../../data/orchestrationApiTypes'
 
 export default class LinkVisitorController {
   public constructor(

@@ -1,10 +1,10 @@
 import type { Express } from 'express'
 import request from 'supertest'
-import { appWithAllRoutes, flashProvider, user } from '../testutils/appSetup'
-import { createMockAuditService, createMockBookerService } from '../../services/testutils/mocks'
-import bapvUserRoles from '../../constants/bapvUserRoles'
-import TestData from '../testutils/testData'
-import { MoJAlert } from '../../@types/bapv'
+import { appWithAllRoutes, flashProvider, user } from '../../testutils/appSetup'
+import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
+import bapvUserRoles from '../../../constants/bapvUserRoles'
+import TestData from '../../testutils/testData'
+import { MoJAlert } from '../../../@types/bapv'
 
 let app: Express
 

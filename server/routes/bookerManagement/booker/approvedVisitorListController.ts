@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { BookerService } from '../../services'
-import { isValidPrisonerNumber } from '../validationChecks'
+import { BookerService } from '../../../services'
+import { isValidPrisonerNumber } from '../../validationChecks'
 
 export default class ApprovedVisitorListController {
   public constructor(private readonly bookerService: BookerService) {}

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
-import { AuditService, BookerService } from '../../services'
-import { MoJAlert } from '../../@types/bapv'
+import { AuditService, BookerService } from '../../../services'
+import { MoJAlert } from '../../../@types/bapv'
 
 export default class BookerDetailsController {
   public constructor(
