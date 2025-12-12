@@ -1,4 +1,4 @@
-import Page, { PageElement } from '../page'
+import Page, { PageElement } from '../../page'
 
 export default class BookerDetailsPage extends Page {
   constructor() {

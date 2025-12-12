@@ -490,6 +490,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVisitorRequestForReview', () => {
+    it('should return visitor request for review', async () => {
+      const visitorRequestForReview = TestData.visitorRequestForReview()
+
+      fakeOrchestrationApi
+        .get(`/visitor-requests/${visitorRequestForReview.reference}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitorRequestForReview)
+
+      const output = await orchestrationApiClient.getVisitorRequestForReview(visitorRequestForReview.reference)
+
+      expect(output).toStrictEqual(visitorRequestForReview)
+    })
+  })
+
   describe('getBookerDetails', () => {
     it('should return booker details for given booker reference', async () => {
       const booker = TestData.bookerDetailedInfo()

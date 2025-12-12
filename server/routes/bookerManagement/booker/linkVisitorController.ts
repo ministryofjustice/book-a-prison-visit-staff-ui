@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, param, ValidationChain, validationResult } from 'express-validator'
 import { SessionData } from 'express-session'
-import { AuditService, BookerService } from '../../services'
-import { isValidPrisonerNumber } from '../validationChecks'
-import { SocialContactsDto } from '../../data/orchestrationApiTypes'
+import { AuditService, BookerService } from '../../../services'
+import { isValidPrisonerNumber } from '../../validationChecks'
+import { SocialContactsDto } from '../../../data/orchestrationApiTypes'
 
 export default class LinkVisitorController {
   public constructor(
@@ -26,7 +26,7 @@ export default class LinkVisitorController {
         return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonerId}/link-visitor`)
       }
 
-      return res.render('pages/bookerManagement/linkVisitor', {
+      return res.render('pages/bookerManagement/booker/linkVisitor', {
         reference,
         prisonerId,
         visitor,
