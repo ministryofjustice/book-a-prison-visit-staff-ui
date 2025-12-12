@@ -32,7 +32,7 @@ export default class BookerDetailsController {
 
       const messages = [...req.flash('messages'), ...this.getBookerDetailsMessages(active, emailHasMultipleAccounts)]
 
-      res.render('pages/bookerManagement/bookerDetails', { backLinkHref, messages, active, booker })
+      res.render('pages/bookerManagement/booker/bookerDetails', { backLinkHref, messages, active, booker })
     }
   }
 

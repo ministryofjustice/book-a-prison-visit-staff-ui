@@ -26,7 +26,7 @@ export default class LinkVisitorController {
         return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonerId}/link-visitor`)
       }
 
-      return res.render('pages/bookerManagement/linkVisitor', {
+      return res.render('pages/bookerManagement/booker/linkVisitor', {
         reference,
         prisonerId,
         visitor,

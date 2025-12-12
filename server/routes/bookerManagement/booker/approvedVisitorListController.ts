@@ -29,7 +29,7 @@ export default class ApprovedVisitorListController {
 
       req.session.bookerLinkVisitor = { reference, prisonerId, nonLinkedContacts }
 
-      return res.render('pages/bookerManagement/approvedVisitorList', {
+      return res.render('pages/bookerManagement/booker/approvedVisitorList', {
         backLinkHref: bookerDetailsPageUrl,
         errors: req.flash('errors'),
         nonLinkedContacts,
