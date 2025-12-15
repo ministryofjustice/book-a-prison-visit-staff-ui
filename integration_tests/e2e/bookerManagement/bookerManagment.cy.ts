@@ -135,7 +135,7 @@ context('Booker management', () => {
       approvedVisitorListPage.getVisitorName(1).contains('Keith Williams')
       approvedVisitorListPage.getVisitorDob(1).contains('1 January 1999')
       approvedVisitorListPage.getVisitorLastVisitDate(1).contains('11 October 2025')
-      approvedVisitorListPage.getVisitor(1021).click()
+      approvedVisitorListPage.getVisitor(1).click()
       approvedVisitorListPage.linkVisitor().click()
 
       // Link visitor page

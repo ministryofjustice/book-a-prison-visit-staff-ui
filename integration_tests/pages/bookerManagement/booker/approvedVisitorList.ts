@@ -11,7 +11,7 @@ export default class ApprovedVisitorListPage extends Page {
 
   getVisitorLastVisitDate = (index: number): PageElement => cy.get(`[data-test=visitor-${index}-last-visit]`)
 
-  getVisitor = (visitorId: number): PageElement => cy.get(`#visitor-${visitorId}`)
+  getVisitor = (index: number): PageElement => cy.get(`#visitor-${index}`)
 
   linkVisitor = (): PageElement => cy.get('[data-test=link-visitor]')
 }
