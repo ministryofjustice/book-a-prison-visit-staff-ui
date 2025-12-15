@@ -47,6 +47,12 @@ describe('Booker management - approved visitor list', () => {
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
+    it('should reject an invalid booker reference', () => {
+      return request(app)
+        .get(`/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner/${prisoner.prisonerNumber}/link-visitor`)
+        .expect(400)
+    })
+
     it('should render non-linked approved visitor list page and save data to session', () => {
       const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
@@ -135,6 +141,12 @@ describe('Booker management - approved visitor list', () => {
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService } })
       return request(app).post(url).expect(302).expect('location', '/authError')
+    })
+
+    it('should reject an invalid booker reference', () => {
+      return request(app)
+        .post(`/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner/${prisoner.prisonerNumber}/link-visitor`)
+        .expect(400)
     })
 
     it('should redirect to link visitor notify page for selected visitor', () => {

@@ -45,6 +45,10 @@ describe('Booker management - booker details', () => {
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
+    it('should reject an invalid booker reference', () => {
+      return request(app).get('/manage-bookers/INVALID-BOOKER-REFERENCE/booker-details').expect(400)
+    })
+
     it('should render booker details page - booker with single prisoner and visitors', () => {
       const booker = TestData.bookerDetailedInfo()
       bookerService.getBookerDetails.mockResolvedValue(booker)
