@@ -81,6 +81,7 @@ describe('Booker management - search for booker by email and visitor request lis
           expect($('title').text()).toMatch(/^Manage online bookers -/)
           expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('.govuk-back-link').length).toBe(0)
+          expect($('.moj-alert').length).toBe(0)
           expect($('h1').text().trim()).toBe('Manage online bookers')
 
           // Booker search
@@ -103,6 +104,19 @@ describe('Booker management - search for booker by email and visitor request lis
 
           expect(sessionData.matchedBookers).toBeUndefined()
           expect(bookerService.getVisitorRequests).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
+        })
+    })
+
+    it('should render any alert messages set in flash', () => {
+      flashData.messages = [TestData.mojAlert({ text: 'test alert message' })]
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect($('.moj-alert').text()).toContain('test alert message')
         })
     })
 
