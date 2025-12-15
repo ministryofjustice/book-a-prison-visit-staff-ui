@@ -43,6 +43,7 @@ export default class VisitorRequestDetailsController {
       const { visitorRequest } = req.session
 
       if (!visitorRequest || visitorRequest.requestReference !== requestReference) {
+        delete req.session.visitorRequest
         return res.redirect('/manage-bookers')
       }
 
