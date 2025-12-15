@@ -71,9 +71,10 @@ export default class VisitorRequestDetailsController {
         req.flash('messages', {
           variant: 'success',
           title: `You approved the request and linked ${approvedVisitorRequest.firstName} ${approvedVisitorRequest.lastName}`,
+          showTitleAsHeading: true,
           html:
-            'The booker has been notified by email.' +
-            `You can <a href="/manage-bookers/${approvedVisitorRequest.bookerReference}">view the booker’s account</a>.`,
+            'The booker has been notified by email. ' +
+            `You can <a href="/manage-bookers/${approvedVisitorRequest.bookerReference}/booker-details">view the booker’s account</a>.`,
           dismissible: true,
         })
 
