@@ -22,6 +22,7 @@ import {
   VisitNotificationEventRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPreview,
   VisitRequestResponse,
@@ -761,6 +762,20 @@ export default class TestData {
     bookedByName,
     visitDate,
     notifications,
+  })
+
+  static visitorInfo = ({
+    visitorId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    visitorRestrictions = [],
+  }: Partial<VisitorInfoDto> = {}): VisitorInfoDto => ({
+    visitorId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    visitorRestrictions,
   })
 
   static visitorRequest = ({

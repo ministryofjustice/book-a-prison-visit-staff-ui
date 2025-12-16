@@ -19,14 +19,7 @@ export default class VisitorRequestDetailsController {
       const atLeastOneSelectableContact = visitorRequest.socialContacts.some(contact => contact.dateOfBirth?.length)
 
       // store request details needed for validation in session
-      req.session.visitorRequest = {
-        requestReference: visitorRequest.reference,
-        bookerEmail: visitorRequest.bookerEmail,
-        firstName: visitorRequest.firstName,
-        lastName: visitorRequest.lastName,
-        dateOfBirth: visitorRequest.dateOfBirth,
-        nonLinkedContactIds: visitorRequest.socialContacts.map(contact => contact.visitorId),
-      }
+      req.session.visitorRequest = visitorRequest
 
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
         errors: req.flash('errors'),
@@ -42,7 +35,7 @@ export default class VisitorRequestDetailsController {
       const { requestReference } = req.params
       const { visitorRequest } = req.session
 
-      if (!visitorRequest || visitorRequest.requestReference !== requestReference) {
+      if (!visitorRequest || visitorRequest.reference !== requestReference) {
         delete req.session.visitorRequest
         return res.redirect('/manage-bookers')
       }
@@ -60,7 +53,8 @@ export default class VisitorRequestDetailsController {
       }
 
       const visitorId = parseInt(visitorIdString, 10)
-      const isVisitorIdValid = visitorRequest.nonLinkedContactIds.includes(visitorId)
+      const validVisitorIds = visitorRequest.socialContacts.map(contact => contact.visitorId)
+      const isVisitorIdValid = validVisitorIds.includes(visitorId)
       if (isVisitorIdValid) {
         const { username } = res.locals.user
         const approvedVisitorRequest = await this.bookerService.approveVisitorRequest({

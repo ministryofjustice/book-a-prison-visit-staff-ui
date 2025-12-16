@@ -94,5 +94,6 @@ export type PrisonVisitorRequestListEntryDto = components['schemas']['PrisonVisi
 export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
 export type SearchBookerDto = components['schemas']['SearchBookerDto']
 export type SocialContactsDto = components['schemas']['SocialContactsDto']
+export type VisitorInfoDto = components['schemas']['VisitorInfoDto']
 export type VisitorRequestsCountByPrisonCodeDto = components['schemas']['VisitorRequestsCountByPrisonCodeDto']
 export type VisitorRequestForReviewDto = components['schemas']['SingleVisitorRequestForReviewDto']

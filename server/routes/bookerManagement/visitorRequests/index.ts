@@ -3,6 +3,7 @@ import { BadRequest } from 'http-errors'
 import { Services } from '../../../services'
 import { isValidVisitorRequestReference } from '../../validationChecks'
 import VisitorRequestDetailsController from './visitorRequestDetailsController'
+import CheckLinkedVisitorsController from './checkLinkedVisitorsController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -11,6 +12,7 @@ export default function routes(services: Services): Router {
     services.auditService,
     services.bookerService,
   )
+  const checkLinkedVisitorsController = new CheckLinkedVisitorsController(services.auditService, services.bookerService)
 
   // middleware to ensure valid visitor request reference
   // for all /manage-bookers/visitor-request/:requestReference routes
@@ -28,6 +30,14 @@ export default function routes(services: Services): Router {
     '/:requestReference/link-visitor',
     visitorRequestDetailsController.validate(),
     visitorRequestDetailsController.submit(),
+  )
+
+  // Visitor request - check linked visitors
+  router.get('/:requestReference/check-linked-visitors', checkLinkedVisitorsController.view())
+  router.post(
+    '/:requestReference/check-linked-visitors',
+    checkLinkedVisitorsController.validate(),
+    checkLinkedVisitorsController.submit(),
   )
 
   return router

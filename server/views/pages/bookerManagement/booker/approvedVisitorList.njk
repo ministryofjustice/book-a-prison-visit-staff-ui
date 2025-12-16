@@ -30,7 +30,7 @@
       attributes: { "data-test": "visitor-" + loop.index + "-name" }
     },
     {
-      html: (contact.dateOfBirth | formatDate +
+      text: (contact.dateOfBirth | formatDate +
         " (" + contact.dateOfBirth | displayAge + ")") if contact.dateOfBirth
         else "Not entered",
       classes: "bapv-vertical-align-middle",

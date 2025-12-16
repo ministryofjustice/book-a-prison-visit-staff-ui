@@ -93,14 +93,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
             requestReference: visitorRequestForReview.reference,
           })
 
-          expect(sessionData.visitorRequest).toStrictEqual({
-            requestReference: visitorRequestForReview.reference,
-            bookerEmail: visitorRequestForReview.bookerEmail,
-            firstName: visitorRequestForReview.firstName,
-            lastName: visitorRequestForReview.lastName,
-            dateOfBirth: visitorRequestForReview.dateOfBirth,
-            nonLinkedContactIds: [visitorRequestForReview.socialContacts[0].visitorId],
-          })
+          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
         })
     })
 
@@ -185,14 +178,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
       bookerService.approveVisitorRequest.mockResolvedValue(approvedVisitorRequest)
 
-      sessionData.visitorRequest = {
-        requestReference: visitorRequestForReview.reference,
-        bookerEmail: visitorRequestForReview.bookerEmail,
-        firstName: visitorRequestForReview.firstName,
-        lastName: visitorRequestForReview.lastName,
-        dateOfBirth: visitorRequestForReview.dateOfBirth,
-        nonLinkedContactIds: [visitorRequestForReview.socialContacts[0].visitorId],
-      }
+      sessionData.visitorRequest = visitorRequestForReview
 
       return request(app)
         .post(url)
@@ -228,14 +214,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
     })
 
     it('should redirect to check if visitor already linked page if "none" option selected', () => {
-      sessionData.visitorRequest = {
-        requestReference: visitorRequestForReview.reference,
-        bookerEmail: visitorRequestForReview.bookerEmail,
-        firstName: visitorRequestForReview.firstName,
-        lastName: visitorRequestForReview.lastName,
-        dateOfBirth: visitorRequestForReview.dateOfBirth,
-        nonLinkedContactIds: [visitorRequestForReview.socialContacts[0].visitorId],
-      }
+      sessionData.visitorRequest = visitorRequestForReview
 
       return request(app)
         .post(url)
@@ -249,7 +228,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest.requestReference).toBe(visitorRequestForReview.reference)
+          expect(sessionData.visitorRequest.reference).toBe(visitorRequestForReview.reference)
         })
     })
 
@@ -267,7 +246,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
     })
 
     it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
-      sessionData.visitorRequest = { requestReference: 'a-different-reference' } as SessionData['visitorRequest']
+      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
 
       return request(app)
         .post(url)
@@ -284,8 +263,8 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
     it('should redirect to manage bookers page if invalid visitor ID submitted', () => {
       sessionData.visitorRequest = {
-        requestReference: visitorRequestForReview.reference,
-        nonLinkedContactIds: [999],
+        reference: visitorRequestForReview.reference,
+        socialContacts: [{ visitorId: 999 }],
       } as SessionData['visitorRequest']
 
       return request(app)
@@ -302,7 +281,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
     it('should set validation error if no visitor selected and redirect to original page', () => {
       sessionData.visitorRequest = {
-        requestReference: visitorRequestForReview.reference,
+        reference: visitorRequestForReview.reference,
       } as SessionData['visitorRequest']
 
       return request(app)
