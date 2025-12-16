@@ -36,6 +36,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitorRequestsCountByPrisonCodeDto,
   VisitPreview,
@@ -278,6 +279,18 @@ export default class OrchestrationApiClient {
     return this.restClient.put({
       path: `/visitor-requests/${requestReference}/approve`,
       data: <ApproveVisitorRequestDto>{ visitorId },
+    })
+  }
+
+  async getLinkedVisitors({
+    bookerReference,
+    prisonerId,
+  }: {
+    bookerReference: string
+    prisonerId: string
+  }): Promise<VisitorInfoDto[]> {
+    return this.restClient.get({
+      path: `/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
     })
   }
 

@@ -60,6 +60,21 @@ describe('Booker service', () => {
     })
   })
 
+  describe('getLinkedVisitors', () => {
+    it('should get visitors linked to a prisoner for given booker account', async () => {
+      const visitors = [TestData.visitorInfo()]
+      const bookerReference = 'aaaa-bbbb-cccc'
+      const prisonerId = 'A1234BC'
+
+      orchestrationApiClient.getLinkedVisitors.mockResolvedValue(visitors)
+
+      const result = await bookerService.getLinkedVisitors({ username, bookerReference, prisonerId })
+
+      expect(result).toStrictEqual(visitors)
+      expect(orchestrationApiClient.getLinkedVisitors).toHaveBeenCalledWith({ bookerReference, prisonerId })
+    })
+  })
+
   describe('getNonLinkedSocialContacts', () => {
     it('should return all non-linked social contacts for given prisoner number and booker reference', async () => {
       const booker = TestData.bookerDetailedInfo()

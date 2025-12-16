@@ -6,6 +6,7 @@ import {
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SocialContactsDto,
+  VisitorInfoDto,
   VisitorRequestForReviewDto,
 } from '../data/orchestrationApiTypes'
 
@@ -45,6 +46,21 @@ export default class BookerService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getBookerDetails(reference)
+  }
+
+  async getLinkedVisitors({
+    username,
+    bookerReference,
+    prisonerId,
+  }: {
+    username: string
+    bookerReference: string
+    prisonerId: string
+  }): Promise<VisitorInfoDto[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId })
   }
 
   async getNonLinkedSocialContacts({

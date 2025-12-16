@@ -20,6 +20,7 @@ import {
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
+  VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPreview,
   VisitRequestResponse,
@@ -385,6 +386,28 @@ export default {
         status: 201,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitorRequest,
+      },
+    })
+  },
+
+  stubGetLinkedVisitors: ({
+    bookerReference = TestData.bookerDetailedInfo().reference,
+    prisonerId = TestData.bookerPrisoner().prisonerNumber,
+    linkedVisitors = [TestData.visitorInfo()],
+  }: {
+    bookerReference?: string
+    prisonerId?: string
+    linkedVisitors?: VisitorInfoDto[]
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: linkedVisitors,
       },
     })
   },

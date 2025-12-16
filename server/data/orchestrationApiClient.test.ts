@@ -471,6 +471,23 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getLinkedVisitors', () => {
+    it('should get visitors linked to a prisoner for given booker account', async () => {
+      const visitors = [TestData.visitorInfo()]
+      const bookerReference = 'aaaa-bbbb-cccc'
+      const prisonerId = 'A1234BC'
+
+      fakeOrchestrationApi
+        .get(`/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitors)
+
+      const output = await orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId })
+
+      expect(output).toStrictEqual(visitors)
+    })
+  })
+
   describe('getBookersByEmail', () => {
     const email = 'booker@example.com'
 
