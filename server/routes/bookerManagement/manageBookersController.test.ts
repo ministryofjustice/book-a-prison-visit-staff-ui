@@ -20,7 +20,7 @@ const url = '/manage-bookers'
 const urlNoBookerFound = `${url}?no-booker-found`
 const booker = TestData.bookerSearchResult()
 const inactiveBooker = TestData.bookerSearchResult({ createdTimestamp: '2000-10-09T12:00:00' })
-const visitorRequest = TestData.prisonVisitorRequest()
+const visitorRequestListEntry = TestData.visitorRequestListEntry()
 
 beforeEach(() => {
   setFeature('visitorRequests', { enabled: true })
@@ -70,7 +70,7 @@ describe('Booker management - search for booker by email and visitor request lis
 
     it('should render booker search, visitor requests and clear any previously matched bookers from session', () => {
       sessionData.matchedBookers = [booker, inactiveBooker]
-      bookerService.getVisitorRequests.mockResolvedValue([visitorRequest])
+      bookerService.getVisitorRequests.mockResolvedValue([visitorRequestListEntry])
 
       return request(app)
         .get(url)
@@ -81,6 +81,7 @@ describe('Booker management - search for booker by email and visitor request lis
           expect($('title').text()).toMatch(/^Manage online bookers -/)
           expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('.govuk-back-link').length).toBe(0)
+          expect($('.moj-alert').length).toBe(0)
           expect($('h1').text().trim()).toBe('Manage online bookers')
 
           // Booker search
@@ -103,6 +104,19 @@ describe('Booker management - search for booker by email and visitor request lis
 
           expect(sessionData.matchedBookers).toBeUndefined()
           expect(bookerService.getVisitorRequests).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
+        })
+    })
+
+    it('should render any alert messages set in flash', () => {
+      flashData.messages = [TestData.mojAlert({ text: 'test alert message' })]
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.moj-alert').length).toBe(1)
+          expect($('.moj-alert').text()).toContain('test alert message')
         })
     })
 

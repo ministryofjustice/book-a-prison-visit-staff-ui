@@ -23,6 +23,7 @@ export default class ManageBookersController {
 
       res.render('pages/bookerManagement/manageBookers', {
         errors: req.flash('errors'),
+        messages: req.flash('messages'),
         formValues: req.flash('formValues')?.[0],
         noBookerFound,
         visitorRequests,

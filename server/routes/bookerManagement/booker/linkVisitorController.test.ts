@@ -50,6 +50,14 @@ describe('Booker management - link visitor with optional notification', () => {
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
+    it('should reject an invalid booker reference', () => {
+      return request(app)
+        .get(
+          `/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner/${prisoner.prisonerNumber}/link-visitor/${visitor.visitorId}/notify`,
+        )
+        .expect(400)
+    })
+
     it('should render do you want to notify booker page', () => {
       const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
@@ -101,6 +109,14 @@ describe('Booker management - link visitor with optional notification', () => {
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService } })
       return request(app).post(url).expect(302).expect('location', '/authError')
+    })
+
+    it('should reject an invalid booker reference', () => {
+      return request(app)
+        .post(
+          `/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner/${prisoner.prisonerNumber}/link-visitor/${visitor.visitorId}/notify`,
+        )
+        .expect(400)
     })
 
     it('should link visitor, set success message, send audit, clear session then redirect to booker details page', () => {

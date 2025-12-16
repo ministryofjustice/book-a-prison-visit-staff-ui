@@ -1,7 +1,7 @@
 import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
 import { ValidationError } from 'express-validator'
 import { PrisonUser } from '../../interfaces/hmppsUser'
-import { CancelledVisitInfo, FlashFormValues, MojAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
+import { CancelledVisitInfo, FlashFormValues, MoJAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
 import { BookerSearchResultsDto, SocialContactsDto } from '../../data/orchestrationApiTypes'
 
 export declare module 'express-session' {
@@ -26,6 +26,15 @@ export declare module 'express-session' {
       prisonerId: string
       nonLinkedContacts: SocialContactsDto[]
     }
+
+    visitorRequest?: {
+      requestReference: string
+      bookerEmail: string
+      firstName: string
+      lastName: string
+      dateOfBirth: string
+      nonLinkedContactIds: number[]
+    }
   }
 }
 
@@ -48,8 +57,8 @@ export declare global {
       flash(type: 'formValues', message: FlashFormValues): number
       flash(type: 'formValues'): FlashFormValues[]
 
-      flash(type: 'messages', message: MojAlert): number
-      flash(type: 'messages'): MojAlert[]
+      flash(type: 'messages', message: MoJAlert): number
+      flash(type: 'messages'): MoJAlert[]
     }
 
     interface Locals {

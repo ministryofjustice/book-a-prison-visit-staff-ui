@@ -3,6 +3,7 @@ import {
   extractPrisonerNumber,
   isValidVisitReference,
   isValidBookerReference,
+  isValidVisitorRequestReference,
 } from './validationChecks'
 
 describe('isValidBookerReference', () => {
@@ -59,5 +60,17 @@ describe('isValidVisitReference', () => {
   })
   it('empty string', () => {
     expect(isValidVisitReference('')).toEqual(false)
+  })
+})
+
+describe('isValidVisitorRequestReference', () => {
+  it('valid', () => {
+    expect(isValidVisitorRequestReference('aaaa-bbbb-cccc')).toEqual(true)
+  })
+  it('invalid', () => {
+    expect(isValidVisitorRequestReference('abc123')).toEqual(false)
+  })
+  it('empty string', () => {
+    expect(isValidVisitorRequestReference('')).toEqual(false)
   })
 })

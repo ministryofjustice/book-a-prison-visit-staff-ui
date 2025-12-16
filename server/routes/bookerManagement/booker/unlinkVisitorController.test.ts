@@ -44,6 +44,12 @@ describe('Booker management - unlink a visitor from a booker account', () => {
       return request(app).post(url).expect(302).expect('location', '/authError')
     })
 
+    it('should reject an invalid booker reference', () => {
+      return request(app)
+        .get('/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner/A1234BC/visitor/1234/unlink')
+        .expect(400)
+    })
+
     it('should unlink visitor, send audit, set success message and redirect to booker details page', () => {
       bookerService.unlinkBookerVisitor.mockResolvedValue()
 
