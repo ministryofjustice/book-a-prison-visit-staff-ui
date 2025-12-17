@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import { BadRequest, InternalServerError } from 'http-errors'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
@@ -7,7 +8,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
-import { MoJAlert } from '../../../@types/bapv'
+import { requestAlreadyReviewedMessage, requestApprovedMessage } from './visitorRequestMessages'
 
 let app: Express
 let flashData: FlashData
@@ -94,6 +95,25 @@ describe('Booker management - visitor requests - link a visitor', () => {
           })
 
           expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
+        })
+    })
+
+    it('should redirect to booker management with message if request has already been processed', () => {
+      bookerService.getVisitorRequestForReview.mockResolvedValue({ ...visitorRequestForReview, status: 'APPROVED' })
+
+      return request(app)
+        .get(url)
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+
+          expect(bookerService.getVisitorRequestForReview).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
         })
     })
 
@@ -192,15 +212,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
             visitorId: 4321,
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
-            variant: 'success',
-            title: 'You approved the request and linked Mike Jones',
-            showTitleAsHeading: true,
-            html:
-              'The booker has been notified by email. ' +
-              'You can <a href="/manage-bookers/aaaa-bbbb-cccc/booker-details">view the booker’s account</a>.',
-            dismissible: true,
-          })
+          expect(flashProvider).toHaveBeenCalledWith('messages', requestApprovedMessage(visitorRequestForReview))
 
           expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
             requestReference: visitorRequestForReview.reference,
@@ -229,6 +241,55 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequest.reference).toBe(visitorRequestForReview.reference)
+        })
+    })
+
+    it('should redirect to booker management with message if approve returns HTP 400 (request already reviewed)', () => {
+      sessionData.visitorRequest = visitorRequestForReview
+      bookerService.approveVisitorRequest.mockRejectedValue(new BadRequest())
+
+      return request(app)
+        .post(url)
+        .send({ visitorId: '4321' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.approveVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            visitorId: 4321,
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+
+          expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            visitorId: '4321',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should propagate any other API errors', () => {
+      sessionData.visitorRequest = visitorRequestForReview
+      bookerService.approveVisitorRequest.mockRejectedValue(new InternalServerError())
+
+      return request(app)
+        .post(url)
+        .send({ visitorId: '4321' })
+        .expect(500)
+        .expect(() => {
+          expect(bookerService.approveVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            visitorId: 4321,
+          })
+          expect(flashProvider).not.toHaveBeenCalled()
+          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
         })
     })
 
