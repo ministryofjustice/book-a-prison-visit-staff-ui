@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { Visit } from '../data/orchestrationApiTypes'
+import { RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
 
 export default class AuditService {
   private sqsClient: SQSClient
@@ -452,6 +452,25 @@ export default class AuditService {
       who: username,
       operationId,
       details: { requestReference, visitorId },
+    })
+  }
+
+  async rejectedVisitorRequest({
+    requestReference,
+    rejectionReason,
+    username,
+    operationId,
+  }: {
+    requestReference: string
+    rejectionReason: RejectVisitorRequestDto['rejectionReason']
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'REJECTED_VISITOR_REQUEST',
+      who: username,
+      operationId,
+      details: { requestReference, rejectionReason },
     })
   }
 

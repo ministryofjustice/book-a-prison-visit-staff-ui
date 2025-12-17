@@ -5,6 +5,7 @@ import {
   BookerSearchResultsDto,
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
+  RejectVisitorRequestDto,
   SocialContactsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
@@ -176,5 +177,20 @@ export default class BookerService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
+  }
+
+  async rejectVisitorRequest({
+    username,
+    requestReference,
+    rejectionReason,
+  }: {
+    username: string
+    requestReference: string
+    rejectionReason: RejectVisitorRequestDto['rejectionReason']
+  }): Promise<PrisonVisitorRequestDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason })
   }
 }

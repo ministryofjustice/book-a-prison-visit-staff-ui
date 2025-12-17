@@ -26,6 +26,7 @@ import {
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   RegisterVisitorForBookerPrisonerDto,
+  RejectVisitorRequestDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionCapacity,
@@ -269,6 +270,19 @@ export default class OrchestrationApiClient {
   }
 
   // public-booker-controller
+  async rejectVisitorRequest({
+    requestReference,
+    rejectionReason,
+  }: {
+    requestReference: string
+    rejectionReason: RejectVisitorRequestDto['rejectionReason']
+  }): Promise<PrisonVisitorRequestDto> {
+    return this.restClient.put({
+      path: `/visitor-requests/${requestReference}/reject`,
+      data: <RejectVisitorRequestDto>{ rejectionReason },
+    })
+  }
+
   async approveVisitorRequest({
     requestReference,
     visitorId,

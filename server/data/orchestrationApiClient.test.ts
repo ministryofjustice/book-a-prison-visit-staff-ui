@@ -16,6 +16,7 @@ import {
   PageVisitDto,
   PrisonDto,
   RegisterVisitorForBookerPrisonerDto,
+  RejectVisitorRequestDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionSchedule,
@@ -454,6 +455,23 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('rejectVisitorRequest', () => {
+    it('should call reject visitor request endpoint and return rejected request', async () => {
+      const visitorRequest = TestData.visitorRequest()
+      const requestReference = visitorRequest.reference
+      const rejectionReason: RejectVisitorRequestDto['rejectionReason'] = 'REJECT'
+
+      fakeOrchestrationApi
+        .put(`/visitor-requests/${requestReference}/reject`, <RejectVisitorRequestDto>{ rejectionReason })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitorRequest)
+
+      const output = await orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason })
+
+      expect(output).toStrictEqual(visitorRequest)
+    })
+  })
+
   describe('approveVisitorRequest', () => {
     it('should call approve visitor request endpoint and return approved request', async () => {
       const visitorRequest = TestData.visitorRequest()
@@ -463,7 +481,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visitor-requests/${requestReference}/approve`, <ApproveVisitorRequestDto>{ visitorId })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(201, visitorRequest)
+        .reply(200, visitorRequest)
 
       const output = await orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
 

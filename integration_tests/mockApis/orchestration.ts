@@ -14,6 +14,7 @@ import {
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
+  RejectVisitorRequestDto,
   SessionCapacity,
   SessionSchedule,
   SocialContactsDto,
@@ -363,6 +364,33 @@ export default {
     })
   },
 
+  stubRejectVisitorRequest: ({
+    rejectionReason = 'REJECT',
+    requestReference = TestData.visitorRequest().reference,
+    visitorRequest = TestData.visitorRequest(),
+  }: {
+    rejectionReason?: RejectVisitorRequestDto['rejectionReason']
+    requestReference?: string
+    visitorRequest?: PrisonVisitorRequestDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/visitor-requests/${requestReference}/reject`,
+        bodyPatterns: [
+          {
+            equalToJson: { rejectionReason },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitorRequest,
+      },
+    })
+  },
+
   stubApproveVisitorRequest: ({
     visitorId = 4321,
     requestReference = TestData.visitorRequest().reference,
@@ -383,7 +411,7 @@ export default {
         ],
       },
       response: {
-        status: 201,
+        status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitorRequest,
       },
