@@ -1,7 +1,7 @@
 import TestData from '../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BookerService from './bookerService'
-import { BookerSearchResultsDto } from '../data/orchestrationApiTypes'
+import { BookerSearchResultsDto, RejectVisitorRequestDto } from '../data/orchestrationApiTypes'
 
 const token = 'some token'
 const username = 'user1'
@@ -211,6 +211,24 @@ describe('Booker service', () => {
 
       expect(result).toStrictEqual(visitorRequest)
       expect(orchestrationApiClient.approveVisitorRequest).toHaveBeenCalledWith({ requestReference, visitorId })
+    })
+  })
+
+  describe('rejectVisitorRequest', () => {
+    it('should call reject visitor request endpoint and return rejected request', async () => {
+      const visitorRequest = TestData.visitorRequest()
+      const requestReference = visitorRequest.reference
+      const rejectionReason: RejectVisitorRequestDto['rejectionReason'] = 'REJECT'
+      orchestrationApiClient.rejectVisitorRequest.mockResolvedValue(visitorRequest)
+
+      const result = await bookerService.rejectVisitorRequest({
+        username,
+        requestReference,
+        rejectionReason,
+      })
+
+      expect(result).toStrictEqual(visitorRequest)
+      expect(orchestrationApiClient.rejectVisitorRequest).toHaveBeenCalledWith({ requestReference, rejectionReason })
     })
   })
 })

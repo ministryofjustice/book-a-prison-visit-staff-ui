@@ -146,6 +146,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visitor-requests/{requestReference}/reject': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Reject visitor request and notify them of the outcome.
+     * @description Reject visitor request and notify them of the outcome.
+     */
+    put: operations['rejectVisitorRequest']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visitor-requests/{requestReference}/approve': {
     parameters: {
       query?: never
@@ -784,6 +804,26 @@ export interface paths {
      * @description Retrieve all visit sessions and schedule for a specified prisoner
      */
     get: operations['getVisitSessionsAndSchedule']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/visit-orders/{prisonerId}/history': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get visit order history for a prisoner since the from date.
+     * @description Get visit order history for a prisoner since the from date.
+     */
+    get: operations['getVisitOrderHistoryForPrisoner']
     put?: never
     post?: never
     delete?: never
@@ -1775,13 +1815,13 @@ export interface components {
       /** @description allow over booking */
       allowOverBooking: boolean
     }
-    ApproveVisitorRequestDto: {
+    RejectVisitorRequestDto: {
       /**
-       * Format: int64
-       * @description Identifier for this contact you wish to approve and link (Person in NOMIS)
-       * @example 5871791
+       * @description Rejection Reason type
+       * @example ALREADY_LINKED
+       * @enum {string}
        */
-      visitorId: number
+      rejectionReason: 'ALREADY_LINKED' | 'REJECT'
     }
     PrisonVisitorRequestDto: {
       /**
@@ -1826,6 +1866,14 @@ export interface components {
        * @example 2025-10-28
        */
       requestedOn: string
+    }
+    ApproveVisitorRequestDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact you wish to approve and link (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
     }
     RetryDlqResult: {
       /** Format: int32 */
@@ -3080,6 +3128,59 @@ export interface components {
       /** @description List of visit sessions and prisoner schedules */
       sessionsAndSchedule: components['schemas']['SessionsAndScheduleDto'][]
     }
+    VisitOrderHistoryDto: {
+      /**
+       * @description nomsNumber of the prisoner
+       * @example AA123456
+       */
+      prisonerId: string
+      /**
+       * @description Visit Order History Type
+       * @example VO_ALLOCATION
+       */
+      visitOrderHistoryType: string
+      /**
+       * Format: date-time
+       * @description Visit order history created data and time
+       * @example 2018-12-01T13:45:00
+       */
+      createdTimeStamp: string
+      /**
+       * Format: int32
+       * @description VO balance after the visit order event
+       * @example 5
+       */
+      voBalance: number
+      /**
+       * Format: int32
+       * @description VO balance change
+       * @example -1
+       */
+      voBalanceChange: number
+      /**
+       * Format: int32
+       * @description PVO balance after the visit order event
+       * @example 5
+       */
+      pvoBalance: number
+      /**
+       * Format: int32
+       * @description PVO balance change
+       * @example -1
+       */
+      pvoBalanceChange: number
+      /**
+       * @description Username for who triggered the event, SYSTEM if system generated or STAFF full name if STAFF event (e.g. manual adjustment)
+       * @example SYSTEM
+       */
+      userName: string
+      /** @description Comment added by STAFF, null if SYSTEM event or if no comment was entered by STAFF */
+      comment?: string
+      /** @description Key, value combination of attributes */
+      attributes: {
+        [key: string]: string
+      }
+    }
     DlqMessage: {
       body: {
         [key: string]: unknown
@@ -4303,6 +4404,68 @@ export interface operations {
       }
     }
   }
+  rejectVisitorRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        requestReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RejectVisitorRequestDto']
+      }
+    }
+    responses: {
+      /** @description Visitor request rejected and booker informed */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PrisonVisitorRequestDto']
+        }
+      }
+      /** @description Incorrect request to reject visitor request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to reject visitor request */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Booker or visitor request not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   approveVisitorRequest: {
     parameters: {
       query?: never
@@ -4318,8 +4481,8 @@ export interface operations {
       }
     }
     responses: {
-      /** @description Visit request approved and visitor linked to booker's prisoner */
-      201: {
+      /** @description Visitor request approved and visitor linked to booker's prisoner */
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -6470,6 +6633,57 @@ export interface operations {
       }
       /** @description Unauthorized to access this endpoint */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitOrderHistoryForPrisoner: {
+    parameters: {
+      query: {
+        fromDate: string
+      }
+      header?: never
+      path: {
+        prisonerId: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Return visit order history for a prisoner since the from date. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitOrderHistoryDto'][]
+        }
+      }
+      /** @description Incorrect request to get visit order history for a prisoner since the from date. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get visit order history */
+      403: {
         headers: {
           [name: string]: unknown
         }
