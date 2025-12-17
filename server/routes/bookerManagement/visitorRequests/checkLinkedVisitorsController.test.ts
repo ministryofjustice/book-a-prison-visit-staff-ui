@@ -70,6 +70,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect($('h1').text().trim()).toBe('Check if the visitor is already linked')
 
           // Visitor request details
+          expect($('[data-test=no-linked-visitors]').length).toBe(0)
           expect($('[data-test=booker-email]').text()).toBe(visitorRequestForReview.bookerEmail)
           expect($('[data-test=visitor-name]').text()).toBe('Mike Jones')
           expect($('[data-test=visitor-dob]').text()).toBe('10 November 1999')
@@ -88,6 +89,20 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             bookerReference: visitorRequestForReview.bookerReference,
             prisonerId: visitorRequestForReview.prisonerId,
           })
+        })
+    })
+
+    it('should handle booker having no linked visitors', () => {
+      bookerService.getLinkedVisitors.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=no-linked-visitors]').text()).toContain('no linked visitors')
+          expect($('input[name=rejectReason]').length).toBe(1)
+          expect($('input[name=rejectReason]').val()).toBe('REJECT')
         })
     })
 

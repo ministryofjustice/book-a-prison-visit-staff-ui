@@ -41,13 +41,14 @@
       </p>
 
       <h2 class="govuk-heading-l">Linked visitors</h2>
-      <p>
-        These visitors for
-        <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>
-        are already linked to the booker’s account. 
-      </p>
 
       {% if linkedVisitorRows | length %}
+        <p>
+          These visitors for
+          <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>
+          are already linked to the booker’s account. 
+        </p>
+
         {{ govukTable({
           classes: "govuk-!-width-one-half govuk-!-margin-bottom-8",
           head: [
@@ -60,6 +61,8 @@
           ],
           rows: linkedVisitorRows
         }) }}
+      {% else %}
+        <p data-test="no-linked-visitors">There are no linked visitors for this prisoner.</p>
       {% endif %}
 
       <form action="/manage-bookers/visitor-request/{{ visitorRequest.reference }}/check-linked-visitors" method="POST" novalidate>
@@ -74,13 +77,14 @@
             }
           },
           items: [
-            {
+            ({
               value: "ALREADY_LINKED",
               text: "Yes, tell the booker that the visitor is already linked to their account"
-            },
+            } if linkedVisitorRows | length),
             {
               value: "REJECT",
-              text: "No, reject the request"
+              text: "No, reject the request",
+              checked: not (linkedVisitorRows | length)
             }
           ],
           errorMessage: errors | findError('rejectReason')
