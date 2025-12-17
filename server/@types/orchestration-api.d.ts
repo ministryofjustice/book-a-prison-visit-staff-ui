@@ -1866,6 +1866,12 @@ export interface components {
        * @example 2025-10-28
        */
       requestedOn: string
+      /**
+       * @description The current status of the request
+       * @example REQUESTED
+       * @enum {string}
+       */
+      status: 'REQUESTED' | 'APPROVED' | 'REJECTED'
     }
     ApproveVisitorRequestDto: {
       /**
@@ -2821,6 +2827,12 @@ export interface components {
        * @example 2025-10-28
        */
       requestedOn: string
+      /**
+       * @description The current status of the request
+       * @example REQUESTED
+       * @enum {string}
+       */
+      status: 'REQUESTED' | 'APPROVED' | 'REJECTED'
       /**
        * @description Date request was submitted
        * @example 2025-10-28

@@ -97,6 +97,29 @@ describe('Booker management - visitor requests - link a visitor', () => {
         })
     })
 
+    it('should redirect to booker management with message if request has already been processed', () => {
+      bookerService.getVisitorRequestForReview.mockResolvedValue({ ...visitorRequestForReview, status: 'APPROVED' })
+
+      return request(app)
+        .get(url)
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
+            variant: 'information',
+            title: 'Request already reviewed',
+            text: 'The selected request has already been reviewed by another staff member.',
+          })
+
+          expect(bookerService.getVisitorRequestForReview).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
     it('should render missing DoB warning', () => {
       bookerService.getVisitorRequestForReview.mockResolvedValue(
         TestData.visitorRequestForReview({

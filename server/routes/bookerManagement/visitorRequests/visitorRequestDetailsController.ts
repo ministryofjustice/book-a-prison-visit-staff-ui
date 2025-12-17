@@ -15,6 +15,15 @@ export default class VisitorRequestDetailsController {
 
       const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
 
+      if (visitorRequest.status !== 'REQUESTED') {
+        req.flash('messages', {
+          variant: 'information',
+          title: 'Request already reviewed',
+          text: 'The selected request has already been reviewed by another staff member.',
+        })
+        return res.redirect('/manage-bookers')
+      }
+
       const showNoDobWarning = visitorRequest.socialContacts.some(contact => contact.dateOfBirth === null)
       const atLeastOneSelectableContact = visitorRequest.socialContacts.some(contact => contact.dateOfBirth?.length)
 

@@ -787,6 +787,7 @@ export default class TestData {
     lastName = 'Jones',
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
+    status = 'APPROVED',
   }: Partial<PrisonVisitorRequestDto> = {}): PrisonVisitorRequestDto => ({
     reference,
     bookerReference,
@@ -796,6 +797,7 @@ export default class TestData {
     lastName,
     dateOfBirth,
     requestedOn,
+    status,
   })
 
   static visitorRequestForReview = ({
@@ -809,6 +811,7 @@ export default class TestData {
     lastName = 'Jones',
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
+    status = 'REQUESTED',
     socialContacts = [this.socialContact()],
   }: Partial<VisitorRequestForReviewDto> = {}): VisitorRequestForReviewDto => ({
     reference,
@@ -821,6 +824,7 @@ export default class TestData {
     lastName,
     dateOfBirth,
     requestedOn,
+    status,
     socialContacts,
   })
 
