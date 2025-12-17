@@ -1,5 +1,6 @@
 import type { Express } from 'express'
 import request from 'supertest'
+import { BadRequest, InternalServerError } from 'http-errors'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
@@ -7,7 +8,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
-import { MoJAlert } from '../../../@types/bapv'
+import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
 
 let app: Express
 let flashData: FlashData
@@ -166,15 +167,10 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             rejectionReason: 'REJECT',
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
-            variant: 'success',
-            title: 'You rejected the request to link Mike Jones',
-            showTitleAsHeading: true,
-            html:
-              'The booker has been notified by email. ' +
-              'You can <a href="/manage-bookers/aaaa-bbbb-cccc/booker-details">view the booker’s account</a>.',
-            dismissible: true,
-          })
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestRejectedMessage(visitorRequestForReview, 'REJECT'),
+          )
 
           expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
             requestReference: visitorRequestForReview.reference,
@@ -206,15 +202,10 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             rejectionReason: 'ALREADY_LINKED',
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
-            variant: 'success',
-            title: 'You confirmed that Mike Jones is already a linked visitor',
-            showTitleAsHeading: true,
-            html:
-              'The booker has been notified by email. ' +
-              'You can <a href="/manage-bookers/aaaa-bbbb-cccc/booker-details">view the booker’s account</a>.',
-            dismissible: true,
-          })
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestRejectedMessage(visitorRequestForReview, 'ALREADY_LINKED'),
+          )
 
           expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
             requestReference: visitorRequestForReview.reference,
@@ -224,6 +215,55 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           })
 
           expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should redirect to booker management with message if reject returns HTP 400 (request already reviewed)', () => {
+      sessionData.visitorRequest = visitorRequestForReview
+      bookerService.rejectVisitorRequest.mockRejectedValue(new BadRequest())
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should propagate any other API errors', () => {
+      sessionData.visitorRequest = visitorRequestForReview
+      bookerService.rejectVisitorRequest.mockRejectedValue(new InternalServerError())
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(500)
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+          })
+          expect(flashProvider).not.toHaveBeenCalled()
+          expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
+          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
         })
     })
 
@@ -249,9 +289,9 @@ describe('Booker management - visitor requests - check linked visitors', () => {
         .expect(302)
         .expect('location', '/manage-bookers')
         .expect(() => {
-          expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
+          expect(bookerService.rejectVisitorRequest).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
-          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequest).toBeUndefined()
         })
     })

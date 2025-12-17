@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
+import { requestAlreadyReviewedMessage, requestApprovedMessage } from './visitorRequestMessages'
 
 export default class VisitorRequestDetailsController {
   public constructor(
@@ -16,11 +17,7 @@ export default class VisitorRequestDetailsController {
       const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
 
       if (visitorRequest.status !== 'REQUESTED') {
-        req.flash('messages', {
-          variant: 'information',
-          title: 'Request already reviewed',
-          text: 'The selected request has already been reviewed by another staff member.',
-        })
+        req.flash('messages', requestAlreadyReviewedMessage())
         return res.redirect('/manage-bookers')
       }
 
@@ -40,7 +37,7 @@ export default class VisitorRequestDetailsController {
   }
 
   public submit(): RequestHandler {
-    return async (req, res) => {
+    return async (req, res, next) => {
       const { requestReference } = req.params
       const { visitorRequest } = req.session
 
@@ -66,21 +63,22 @@ export default class VisitorRequestDetailsController {
       const isVisitorIdValid = validVisitorIds.includes(visitorId)
       if (isVisitorIdValid) {
         const { username } = res.locals.user
-        const approvedVisitorRequest = await this.bookerService.approveVisitorRequest({
-          username,
-          requestReference,
-          visitorId,
-        })
 
-        req.flash('messages', {
-          variant: 'success',
-          title: `You approved the request and linked ${approvedVisitorRequest.firstName} ${approvedVisitorRequest.lastName}`,
-          showTitleAsHeading: true,
-          html:
-            'The booker has been notified by email. ' +
-            `You can <a href="/manage-bookers/${approvedVisitorRequest.bookerReference}/booker-details">view the booker’s account</a>.`,
-          dismissible: true,
-        })
+        try {
+          const approvedVisitorRequest = await this.bookerService.approveVisitorRequest({
+            username,
+            requestReference,
+            visitorId,
+          })
+
+          req.flash('messages', requestApprovedMessage(approvedVisitorRequest))
+        } catch (error) {
+          if (error.status !== 400) {
+            return next(error)
+          }
+
+          req.flash('messages', requestAlreadyReviewedMessage())
+        }
 
         this.auditService.approvedVisitorRequest({
           requestReference,

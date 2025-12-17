@@ -1,7 +1,8 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
-import { PrisonVisitorRequestDto, RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
+import { RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
+import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
 
 export default class CheckLinkedVisitorsController {
   public constructor(
@@ -36,7 +37,7 @@ export default class CheckLinkedVisitorsController {
   }
 
   public submit(): RequestHandler {
-    return async (req, res) => {
+    return async (req, res, next) => {
       const { requestReference } = req.params
       const { visitorRequest } = req.session
 
@@ -54,21 +55,21 @@ export default class CheckLinkedVisitorsController {
       const { rejectionReason } = matchedData<{ rejectionReason: RejectVisitorRequestDto['rejectionReason'] }>(req)
       const { username } = res.locals.user
 
-      const rejectedVisitorRequest = await this.bookerService.rejectVisitorRequest({
-        username,
-        requestReference,
-        rejectionReason,
-      })
+      try {
+        const rejectedVisitorRequest = await this.bookerService.rejectVisitorRequest({
+          username,
+          requestReference,
+          rejectionReason,
+        })
 
-      req.flash('messages', {
-        variant: 'success',
-        title: this.getAlertMessageTitle(rejectedVisitorRequest, rejectionReason),
-        showTitleAsHeading: true,
-        html:
-          'The booker has been notified by email. ' +
-          `You can <a href="/manage-bookers/${rejectedVisitorRequest.bookerReference}/booker-details">view the booker’s account</a>.`,
-        dismissible: true,
-      })
+        req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+      } catch (error) {
+        if (error.status !== 400) {
+          return next(error)
+        }
+
+        req.flash('messages', requestAlreadyReviewedMessage())
+      }
 
       this.auditService.rejectedVisitorRequest({
         requestReference,
@@ -85,16 +86,5 @@ export default class CheckLinkedVisitorsController {
 
   public validate(): ValidationChain[] {
     return [body('rejectionReason').isIn(this.REJECTION_REASONS).withMessage('Select an answer')]
-  }
-
-  private getAlertMessageTitle(
-    rejectedVisitorRequest: PrisonVisitorRequestDto,
-    rejectionReason: RejectVisitorRequestDto['rejectionReason'],
-  ): string {
-    if (rejectionReason === 'ALREADY_LINKED') {
-      return `You confirmed that ${rejectedVisitorRequest.firstName} ${rejectedVisitorRequest.lastName} is already a linked visitor`
-    }
-
-    return `You rejected the request to link ${rejectedVisitorRequest.firstName} ${rejectedVisitorRequest.lastName}`
   }
 }
