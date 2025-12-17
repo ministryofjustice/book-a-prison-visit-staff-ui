@@ -23,6 +23,8 @@ generic-service:
     REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: staging
 
+    FEATURE_VISITOR_REQUESTS: "true"
+
   allowlist:
     groups:
       - internal
