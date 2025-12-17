@@ -7,6 +7,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
+import { MoJAlert } from '../../../@types/bapv'
 
 let app: Express
 let flashData: FlashData
@@ -26,7 +27,7 @@ beforeEach(() => {
   flashData = { errors: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
-  sessionData = { visitorRequest: visitorRequestForReview } as SessionData
+  sessionData = {} as SessionData
 
   app = appWithAllRoutes({
     services: { auditService, bookerService },
@@ -53,7 +54,18 @@ describe('Booker management - visitor requests - check linked visitors', () => {
         .expect(400)
     })
 
+    it('should redirect to manage bookers page if no visitor request details in session', () => {
+      return request(app).get(url).expect(302).expect('location', '/manage-bookers')
+    })
+
+    it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
+      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
+
+      return request(app).get(url).expect(302).expect('location', '/manage-bookers')
+    })
+
     it('should render check if visitor already linked page', () => {
+      sessionData.visitorRequest = visitorRequestForReview
       bookerService.getLinkedVisitors.mockResolvedValue([linkedVisitor])
 
       return request(app)
@@ -80,7 +92,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect($('[data-test=visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
 
           // Rejection reason form
-          expect($('input[name=rejectReason]').length).toBe(2)
+          expect($('input[name=rejectionReason]').length).toBe(2)
           expect($('[data-test=reject-request]').parent('form').attr('action')).toBe(url)
           expect($('[data-test=reject-request]').text().trim()).toBe('Confirm')
 
@@ -93,6 +105,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
     })
 
     it('should handle booker having no linked visitors', () => {
+      sessionData.visitorRequest = visitorRequestForReview
       bookerService.getLinkedVisitors.mockResolvedValue([])
 
       return request(app)
@@ -101,15 +114,16 @@ describe('Booker management - visitor requests - check linked visitors', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test=no-linked-visitors]').text()).toContain('no linked visitors')
-          expect($('input[name=rejectReason]').length).toBe(1)
-          expect($('input[name=rejectReason]').val()).toBe('REJECT')
+          expect($('input[name=rejectionReason]').length).toBe(1)
+          expect($('input[name=rejectionReason]').val()).toBe('REJECT')
         })
     })
 
     it('should render validation errors', () => {
+      sessionData.visitorRequest = visitorRequestForReview
       bookerService.getLinkedVisitors.mockResolvedValue([linkedVisitor])
 
-      flashData.errors = <FieldValidationError[]>[{ msg: 'Select an answer', path: 'rejectReason' }]
+      flashData.errors = <FieldValidationError[]>[{ msg: 'Select an answer', path: 'rejectionReason' }]
 
       return request(app)
         .get(url)
@@ -118,7 +132,167 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           const $ = cheerio.load(res.text)
           expect($('title').text()).toMatch(/^Error: Check if the visitor is already linked -/)
           expect($('.govuk-error-summary__body').text()).toContain('Select an answer')
-          expect($('#rejectReason-error').text()).toContain('Select an answer')
+          expect($('#rejectionReason-error').text()).toContain('Select an answer')
+        })
+    })
+  })
+
+  describe(`POST ${url}`, () => {
+    it('should require booker admin role', () => {
+      app = appWithAllRoutes({ services: { auditService, bookerService } })
+      return request(app).post(url).expect(302).expect('location', '/authError')
+    })
+
+    it('should reject an invalid visitor request reference', () => {
+      return request(app).post('/manage-bookers/visitor-request/INVALID-REQUEST-REFERENCE/link-visitor').expect(400)
+    })
+
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page - REJECT', () => {
+      const rejectedVisitorRequest = TestData.visitorRequest()
+
+      bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
+
+      sessionData.visitorRequest = visitorRequestForReview
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
+            variant: 'success',
+            title: 'You rejected the request to link Mike Jones',
+            showTitleAsHeading: true,
+            html:
+              'The booker has been notified by email. ' +
+              'You can <a href="/manage-bookers/aaaa-bbbb-cccc/booker-details">view the booker’s account</a>.',
+            dismissible: true,
+          })
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page - ALREADY_LINKED', () => {
+      const rejectedVisitorRequest = TestData.visitorRequest()
+
+      bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
+
+      sessionData.visitorRequest = visitorRequestForReview
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'ALREADY_LINKED' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'ALREADY_LINKED',
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
+            variant: 'success',
+            title: 'You confirmed that Mike Jones is already a linked visitor',
+            showTitleAsHeading: true,
+            html:
+              'The booker has been notified by email. ' +
+              'You can <a href="/manage-bookers/aaaa-bbbb-cccc/booker-details">view the booker’s account</a>.',
+            dismissible: true,
+          })
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'ALREADY_LINKED',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should redirect to manage bookers page if no visitor request details in session', () => {
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).not.toHaveBeenCalled()
+          expect(flashProvider).not.toHaveBeenCalled()
+          expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
+      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
+          expect(flashProvider).not.toHaveBeenCalled()
+          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(sessionData.visitorRequest).toBeUndefined()
+        })
+    })
+
+    it('should set validation error if no rejection reason selected and redirect to original page', () => {
+      sessionData.visitorRequest = {
+        reference: visitorRequestForReview.reference,
+      } as SessionData['visitorRequest']
+
+      return request(app)
+        .post(url)
+        .send({})
+        .expect(302)
+        .expect(
+          'location',
+          `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/check-linked-visitors`,
+        )
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Select an answer', path: 'rejectionReason', type: 'field', value: undefined },
+          ])
+        })
+    })
+
+    it('should set validation error if invalid rejection reason selected and redirect to original page', () => {
+      sessionData.visitorRequest = {
+        reference: visitorRequestForReview.reference,
+      } as SessionData['visitorRequest']
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'XYZ' })
+        .expect(302)
+        .expect(
+          'location',
+          `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/check-linked-visitors`,
+        )
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Select an answer', path: 'rejectionReason', type: 'field', value: 'XYZ' },
+          ])
         })
     })
   })

@@ -69,7 +69,7 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({
-          name: "rejectReason",
+          name: "rejectionReason",
           fieldset: {
             legend: {
               text: "Is the visitor already linked?",
@@ -87,7 +87,7 @@
               checked: not (linkedVisitorRows | length)
             }
           ],
-          errorMessage: errors | findError('rejectReason')
+          errorMessage: errors | findError('rejectionReason')
         }) }}
 
         {{ govukButton({
