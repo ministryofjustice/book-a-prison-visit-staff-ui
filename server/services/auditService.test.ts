@@ -499,4 +499,28 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a rejected visitor request audit message', async () => {
+    await auditService.rejectedVisitorRequest({
+      requestReference: 'cccc-dddd-eeee',
+      rejectionReason: 'REJECT',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'REJECTED_VISITOR_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"requestReference":"cccc-dddd-eeee","rejectionReason":"REJECT"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })
