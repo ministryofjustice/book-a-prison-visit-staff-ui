@@ -118,7 +118,7 @@
               <div class="govuk-radios__item">
                 <input class="govuk-radios__input" id="visitor-none" name="visitorId" type="radio" value="none">
                 <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="visitor-none">
-                  None of the above
+                  None of the above{% if not hasLinkedVisitors %}, reject the request{% endif %}
                 </label>
               </div>
             {% endif %}

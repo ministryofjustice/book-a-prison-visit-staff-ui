@@ -21,17 +21,23 @@ export default class VisitorRequestDetailsController {
         return res.redirect('/manage-bookers')
       }
 
+      const linkedVisitors = await this.bookerService.getLinkedVisitors({
+        username: res.locals.user.username,
+        bookerReference: visitorRequest.bookerReference,
+        prisonerId: visitorRequest.prisonerId,
+      })
+
       const showNoDobWarning = visitorRequest.socialContacts.some(contact => contact.dateOfBirth === null)
       const atLeastOneSelectableContact = visitorRequest.socialContacts.some(contact => contact.dateOfBirth?.length)
 
-      // store request details needed for validation in session
-      req.session.visitorRequest = visitorRequest
+      req.session.visitorRequestJourney = { visitorRequest, linkedVisitors }
 
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
         errors: req.flash('errors'),
         atLeastOneSelectableContact,
         showNoDobWarning,
         visitorRequest,
+        hasLinkedVisitors: !!linkedVisitors.length,
       })
     }
   }
@@ -39,12 +45,13 @@ export default class VisitorRequestDetailsController {
   public submit(): RequestHandler {
     return async (req, res, next) => {
       const { requestReference } = req.params
-      const { visitorRequest } = req.session
+      const { visitorRequestJourney } = req.session
 
-      if (!visitorRequest || visitorRequest.reference !== requestReference) {
-        delete req.session.visitorRequest
+      if (!visitorRequestJourney || visitorRequestJourney.visitorRequest.reference !== requestReference) {
+        delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
+      const { visitorRequest } = visitorRequestJourney
 
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -87,7 +94,7 @@ export default class VisitorRequestDetailsController {
           operationId: res.locals.appInsightsOperationId,
         })
 
-        delete req.session.visitorRequest
+        delete req.session.visitorRequestJourney
       }
 
       return res.redirect(`/manage-bookers`)
