@@ -6,6 +6,7 @@ import { isValidPrisonerNumber } from '../validationChecks'
 import { clearSession } from '../visitorUtils'
 import type { Services } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import config from '../../config'
 
 export default function routes({ auditService, prisonerProfileService }: Services): Router {
   const router = Router()
@@ -25,6 +26,8 @@ export default function routes({ auditService, prisonerProfileService }: Service
       operationId: res.locals.appInsightsOperationId,
     })
 
+    const showVoHistoryButton = config.features.voHistory.enabled
+
     return res.render('pages/prisoner/profile', {
       messages: req.flash('messages'),
       errors: req.flash('errors'),
@@ -32,6 +35,7 @@ export default function routes({ auditService, prisonerProfileService }: Service
       prisonerName: `${prisonerProfile.prisonerDetails.lastName}, ${prisonerProfile.prisonerDetails.firstName}`,
       queryParamsForBackLink,
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(prisonerId),
+      showVoHistoryButton,
     })
   })
 
