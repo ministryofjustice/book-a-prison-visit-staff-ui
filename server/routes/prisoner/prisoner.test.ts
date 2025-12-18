@@ -145,9 +145,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="view-vo-history"]').attr('href')).toBe(
-            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/visiting-orders-history',
-          )
+          expect($('[data-test="view-vo-history"]').attr('href')).toBe('/prisoner/A1234BC/visiting-orders-history')
         })
     })
 
