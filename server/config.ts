@@ -153,6 +153,9 @@ export default {
     visitorRequests: {
       enabled: get('FEATURE_VISITOR_REQUESTS', 'false') === 'true',
     },
+    voHistory: {
+      enabled: get('FEATURE_VO_HISTORY', 'false') === 'true',
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: translateEnvironment(get('ENVIRONMENT_NAME', '')),

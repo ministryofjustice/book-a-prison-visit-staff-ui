@@ -70,6 +70,7 @@ context('Prisoner profile page', () => {
     prisonerProfilePage.visitTabPVORemaining().contains(2)
     prisonerProfilePage.visitTabPVOLastAdjustment().contains('1 December 2021')
     prisonerProfilePage.visitTabPVONextAdjustment().contains('1 January 2022')
+    prisonerProfilePage.visitsTabShowVoHistoryLink().should('not.exist') // feature not enabled by default
 
     // Active alerts tab
     prisonerProfilePage.selectActiveAlertsTab()
