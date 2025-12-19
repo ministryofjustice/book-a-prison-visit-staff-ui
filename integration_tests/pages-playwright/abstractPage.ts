@@ -15,12 +15,17 @@ export default class AbstractPage {
   /** link to manage user details */
   readonly manageUserDetails: Locator
 
+  /** top of page MoJ alert messages */
+  readonly messages: Locator
+
   protected constructor(page: Page) {
     this.page = page
     this.phaseBanner = page.getByTestId('header-phase-banner')
     this.usersName = page.locator('[data-qa=header-user-name]')
     this.signoutLink = page.getByText('Sign out')
     this.manageUserDetails = page.getByTestId('manageDetails')
+
+    this.messages = page.locator('.moj-alert')
   }
 
   async signOut() {
