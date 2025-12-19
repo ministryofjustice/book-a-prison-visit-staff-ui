@@ -42,28 +42,24 @@
 
       <h2 class="govuk-heading-l">Linked visitors</h2>
 
-      {% if linkedVisitorRows | length %}
-        <p>
-          These visitors for
-          <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>
-          are already linked to the booker’s account. 
-        </p>
+      <p>
+        These visitors for
+        <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>
+        are already linked to the booker’s account. 
+      </p>
 
-        {{ govukTable({
-          classes: "govuk-!-width-one-half govuk-!-margin-bottom-8",
-          head: [
-            {
-              text: "Name"
-            },
-            {
-              text: "Date of birth"
-            }
-          ],
-          rows: linkedVisitorRows
-        }) }}
-      {% else %}
-        <p data-test="no-linked-visitors">There are no linked visitors for this prisoner.</p>
-      {% endif %}
+      {{ govukTable({
+        classes: "govuk-!-width-one-half govuk-!-margin-bottom-8",
+        head: [
+          {
+            text: "Name"
+          },
+          {
+            text: "Date of birth"
+          }
+        ],
+        rows: linkedVisitorRows
+      }) }}
 
       <form action="/manage-bookers/visitor-request/{{ visitorRequest.reference }}/check-linked-visitors" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -77,14 +73,13 @@
             }
           },
           items: [
-            ({
+            {
               value: "ALREADY_LINKED",
               text: "Yes, tell the booker that the visitor is already linked to their account"
-            } if linkedVisitorRows | length),
+            },
             {
               value: "REJECT",
-              text: "No, reject the request",
-              checked: not (linkedVisitorRows | length)
+              text: "No, reject the request"
             }
           ],
           errorMessage: errors | findError('rejectionReason')

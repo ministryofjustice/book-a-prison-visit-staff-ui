@@ -15,18 +15,13 @@ export default class CheckLinkedVisitorsController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { requestReference } = req.params
-      const { visitorRequest } = req.session
+      const { visitorRequestJourney } = req.session
 
-      if (!visitorRequest || visitorRequest.reference !== requestReference) {
-        delete req.session.visitorRequest
+      if (!visitorRequestJourney || visitorRequestJourney.visitorRequest.reference !== requestReference) {
+        delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
-
-      const linkedVisitors = await this.bookerService.getLinkedVisitors({
-        username: res.locals.user.username,
-        bookerReference: visitorRequest.bookerReference,
-        prisonerId: visitorRequest.prisonerId,
-      })
+      const { visitorRequest, linkedVisitors } = visitorRequestJourney
 
       return res.render('pages/bookerManagement/visitorRequests/checkLinkedVisitors', {
         errors: req.flash('errors'),
@@ -39,10 +34,10 @@ export default class CheckLinkedVisitorsController {
   public submit(): RequestHandler {
     return async (req, res, next) => {
       const { requestReference } = req.params
-      const { visitorRequest } = req.session
+      const { visitorRequestJourney } = req.session
 
-      if (!visitorRequest || visitorRequest.reference !== requestReference) {
-        delete req.session.visitorRequest
+      if (!visitorRequestJourney || visitorRequestJourney.visitorRequest.reference !== requestReference) {
+        delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
 
@@ -63,6 +58,13 @@ export default class CheckLinkedVisitorsController {
         })
 
         req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+
+        this.auditService.rejectedVisitorRequest({
+          requestReference,
+          rejectionReason,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
       } catch (error) {
         if (error.status !== 400) {
           return next(error)
@@ -71,15 +73,7 @@ export default class CheckLinkedVisitorsController {
         req.flash('messages', requestAlreadyReviewedMessage())
       }
 
-      this.auditService.rejectedVisitorRequest({
-        requestReference,
-        rejectionReason,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
-
-      delete req.session.visitorRequest
-
+      delete req.session.visitorRequestJourney
       return res.redirect(`/manage-bookers`)
     }
   }

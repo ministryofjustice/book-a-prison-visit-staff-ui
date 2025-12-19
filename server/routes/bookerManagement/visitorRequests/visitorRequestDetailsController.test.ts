@@ -8,7 +8,8 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
-import { requestAlreadyReviewedMessage, requestApprovedMessage } from './visitorRequestMessages'
+import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
+import { VisitorRequestForReviewDto } from '../../../data/orchestrationApiTypes'
 
 let app: Express
 let flashData: FlashData
@@ -18,6 +19,7 @@ const auditService = createMockAuditService()
 const bookerService = createMockBookerService()
 
 const visitorRequestForReview = TestData.visitorRequestForReview()
+const linkedVisitors = [TestData.visitorInfo()]
 const url = `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`
 const fakeDateTime = new Date('2025-10-01T09:00')
 
@@ -43,6 +45,10 @@ afterEach(() => {
 
 describe('Booker management - visitor requests - link a visitor', () => {
   describe(`GET ${url}`, () => {
+    beforeEach(() => {
+      bookerService.getVisitorRequestForReview.mockResolvedValue(visitorRequestForReview)
+      bookerService.getLinkedVisitors.mockResolvedValue(linkedVisitors)
+    })
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService } })
       return request(app).get(url).expect(302).expect('location', '/authError')
@@ -53,8 +59,6 @@ describe('Booker management - visitor requests - link a visitor', () => {
     })
 
     it('should render visitor request details and non-linked contacts, and save data to session', () => {
-      bookerService.getVisitorRequestForReview.mockResolvedValue(visitorRequestForReview)
-
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
@@ -94,7 +98,29 @@ describe('Booker management - visitor requests - link a visitor', () => {
             requestReference: visitorRequestForReview.reference,
           })
 
-          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
+          expect(bookerService.getLinkedVisitors).toHaveBeenCalledWith({
+            username: 'user1',
+            bookerReference: visitorRequestForReview.bookerReference,
+            prisonerId: visitorRequestForReview.prisonerId,
+          })
+
+          expect(sessionData.visitorRequestJourney).toStrictEqual({
+            visitorRequest: visitorRequestForReview,
+            linkedVisitors,
+          })
+        })
+    })
+
+    it('should render "reject" message for "none of the above" radio if booker has no already-linked visitors', () => {
+      bookerService.getLinkedVisitors.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('input#visitor-none').val()).toBe('reject')
+          expect($('label[for=visitor-none]').text().trim()).toBe('None of the above, reject the request')
         })
     })
 
@@ -113,7 +139,9 @@ describe('Booker management - visitor requests - link a visitor', () => {
             requestReference: visitorRequestForReview.reference,
           })
 
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(bookerService.getLinkedVisitors).not.toHaveBeenCalled()
+
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
@@ -167,8 +195,6 @@ describe('Booker management - visitor requests - link a visitor', () => {
     })
 
     it('should render validation errors', () => {
-      bookerService.getVisitorRequestForReview.mockResolvedValue(visitorRequestForReview)
-
       flashData.errors = <FieldValidationError[]>[{ msg: 'Select a visitor to link', path: 'visitorId' }]
 
       return request(app)
@@ -184,6 +210,10 @@ describe('Booker management - visitor requests - link a visitor', () => {
   })
 
   describe(`POST ${url}`, () => {
+    beforeEach(() => {
+      sessionData.visitorRequestJourney = { visitorRequest: visitorRequestForReview, linkedVisitors }
+    })
+
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService } })
       return request(app).post(url).expect(302).expect('location', '/authError')
@@ -195,10 +225,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
     it('should approve request, send audit, set message, clear session and redirect to manage bookers page if visitor selected', () => {
       const approvedVisitorRequest = TestData.visitorRequest()
-
       bookerService.approveVisitorRequest.mockResolvedValue(approvedVisitorRequest)
-
-      sessionData.visitorRequest = visitorRequestForReview
 
       return request(app)
         .post(url)
@@ -221,13 +248,11 @@ describe('Booker management - visitor requests - link a visitor', () => {
             operationId: undefined,
           })
 
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should redirect to check if visitor already linked page if "none" option selected', () => {
-      sessionData.visitorRequest = visitorRequestForReview
-
       return request(app)
         .post(url)
         .send({ visitorId: 'none' })
@@ -240,12 +265,44 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest.reference).toBe(visitorRequestForReview.reference)
+          expect(sessionData.visitorRequestJourney.visitorRequest.reference).toBe(visitorRequestForReview.reference)
+        })
+    })
+
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page if no linked visitors and "None" (reject) selected', () => {
+      const rejectedVisitorRequest = TestData.visitorRequest()
+      bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
+      const rejectionReason = 'REJECT'
+
+      return request(app)
+        .post(url)
+        .send({ visitorId: 'reject' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason,
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestRejectedMessage(visitorRequestForReview, rejectionReason),
+          )
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason,
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should redirect to booker management with message if approve returns HTP 400 (request already reviewed)', () => {
-      sessionData.visitorRequest = visitorRequestForReview
       bookerService.approveVisitorRequest.mockRejectedValue(new BadRequest())
 
       return request(app)
@@ -261,20 +318,12 @@ describe('Booker management - visitor requests - link a visitor', () => {
           })
 
           expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
-
-          expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
-            requestReference: visitorRequestForReview.reference,
-            visitorId: '4321',
-            username: 'user1',
-            operationId: undefined,
-          })
-
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should propagate any other API errors', () => {
-      sessionData.visitorRequest = visitorRequestForReview
       bookerService.approveVisitorRequest.mockRejectedValue(new InternalServerError())
 
       return request(app)
@@ -289,11 +338,16 @@ describe('Booker management - visitor requests - link a visitor', () => {
           })
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
+          expect(sessionData.visitorRequestJourney).toStrictEqual({
+            visitorRequest: visitorRequestForReview,
+            linkedVisitors,
+          })
         })
     })
 
     it('should redirect to manage bookers page if no visitor request details in session', () => {
+      delete sessionData.visitorRequestJourney
+
       return request(app)
         .post(url)
         .send({ visitorId: '1' })
@@ -307,7 +361,9 @@ describe('Booker management - visitor requests - link a visitor', () => {
     })
 
     it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
-      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
+      sessionData.visitorRequestJourney.visitorRequest = {
+        reference: 'a-different-reference',
+      } as VisitorRequestForReviewDto
 
       return request(app)
         .post(url)
@@ -318,33 +374,29 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
-    it('should redirect to manage bookers page if invalid visitor ID submitted', () => {
-      sessionData.visitorRequest = {
+    it('should set validation error if invalid visitor ID submitted', () => {
+      sessionData.visitorRequestJourney.visitorRequest = {
         reference: visitorRequestForReview.reference,
         socialContacts: [{ visitorId: 999 }],
-      } as SessionData['visitorRequest']
+      } as VisitorRequestForReviewDto
 
       return request(app)
         .post(url)
         .send({ visitorId: '1' })
         .expect(302)
-        .expect('location', '/manage-bookers')
+        .expect('location', `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`)
         .expect(() => {
-          expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
-          expect(flashProvider).not.toHaveBeenCalled()
-          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: 1 },
+          ])
         })
     })
 
     it('should set validation error if no visitor selected and redirect to original page', () => {
-      sessionData.visitorRequest = {
-        reference: visitorRequestForReview.reference,
-      } as SessionData['visitorRequest']
-
       return request(app)
         .post(url)
         .send({})
@@ -352,7 +404,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .expect('location', `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: undefined },
+            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: NaN },
           ])
         })
     })
