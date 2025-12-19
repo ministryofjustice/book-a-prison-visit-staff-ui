@@ -63,4 +63,9 @@ test.describe('SignIn', () => {
     const homePage = await HomePage.verifyOnPage(page)
     await expect(homePage.usersName).toHaveText('S. Othertestuser')
   })
+
+  test('User without required role is redirected to Authorisation Error page', async ({ page }) => {
+    await login(page, { roles: [] })
+    await expect(page.locator('h1')).toHaveText('Authorisation Error')
+  })
 })
