@@ -8,7 +8,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
-import { requestAlreadyReviewedMessage, requestApprovedMessage } from './visitorRequestMessages'
+import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
 import { VisitorRequestForReviewDto } from '../../../data/orchestrationApiTypes'
 
 let app: Express
@@ -119,7 +119,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('input#visitor-none').val()).toBe('none')
+          expect($('input#visitor-none').val()).toBe('reject')
           expect($('label[for=visitor-none]').text().trim()).toBe('None of the above, reject the request')
         })
     })
@@ -269,6 +269,39 @@ describe('Booker management - visitor requests - link a visitor', () => {
         })
     })
 
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page if no linked visitors and "None" (reject) selected', () => {
+      const rejectedVisitorRequest = TestData.visitorRequest()
+      bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
+      const rejectionReason = 'REJECT'
+
+      return request(app)
+        .post(url)
+        .send({ visitorId: 'reject' })
+        .expect(302)
+        .expect('location', '/manage-bookers')
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason,
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestRejectedMessage(visitorRequestForReview, rejectionReason),
+          )
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason,
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
+        })
+    })
+
     it('should redirect to booker management with message if approve returns HTP 400 (request already reviewed)', () => {
       bookerService.approveVisitorRequest.mockRejectedValue(new BadRequest())
 
@@ -285,14 +318,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
           })
 
           expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
-
-          expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
-            requestReference: visitorRequestForReview.reference,
-            visitorId: '4321',
-            username: 'user1',
-            operationId: undefined,
-          })
-
+          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
@@ -352,7 +378,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
         })
     })
 
-    it('should redirect to manage bookers page if invalid visitor ID submitted', () => {
+    it('should set validation error if invalid visitor ID submitted', () => {
       sessionData.visitorRequestJourney.visitorRequest = {
         reference: visitorRequestForReview.reference,
         socialContacts: [{ visitorId: 999 }],
@@ -362,11 +388,11 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .post(url)
         .send({ visitorId: '1' })
         .expect(302)
-        .expect('location', '/manage-bookers')
+        .expect('location', `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`)
         .expect(() => {
-          expect(bookerService.approveVisitorRequest).not.toHaveBeenCalled()
-          expect(flashProvider).not.toHaveBeenCalled()
-          expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
+          expect(flashProvider).toHaveBeenCalledWith('errors', [
+            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: 1 },
+          ])
         })
     })
 
@@ -378,7 +404,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .expect('location', `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`)
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [
-            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: undefined },
+            { location: 'body', msg: 'Select a visitor to link', path: 'visitorId', type: 'field', value: NaN },
           ])
         })
     })

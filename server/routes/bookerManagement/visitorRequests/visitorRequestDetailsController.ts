@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
-import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
+import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
-import { requestAlreadyReviewedMessage, requestApprovedMessage } from './visitorRequestMessages'
+import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
 
 export default class VisitorRequestDetailsController {
   public constructor(
@@ -51,7 +51,6 @@ export default class VisitorRequestDetailsController {
         delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
-      const { visitorRequest } = visitorRequestJourney
 
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -59,19 +58,36 @@ export default class VisitorRequestDetailsController {
         return res.redirect(`/manage-bookers/visitor-request/${requestReference}/link-visitor`)
       }
 
-      const { visitorId: visitorIdString } = matchedData<{ visitorId: string }>(req)
+      const { visitorId } = matchedData<{ visitorId: 'none' | 'reject' | number }>(req)
 
-      if (visitorIdString === 'none') {
+      // 'None' radio selected - go to linked visitors page
+      if (visitorId === 'none') {
         return res.redirect(`/manage-bookers/visitor-request/${requestReference}/check-linked-visitors`)
       }
 
-      const visitorId = parseInt(visitorIdString, 10)
-      const validVisitorIds = visitorRequest.socialContacts.map(contact => contact.visitorId)
-      const isVisitorIdValid = validVisitorIds.includes(visitorId)
-      if (isVisitorIdValid) {
+      try {
         const { username } = res.locals.user
 
-        try {
+        // 'None - reject' radio selected - reject visitor request
+        if (visitorId === 'reject') {
+          const rejectionReason = 'REJECT'
+
+          const rejectedVisitorRequest = await this.bookerService.rejectVisitorRequest({
+            username,
+            requestReference,
+            rejectionReason,
+          })
+
+          req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+
+          this.auditService.rejectedVisitorRequest({
+            requestReference,
+            rejectionReason,
+            username,
+            operationId: res.locals.appInsightsOperationId,
+          })
+        } else {
+          // A non-linked visitor selected - approve visitor request
           const approvedVisitorRequest = await this.bookerService.approveVisitorRequest({
             username,
             requestReference,
@@ -79,32 +95,38 @@ export default class VisitorRequestDetailsController {
           })
 
           req.flash('messages', requestApprovedMessage(approvedVisitorRequest))
-        } catch (error) {
-          if (error.status !== 400) {
-            return next(error)
-          }
 
-          req.flash('messages', requestAlreadyReviewedMessage())
+          this.auditService.approvedVisitorRequest({
+            requestReference,
+            visitorId: visitorId.toString(),
+            username,
+            operationId: res.locals.appInsightsOperationId,
+          })
+        }
+      } catch (error) {
+        if (error.status !== 400) {
+          return next(error)
         }
 
-        this.auditService.approvedVisitorRequest({
-          requestReference,
-          visitorId: visitorIdString,
-          username,
-          operationId: res.locals.appInsightsOperationId,
-        })
-
-        delete req.session.visitorRequestJourney
+        req.flash('messages', requestAlreadyReviewedMessage())
       }
 
+      delete req.session.visitorRequestJourney
       return res.redirect(`/manage-bookers`)
     }
   }
 
   public validate(): ValidationChain[] {
     return [
-      // visitorId should be an integer or 'none'
-      body('visitorId').if(body('visitorId').not().equals('none')).isInt().withMessage('Select a visitor to link'),
+      // visitorId should be 'none' or an integer that matches a valid visitor ID
+      body('visitorId')
+        .if(body('visitorId').not().isIn(['none', 'reject']))
+        .toInt()
+        .custom((visitorId: number, { req }: Meta & { req: Express.Request }) => {
+          const { visitorRequestJourney } = req.session
+          return visitorRequestJourney?.visitorRequest.socialContacts.some(contact => contact.visitorId === visitorId)
+        })
+        .withMessage('Select a visitor to link'),
     ]
   }
 }

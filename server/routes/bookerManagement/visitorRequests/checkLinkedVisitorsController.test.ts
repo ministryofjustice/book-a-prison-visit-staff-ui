@@ -209,14 +209,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           })
 
           expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
-
-          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
-            requestReference: visitorRequestForReview.reference,
-            rejectionReason: 'REJECT',
-            username: 'user1',
-            operationId: undefined,
-          })
-
+          expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })

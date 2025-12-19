@@ -58,6 +58,13 @@ export default class CheckLinkedVisitorsController {
         })
 
         req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+
+        this.auditService.rejectedVisitorRequest({
+          requestReference,
+          rejectionReason,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
       } catch (error) {
         if (error.status !== 400) {
           return next(error)
@@ -66,15 +73,7 @@ export default class CheckLinkedVisitorsController {
         req.flash('messages', requestAlreadyReviewedMessage())
       }
 
-      this.auditService.rejectedVisitorRequest({
-        requestReference,
-        rejectionReason,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
-
       delete req.session.visitorRequestJourney
-
       return res.redirect(`/manage-bookers`)
     }
   }
