@@ -72,8 +72,8 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
           // Visitor request details
           expect($('[data-test=booker-email]').text()).toBe(visitorRequestForReview.bookerEmail)
-          expect($('[data-test=visitor-name]').text()).toBe('Mike Jones')
-          expect($('[data-test=visitor-dob]').text()).toBe('10 November 1999')
+          expect($('[data-test=requested-visitor-name]').text()).toBe('Mike Jones')
+          expect($('[data-test=requested-visitor-dob]').text()).toBe('10 November 1999')
 
           // Non-linked visitor list
           expect($('h2').text().trim()).toBe('John Smith’s visitors')

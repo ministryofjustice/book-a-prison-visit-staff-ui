@@ -90,8 +90,8 @@ describe('Booker management - visitor requests - check linked visitors', () => {
 
           // Visitor request details
           expect($('[data-test=booker-email]').text()).toBe(visitorRequestForReview.bookerEmail)
-          expect($('[data-test=visitor-name]').text()).toBe('Mike Jones')
-          expect($('[data-test=visitor-dob]').text()).toBe('10 November 1999')
+          expect($('[data-test=requested-visitor-name]').text()).toBe('Mike Jones')
+          expect($('[data-test=requested-visitor-dob]').text()).toBe('10 November 1999')
 
           // Linked visitor list
           expect($('[data-test=visitor-1-name]').text()).toBe('Jeanette Smith')
