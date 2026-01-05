@@ -1020,6 +1020,27 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVoHistory', () => {
+    it('should return voHistoryDetails for selected prisoner', async () => {
+      const visitOrderHistoryDetailsDto = TestData.visitOrderHistoryDetailsDto()
+
+      fakeOrchestrationApi
+        .get(`/visit-orders/${visitOrderHistoryDetailsDto.prisonerId}/history`)
+        .query({
+          fromDate: '01-01-2025',
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitOrderHistoryDetailsDto)
+
+      const output = await orchestrationApiClient.getVoHistory({
+        prisonerId: visitOrderHistoryDetailsDto.prisonerId,
+        fromDate: '01-01-2025',
+      })
+
+      expect(output).toStrictEqual(visitOrderHistoryDetailsDto)
+    })
+  })
+
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
       const prisonerProfile = TestData.prisonerProfile()

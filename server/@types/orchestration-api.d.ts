@@ -3140,6 +3140,51 @@ export interface components {
       /** @description List of visit sessions and prisoner schedules */
       sessionsAndSchedule: components['schemas']['SessionsAndScheduleDto'][]
     }
+    VisitOrderHistoryAttributesDto: {
+      /**
+       * @description Visit order history attribute type
+       * @example VISIT_REFERENCE
+       * @enum {string}
+       */
+      attributeType: 'VISIT_REFERENCE' | 'INCENTIVE_LEVEL' | 'OLD_PRISONER_ID' | 'NEW_PRISONER_ID'
+      /** @description Visit order history attribute value */
+      attributeValue: string
+    }
+    VisitOrderHistoryDetailsDto: {
+      /**
+       * @description nomsNumber of the prisoner
+       * @example AA123456
+       */
+      prisonerId: string
+      /**
+       * @description First Name
+       * @example Robert
+       */
+      firstName: string
+      /**
+       * @description Last name
+       * @example Larsen
+       */
+      lastName: string
+      /**
+       * @description Convicted Status
+       * @example Convicted
+       * @enum {string}
+       */
+      convictedStatus?: 'Convicted' | 'Remand'
+      /**
+       * @description Incentive level
+       * @example Standard
+       */
+      incentiveLevel?: string
+      /**
+       * @description Category description (from list of assessments)
+       * @example Category C
+       */
+      category?: string
+      /** @description List of Visit Order History */
+      visitOrderHistory: components['schemas']['VisitOrderHistoryDto'][]
+    }
     VisitOrderHistoryDto: {
       /**
        * @description nomsNumber of the prisoner
@@ -3149,8 +3194,23 @@ export interface components {
       /**
        * @description Visit Order History Type
        * @example VO_ALLOCATION
+       * @enum {string}
        */
-      visitOrderHistoryType: string
+      visitOrderHistoryType:
+        | 'MIGRATION'
+        | 'VO_ACCUMULATION'
+        | 'VO_ALLOCATION'
+        | 'VO_AND_PVO_ALLOCATION'
+        | 'PVO_ALLOCATION'
+        | 'VO_EXPIRATION'
+        | 'VO_AND_PVO_EXPIRATION'
+        | 'PVO_EXPIRATION'
+        | 'ALLOCATION_USED_BY_VISIT'
+        | 'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED'
+        | 'PRISONER_BALANCE_RESET'
+        | 'SYNC_FROM_NOMIS'
+        | 'ALLOCATION_ADDED_AFTER_PRISONER_MERGE'
+        | 'ADMIN_RESET_NEGATIVE_BALANCE'
       /**
        * Format: date-time
        * @description Visit order history created data and time
@@ -3189,9 +3249,7 @@ export interface components {
       /** @description Comment added by STAFF, null if SYSTEM event or if no comment was entered by STAFF */
       comment?: string
       /** @description Key, value combination of attributes */
-      attributes: {
-        [key: string]: string
-      }
+      attributes: components['schemas']['VisitOrderHistoryAttributesDto'][]
     }
     DlqMessage: {
       body: {
@@ -6673,7 +6731,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          '*/*': components['schemas']['VisitOrderHistoryDto'][]
+          '*/*': components['schemas']['VisitOrderHistoryDetailsDto']
         }
       }
       /** @description Incorrect request to get visit order history for a prisoner since the from date. */

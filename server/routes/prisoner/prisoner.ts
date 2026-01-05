@@ -1,6 +1,7 @@
 import { type Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
+import { format, subMonths } from 'date-fns'
 import { VisitSessionData } from '../../@types/bapv'
 import { isValidPrisonerNumber } from '../validationChecks'
 import { clearSession } from '../visitorUtils'
@@ -8,8 +9,31 @@ import type { Services } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import config from '../../config'
 
-export default function routes({ auditService, prisonerProfileService }: Services): Router {
+export default function routes({ auditService, prisonerProfileService, visitOrderHistoryService }: Services): Router {
   const router = Router()
+
+  router.get('/:offenderNo/visiting-orders-history', async (req, res) => {
+    const prisonerId = getOffenderNo(req)
+
+    // redirect back to profile, if address visited
+    if (!config.features.voHistory.enabled) {
+      return res.redirect(`/prisoner/${prisonerId}`)
+    }
+
+    const date = format(subMonths(new Date(Date.now()), 3), 'y-MM-dd')
+
+    const { prisonerDetails, historyItems } = await visitOrderHistoryService.getVoHistory({
+      prisonerId,
+      fromDate: date,
+      username: res.locals.user.username,
+    })
+
+    return res.render('pages/prisoner/voHistory', {
+      prisonerId,
+      prisonerDetails,
+      historyItems,
+    })
+  })
 
   router.get('/:offenderNo', async (req, res) => {
     const prisonerId = getOffenderNo(req)

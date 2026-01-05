@@ -1,4 +1,4 @@
-.prisoner-profile-summary {
+.prisoner-profile-summary, .vo-history-summary {
   @extend %govuk-list;
   display: flex;
   flex-wrap: wrap;
@@ -16,6 +16,13 @@
     strong {
       margin-right: govuk-spacing(4);
     }
+  }
+}
+
+.vo-history-summary li {
+
+  @include govuk-media-query($from: desktop) {
+    flex-basis: 24%;
   }
 }
 

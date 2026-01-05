@@ -37,6 +37,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitOrderHistoryDetailsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitorRequestsCountByPrisonCodeDto,
@@ -551,6 +552,23 @@ export default class OrchestrationApiClient {
         prisonerId,
         min: minNumberOfDays.toString(),
         username,
+      }).toString(),
+    })
+  }
+
+  // visit-orders-controller
+
+  async getVoHistory({
+    prisonerId,
+    fromDate,
+  }: {
+    prisonerId: string
+    fromDate: string
+  }): Promise<VisitOrderHistoryDetailsDto> {
+    return this.restClient.get({
+      path: `/visit-orders/${prisonerId}/history`,
+      query: new URLSearchParams({
+        fromDate,
       }).toString(),
     })
   }

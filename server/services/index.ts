@@ -6,6 +6,7 @@ import PrisonerProfileService from './prisonerProfileService'
 import PrisonerSearchService from './prisonerSearchService'
 import PrisonerVisitorsService from './prisonerVisitorsService'
 import SupportedPrisonsService from './supportedPrisonsService'
+import VisitOrderHistoryService from './visitOrderHistoryService'
 import VisitNotificationsService from './visitNotificationsService'
 import VisitRequestsService from './visitRequestsService'
 import VisitService from './visitService'
@@ -34,6 +35,8 @@ export const services = () => {
 
   const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient)
 
+  const visitOrderHistoryService = new VisitOrderHistoryService(orchestrationApiClientBuilder, hmppsAuthClient)
+
   const visitNotificationsService = new VisitNotificationsService(orchestrationApiClientBuilder, hmppsAuthClient)
 
   const visitRequestsService = new VisitRequestsService(orchestrationApiClientBuilder, hmppsAuthClient)
@@ -50,6 +53,7 @@ export const services = () => {
     prisonerSearchService,
     prisonerVisitorsService,
     supportedPrisonsService,
+    visitOrderHistoryService,
     visitNotificationsService,
     visitRequestsService,
     visitService,
@@ -68,6 +72,7 @@ export {
   PrisonerSearchService,
   PrisonerVisitorsService,
   SupportedPrisonsService,
+  VisitOrderHistoryService,
   VisitNotificationsService,
   VisitRequestsService,
   VisitService,

@@ -22,6 +22,8 @@ import {
   VisitNotificationEventRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitOrderHistoryDetailsDto,
+  VisitOrderHistoryDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPreview,
@@ -762,6 +764,51 @@ export default class TestData {
     bookedByName,
     visitDate,
     notifications,
+  })
+
+  static visitOrderHistoryDto = ({
+    prisonerId = 'A1234BC',
+    createdTimeStamp = '2025-01-01T10:00:00',
+    pvoBalance = 0,
+    pvoBalanceChange = 0,
+    voBalance = 0,
+    voBalanceChange = 0,
+    comment = 'a comment',
+    visitOrderHistoryType = 'VO_ALLOCATION',
+    userName = 'user1',
+    attributes = [
+      { attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' },
+      { attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' },
+    ],
+  }: Partial<VisitOrderHistoryDto> = {}): VisitOrderHistoryDto => ({
+    prisonerId,
+    createdTimeStamp,
+    pvoBalance,
+    pvoBalanceChange,
+    voBalance,
+    voBalanceChange,
+    comment,
+    visitOrderHistoryType,
+    userName,
+    attributes,
+  })
+
+  static visitOrderHistoryDetailsDto = ({
+    prisonerId = 'A1234BC',
+    firstName = 'John',
+    lastName = 'Smith',
+    convictedStatus = 'Convicted',
+    incentiveLevel = 'Standard',
+    category = 'Category B',
+    visitOrderHistory = [this.visitOrderHistoryDto()],
+  }: Partial<VisitOrderHistoryDetailsDto> = {}): VisitOrderHistoryDetailsDto => ({
+    prisonerId,
+    firstName,
+    lastName,
+    convictedStatus,
+    incentiveLevel,
+    category,
+    visitOrderHistory,
   })
 
   static visitorInfo = ({
