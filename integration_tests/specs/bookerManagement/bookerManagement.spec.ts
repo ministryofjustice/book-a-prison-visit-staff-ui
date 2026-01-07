@@ -5,13 +5,13 @@ import { login, resetStubs } from '../../testUtils'
 import HomePage from '../../pages-playwright/homePage'
 import TestData from '../../../server/routes/testutils/testData'
 import bapvUserRoles from '../../../server/constants/bapvUserRoles'
-import BookerSearchPage from '../../pages-playwright/bookerManagement/bookerSearchPage'
+import BookerManagementPage from '../../pages-playwright/bookerManagement/bookerManagementPage'
 import BookerDetailsPage from '../../pages-playwright/bookerManagement/booker/bookerDetailsPage'
 import SelectBookerAccountPage from '../../pages-playwright/bookerManagement/selectBookerAccountPage'
 import ApprovedVisitorListPage from '../../pages-playwright/bookerManagement/booker/approvedVisitorListPage'
 import LinkVisitorPage from '../../pages-playwright/bookerManagement/booker/linkVisitorPage'
 
-test.describe('Booker management', () => {
+test.describe('Booker management - search, manual link/unlink visitors', () => {
   test.beforeEach(async () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
@@ -49,9 +49,9 @@ test.describe('Booker management', () => {
       await homePage.bookerManagementTile.click()
 
       // Search for booker by email
-      const bookerSearchPage = await BookerSearchPage.verifyOnPage(page)
-      await bookerSearchPage.emailInput.fill(email)
-      await bookerSearchPage.search.click()
+      const bookerManagementPage = await BookerManagementPage.verifyOnPage(page)
+      await bookerManagementPage.emailInput.fill(email)
+      await bookerManagementPage.search.click()
 
       // Booker details page
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
@@ -83,9 +83,9 @@ test.describe('Booker management', () => {
       await homePage.bookerManagementTile.click()
 
       // Search for booker by email
-      const bookerSearchPage = await BookerSearchPage.verifyOnPage(page)
-      await bookerSearchPage.emailInput.fill(email)
-      await bookerSearchPage.search.click()
+      const bookerManagementPage = await BookerManagementPage.verifyOnPage(page)
+      await bookerManagementPage.emailInput.fill(email)
+      await bookerManagementPage.search.click()
 
       await orchestrationApi.stubGetBookerDetails({
         reference: activeBookerDetails.reference,
@@ -115,9 +115,9 @@ test.describe('Booker management', () => {
       await homePage.bookerManagementTile.click()
 
       // Search for booker by email
-      const bookerSearchPage = await BookerSearchPage.verifyOnPage(page)
-      await bookerSearchPage.emailInput.fill(email)
-      bookerSearchPage.search.click()
+      const bookerManagementPage = await BookerManagementPage.verifyOnPage(page)
+      await bookerManagementPage.emailInput.fill(email)
+      bookerManagementPage.search.click()
 
       // Booker details page
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
@@ -175,9 +175,9 @@ test.describe('Booker management', () => {
       await homePage.bookerManagementTile.click()
 
       // Search for booker by email
-      const bookerSearchPage = await BookerSearchPage.verifyOnPage(page)
-      await bookerSearchPage.emailInput.fill(email)
-      await bookerSearchPage.search.click()
+      const bookerManagementPage = await BookerManagementPage.verifyOnPage(page)
+      await bookerManagementPage.emailInput.fill(email)
+      await bookerManagementPage.search.click()
 
       // Booker details page
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)

@@ -122,7 +122,7 @@ context('Update a visit', () => {
       visitorSupport: { description: '' },
       sessionTemplateReference: sessionIn8DaysTemplateReference,
     })
-    updatedApplication.visitContact.email = 'visitor@example.com' // (may be present if visit originated in public servivce)
+    updatedApplication.visitContact.email = 'visitor@example.com' // (may be present if visit originated in public service)
     cy.task('stubCreateVisitApplicationFromVisit', {
       visitReference: originalVisit.reference,
       application: updatedApplication,
@@ -203,7 +203,7 @@ context('Update a visit', () => {
     checkYourBookingPage.submitBooking()
 
     // Confirmation page
-    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Booking updated' })
+    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Visit updated' })
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)

@@ -467,6 +467,7 @@ export default class TestData {
     maxAdultVisitors = this.prisonDto().maxAdultVisitors,
     maxChildVisitors = this.prisonDto().maxChildVisitors,
     adultAgeYears = this.prisonDto().adultAgeYears,
+    webAddress = this.prisonDto().webAddress,
     clients = this.prisonDto().clients,
   }: Partial<Prison> = {}): Prison =>
     ({
@@ -479,6 +480,7 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      webAddress,
       clients,
     }) as Prison
 
@@ -492,6 +494,7 @@ export default class TestData {
     maxAdultVisitors = 3,
     maxChildVisitors = 4,
     adultAgeYears = 18,
+    webAddress = 'https://www.example.com/hewell',
     clients = [{ userType: 'STAFF', active: true }],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
@@ -504,6 +507,7 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      webAddress,
       clients,
     }) as PrisonDto
 
