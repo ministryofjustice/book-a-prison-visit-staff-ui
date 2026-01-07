@@ -164,12 +164,16 @@ context('Book a visit', () => {
     const mainContactPage = Page.verifyOnPage(MainContactPage)
     mainContactPage.getFirstContact().check()
     mainContactPage.phoneNumberTrueRadio().click()
-    mainContactPage.enterPhoneNumber('01234 567890')
+    mainContactPage.enterPhoneNumber('07712 000 000')
     cy.task(
       'stubChangeVisitApplication',
       TestData.application({
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
+        visitContact: {
+          name: 'Jeanette Smith',
+          telephone: '07712 000 000',
+        },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -196,7 +200,7 @@ context('Book a visit', () => {
     checkYourBookingPage.visitorName(2).contains('Bob Smith (son of the prisoner)')
     checkYourBookingPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     checkYourBookingPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
-    checkYourBookingPage.mainContactNumber().contains('01234 567890')
+    checkYourBookingPage.mainContactNumber().contains('07712 000 000')
     checkYourBookingPage.requestMethod().contains('Phone call')
 
     // Confirmation
@@ -205,6 +209,10 @@ context('Book a visit', () => {
         visitStatus: 'BOOKED',
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
+        visitContact: {
+          name: 'Jeanette smith',
+          telephone: '07712 000 000',
+        },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -220,10 +228,11 @@ context('Book a visit', () => {
     })
 
     checkYourBookingPage.submitBooking()
-    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Booking confirmed' })
+    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Visit confirmed' })
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(offenderNo)
+    confirmationPage.prisonName().contains('Hewell (HMP)')
     confirmationPage.visitDate().contains(format(dateIn7Days, longDateFormat))
     confirmationPage.visitTime().contains('10am to 11am')
     confirmationPage.visitType().contains('Open')
@@ -231,7 +240,7 @@ context('Book a visit', () => {
     confirmationPage.visitorName(2).contains('Bob Smith (son of the prisoner)')
     confirmationPage.additionalSupport().contains('Wheelchair ramp, Some extra help!')
     confirmationPage.mainContactName().contains('Jeanette Smith (wife of the prisoner)')
-    confirmationPage.mainContactNumber().contains('01234 567890')
+    confirmationPage.mainContactNumber().contains('07712 000 000')
     confirmationPage.viewPrisonersProfileButton(offenderNo)
   })
 

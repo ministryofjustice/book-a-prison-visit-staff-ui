@@ -13,6 +13,8 @@ export default class ConfirmationPage extends Page {
 
   prisonerNumber = (): PageElement => cy.get('.test-visit-prisoner-number')
 
+  prisonName = (): PageElement => cy.get('.test-visit-prison')
+
   visitDate = (): PageElement => cy.get('.test-visit-date')
 
   visitTime = (): PageElement => cy.get('.test-visit-time')

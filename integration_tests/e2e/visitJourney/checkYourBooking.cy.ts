@@ -262,7 +262,7 @@ context('Check visit details page', () => {
     })
 
     checkYourBookingPage.submitBooking()
-    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Booking confirmed' })
+    const confirmationPage = Page.verifyOnPage(ConfirmationPage, { title: 'Visit confirmed' })
     confirmationPage.bookingReference().contains(TestData.visit().reference)
     confirmationPage.prisonerName().contains('John Smith')
     confirmationPage.prisonerNumber().contains(prisonerId)

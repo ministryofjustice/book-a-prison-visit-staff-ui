@@ -97,11 +97,17 @@ testJourneys.forEach(journey => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Booking updated' : 'Booking confirmed')
+          expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Visit updated' : 'Visit confirmed')
           expect($('main h2').first().text()).toBe(journey.isUpdate ? 'What happens next' : 'What to do next')
+          expect($('[data-test=booking-changes-days]').text()).toBe(journey.isUpdate ? '' : '2 days')
+          expect($('[data-test=prison-website]').text()).toBe(journey.isUpdate ? '' : 'Hewell (HMP)’s GOV.UK page')
+          expect($('[data-test=prison-website]').attr('href')).toBe(
+            journey.isUpdate ? undefined : 'https://www.example.com/hewell',
+          )
           expect($('.govuk-button--secondary').attr('href')).toBe('/prisoner/A1234BC')
           expect($('.test-visit-prisoner-name').text()).toContain('prisoner name')
           expect($('.test-visit-prisoner-number').text()).toContain('A1234BC')
+          expect($('.test-visit-prison').text()).toContain('Hewell (HMP)')
           expect($('.test-visit-date').text()).toContain('Saturday 12 March 2022')
           expect($('.test-visit-time').text()).toContain('9:30am to 10:30am')
           expect($('.test-visit-type').text()).toContain('Open')
@@ -112,11 +118,7 @@ testJourneys.forEach(journey => {
           expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
           expect($('.test-main-contact-number').text()).toContain('07771 123456')
           expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
-          expect($('[data-test=contact-method-text]').text()).toBe(
-            journey.isUpdate
-              ? 'The main contact will get a text message to confirm the updated booking. This will include the booking reference.'
-              : '',
-          )
+          expect($('[data-test=contact-method-text]').text()).toContain('a text message')
 
           expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
         })
@@ -190,7 +192,7 @@ testJourneys.forEach(journey => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Booking updated' : 'Booking confirmed')
+            expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Visit updated' : 'Visit confirmed')
             expect($('main h2').first().text()).toBe(journey.isUpdate ? 'What happens next' : 'What to do next')
             expect($('.govuk-button--secondary').attr('href')).toBe('/prisoner/A1234BC')
             expect($('.test-visit-prisoner-name').text()).toContain('prisoner name')
@@ -204,11 +206,7 @@ testJourneys.forEach(journey => {
             expect($('.test-main-contact-number').text()).toContain('No phone number provided')
             expect($('.test-main-contact-email').text()).toContain('test@test.net')
             expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
-            expect($('[data-test=contact-method-text]').text()).toBe(
-              journey.isUpdate
-                ? 'The main contact will get an email to confirm the updated booking. This will include the booking reference.'
-                : '',
-            )
+            expect($('[data-test=contact-method-text]').text()).toContain('an email')
 
             expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
           })
