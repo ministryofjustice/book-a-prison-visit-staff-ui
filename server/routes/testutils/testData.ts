@@ -772,38 +772,35 @@ export default class TestData {
 
   static visitOrderHistoryDto = ({
     prisonerId = 'A1234BC',
-    createdTimeStamp = '2025-01-01T10:00:00',
+    visitOrderHistoryType = 'VO_ALLOCATION',
+    createdTimeStamp = '2025-12-01T10:00:00',
+    voBalance = 0,
+    voBalanceChange = 0, // TODO this can be null for 'MIGRATION' type; check it's handled
     pvoBalance = 0,
     pvoBalanceChange = 0,
-    voBalance = 0,
-    voBalanceChange = 0,
-    comment = 'a comment',
-    visitOrderHistoryType = 'VO_ALLOCATION',
-    userName = 'user1',
-    attributes = [
-      { attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' },
-      { attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' },
-    ],
+    userName = 'SYSTEM', // TODO this can be null for 'MIGRATION' type; check it's handled
+    comment = null,
+    attributes = [{ attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' }],
   }: Partial<VisitOrderHistoryDto> = {}): VisitOrderHistoryDto => ({
     prisonerId,
+    visitOrderHistoryType,
     createdTimeStamp,
-    pvoBalance,
-    pvoBalanceChange,
     voBalance,
     voBalanceChange,
-    comment,
-    visitOrderHistoryType,
+    pvoBalance,
+    pvoBalanceChange,
     userName,
+    comment,
     attributes,
   })
 
   static visitOrderHistoryDetailsDto = ({
     prisonerId = 'A1234BC',
-    firstName = 'John',
-    lastName = 'Smith',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
     convictedStatus = 'Convicted',
     incentiveLevel = 'Standard',
-    category = 'Category B',
+    category = 'Cat C',
     visitOrderHistory = [this.visitOrderHistoryDto()],
   }: Partial<VisitOrderHistoryDetailsDto> = {}): VisitOrderHistoryDetailsDto => ({
     prisonerId,

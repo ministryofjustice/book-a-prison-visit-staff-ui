@@ -1027,14 +1027,14 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .get(`/visit-orders/${visitOrderHistoryDetailsDto.prisonerId}/history`)
         .query({
-          fromDate: '01-01-2025',
+          fromDate: '2025-02-01',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitOrderHistoryDetailsDto)
 
       const output = await orchestrationApiClient.getVoHistory({
         prisonerId: visitOrderHistoryDetailsDto.prisonerId,
-        fromDate: '01-01-2025',
+        fromDate: '2025-02-01',
       })
 
       expect(output).toStrictEqual(visitOrderHistoryDetailsDto)
