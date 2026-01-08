@@ -23,7 +23,7 @@ export default class VisitOrdersService {
     const results = await orchestrationApiClient.getVoHistory({ prisonerId, fromDate })
 
     const prisonerDetails = {
-      prisonerName: `${results.firstName} ${results.lastName}`,
+      prisonerName: `${results.firstName} ${results.lastName}`, // TODO need to use prisoner name helper function
       category: results.category,
       convictedStatus: results.convictedStatus,
       incentiveLevel: results.incentiveLevel,
