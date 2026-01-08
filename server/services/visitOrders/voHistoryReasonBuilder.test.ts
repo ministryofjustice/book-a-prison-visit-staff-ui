@@ -1,6 +1,7 @@
-import TestData from '../routes/testutils/testData'
+import TestData from '../../routes/testutils/testData'
 import voHistoryReasonBuilder from './voHistoryReasonBuilder'
 
+// TODO parameterise tests
 describe('voHistoryReasonBuilder - Build VO history page reason HTML', () => {
   it('should return correct content for "VO_ALLOCATION"', () => {
     const visitOrderHistory = TestData.visitOrderHistoryDto({ visitOrderHistoryType: 'VO_ALLOCATION' })
@@ -33,20 +34,24 @@ describe('voHistoryReasonBuilder - Build VO history page reason HTML', () => {
     expect(output).toStrictEqual('VO and PVO expired')
   })
   it('should return correct content for "MIGRATION"', () => {
-    const visitOrderHistory = TestData.visitOrderHistoryDto({ visitOrderHistoryType: 'MIGRATION' })
+    const visitOrderHistory = TestData.visitOrderHistoryDto({ visitOrderHistoryType: 'MIGRATION', userName: 'user1' })
     const output = voHistoryReasonBuilder({ visitOrderHistory })
     expect(output).toStrictEqual('Balance transferred from previous prison by user1')
   })
   it('should return correct content for "ALLOCATION_USED_BY_VISIT"', () => {
     const visitOrderHistory = TestData.visitOrderHistoryDto({
       visitOrderHistoryType: 'ALLOCATION_USED_BY_VISIT',
+      attributes: [{ attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' }],
     })
-    const output = voHistoryReasonBuilder({ visitOrderHistory })
+    const output = voHistoryReasonBuilder({
+      visitOrderHistory,
+    })
     expect(output).toStrictEqual(`<a href="/visit/ab-cd-ef-gh">Visit ab-cd-ef-gh</a> booked for X visit date`)
   })
   it('should return correct content for "ALLOCATION_REFUNDED_BY_VISIT_CANCELLED"', () => {
     const visitOrderHistory = TestData.visitOrderHistoryDto({
       visitOrderHistoryType: 'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED',
+      attributes: [{ attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' }],
     })
     const output = voHistoryReasonBuilder({ visitOrderHistory })
     expect(output).toStrictEqual(`<a href="/visit/ab-cd-ef-gh">Visit ab-cd-ef-gh</a> cancelled for X visit date`)

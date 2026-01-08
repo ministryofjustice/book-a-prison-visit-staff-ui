@@ -1,4 +1,4 @@
-import { VisitOrderHistoryDto } from '../data/orchestrationApiTypes'
+import { VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
 
 export default ({ visitOrderHistory }: { visitOrderHistory: VisitOrderHistoryDto }): string => {
   switch (visitOrderHistory.visitOrderHistoryType) {

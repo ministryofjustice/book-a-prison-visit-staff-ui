@@ -1,8 +1,8 @@
-import { VoHistoryPage } from '../@types/bapv'
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { VoHistoryPage } from '../../@types/bapv'
+import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../../data'
 import voHistoryReasonBuilder from './voHistoryReasonBuilder'
 
-export default class VoHistoryService {
+export default class VisitOrdersService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,
