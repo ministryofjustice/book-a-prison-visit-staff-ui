@@ -36,24 +36,6 @@ export type VisitorListItem = {
   banned: boolean
 }
 
-export type VoHistoryPage = {
-  prisonerDetails: {
-    prisonerName: string
-    category: string
-    convictedStatus: PrisonerProfileDto['convictedStatus']
-    incentiveLevel: string
-  }
-  historyItems: {
-    date: string
-    visitOrderHistoryType: string
-    voBalanceChange: number
-    voBalance: number
-    pvoBalanceChange: number
-    pvoBalance: number
-    reason: string
-  }[]
-}
-
 export type PrisonerProfilePage = {
   alerts: Alert[]
   flaggedAlerts: Alert[]
@@ -183,4 +165,11 @@ export type CancelledVisitInfo = {
 
 export type GOVUKTag = TextOrHtml & {
   classes?: string
+}
+
+export type GOVUKTableRow = GOVUKTableRowItem[]
+
+type GOVUKTableRowItem = TextOrHtml & {
+  classes?: string
+  attributes?: { 'data-test': string }
 }

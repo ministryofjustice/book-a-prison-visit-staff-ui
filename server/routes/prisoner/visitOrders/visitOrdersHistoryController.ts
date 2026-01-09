@@ -9,15 +9,15 @@ export default class VisitOrdersHistoryController {
     return async (req, res) => {
       const { prisonerId } = req.params
 
-      const { prisonerDetails, historyItems } = await this.visitOrdersService.getVoHistory({
-        prisonerId,
+      const { voHistoryRows, ...prisonerDetails } = await this.visitOrdersService.getVoHistory({
         username: res.locals.user.username,
+        prisonerId,
       })
 
-      return res.render('pages/prisoner/voHistory', {
+      return res.render('pages/prisoner/visitOrders/voHistory', {
         prisonerId,
         prisonerDetails,
-        historyItems,
+        voHistoryRows,
       })
     }
   }

@@ -3,6 +3,7 @@ import { VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
 export default ({ visitOrderHistory }: { visitOrderHistory: VisitOrderHistoryDto }): string => {
   switch (visitOrderHistory.visitOrderHistoryType) {
     case 'VO_ALLOCATION': {
+      // FIXME these 'find()'s are not safe as could return undefined
       const incentiveLevelAttribute = visitOrderHistory.attributes.find(
         attribute => attribute.attributeType === 'INCENTIVE_LEVEL',
       )
