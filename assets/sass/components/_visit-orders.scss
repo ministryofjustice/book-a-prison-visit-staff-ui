@@ -17,3 +17,16 @@
     }
   }
 }
+
+.vo-history-table {
+  // right-align numerical columns
+  tr :is(th, td):nth-child(n+3) {
+    text-align: right;
+  }
+
+  // VO/PVO balance columns bold
+  tr td:nth-child(4),
+  tr td:nth-child(6) {
+    font-weight: $govuk-font-weight-bold;
+  }
+}
