@@ -559,15 +559,22 @@ export default class OrchestrationApiClient {
 
   // visit-orders-controller
 
-  async getVoHistory(prisonerId: string): Promise<VisitOrderHistoryDetailsDto> {
+  async getVoHistory({
+    prisonId,
+    prisonerId,
+  }: {
+    prisonId: string
+    prisonerId: string
+  }): Promise<VisitOrderHistoryDetailsDto> {
     // fixed to get past 3 months of VO history
     const date3MonthsAgo = subMonths(new Date(), 3)
     const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
 
     return this.restClient.get({
-      path: `/visit-orders/${prisonerId}/history`,
+      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`,
       query: new URLSearchParams({
         fromDate,
+        maxResults: '30',
       }).toString(),
     })
   }

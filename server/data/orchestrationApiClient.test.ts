@@ -1024,20 +1024,23 @@ describe('orchestrationApiClient', () => {
     it('should return voHistoryDetails for selected prisoner (for past 3 months', async () => {
       const fakeDate = new Date('2025-12-01')
       const fakeDateMinus3Months = '2025-09-01'
+      const prisonerId = 'A1234BC'
+      const maxResults = 30
 
       jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
 
       const visitOrderHistoryDetailsDto = TestData.visitOrderHistoryDetailsDto()
 
       fakeOrchestrationApi
-        .get(`/visit-orders/${visitOrderHistoryDetailsDto.prisonerId}/history`)
+        .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`)
         .query({
           fromDate: fakeDateMinus3Months,
+          maxResults,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitOrderHistoryDetailsDto)
 
-      const output = await orchestrationApiClient.getVoHistory(visitOrderHistoryDetailsDto.prisonerId)
+      const output = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
 
       expect(output).toStrictEqual(visitOrderHistoryDetailsDto)
 

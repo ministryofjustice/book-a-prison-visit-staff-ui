@@ -14,11 +14,19 @@ export default class VisitOrdersService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getVoHistory({ username, prisonerId }: { username: string; prisonerId: string }): Promise<VoHistoryPage> {
+  async getVoHistory({
+    username,
+    prisonId,
+    prisonerId,
+  }: {
+    username: string
+    prisonId: string
+    prisonerId: string
+  }): Promise<VoHistoryPage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const voHistoryDetails = await orchestrationApiClient.getVoHistory(prisonerId)
+    const voHistoryDetails = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
     const { visitOrderHistory, ...prisonerDetails } = voHistoryDetails
 
     const voHistoryRows = visitOrderHistory.map((historyItem): GOVUKTableRow => {

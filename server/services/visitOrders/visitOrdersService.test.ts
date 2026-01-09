@@ -5,6 +5,9 @@ import VisitOrdersService from './visitOrdersService'
 const token = 'some token'
 const username = 'user1'
 
+const prisonId = 'HEI'
+const prisonerId = 'A1234BC'
+
 describe('Visit orders service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
@@ -26,16 +29,15 @@ describe('Visit orders service', () => {
 
   describe('getVoHistory', () => {
     it('should return visit order history for given prisoner', async () => {
-      const prisonerId = 'A1234BC'
       const voHistoryDetails = TestData.visitOrderHistoryDetailsDto()
 
       orchestrationApiClient.getVoHistory.mockResolvedValue(voHistoryDetails)
 
-      const result = await visitOrdersService.getVoHistory({ username, prisonerId })
+      const result = await visitOrdersService.getVoHistory({ username, prisonId, prisonerId })
 
       expect(result).not.toBe(null) // TODO flesh out test of returned data
 
-      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith(prisonerId)
+      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonId, prisonerId })
     })
   })
 })

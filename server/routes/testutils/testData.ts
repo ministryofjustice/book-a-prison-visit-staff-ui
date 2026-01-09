@@ -771,7 +771,6 @@ export default class TestData {
   })
 
   static visitOrderHistoryDto = ({
-    prisonerId = 'A1234BC',
     visitOrderHistoryType = 'VO_ALLOCATION',
     createdTimeStamp = '2025-12-01T10:00:00',
     voBalance = 0,
@@ -782,7 +781,6 @@ export default class TestData {
     comment = null,
     attributes = [{ attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' }],
   }: Partial<VisitOrderHistoryDto> = {}): VisitOrderHistoryDto => ({
-    prisonerId,
     visitOrderHistoryType,
     createdTimeStamp,
     voBalance,
