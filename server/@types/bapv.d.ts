@@ -166,3 +166,10 @@ export type CancelledVisitInfo = {
 export type GOVUKTag = TextOrHtml & {
   classes?: string
 }
+
+export type GOVUKTableRow = GOVUKTableRowItem[]
+
+type GOVUKTableRowItem = TextOrHtml & {
+  classes?: string
+  attributes?: { 'data-test': string }
+}
