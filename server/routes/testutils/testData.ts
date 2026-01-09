@@ -773,11 +773,11 @@ export default class TestData {
   static visitOrderHistoryDto = ({
     visitOrderHistoryType = 'VO_ALLOCATION',
     createdTimeStamp = '2025-12-01T10:00:00',
-    voBalance = 0,
-    voBalanceChange = 0, // TODO this can be null for 'MIGRATION' type; check it's handled
-    pvoBalance = 0,
+    voBalance = 5,
+    voBalanceChange = 0,
+    pvoBalance = 2,
     pvoBalanceChange = 0,
-    userName = 'SYSTEM', // TODO this can be null for 'MIGRATION' type; check it's handled
+    userName = 'SYSTEM',
     comment = null,
     attributes = [{ attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' }],
   }: Partial<VisitOrderHistoryDto> = {}): VisitOrderHistoryDto => ({
