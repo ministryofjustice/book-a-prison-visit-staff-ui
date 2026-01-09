@@ -8,19 +8,11 @@ export default class VisitOrdersService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getVoHistory({
-    prisonerId,
-    fromDate,
-    username,
-  }: {
-    prisonerId: string
-    fromDate: string
-    username: string
-  }): Promise<VoHistoryPage> {
+  async getVoHistory({ username, prisonerId }: { username: string; prisonerId: string }): Promise<VoHistoryPage> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const results = await orchestrationApiClient.getVoHistory({ prisonerId, fromDate })
+    const results = await orchestrationApiClient.getVoHistory(prisonerId)
 
     const prisonerDetails = {
       prisonerName: `${results.firstName} ${results.lastName}`, // TODO need to use prisoner name helper function

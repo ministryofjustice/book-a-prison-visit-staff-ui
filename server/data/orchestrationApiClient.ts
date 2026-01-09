@@ -1,3 +1,4 @@
+import { format, subMonths } from 'date-fns'
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
 import {
@@ -558,13 +559,11 @@ export default class OrchestrationApiClient {
 
   // visit-orders-controller
 
-  async getVoHistory({
-    prisonerId,
-    fromDate,
-  }: {
-    prisonerId: string
-    fromDate: string
-  }): Promise<VisitOrderHistoryDetailsDto> {
+  async getVoHistory(prisonerId: string): Promise<VisitOrderHistoryDetailsDto> {
+    // fixed to get past 3 months of VO history
+    const date3MonthsAgo = subMonths(new Date(), 3)
+    const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
+
     return this.restClient.get({
       path: `/visit-orders/${prisonerId}/history`,
       query: new URLSearchParams({

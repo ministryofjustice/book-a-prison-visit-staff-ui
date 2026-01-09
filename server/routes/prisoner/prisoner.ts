@@ -1,7 +1,6 @@
 import { type Request, Router } from 'express'
 import { body, validationResult } from 'express-validator'
 import { BadRequest } from 'http-errors'
-import { format, subMonths } from 'date-fns'
 import { VisitSessionData } from '../../@types/bapv'
 import { isValidPrisonerNumber } from '../validationChecks'
 import { clearSession } from '../visitorUtils'
@@ -9,7 +8,7 @@ import type { Services } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import config from '../../config'
 
-export default function routes({ auditService, prisonerProfileService, visitOrderHistoryService }: Services): Router {
+export default function routes({ auditService, prisonerProfileService, visitOrdersService }: Services): Router {
   const router = Router()
 
   router.get('/:offenderNo/visiting-orders-history', async (req, res) => {
@@ -20,11 +19,8 @@ export default function routes({ auditService, prisonerProfileService, visitOrde
       return res.redirect(`/prisoner/${prisonerId}`)
     }
 
-    const date = format(subMonths(new Date(Date.now()), 3), 'y-MM-dd')
-
-    const { prisonerDetails, historyItems } = await visitOrderHistoryService.getVoHistory({
+    const { prisonerDetails, historyItems } = await visitOrdersService.getVoHistory({
       prisonerId,
-      fromDate: date,
       username: res.locals.user.username,
     })
 

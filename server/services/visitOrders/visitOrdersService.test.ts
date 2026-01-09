@@ -26,17 +26,16 @@ describe('Visit orders service', () => {
 
   describe('getVoHistory', () => {
     it('should return visit order history for given prisoner', async () => {
-      const fromDate = '2025-12-01'
       const prisonerId = 'A1234BC'
       const voHistoryDetails = TestData.visitOrderHistoryDetailsDto()
 
       orchestrationApiClient.getVoHistory.mockResolvedValue(voHistoryDetails)
 
-      const result = await visitOrdersService.getVoHistory({ prisonerId, fromDate, username })
+      const result = await visitOrdersService.getVoHistory({ username, prisonerId })
 
       expect(result).not.toBe(null) // TODO flesh out test of returned data
 
-      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonerId, fromDate })
+      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith(prisonerId)
     })
   })
 })
