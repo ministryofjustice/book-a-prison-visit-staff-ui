@@ -8,9 +8,11 @@ export default class VisitOrdersHistoryController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { prisonerId } = req.params
+      const { prisonId } = req.session.selectedEstablishment
 
       const { voHistoryRows, ...prisonerDetails } = await this.visitOrdersService.getVoHistory({
         username: res.locals.user.username,
+        prisonId,
         prisonerId,
       })
 
