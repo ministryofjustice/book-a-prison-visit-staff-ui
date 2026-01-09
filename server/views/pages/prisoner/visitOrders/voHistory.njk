@@ -11,11 +11,12 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <ul>
+      <ul class="vo-history-prisoner-details">
         <li>
           <strong>Prisoner name</strong>
           <span data-test="prisoner-name">{{ (prisonerDetails.firstName + " " + prisonerDetails.lastName) | properCaseFullName }}</span>
         </li>
+        <li>
           <strong>Category</strong>
           <span data-test="prisoner-category">{{ prisonerDetails.category }}</span>
         </li>
