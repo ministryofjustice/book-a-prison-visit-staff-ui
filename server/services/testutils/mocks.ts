@@ -57,8 +57,7 @@ export const createMockSupportedPrisonsService = () =>
 export const createMockVisitNotificationsService = () =>
   new VisitNotificationsService(null, null) as jest.Mocked<VisitNotificationsService>
 
-export const createMockVisitOrdersService = () =>
-  new VisitOrdersService(null, null) as jest.Mocked<VisitOrdersService>
+export const createMockVisitOrdersService = () => new VisitOrdersService(null, null) as jest.Mocked<VisitOrdersService>
 
 export const createMockVisitRequestsService = () =>
   new VisitRequestsService(null, null) as jest.Mocked<VisitRequestsService>
