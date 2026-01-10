@@ -20,9 +20,7 @@ export default class SearchForAPrisonerResultsPage extends Page {
 
   resultRows = (): PageElement => cy.get('.bapv-result-row').parent().parent('tr')
 
-  pagingLinks = (): PageElement => cy.get('.moj-pagination__list')
-
-  nextPageLink = (): PageElement => cy.get('.moj-pagination__item--next a').first()
+  nextPageLink = (): PageElement => cy.get('.govuk-pagination__next > .govuk-link')
 
   firstResultLink = (): PageElement => cy.get('.bapv-result-row').first()
 
