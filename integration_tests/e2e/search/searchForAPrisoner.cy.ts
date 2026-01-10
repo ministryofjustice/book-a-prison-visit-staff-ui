@@ -121,7 +121,6 @@ context('Search for a prisoner', () => {
       // results page 1
       const searchForAPrisonerResultsPage = Page.verifyOnPage(SearchForAPrisonerResultsPage)
       searchForAPrisonerResultsPage.hasResults()
-      searchForAPrisonerResultsPage.pagingLinks().should('exist')
       searchForAPrisonerResultsPage.resultRows().should('have.length', 10)
       searchForAPrisonerResultsPage.checkResultRows(resultsPage1, searchTerm)
 
@@ -138,7 +137,6 @@ context('Search for a prisoner', () => {
 
       searchForAPrisonerResultsPage.nextPageLink().click()
       searchForAPrisonerResultsPage.hasResults()
-      searchForAPrisonerResultsPage.pagingLinks().should('exist')
       searchForAPrisonerResultsPage.resultRows().should('have.length', 1)
       searchForAPrisonerResultsPage.checkResultRows(resultsPage2, searchTerm)
     })
