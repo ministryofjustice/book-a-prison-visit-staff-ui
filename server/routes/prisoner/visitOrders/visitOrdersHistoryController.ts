@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { VisitOrdersService } from '../../../services'
 
-// TODO unit tests for this controller
 export default class VisitOrdersHistoryController {
   public constructor(private readonly visitOrdersService: VisitOrdersService) {}
 

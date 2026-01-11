@@ -37,6 +37,7 @@ import {
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
+import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
 
 export default class TestData {
   static address = ({
@@ -808,6 +809,33 @@ export default class TestData {
     incentiveLevel,
     category,
     visitOrderHistory,
+  })
+
+  static visitOrderHistoryPage = ({
+    prisonerId = this.visitOrderHistoryDetailsDto().prisonerId,
+    firstName = this.visitOrderHistoryDetailsDto().firstName,
+    lastName = this.visitOrderHistoryDetailsDto().lastName,
+    convictedStatus = this.visitOrderHistoryDetailsDto().convictedStatus,
+    incentiveLevel = this.visitOrderHistoryDetailsDto().incentiveLevel,
+    category = this.visitOrderHistoryDetailsDto().category,
+    voHistoryRows = [
+      [
+        { text: '1/12/2025', classes: 'bapv-secondary-text', attributes: { 'data-test': 'date-0' } },
+        { html: 'VO expired', classes: 'bapv-secondary-text', attributes: { 'data-test': 'reason-0' } },
+        { text: '1', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-change-0' } },
+        { text: '5', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-balance-0' } },
+        { text: '0', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-change-0' } },
+        { text: '2', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-balance-0' } },
+      ],
+    ],
+  }: Partial<VisitOrderHistoryPage> = {}): VisitOrderHistoryPage => ({
+    prisonerId,
+    firstName,
+    lastName,
+    convictedStatus,
+    incentiveLevel,
+    category,
+    voHistoryRows,
   })
 
   static visitorInfo = ({

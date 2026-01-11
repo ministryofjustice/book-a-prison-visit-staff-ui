@@ -1,6 +1,6 @@
 import TestData from '../../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../../data/testutils/mocks'
-import VisitOrdersService, { VoHistoryPage } from './visitOrdersService'
+import VisitOrdersService, { VisitOrderHistoryPage } from './visitOrdersService'
 
 const token = 'some token'
 const username = 'user1'
@@ -39,7 +39,7 @@ describe('Visit orders service', () => {
 
       const result = await visitOrdersService.getVoHistory({ username, prisonId, prisonerId })
 
-      expect(result).toStrictEqual<VoHistoryPage>({
+      expect(result).toStrictEqual<VisitOrderHistoryPage>({
         prisonerId: voHistoryDetails.prisonerId,
         firstName: voHistoryDetails.firstName,
         lastName: voHistoryDetails.lastName,
@@ -49,17 +49,17 @@ describe('Visit orders service', () => {
         voHistoryRows: [
           [
             // date
-            { text: '2025-12-01', classes: 'bapv-secondary-text' },
+            { text: '1/12/2025', classes: 'bapv-secondary-text', attributes: { 'data-test': 'date-0' } },
             // reason
-            { html: 'VO expired', classes: 'bapv-secondary-text' },
+            { html: 'VO expired', classes: 'bapv-secondary-text', attributes: { 'data-test': 'reason-0' } },
             // VO change
-            { text: '1', classes: 'bapv-secondary-text' },
+            { text: '1', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-change-0' } },
             // VO balance
-            { text: '5', classes: 'bapv-secondary-text' },
+            { text: '5', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-balance-0' } },
             // PVO change
-            { text: '0', classes: 'bapv-secondary-text' },
+            { text: '0', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-change-0' } },
             // PVO balance
-            { text: '2', classes: 'bapv-secondary-text' },
+            { text: '2', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-balance-0' } },
           ],
         ],
       })
