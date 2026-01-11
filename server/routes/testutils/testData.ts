@@ -774,7 +774,7 @@ export default class TestData {
     visitOrderHistoryType = 'VO_ALLOCATION',
     createdTimeStamp = '2025-12-01T10:00:00',
     voBalance = 5,
-    voBalanceChange = 0,
+    voBalanceChange = 1,
     pvoBalance = 2,
     pvoBalanceChange = 0,
     userName = 'SYSTEM',
