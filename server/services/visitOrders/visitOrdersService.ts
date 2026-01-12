@@ -39,7 +39,7 @@ export default class VisitOrdersService {
 
     const voHistoryRows = visitOrderHistory.map((historyItem, index): GOVUKTableRow => {
       const date = format(parseISO(historyItem.createdTimeStamp), 'd/M/yyyy')
-      const reason = voHistoryReasonBuilder({ visitOrderHistory: historyItem })
+      const reason = voHistoryReasonBuilder(historyItem)
 
       const classes = this.VO_HISTORY_TYPES_DEFAULT_STYLE.includes(historyItem.visitOrderHistoryType)
         ? ''
