@@ -1,0 +1,32 @@
+.vo-history-prisoner-details {
+  @extend %govuk-list;
+  display: flex;
+  justify-content: space-between;
+  gap: govuk-spacing(4) 2%;
+  margin-bottom: govuk-spacing(6);
+
+  li {
+    flex-basis: auto;
+
+    strong {
+      margin-right: govuk-spacing(4);
+    }
+
+    span {
+      white-space: nowrap;
+    }
+  }
+}
+
+.vo-history-table {
+  // right-align numerical columns
+  tr :is(th, td):nth-child(n+3) {
+    text-align: right;
+  }
+
+  // VO/PVO balance columns bold
+  tr td:nth-child(4),
+  tr td:nth-child(6) {
+    font-weight: $govuk-font-weight-bold;
+  }
+}
