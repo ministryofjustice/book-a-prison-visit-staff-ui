@@ -1080,4 +1080,64 @@ export default {
       },
     })
   },
+
+  // Stub for prisoner social contacts
+stubPrisonerSocialContacts: async ({
+  offenderNo,
+  contacts,
+}: {
+  offenderNo: string
+  contacts: Array<{
+    personId: number
+    firstName: string
+    lastName: string
+    dateOfBirth: string
+    restrictions?: any[]
+  }>
+}) => {
+  return stubFor({
+    request: {
+      method: 'GET',
+      url: `/contactRegistry/v2/prisoners/${offenderNo}/contacts/social/approved?hasDateOfBirth=false&withAddress=true`,
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: contacts,
+    },
+  })
+},
+
+  stubPrisoners: async ({
+    term,
+    prisonId,
+    results,
+  }: {
+    term: string
+    prisonId?: string
+    results: {
+      totalElements: number
+      totalPages: number
+      content: any[]
+    }
+  }) =>
+    stubFor({
+      request: {
+        method: 'GET',
+        // Use urlPathPattern to allow dynamic prisonId in the URL
+        urlPathPattern: `/offenderSearch/prison/${prisonId ?? '.*'}/prisoners`,
+        queryParameters: {
+          term: { equalTo: term },
+          page: { matches: '.*' },   // optional: match any page
+          size: { matches: '.*' },   // optional: match any size
+        },
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: results,
+      },
+    })
+
+
 }
