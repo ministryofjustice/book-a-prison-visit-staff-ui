@@ -1,8 +1,9 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
-export default class SelectVisitDateAndTime extends AbstractPage {
+export default class SelectVisitDateAndTimePage extends AbstractPage {
   readonly visitRestriction: Locator
+
   readonly continueButton: Locator
 
   private constructor(page: Page) {
@@ -11,8 +12,8 @@ export default class SelectVisitDateAndTime extends AbstractPage {
     this.continueButton = page.getByTestId('submit')
   }
 
-  static async verifyOnPage(page: Page): Promise<SelectVisitDateAndTime> {
-    const visitPage = new SelectVisitDateAndTime(page)
+  static async verifyOnPage(page: Page): Promise<SelectVisitDateAndTimePage> {
+    const visitPage = new SelectVisitDateAndTimePage(page)
     await expect(visitPage.visitRestriction).toBeVisible()
     return visitPage
   }

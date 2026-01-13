@@ -1081,33 +1081,6 @@ export default {
     })
   },
 
-  // Stub for prisoner social contacts
-stubPrisonerSocialContacts: async ({
-  offenderNo,
-  contacts,
-}: {
-  offenderNo: string
-  contacts: Array<{
-    personId: number
-    firstName: string
-    lastName: string
-    dateOfBirth: string
-    restrictions?: any[]
-  }>
-}) => {
-  return stubFor({
-    request: {
-      method: 'GET',
-      url: `/contactRegistry/v2/prisoners/${offenderNo}/contacts/social/approved?hasDateOfBirth=false&withAddress=true`,
-    },
-    response: {
-      status: 200,
-      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      jsonBody: contacts,
-    },
-  })
-},
-
   stubPrisoners: async ({
     term,
     prisonId,
@@ -1118,7 +1091,7 @@ stubPrisonerSocialContacts: async ({
     results: {
       totalElements: number
       totalPages: number
-      content: any[]
+      content: Record<string, unknown>[]
     }
   }) =>
     stubFor({
@@ -1128,8 +1101,8 @@ stubPrisonerSocialContacts: async ({
         urlPathPattern: `/offenderSearch/prison/${prisonId ?? '.*'}/prisoners`,
         queryParameters: {
           term: { equalTo: term },
-          page: { matches: '.*' },   // optional: match any page
-          size: { matches: '.*' },   // optional: match any size
+          page: { matches: '.*' }, // optional: match any page
+          size: { matches: '.*' }, // optional: match any size
         },
       },
       response: {
@@ -1137,7 +1110,5 @@ stubPrisonerSocialContacts: async ({
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: results,
       },
-    })
-
-
+    }),
 }
