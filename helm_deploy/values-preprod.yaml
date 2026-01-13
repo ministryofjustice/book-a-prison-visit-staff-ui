@@ -24,7 +24,6 @@ generic-service:
     ENVIRONMENT_NAME: preprod
 
     FEATURE_VISITOR_REQUESTS: "true"
-    FEATURE_VO_ADJUSTMENT: "true"
     FEATURE_VO_HISTORY: "true"
 
 generic-prometheus-alerts:
