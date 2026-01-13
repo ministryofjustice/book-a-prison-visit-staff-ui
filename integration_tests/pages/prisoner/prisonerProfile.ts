@@ -1,3 +1,6 @@
+// This page has been moved over to Playwright; this Cypress file can go once remaining
+// Cypress integration tests depending on it are migrated.
+
 import Page, { PageElement } from '../page'
 
 export default class PrisonerProfilePage extends Page {
