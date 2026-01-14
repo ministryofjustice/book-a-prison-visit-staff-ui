@@ -2,7 +2,6 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class PrisonerProfilePage extends AbstractPage {
-
   readonly flaggedAlerts: Locator
 
   readonly prisonNumber: Locator

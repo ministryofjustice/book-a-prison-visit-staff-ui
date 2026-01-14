@@ -16,6 +16,7 @@ import MainContactPage from '../../pages-playwright/visitJourney/mainContactPage
 import RequestMethodPage from '../../pages-playwright/visitJourney/requestMethodPage'
 import CheckYourBookingPage from '../../pages-playwright/visitJourney/checkYourBookingPage'
 import ConfirmationPage from '../../pages-playwright/visitJourney/confirmationPage'
+import prisonerSearch from '../../mockApis/prisonerSearch'
 
 test.describe('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -95,8 +96,11 @@ test.describe('Book a visit', () => {
     )
 
     // --- Stub prisoner search API results ---
-    await orchestrationApi.stubPrisoners({
+    await prisonerSearch.stubPrisoners({
       term: offenderNo,
+      prisonId: 'HEI',
+      page: '0',
+      size: '10',
       results: {
         totalElements: 1,
         totalPages: 1,
@@ -155,7 +159,7 @@ test.describe('Book a visit', () => {
 
     // // --- Go to prisoner profile page ---
     await searchResultsPage.firstResultLink.click()
-    const profilePage = await PrisonerProfilePage.verifyOnPage(page)
+    const profilePage = await PrisonerProfilePage.verifyOnPage(page, 'Smith, John')
     await prisonerContactRegistry.stubPrisonerSocialContacts({
       offenderNo,
       contacts: socialContacts,

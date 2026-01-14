@@ -1080,35 +1080,4 @@ export default {
       },
     })
   },
-
-  stubPrisoners: async ({
-    term,
-    prisonId,
-    results,
-  }: {
-    term: string
-    prisonId?: string
-    results: {
-      totalElements: number
-      totalPages: number
-      content: Record<string, unknown>[]
-    }
-  }) =>
-    stubFor({
-      request: {
-        method: 'GET',
-        // Use urlPathPattern to allow dynamic prisonId in the URL
-        urlPathPattern: `/offenderSearch/prison/${prisonId ?? '.*'}/prisoners`,
-        queryParameters: {
-          term: { equalTo: term },
-          page: { matches: '.*' }, // optional: match any page
-          size: { matches: '.*' }, // optional: match any size
-        },
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: results,
-      },
-    }),
 }
