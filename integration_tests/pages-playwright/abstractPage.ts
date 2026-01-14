@@ -1,4 +1,5 @@
 import { type Locator, type Page, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
 
 export default class AbstractPage {
   readonly page: Page
@@ -26,6 +27,12 @@ export default class AbstractPage {
     this.manageUserDetails = page.getByTestId('manageDetails')
 
     this.messages = page.locator('.moj-alert')
+  }
+
+  async verifyNoAccessViolationsOnPage(disabledRules: string[] = []): Promise<void> {
+    const accessibilityScanResults = await new AxeBuilder({ page: this.page }).disableRules(disabledRules).analyze()
+
+    expect(accessibilityScanResults.violations).toHaveLength(0)
   }
 
   async signOut() {

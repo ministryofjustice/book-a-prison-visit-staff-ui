@@ -22,9 +22,10 @@ export default class BlockVisitDateConfirmationPage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page, date?: string): Promise<BlockVisitDateConfirmationPage> {
-    const blockPage = new BlockVisitDateConfirmationPage(page, date)
-    await expect(blockPage.header).toBeVisible()
-    return blockPage
+    const blockVisitDateConfirmationPage = new BlockVisitDateConfirmationPage(page, date)
+    await expect(blockVisitDateConfirmationPage.header).toBeVisible()
+    await blockVisitDateConfirmationPage.verifyNoAccessViolationsOnPage()
+    return blockVisitDateConfirmationPage
   }
 
   async selectYes(): Promise<void> {

@@ -18,6 +18,7 @@ export default class BookerDetailsPage extends AbstractPage {
   static async verifyOnPage(page: Page): Promise<BookerDetailsPage> {
     const bookerDetailsPage = new BookerDetailsPage(page)
     await expect(bookerDetailsPage.header).toBeVisible()
+    await bookerDetailsPage.verifyNoAccessViolationsOnPage()
     return bookerDetailsPage
   }
 

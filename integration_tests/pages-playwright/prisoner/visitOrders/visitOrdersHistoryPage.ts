@@ -23,9 +23,10 @@ export default class VisitOrdersHistoryPage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page): Promise<VisitOrdersHistoryPage> {
-    const bookerSearchPage = new VisitOrdersHistoryPage(page)
-    await expect(bookerSearchPage.header).toBeVisible()
-    return bookerSearchPage
+    const visitOrdersHistoryPage = new VisitOrdersHistoryPage(page)
+    await expect(visitOrdersHistoryPage.header).toBeVisible()
+    await visitOrdersHistoryPage.verifyNoAccessViolationsOnPage()
+    return visitOrdersHistoryPage
   }
 
   date = (row: number): Locator => this.page.getByTestId(`date-${row}`)

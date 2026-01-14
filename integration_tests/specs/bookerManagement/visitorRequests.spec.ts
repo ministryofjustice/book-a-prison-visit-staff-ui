@@ -61,7 +61,7 @@ test.describe('Booker management - visitor requests', () => {
     await linkVisitorRequestPage.confirm.click()
 
     // Back to booker management page with success message
-    BookerManagementPage.verifyOnPage(page)
+    await BookerManagementPage.verifyOnPage(page)
     await expect(bookerManagementPage.messages).toContainText('You approved the request and linked Mike Jones')
   })
 
@@ -97,7 +97,7 @@ test.describe('Booker management - visitor requests', () => {
     await linkVisitorRequestPage.confirm.click()
 
     // Back to booker management page with success message
-    BookerManagementPage.verifyOnPage(page)
+    await BookerManagementPage.verifyOnPage(page)
     await expect(bookerManagementPage.messages).toContainText('You rejected the request to link Mike Jones')
   })
 
@@ -139,7 +139,7 @@ test.describe('Booker management - visitor requests', () => {
     await checkLinkedVisitorsPage.confirm.click()
 
     // Back to booker management page with success message
-    BookerManagementPage.verifyOnPage(page)
+    await BookerManagementPage.verifyOnPage(page)
     await expect(bookerManagementPage.messages).toContainText('You rejected the request to link Mike Jones')
   })
 })
