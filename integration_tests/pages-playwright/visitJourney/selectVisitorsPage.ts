@@ -3,7 +3,9 @@ import AbstractPage from '../abstractPage'
 
 export default class SelectVisitorsPage extends AbstractPage {
   readonly continueButton: Locator
+
   readonly showFullCommentLink: Locator
+
   readonly closeFullCommentLink: Locator
 
   private constructor(page: Page) {
