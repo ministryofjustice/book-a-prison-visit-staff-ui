@@ -47,7 +47,7 @@ describe('Edit visit order balances', () => {
           // Page header
           expect($('title').text()).toMatch(/^Edit visiting orders balances -/)
           expect($('.govuk-breadcrumbs li').length).toBe(0)
-          expect($('.govuk-back-link').attr('href')).toBe(`/prisoner/${prisonerId}`)
+          expect($('.govuk-back-link').attr('href')).toBe(`/prisoner/${prisonerId}#visiting-orders`)
           expect($('h1').text().trim()).toBe('Edit visiting orders balances')
 
           // Prisoner and balance details
