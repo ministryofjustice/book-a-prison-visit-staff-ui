@@ -1,0 +1,219 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Edit visiting orders balances" %}
+
+{% set backLinkHref = "/prisoner/" + prisonerVoBalance.prisonerId %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <ul class="edit-vo-prisoner-details govuk-!-width-three-quarters">
+        <li>
+          <strong>Prisoner name</strong>
+          <span data-test="prisoner-name">{{ (prisonerVoBalance.firstName + " " + prisonerVoBalance.lastName) | properCaseFullName }}</span>
+        </li>
+        <li>
+          <strong>VO balance</strong>
+          <span data-test="vo-balance">{{ prisonerVoBalance.voBalance }}</span> available
+        </li>
+        <li>
+          <strong>PVO balance</strong>
+          <span data-test="pvo-balance">{{ prisonerVoBalance.pvoBalance }}</span> available
+        </li>
+      </ul>
+
+      <form action="/prisoner/{{ prisonerVoBalance.prisonerId }}/edit-visiting-orders-balances" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {# VO change radios #}
+          {{ govukRadios({
+            name: "voChange",
+            fieldset: {
+              legend: {
+                text: "What change should be made to the VO balance?",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            hint: {
+              text: "PVOs expire when the prisoner receives their next PVO allocation."
+            },
+            items: [
+              {
+                value: "NO_CHANGE",
+                text: "No change"
+              },
+
+              {
+                value: "ADD",
+                text: "Add",
+                conditional: {
+                  html: govukInput({
+                    name: "addVoAmount",
+                    label: {
+                      text : "How many VOs should be added?"
+                    },
+                    classes: "govuk-input--width-5",
+                    autocomplete: "off",
+                    value: formValues.addVoAmount,
+                    errorMessage: errors | findError('addVoAmount')
+                  })
+                }
+              },
+
+              {
+                value: "REMOVE",
+                text: "Remove",
+                conditional: {
+                  html: govukInput({
+                    name: "removeVoAmount",
+                    label: {
+                      text : "How many VOs should be removed?"
+                    },
+                    classes: "govuk-input--width-5",
+                    autocomplete: "off",
+                    value: formValues.removeVoAmount,
+                    errorMessage: errors | findError('removeVoAmount')
+                  })
+                }
+              }
+            ],
+            value: formValues.voChange or "NO_CHANGE",
+            errorMessage: errors | findError('voChange')
+          }) }}
+
+          {# PVO change radios #}
+          {{ govukRadios({
+            name: "pvoChange",
+            fieldset: {
+              legend: {
+                text: "What change should be made to the PVO balance?",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                value: "NO_CHANGE",
+                text: "No change"
+              },
+
+              {
+                value: "ADD",
+                text: "Add",
+                conditional: {
+                  html: govukInput({
+                    name: "addPvoAmount",
+                    label: {
+                      text : "How many PVOs should be added?"
+                    },
+                    classes: "govuk-input--width-5",
+                    autocomplete: "off",
+                    value: formValues.addPvoAmount,
+                    errorMessage: errors | findError('addPvoAmount')
+                  })
+                }
+              },
+
+              {
+                value: "REMOVE",
+                text: "Remove",
+                conditional: {
+                  html: govukInput({
+                    name: "removePvoAmount",
+                    label: {
+                      text : "How many PVOs should be removed?"
+                    },
+                    classes: "govuk-input--width-5",
+                    autocomplete: "off",
+                    value: formValues.removePvoAmount,
+                    errorMessage: errors | findError('removePvoAmount')
+                  })
+                }
+              }
+            ],
+            value: formValues.pvoChange or "NO_CHANGE",
+            errorMessage: errors | findError('pvoChange')
+          }) }}
+
+          {# Adjustment reason radios #}
+          {{ govukRadios({
+            name: "reason",
+            fieldset: {
+              legend: {
+                text: "What is the reason for this change?",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            items: [
+              {
+                value: "GOVERNOR_ADJUSTMENT",
+                text: "Governor’s adjustment",
+                conditional: {
+                  html: govukInput({
+                    name: "governorAdjustmentDetails",
+                    label: {
+                      text : "Provide details (optional)"
+                    },
+                    classes: "govuk-input--width-20",
+                    autocomplete: "off",
+                    value: formValues.governorAdjustmentDetails,
+                    errorMessage: errors | findError('governorAdjustmentDetails')
+                  })
+                }
+              },
+
+              {
+                value: "BALANCE_TRANSFER_FROM_PREVIOUS_PRISON",
+                text: "Transferring balances from previous establishment"
+              },
+
+              {
+                value: "CORRECTIVE_ACTION",
+                text: "Correcting an inaccurate balance"
+              },
+
+              {
+                value: "EXCHANGE_FOR_PIN_PHONE_CREDIT",
+                text: "Exchanged for PIN phone credit"
+              },
+
+              {
+                value: "OTHER",
+                text: "Something else",
+                conditional: {
+                  html: govukInput({
+                    name: "otherDetails",
+                    label: {
+                      text : "Provide details"
+                    },
+                    classes: "govuk-input--width-20",
+                    autocomplete: "off",
+                    value: formValues.otherDetails,
+                    errorMessage: errors | findError('otherDetails')
+                  })
+                }
+              }
+            ],
+            value: formValues.pvoChange or "NO_CHANGE",
+            errorMessage: errors | findError('voChange')
+          }) }}
+
+          {# Submit #}
+          {{ govukButton({
+            text: "Edit balance",
+            attributes: { "data-test": "edit-balance" },
+            classes: "govuk-!-margin-top-3",
+            preventDoubleClick: true
+          }) }}
+        </form>
+    </div>
+  </div>
+
+{% endblock %}

@@ -27,6 +27,18 @@ describe('Visit orders service', () => {
     jest.resetAllMocks()
   })
 
+  describe('getVoBalance', () => {
+    it('should return visit order balance for given prisoner', async () => {
+      const prisonerVoBalance = TestData.prisonerVoBalance()
+      orchestrationApiClient.getVoBalance.mockResolvedValue(prisonerVoBalance)
+
+      const result = await visitOrdersService.getVoBalance({ username, prisonId, prisonerId })
+
+      expect(result).toStrictEqual(prisonerVoBalance)
+      expect(orchestrationApiClient.getVoBalance).toHaveBeenCalledWith({ prisonId, prisonerId })
+    })
+  })
+
   describe('getVoHistory', () => {
     it('should return visit order history page data for given prisoner', async () => {
       const voHistoryDetails = TestData.visitOrderHistoryDetailsDto({
