@@ -160,7 +160,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       await linkVisitorPage.submit.click()
 
       // booker details page
-      BookerDetailsPage.verifyOnPage(page)
+      await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.messages).toContainText('Keith Williams has been linked to this booker.')
     })
 
@@ -193,7 +193,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
         visitorId: bookerDetails.permittedPrisoners[0].permittedVisitors[0].visitorId,
       })
       await bookerDetailsPage.unlinkPrisonerVisitor(1, 1).click()
-      BookerDetailsPage.verifyOnPage(page)
+      await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.messages).toContainText('Jeanette Smith has been unlinked from this booker.')
     })
   })
