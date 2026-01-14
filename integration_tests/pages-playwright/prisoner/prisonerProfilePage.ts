@@ -150,9 +150,10 @@ export default class PrisonerProfilePage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page, title: string): Promise<PrisonerProfilePage> {
-    const homePage = new PrisonerProfilePage(page, title)
-    await expect(homePage.header).toBeVisible()
-    return homePage
+    const prisonerProfilePage = new PrisonerProfilePage(page, title)
+    await expect(prisonerProfilePage.header).toBeVisible()
+    await prisonerProfilePage.verifyNoAccessViolationsOnPage()
+    return prisonerProfilePage
   }
 
   visitTabCaption = (index: number): Locator => this.page.locator(`#visits caption:nth-of-type(${index})`)

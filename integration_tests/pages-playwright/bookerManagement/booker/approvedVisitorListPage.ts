@@ -15,6 +15,7 @@ export default class ApprovedVisitorListPage extends AbstractPage {
   static async verifyOnPage(page: Page): Promise<ApprovedVisitorListPage> {
     const approvedVisitorListPage = new ApprovedVisitorListPage(page)
     await expect(approvedVisitorListPage.header).toBeVisible()
+    await approvedVisitorListPage.verifyNoAccessViolationsOnPage()
     return approvedVisitorListPage
   }
 

@@ -19,10 +19,11 @@ export default class BlockVisitDatesPage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page): Promise<BlockVisitDatesPage> {
-    const pageObj = new BlockVisitDatesPage(page)
+    const blockVisitDatesPage = new BlockVisitDatesPage(page)
     // Use the new verifyHeading method from AbstractPage
-    await pageObj.verifyHeading('Block visit dates')
-    return pageObj
+    await blockVisitDatesPage.verifyHeading('Block visit dates')
+    await blockVisitDatesPage.verifyNoAccessViolationsOnPage()
+    return blockVisitDatesPage
   }
 
   blockedDate(index: number): Locator {

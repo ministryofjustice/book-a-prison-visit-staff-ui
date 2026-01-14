@@ -33,6 +33,7 @@ export default class LinkVisitorRequestPage extends AbstractPage {
   static async verifyOnPage(page: Page): Promise<LinkVisitorRequestPage> {
     const linkVisitorRequestPage = new LinkVisitorRequestPage(page)
     await expect(linkVisitorRequestPage.header).toBeVisible()
+    await linkVisitorRequestPage.verifyNoAccessViolationsOnPage()
     return linkVisitorRequestPage
   }
 

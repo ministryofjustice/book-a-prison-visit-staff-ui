@@ -15,6 +15,7 @@ export default class SelectBookerAccountPage extends AbstractPage {
   static async verifyOnPage(page: Page): Promise<SelectBookerAccountPage> {
     const selectBookerAccountPage = new SelectBookerAccountPage(page)
     await expect(selectBookerAccountPage.header).toBeVisible()
+    await selectBookerAccountPage.verifyNoAccessViolationsOnPage()
     return selectBookerAccountPage
   }
 }

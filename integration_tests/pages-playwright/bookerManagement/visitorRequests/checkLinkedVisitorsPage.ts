@@ -28,9 +28,10 @@ export default class CheckLinkedVisitorsPage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page): Promise<CheckLinkedVisitorsPage> {
-    const linkVisitorRequestPage = new CheckLinkedVisitorsPage(page)
-    await expect(linkVisitorRequestPage.header).toBeVisible()
-    return linkVisitorRequestPage
+    const checkLinkedVisitorsPage = new CheckLinkedVisitorsPage(page)
+    await expect(checkLinkedVisitorsPage.header).toBeVisible()
+    await checkLinkedVisitorsPage.verifyNoAccessViolationsOnPage()
+    return checkLinkedVisitorsPage
   }
 
   visitorListVisitorName = (index: number): Locator => this.page.getByTestId(`visitor-${index}-name`)

@@ -16,9 +16,10 @@ export default class BookerManagementPage extends AbstractPage {
   }
 
   static async verifyOnPage(page: Page): Promise<BookerManagementPage> {
-    const bookerSearchPage = new BookerManagementPage(page)
-    await expect(bookerSearchPage.header).toBeVisible()
-    return bookerSearchPage
+    const bookerManagementPage = new BookerManagementPage(page)
+    await expect(bookerManagementPage.header).toBeVisible()
+    await bookerManagementPage.verifyNoAccessViolationsOnPage()
+    return bookerManagementPage
   }
 
   prisonerName = (index: number): Locator => this.page.getByTestId(`prisoner-name-${index}`)
