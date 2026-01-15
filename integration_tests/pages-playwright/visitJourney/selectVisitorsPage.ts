@@ -8,16 +8,19 @@ export default class SelectVisitorsPage extends AbstractPage {
 
   readonly closeFullCommentLink: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
 
     this.continueButton = page.locator('[data-test=submit]')
     this.showFullCommentLink = page.locator('[data-test=show-full-comment]')
     this.closeFullCommentLink = page.locator('[data-test=close-full-comment]')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page): Promise<SelectVisitorsPage> {
-    const selectVisitorsPage = new SelectVisitorsPage(page)
+  static async verifyOnPage(page: Page, title: string): Promise<SelectVisitorsPage> {
+    const selectVisitorsPage = new SelectVisitorsPage(page, title)
     await expect(selectVisitorsPage.continueButton).toBeVisible()
     return selectVisitorsPage
   }

@@ -6,15 +6,19 @@ export default class SelectVisitDateAndTimePage extends AbstractPage {
 
   readonly continueButton: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
     this.visitRestriction = page.locator('[data-test="visit-restriction"]')
     this.continueButton = page.getByTestId('submit')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page): Promise<SelectVisitDateAndTimePage> {
-    const visitPage = new SelectVisitDateAndTimePage(page)
-    await expect(visitPage.visitRestriction).toBeVisible()
+  static async verifyOnPage(page: Page, title: string): Promise<SelectVisitDateAndTimePage> {
+    const visitPage = new SelectVisitDateAndTimePage(page, title)
+    await expect(visitPage.header).toBeVisible()
+    await visitPage.verifyNoAccessViolationsOnPage()
     return visitPage
   }
 

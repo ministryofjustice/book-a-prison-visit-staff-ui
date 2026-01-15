@@ -27,12 +27,12 @@ export default {
     page = '0',
     size = '10',
   }: {
-    results: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }
-    prisonId: string
-    term: string
-    page: string
-    size: string
-  }): SuperAgentRequest => {
+    results?: { totalPages: number; totalElements: number; content: Partial<Prisoner>[] }
+    prisonId?: string
+    term?: string
+    page?: string
+    size?: string
+  } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

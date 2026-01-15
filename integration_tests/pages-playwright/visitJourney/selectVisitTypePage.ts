@@ -4,14 +4,17 @@ import AbstractPage from '../abstractPage'
 export default class SelectVisitTypePage extends AbstractPage {
   readonly submitButton: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
     this.submitButton = page.getByTestId('submit')
   }
 
-  static async verifyOnPage(page: Page): Promise<SelectVisitTypePage> {
-    const visitTypePage = new SelectVisitTypePage(page)
-    await expect(visitTypePage.submitButton).toBeVisible()
+  static async verifyOnPage(page: Page, title: string): Promise<SelectVisitTypePage> {
+    const visitTypePage = new SelectVisitTypePage(page, title)
+    await expect(visitTypePage.header).toBeVisible()
+    await visitTypePage.verifyNoAccessViolationsOnPage()
     return visitTypePage
   }
 

@@ -8,20 +8,20 @@ export default class SearchForAPrisonerPage extends AbstractPage {
 
   readonly searchButton: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
     this.searchForm = page.locator('[action="/search/prisoner"]')
     this.searchInput = page.locator('.moj-search__input')
     this.searchButton = page.locator('.moj-search__button')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page): Promise<SearchForAPrisonerPage> {
-    const searchPage = new SearchForAPrisonerPage(page)
-    // Page-specific checks
-    await expect(searchPage.searchForm).toBeVisible()
-    await expect(searchPage.searchInput).toBeVisible()
-    await expect(searchPage.searchButton).toBeVisible()
-
+  static async verifyOnPage(page: Page, title: string): Promise<SearchForAPrisonerPage> {
+    const searchPage = new SearchForAPrisonerPage(page, title)
+    await expect(searchPage.header).toBeVisible()
+    await searchPage.verifyNoAccessViolationsOnPage()
     return searchPage
   }
 

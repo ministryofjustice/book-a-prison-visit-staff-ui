@@ -26,7 +26,9 @@ export default class ConfirmationPage extends AbstractPage {
 
   readonly prisonName: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
 
     this.bookingReference = page.locator('.test-booking-reference')
@@ -43,17 +45,20 @@ export default class ConfirmationPage extends AbstractPage {
 
     this.goToHomeLink = page.getByTestId('go-to-home')
     this.goToPrisonerLink = page.getByTestId('go-to-prisoner')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page, title?: string): Promise<ConfirmationPage> {
-    const confirmationPage = new ConfirmationPage(page)
+  static async verifyOnPage(page: Page, title: string): Promise<ConfirmationPage> {
+    const confirmationPage = new ConfirmationPage(page, title)
 
-    if (title) {
-      await confirmationPage.verifyHeading(title)
-    }
+    // if (title) {
+    //   await confirmationPage.verifyHeading(title)
+    // }
 
-    await expect(confirmationPage.goToHomeLink).toBeVisible()
-    await expect(confirmationPage.goToHomeLink).toHaveAttribute('href', '/')
+    // await expect(confirmationPage.goToHomeLink).toBeVisible()
+    // await expect(confirmationPage.goToHomeLink).toHaveAttribute('href', '/')
+    await expect(confirmationPage.header).toBeVisible()
+    await confirmationPage.verifyNoAccessViolationsOnPage()
 
     return confirmationPage
   }

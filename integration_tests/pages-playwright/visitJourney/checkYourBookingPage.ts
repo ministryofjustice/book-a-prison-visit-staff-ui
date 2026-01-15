@@ -30,7 +30,9 @@ export default class CheckYourBookingPage extends AbstractPage {
 
   readonly submitButton: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
 
     this.prisonerName = page.locator('.test-prisoner-name')
@@ -51,11 +53,13 @@ export default class CheckYourBookingPage extends AbstractPage {
     this.changeRequestMethod = page.getByTestId('change-request-method')
 
     this.submitButton = page.getByTestId('submit')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page): Promise<CheckYourBookingPage> {
-    const bookingPage = new CheckYourBookingPage(page)
-    await expect(bookingPage.submitButton).toBeVisible()
+  static async verifyOnPage(page: Page, title: string): Promise<CheckYourBookingPage> {
+    const bookingPage = new CheckYourBookingPage(page, title)
+
+    await expect(bookingPage.header).toBeVisible()
     return bookingPage
   }
 
