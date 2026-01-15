@@ -11,6 +11,7 @@ import {
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
@@ -992,6 +993,32 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: prisonerVoBalance,
+      },
+    })
+  },
+
+  stubChangeVoBalance: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisoner().prisonerNumber,
+    prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto(),
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    prisonerBalanceAdjustmentDto?: PrisonerBalanceAdjustmentDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+        bodyPatterns: [
+          {
+            equalToJson: { prisonerBalanceAdjustmentDto },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
       },
     })
   },

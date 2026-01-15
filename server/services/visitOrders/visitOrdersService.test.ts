@@ -39,6 +39,21 @@ describe('Visit orders service', () => {
     })
   })
 
+  describe('changeVoBalance', () => {
+    it('should adjust visit order balance for given prisoner', async () => {
+      const prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto()
+      orchestrationApiClient.changeVoBalance.mockResolvedValue()
+
+      await visitOrdersService.changeVoBalance({ username, prisonId, prisonerId, prisonerBalanceAdjustmentDto })
+
+      expect(orchestrationApiClient.changeVoBalance).toHaveBeenCalledWith({
+        prisonId,
+        prisonerId,
+        prisonerBalanceAdjustmentDto,
+      })
+    })
+  })
+
   describe('getVoHistory', () => {
     it('should return visit order history page data for given prisoner', async () => {
       const voHistoryDetails = TestData.visitOrderHistoryDetailsDto({
