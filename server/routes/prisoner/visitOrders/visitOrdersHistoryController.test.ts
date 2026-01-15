@@ -46,7 +46,7 @@ describe('Visit orders history', () => {
           // Page header
           expect($('title').text()).toMatch(/^Visiting orders history -/)
           expect($('.govuk-breadcrumbs li').length).toBe(0)
-          expect($('.govuk-back-link').attr('href')).toBe(`/prisoner/${prisonerId}`)
+          expect($('.govuk-back-link').attr('href')).toBe(`/prisoner/${prisonerId}#visiting-orders`)
           expect($('h1').text().trim()).toBe('Visiting orders history')
 
           // Prisoner details
