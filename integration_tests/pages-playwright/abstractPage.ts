@@ -29,8 +29,17 @@ export default class AbstractPage {
     this.messages = page.locator('.moj-alert')
   }
 
-  async verifyNoAccessViolationsOnPage(disabledRules: string[] = []): Promise<void> {
-    const accessibilityScanResults = await new AxeBuilder({ page: this.page }).disableRules(disabledRules).analyze()
+  async verifyNoAccessViolationsOnPage({
+    disabledRules = [],
+    exclude = [],
+  }: {
+    disabledRules?: string[]
+    exclude?: string[]
+  } = {}): Promise<void> {
+    const accessibilityScanResults = await new AxeBuilder({ page: this.page })
+      .disableRules(disabledRules)
+      .exclude(exclude)
+      .analyze()
 
     expect(accessibilityScanResults.violations).toHaveLength(0)
   }

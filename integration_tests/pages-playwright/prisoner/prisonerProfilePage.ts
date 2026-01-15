@@ -44,6 +44,8 @@ export default class PrisonerProfilePage extends AbstractPage {
 
   readonly visitTabPVONextAdjustment: Locator
 
+  readonly visitsTabEditVoLink: Locator
+
   readonly visitsTabShowVoHistoryLink: Locator
 
   readonly alertsLink: Locator
@@ -117,6 +119,8 @@ export default class PrisonerProfilePage extends AbstractPage {
     this.visitTabPVOLastAdjustment = page.getByTestId('tab-pvo-last-date')
 
     this.visitTabPVONextAdjustment = page.getByTestId('tab-pvo-next-date')
+
+    this.visitsTabEditVoLink = page.getByTestId('edit-vo-balances')
 
     this.visitsTabShowVoHistoryLink = page.getByTestId('view-vo-history')
 

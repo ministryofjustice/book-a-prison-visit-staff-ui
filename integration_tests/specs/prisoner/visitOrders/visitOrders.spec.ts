@@ -4,6 +4,7 @@ import { login, resetStubs } from '../../../testUtils'
 import TestData from '../../../../server/routes/testutils/testData'
 import PrisonerProfilePage from '../../../pages-playwright/prisoner/prisonerProfilePage'
 import VisitOrdersHistoryPage from '../../../pages-playwright/prisoner/visitOrders/visitOrdersHistoryPage'
+import EditVoBalancePage from '../../../pages-playwright/prisoner/visitOrders/editVoBalancePage'
 
 test.describe('Visiting orders', () => {
   const profile = TestData.prisonerProfile()
@@ -48,5 +49,28 @@ test.describe('Visiting orders', () => {
     await expect(visitOrdersHistoryPage.voBalance(0)).toContainText('5')
     await expect(visitOrdersHistoryPage.pvoChange(0)).toContainText('0')
     await expect(visitOrdersHistoryPage.pvoBalance(0)).toContainText('2')
+  })
+
+  test('should navigate to edit visit orders page from prisoner profile', async ({ page }) => {
+    // Go to prisoner profile page
+    await page.goto(`/prisoner/${prisonerId}`)
+    const prisonerProfilePage = await PrisonerProfilePage.verifyOnPage(page, 'Smith, John')
+
+    // Select visiting orders tab
+    await orchestrationApi.stubGetVoBalance()
+    await prisonerProfilePage.visitingOrdersTab.click()
+    await prisonerProfilePage.visitsTabEditVoLink.click()
+
+    // Edit vo balance page
+    const editVoBalancePage = await EditVoBalancePage.verifyOnPage(page)
+    await expect(editVoBalancePage.prisonerName).toContainText('John Smith')
+    await expect(editVoBalancePage.voBalance).toContainText('5')
+    await expect(editVoBalancePage.pvoBalance).toContainText('2')
+
+    await editVoBalancePage.voChangeRadio('Add').click()
+    await editVoBalancePage.voChangeText(2).fill('5') // Enter '5' in 'Add' conditional reveal
+    await editVoBalancePage.pvoChangeRadio('Remove').click()
+    await editVoBalancePage.pvoChangeText(3).fill('1') // Enter '1' in 'Remove' conditional reveal
+    await editVoBalancePage.reason(2).click() // Reason - Correcting inaccurate balance
   })
 })
