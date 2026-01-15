@@ -12,7 +12,9 @@ export default class MainContactPage extends AbstractPage {
 
   readonly continueButton: Locator
 
-  private constructor(page: Page) {
+  readonly header: Locator
+
+  private constructor(page: Page, title: string) {
     super(page)
 
     this.firstContact = page.locator('#contact')
@@ -20,11 +22,13 @@ export default class MainContactPage extends AbstractPage {
     this.phoneNumberInput = page.locator('#phoneNumberInput')
     this.emailInput = page.locator('#email')
     this.continueButton = page.getByTestId('submit')
+    this.header = page.locator('h1', { hasText: title })
   }
 
-  static async verifyOnPage(page: Page): Promise<MainContactPage> {
-    const contactPage = new MainContactPage(page)
-    await expect(contactPage.firstContact).toBeVisible()
+  static async verifyOnPage(page: Page, title: string): Promise<MainContactPage> {
+    const contactPage = new MainContactPage(page, title)
+    await expect(contactPage.header).toBeVisible()
+    // await contactPage.verifyNoAccessViolationsOnPage()
     return contactPage
   }
 }

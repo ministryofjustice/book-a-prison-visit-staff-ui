@@ -95,26 +95,34 @@ test.describe('Book a visit', () => {
       }),
     )
 
-    // --- Stub prisoner search API results ---
+    // // --- Stub prisoner search API results ---
+    // await prisonerSearch.stubPrisoners({
+    //   term: offenderNo,
+    //   prisonId: 'HEI',
+    //   page: '0',
+    //   size: '10',
+    //   results: {
+    //     totalElements: 1,
+    //     totalPages: 1,
+    //     content: [
+    //       {
+    //         prisonerNumber: offenderNo,
+    //         firstName: 'John',
+    //         lastName: 'Smith',
+    //         dateOfBirth: '1990-01-01',
+    //       },
+    //     ],
+    //   },
+    // })
+
     await prisonerSearch.stubPrisoners({
       term: offenderNo,
-      prisonId: 'HEI',
-      page: '0',
-      size: '10',
       results: {
         totalElements: 1,
         totalPages: 1,
-        content: [
-          {
-            prisonerNumber: offenderNo,
-            firstName: 'John',
-            lastName: 'Smith',
-            dateOfBirth: '1990-01-01',
-          },
-        ],
+        content: [prisoner],
       },
     })
-
     // generate array of dates over next month and add some visit sessions and events as defined in Cypress tests
     const dateIn7Days = format(addDays(today, 7), shortDateFormat)
     const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
@@ -145,14 +153,14 @@ test.describe('Book a visit', () => {
     await homePage.bookOrChangeVisitTile.click()
 
     // --- Navigate to search page ---
-    const searchPage = await SearchForAPrisonerPage.verifyOnPage(page)
+    const searchPage = await SearchForAPrisonerPage.verifyOnPage(page, 'Search for a prisoner')
 
     // --- Perform search ---
     await searchPage.searchInput.fill(offenderNo)
     await searchPage.searchButton.click()
 
     // --- Verify search results page ---
-    const searchResultsPage = await SearchForAPrisonerResultsPage.verifyOnPage(page)
+    const searchResultsPage = await SearchForAPrisonerResultsPage.verifyOnPage(page, 'Search for a prisoner')
     await expect(searchResultsPage.resultRows.first()).toBeVisible()
     await expect(searchResultsPage.resultRows).toHaveCount(1)
     await expect(searchResultsPage.firstResultLink).toHaveText('Smith, John')
@@ -167,7 +175,7 @@ test.describe('Book a visit', () => {
     await profilePage.bookAVisitButton.click()
 
     // // --- Select visitors page ---
-    const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page)
+    const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page, 'Select visitors')
     await expect(selectVisitorsPage.getPrisonerRestrictionType(1)).toHaveText(
       prisonerRestrictions[0].restrictionTypeDescription,
     )
@@ -199,18 +207,21 @@ test.describe('Book a visit', () => {
     )
 
     await selectVisitorsPage.continueButton.click()
-    const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page)
+    const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page, 'Select date and time of visit')
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
 
     // Additional support
     await selectVisitDateAndTime.continueButton.click()
-    const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(page)
+    const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(
+      page,
+      'Is additional support needed for any of the visitors?',
+    )
     await additionalSupportPage.additionalSupportRequired.check()
     await additionalSupportPage.additionalSupportInput.fill('Wheelchair ramp, Some extra help!')
 
     // Main contact
     await additionalSupportPage.continueButton.click()
-    const mainContactPage = await MainContactPage.verifyOnPage(page)
+    const mainContactPage = await MainContactPage.verifyOnPage(page, 'Who is the main contact for this booking?')
     await mainContactPage.firstContact.check()
     await mainContactPage.phoneNumberYesRadio.click()
     await mainContactPage.phoneNumberInput.fill('07712 000 000')
@@ -234,13 +245,13 @@ test.describe('Book a visit', () => {
     )
     // Request method
     mainContactPage.continueButton.click()
-    const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
+    const requestMethodPage = await RequestMethodPage.verifyOnPage(page, 'How was this booking requested?')
     await expect(requestMethodPage.getRequestLabelByValue('PHONE')).toContainText('Phone call')
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
     await requestMethodPage.continueButton.click()
 
     // Check booking details
-    const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page)
+    const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page, 'Check the visit details before booking')
     await expect(checkYourBookingPage.prisonerName).toContainText('John Smith')
     await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn7Days, longDateFormat))
     await expect(checkYourBookingPage.visitTime).toContainText('10am to 11am')
@@ -281,7 +292,7 @@ test.describe('Book a visit', () => {
     })
 
     await checkYourBookingPage.submitButton.click()
-    const confirmationPage = await ConfirmationPage.verifyOnPage(page)
+    const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit confirmed')
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')
     await expect(confirmationPage.prisonerNumber).toContainText(offenderNo)
