@@ -67,10 +67,7 @@ test.describe('Visiting orders', () => {
     await expect(editVoBalancePage.voBalance).toContainText('5')
     await expect(editVoBalancePage.pvoBalance).toContainText('2')
 
-    await editVoBalancePage.voChangeRadio('Add').click()
-    await editVoBalancePage.voChangeText(2).fill('5') // Enter '5' in 'Add' conditional reveal
-    await editVoBalancePage.pvoChangeRadio('Remove').click()
-    await editVoBalancePage.pvoChangeText(3).fill('1') // Enter '1' in 'Remove' conditional reveal
-    await editVoBalancePage.reason(2).click() // Reason - Correcting inaccurate balance
+    await editVoBalancePage.changeBalance('VO', 'Add', '2')
+    await editVoBalancePage.enterChangeReason('Governor’s adjustment', 'a reason for extra visits')
   })
 })
