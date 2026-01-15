@@ -68,6 +68,7 @@ test.describe('Visiting orders', () => {
     await expect(editVoBalancePage.pvoBalance).toContainText('2')
 
     await editVoBalancePage.changeBalance('VO', 'Add', '2')
+    await editVoBalancePage.changeBalance('PVO', 'Remove', '1')
     await editVoBalancePage.enterChangeReason('Governor’s adjustment', 'a reason for extra visits')
   })
 })
