@@ -1,22 +1,13 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../../abstractPage'
 
 export default class ApprovedVisitorListPage extends AbstractPage {
-  readonly header: Locator
-
   readonly linkVisitor: Locator
 
-  private constructor(page: Page) {
-    super(page)
-    this.header = page.locator('h1', { hasText: 'Link a visitor' })
-    this.linkVisitor = page.getByRole('button', { name: 'Link the selected visitor' })
-  }
+  constructor(page: Page) {
+    super(page, 'Link a visitor')
 
-  static async verifyOnPage(page: Page): Promise<ApprovedVisitorListPage> {
-    const approvedVisitorListPage = new ApprovedVisitorListPage(page)
-    await expect(approvedVisitorListPage.header).toBeVisible()
-    await approvedVisitorListPage.verifyNoAccessViolationsOnPage()
-    return approvedVisitorListPage
+    this.linkVisitor = page.getByRole('button', { name: 'Link the selected visitor' })
   }
 
   visitorName = (index: number): Locator => this.page.getByTestId(`visitor-${index}-name`)

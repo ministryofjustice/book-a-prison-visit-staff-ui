@@ -1,9 +1,7 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class PrisonerProfilePage extends AbstractPage {
-  readonly header: Locator
-
   readonly flaggedAlerts: Locator
 
   readonly prisonNumber: Locator
@@ -76,9 +74,8 @@ export default class PrisonerProfilePage extends AbstractPage {
 
   readonly voOverrideText: Locator
 
-  private constructor(page: Page, title: string) {
-    super(page)
-    this.header = page.locator('h1', { hasText: title })
+  constructor(page: Page, title: string) {
+    super(page, title)
 
     this.flaggedAlerts = page.locator('.flagged-alert')
 
@@ -151,13 +148,6 @@ export default class PrisonerProfilePage extends AbstractPage {
     this.voOverrideButton = page.locator('#vo-override')
 
     this.voOverrideText = page.locator('.moj-banner__message')
-  }
-
-  static async verifyOnPage(page: Page, title: string): Promise<PrisonerProfilePage> {
-    const prisonerProfilePage = new PrisonerProfilePage(page, title)
-    await expect(prisonerProfilePage.header).toBeVisible()
-    await prisonerProfilePage.verifyNoAccessViolationsOnPage()
-    return prisonerProfilePage
   }
 
   visitTabCaption = (index: number): Locator => this.page.locator(`#visits caption:nth-of-type(${index})`)

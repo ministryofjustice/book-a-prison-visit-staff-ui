@@ -1,9 +1,7 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../../abstractPage'
 
 export default class VisitOrdersHistoryPage extends AbstractPage {
-  readonly header: Locator
-
   readonly prisonerName: Locator
 
   readonly prisonerCategory: Locator
@@ -12,21 +10,13 @@ export default class VisitOrdersHistoryPage extends AbstractPage {
 
   readonly prisonerIncentiveLevel: Locator
 
-  private constructor(page: Page) {
-    super(page)
-    this.header = page.locator('h1', { hasText: 'Visiting orders history' })
+  constructor(page: Page) {
+    super(page, 'Visiting orders history')
 
     this.prisonerName = page.getByTestId('prisoner-name')
     this.prisonerCategory = page.getByTestId('prisoner-category')
     this.prisonerConvictedStatus = page.getByTestId('prisoner-convicted-status')
     this.prisonerIncentiveLevel = page.getByTestId('prisoner-incentive-level')
-  }
-
-  static async verifyOnPage(page: Page): Promise<VisitOrdersHistoryPage> {
-    const visitOrdersHistoryPage = new VisitOrdersHistoryPage(page)
-    await expect(visitOrdersHistoryPage.header).toBeVisible()
-    await visitOrdersHistoryPage.verifyNoAccessViolationsOnPage()
-    return visitOrdersHistoryPage
   }
 
   date = (row: number): Locator => this.page.getByTestId(`date-${row}`)
