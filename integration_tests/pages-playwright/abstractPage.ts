@@ -1,11 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
-export default abstract class AbstractPage {
-  readonly axeDisabledRules: string[]
-
-  readonly axeExcludedElements: string[]
-
+export default class AbstractPage {
   readonly page: Page
 
   /** user name that appear in header */
@@ -25,6 +21,12 @@ export default abstract class AbstractPage {
 
   readonly header: Locator
 
+  /** Axe rules to disable for a page */
+  readonly axeDisabledRules: string[] = []
+
+  /** Elements to exclude from Axe page scan */
+  readonly axeExcludedElements: string[] = []
+
   protected constructor(page: Page, title: string) {
     this.page = page
     this.phaseBanner = page.getByTestId('header-phase-banner')
@@ -32,18 +34,19 @@ export default abstract class AbstractPage {
     this.signoutLink = page.getByText('Sign out')
     this.manageUserDetails = page.getByTestId('manageDetails')
 
-    this.header = page.locator('h1', { hasText: title })
+    this.header = page.getByRole('heading', { level: 1, name: title })
 
     this.messages = page.locator('.moj-alert')
   }
 
-  static async verifyOnPage<PageClass extends new (...args: unknown[]) => AbstractPage>(
-    this: PageClass,
-    ...args: ConstructorParameters<PageClass>
-  ): Promise<InstanceType<PageClass>> {
-    const pageInstance = new this(...args) as InstanceType<PageClass>
+  static async verifyOnPage<T extends AbstractPage, Args extends unknown[]>(
+    this: (new (...args: Args) => T) & typeof AbstractPage,
+    ...args: Args
+  ): Promise<T> {
+    const pageInstance = new this(...args)
     await expect(pageInstance.header).toBeVisible()
-    await AbstractPage.verifyNoAccessibilityViolations(
+
+    await this.verifyNoAccessibilityViolations(
       pageInstance.page,
       pageInstance.axeDisabledRules,
       pageInstance.axeExcludedElements,
@@ -52,7 +55,7 @@ export default abstract class AbstractPage {
     return pageInstance
   }
 
-  private static async verifyNoAccessibilityViolations(
+  protected static async verifyNoAccessibilityViolations(
     page: Page,
     disabledRules: string[] = [],
     exclude: string[] = [],
@@ -61,6 +64,7 @@ export default abstract class AbstractPage {
       .disableRules(disabledRules)
       .exclude(exclude)
       .analyze()
+
     expect(accessibilityScanResults.violations).toHaveLength(0)
   }
 
