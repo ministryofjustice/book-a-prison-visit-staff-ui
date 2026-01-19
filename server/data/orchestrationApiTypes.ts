@@ -47,6 +47,7 @@ export type PrisonerBalanceAdjustmentDto = components['schemas']['PrisonerBalanc
 export type PrisonerBalanceAdjustmentReason = PrisonerBalanceAdjustmentDto['adjustmentReasonType']
 export type VisitOrderHistoryDetailsDto = components['schemas']['VisitOrderHistoryDetailsDto']
 export type VisitOrderHistoryDto = components['schemas']['VisitOrderHistoryDto']
+export type VisitOrderHistoryAttributeType = components['schemas']['VisitOrderHistoryAttributesDto']['attributeType']
 
 export type PrisonerProfileDto = components['schemas']['PrisonerProfileDto']
 export type VisitSummary = components['schemas']['VisitSummaryDto']
