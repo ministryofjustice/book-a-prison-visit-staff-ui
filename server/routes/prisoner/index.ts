@@ -36,6 +36,11 @@ export default function routes(services: Services): Router {
   // Visiting orders
   if (config.features.voAdjustment.enabled) {
     router.get('/:prisonerId/edit-visiting-orders-balances', editVisitOrdersBalancesController.view())
+    router.post(
+      '/:prisonerId/edit-visiting-orders-balances',
+      editVisitOrdersBalancesController.validate(),
+      editVisitOrdersBalancesController.submit(),
+    )
   }
   if (config.features.voHistory.enabled) {
     router.get('/:prisonerId/visiting-orders-history', visitOrdersHistoryController.view())
