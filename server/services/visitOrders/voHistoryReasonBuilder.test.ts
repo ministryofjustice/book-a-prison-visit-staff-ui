@@ -39,14 +39,14 @@ describe('voHistoryReasonBuilder - build VO history page reason HTML', () => {
         'ALLOCATION_USED_BY_VISIT',
 
         [{ attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' }],
-        '<a href="/visit/ab-cd-ef-gh">Visit ab-cd-ef-gh</a> booked',
+        '<a href="/visit/ab-cd-ef-gh?from=vo-history">Visit ab-cd-ef-gh</a> booked',
       ],
 
       [
         'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED',
 
         [{ attributeType: 'VISIT_REFERENCE', attributeValue: 'ab-cd-ef-gh' }],
-        '<a href="/visit/ab-cd-ef-gh">Visit ab-cd-ef-gh</a> cancelled',
+        '<a href="/visit/ab-cd-ef-gh?from=vo-history">Visit ab-cd-ef-gh</a> cancelled',
       ],
 
       ['PRISONER_BALANCE_RESET', [], 'Balance reset when prisoner received into prison'],

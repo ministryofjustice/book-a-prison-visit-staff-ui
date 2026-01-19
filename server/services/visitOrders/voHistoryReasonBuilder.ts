@@ -33,12 +33,12 @@ export default ({ visitOrderHistoryType, comment, userName, attributes }: VisitO
 
     case 'ALLOCATION_USED_BY_VISIT': {
       const reference = getAttributeValue(attributes, 'VISIT_REFERENCE')
-      return `<a href="/visit/${reference}">Visit ${reference}</a> booked`
+      return `<a href="/visit/${reference}?from=vo-history">Visit ${reference}</a> booked`
     }
 
     case 'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED': {
       const reference = getAttributeValue(attributes, 'VISIT_REFERENCE')
-      return `<a href="/visit/${reference}">Visit ${reference}</a> cancelled`
+      return `<a href="/visit/${reference}?from=vo-history">Visit ${reference}</a> cancelled`
     }
 
     case 'PRISONER_BALANCE_RESET':
