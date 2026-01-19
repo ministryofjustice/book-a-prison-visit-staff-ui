@@ -1,12 +1,12 @@
-import { VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
+import { VisitOrderHistoryAttributeType, VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
 
 export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): string => {
   switch (visitOrderHistoryType) {
     case 'MIGRATION':
-      return visitOrderHistoryType
+      return 'Balance migrated from NOMIS'
 
     case 'VO_ACCUMULATION':
-      return visitOrderHistoryType
+      return 'Accumulated visiting orders'
 
     case 'VO_ALLOCATION':
       return `VO allocation (${getIncentiveLevel(attributes)} incentive level)`
@@ -26,17 +26,30 @@ export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): st
     case 'PVO_EXPIRATION':
       return 'PVO expired'
 
-    case 'ALLOCATION_USED_BY_VISIT':
-      return `<a href="/visit/${getVisitReference(attributes)}">Visit ${getVisitReference(attributes)}</a> booked`
+    case 'ALLOCATION_USED_BY_VISIT': {
+      const reference = getAttributeValue(attributes, 'VISIT_REFERENCE')
+      return `<a href="/visit/${reference}">Visit ${reference}</a> booked`
+    }
 
-    case 'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED':
-      return `<a href="/visit/${getVisitReference(attributes)}">Visit ${getVisitReference(attributes)}</a> cancelled`
+    case 'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED': {
+      const reference = getAttributeValue(attributes, 'VISIT_REFERENCE')
+      return `<a href="/visit/${reference}">Visit ${reference}</a> cancelled`
+    }
 
     case 'PRISONER_BALANCE_RESET':
+      return 'Balance reset when prisoner received into prison'
+
     case 'SYNC_FROM_NOMIS':
-    case 'ALLOCATION_ADDED_AFTER_PRISONER_MERGE':
+      return 'Balance changed in NOMIS'
+
+    case 'ALLOCATION_ADDED_AFTER_PRISONER_MERGE': {
+      const oldPrisonerId = getAttributeValue(attributes, 'OLD_PRISONER_ID')
+      const newPrisonerId = getAttributeValue(attributes, 'NEW_PRISONER_ID')
+      return `Balance adjusted after merging records for ${oldPrisonerId} and ${newPrisonerId}`
+    }
+
     case 'ADMIN_RESET_NEGATIVE_BALANCE':
-      return visitOrderHistoryType
+      return 'Negative balance removed'
 
     default: {
       /// get TypeScript to catch any unhandled cases being added to API
@@ -46,12 +59,13 @@ export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): st
   }
 }
 
-const getIncentiveLevel = (attributes: VisitOrderHistoryDto['attributes']): string => {
-  return attributes
-    .find(attributePair => attributePair.attributeType === 'INCENTIVE_LEVEL')
-    ?.attributeValue.toLocaleLowerCase()
+const getAttributeValue = (
+  attributes: VisitOrderHistoryDto['attributes'],
+  attributeType: VisitOrderHistoryAttributeType,
+): string => {
+  return attributes.find(attributePair => attributePair.attributeType === attributeType)?.attributeValue
 }
 
-const getVisitReference = (attributes: VisitOrderHistoryDto['attributes']): string => {
-  return attributes.find(attributePair => attributePair.attributeType === 'VISIT_REFERENCE')?.attributeValue
+const getIncentiveLevel = (attributes: VisitOrderHistoryDto['attributes']): string => {
+  return getAttributeValue(attributes, 'INCENTIVE_LEVEL')?.toLocaleLowerCase()
 }
