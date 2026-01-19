@@ -1,7 +1,7 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
+import { PrisonerBalanceAdjustmentReason, RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
 
 export default class AuditService {
   private sqsClient: SQSClient
@@ -471,6 +471,31 @@ export default class AuditService {
       who: username,
       operationId,
       details: { requestReference, rejectionReason },
+    })
+  }
+
+  async adjustedVisitBalance({
+    prisonerId,
+    voChange,
+    pvoChange,
+    reason,
+    reasonDetails,
+    username,
+    operationId,
+  }: {
+    prisonerId: string
+    voChange: number
+    pvoChange: number
+    reason: PrisonerBalanceAdjustmentReason
+    reasonDetails: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'ADJUSTED_VISIT_BALANCE',
+      who: username,
+      operationId,
+      details: { prisonerId, voChange, pvoChange, reason, reasonDetails },
     })
   }
 

@@ -195,7 +195,7 @@ describe('Audit service', () => {
     })
   })
 
-  it('sends a viewd visits page audit message', async () => {
+  it('sends a viewed visits page audit message', async () => {
     await auditService.viewedVisits({
       viewDate: '2022-06-01T12:12:12',
       prisonId,
@@ -518,6 +518,34 @@ describe('Audit service', () => {
           who: 'username',
           service: 'book-a-prison-visit-staff-ui',
           details: '{"requestReference":"cccc-dddd-eeee","rejectionReason":"REJECT"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit balance adjusted audit message', async () => {
+    await auditService.adjustedVisitBalance({
+      prisonerId: 'A1234BC',
+      voChange: 2,
+      pvoChange: -1,
+      reason: 'GOVERNOR_ADJUSTMENT',
+      reasonDetails: 'comment text',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'ADJUSTED_VISIT_BALANCE',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details:
+            '{"prisonerId":"A1234BC","voChange":2,"pvoChange":-1,"reason":"GOVERNOR_ADJUSTMENT","reasonDetails":"comment text"}',
         }),
         QueueUrl,
       },
