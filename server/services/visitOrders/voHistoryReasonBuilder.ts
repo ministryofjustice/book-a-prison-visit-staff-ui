@@ -1,6 +1,11 @@
-import { VisitOrderHistoryAttributeType, VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
+import {
+  PrisonerBalanceAdjustmentReason,
+  VisitOrderHistoryAttributeType,
+  VisitOrderHistoryDto,
+} from '../../data/orchestrationApiTypes'
+import ViewUtils from '../../utils/viewUtils'
 
-export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): string => {
+export default ({ visitOrderHistoryType, comment, userName, attributes }: VisitOrderHistoryDto): string => {
   switch (visitOrderHistoryType) {
     case 'MIGRATION':
       return 'Balance migrated from NOMIS'
@@ -51,6 +56,9 @@ export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): st
     case 'ADMIN_RESET_NEGATIVE_BALANCE':
       return 'Negative balance removed'
 
+    case 'MANUAL_PRISONER_BALANCE_ADJUSTMENT':
+      return getManualAdjustmentReason(attributes, comment, userName)
+
     default: {
       /// get TypeScript to catch any unhandled cases being added to API
       const unhandledCase: never = visitOrderHistoryType
@@ -62,10 +70,44 @@ export default ({ visitOrderHistoryType, attributes }: VisitOrderHistoryDto): st
 const getAttributeValue = (
   attributes: VisitOrderHistoryDto['attributes'],
   attributeType: VisitOrderHistoryAttributeType,
-): string => {
+): string | undefined => {
   return attributes.find(attributePair => attributePair.attributeType === attributeType)?.attributeValue
 }
 
-const getIncentiveLevel = (attributes: VisitOrderHistoryDto['attributes']): string => {
+const getIncentiveLevel = (attributes: VisitOrderHistoryDto['attributes']): string | undefined => {
   return getAttributeValue(attributes, 'INCENTIVE_LEVEL')?.toLocaleLowerCase()
+}
+
+const getManualAdjustmentReason = (
+  attributes: VisitOrderHistoryDto['attributes'],
+  comment: string,
+  userName: string,
+): string | undefined => {
+  const adjustmentReason = getAttributeValue(attributes, 'ADJUSTMENT_REASON_TYPE') as
+    | PrisonerBalanceAdjustmentReason
+    | undefined
+
+  switch (adjustmentReason) {
+    case 'GOVERNOR_ADJUSTMENT':
+      return typeof comment === 'string'
+        ? `Governor’s adjustment by ${userName}<br><br>${ViewUtils.escape(comment)}`
+        : `Governor’s adjustment by ${userName}`
+
+    case 'BALANCE_TRANSFER_FROM_PREVIOUS_PRISON':
+      return `Balance transferred from previous establishment by ${userName}`
+
+    case 'CORRECTIVE_ACTION':
+      return `Inaccurate balance corrected by ${userName}`
+
+    case 'EXCHANGE_FOR_PIN_PHONE_CREDIT':
+      return `Exchange for PIN phone credit by ${userName}`
+
+    case 'OTHER':
+      return `${ViewUtils.escape(comment)}<br><br>${userName}`
+
+    default: {
+      const unhandledCase: never = adjustmentReason
+      return unhandledCase
+    }
+  }
 }

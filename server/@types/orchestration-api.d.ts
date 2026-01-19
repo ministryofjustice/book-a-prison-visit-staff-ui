@@ -1892,7 +1892,7 @@ export interface components {
        * @example REQUESTED
        * @enum {string}
        */
-      status: 'REQUESTED' | 'APPROVED' | 'REJECTED'
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
     }
     ApproveVisitorRequestDto: {
       /**
@@ -1955,6 +1955,40 @@ export interface components {
        */
       userName: string
     }
+    PrisonerBalanceAdjustmentValidationErrorResponse: {
+      /** Format: int32 */
+      status: number
+      /** Format: int32 */
+      errorCode?: number
+      userMessage?: string
+      developerMessage?: string
+      validationErrors: (
+        | 'VO_OR_PVO_NOT_SUPPLIED'
+        | 'VO_TOTAL_POST_ADJUSTMENT_ABOVE_MAX'
+        | 'VO_TOTAL_POST_ADJUSTMENT_BELOW_ZERO'
+        | 'PVO_TOTAL_POST_ADJUSTMENT_ABOVE_MAX'
+        | 'PVO_TOTAL_POST_ADJUSTMENT_BELOW_ZERO'
+      )[]
+    }
+    VisitOrderPrisonerBalanceDto: {
+      /**
+       * @description nomsNumber of the prisoner
+       * @example AA123456
+       */
+      prisonerId: string
+      /**
+       * Format: int32
+       * @description The total of available and accumulated VO balance - any negative VO balance
+       * @example 5
+       */
+      voBalance: number
+      /**
+       * Format: int32
+       * @description The total of available PVO balance - any negative VO balance
+       * @example 5
+       */
+      pvoBalance: number
+    }
     /** @description Prison exclude date */
     ExcludeDateDto: {
       /**
@@ -2013,6 +2047,29 @@ export interface components {
         | 'MAX_IN_PROGRESS_REQUESTS_REACHED'
         | 'REQUEST_ALREADY_EXISTS'
         | 'VISITOR_ALREADY_EXISTS'
+    }
+    CreateVisitorRequestResponseDto: {
+      /**
+       * @description Reference of newly created visitor request
+       * @example abc-def-ghi
+       */
+      reference: string
+      /**
+       * @description Status of newly created visitor request
+       * @example REQUESTED or AUTO_APPROVED
+       * @enum {string}
+       */
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
+      /**
+       * @description Reference of booker who submitted the request
+       * @example abc-def-ghi
+       */
+      bookerReference: string
+      /**
+       * @description The id of the booker's prisoner for the visitor request
+       * @example AA123456
+       */
+      prisonerId: string
     }
     /** @description Details to register a prisoner to a booker. */
     RegisterPrisonerForBookerDto: {
@@ -2725,9 +2782,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
       unpaged?: boolean
     }
     SortObject: {
@@ -2884,7 +2941,7 @@ export interface components {
        * @example REQUESTED
        * @enum {string}
        */
-      status: 'REQUESTED' | 'APPROVED' | 'REJECTED'
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
       /**
        * @description Date request was submitted
        * @example 2025-10-28
@@ -3760,7 +3817,12 @@ export interface components {
        * @example VISIT_REFERENCE
        * @enum {string}
        */
-      attributeType: 'VISIT_REFERENCE' | 'INCENTIVE_LEVEL' | 'OLD_PRISONER_ID' | 'NEW_PRISONER_ID'
+      attributeType:
+        | 'VISIT_REFERENCE'
+        | 'INCENTIVE_LEVEL'
+        | 'OLD_PRISONER_ID'
+        | 'NEW_PRISONER_ID'
+        | 'ADJUSTMENT_REASON_TYPE'
       /** @description Visit order history attribute value */
       attributeValue: string
     }
@@ -3820,6 +3882,7 @@ export interface components {
         | 'SYNC_FROM_NOMIS'
         | 'ALLOCATION_ADDED_AFTER_PRISONER_MERGE'
         | 'ADMIN_RESET_NEGATIVE_BALANCE'
+        | 'MANUAL_PRISONER_BALANCE_ADJUSTMENT'
       /**
        * Format: date-time
        * @description Visit order history created data and time
@@ -4869,7 +4932,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          '*/*': components['schemas']['VisitOrderPrisonerBalanceDto']
+        }
       }
       /** @description Bad request to adjust balance, prisoner on remand or invalid data submitted via DTO */
       400: {
@@ -4905,6 +4970,15 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner balance adjustment validation failed */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonerBalanceAdjustmentValidationErrorResponse']
         }
       }
     }
@@ -5621,7 +5695,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          '*/*': string
+          '*/*': components['schemas']['CreateVisitorRequestResponseDto']
         }
       }
       /** @description Incorrect request to submit a visitor request */
@@ -7464,9 +7538,13 @@ export interface operations {
   getVisitOrderHistoryForPrisoner: {
     parameters: {
       query: {
+        /**
+         * @description Date from which the visit order history will be returned
+         * @example 2025-01-01
+         */
         fromDate: string
         /**
-         * @description Maximum number of results to return, if null, returns all result from date
+         * @description Maximum number of results to return, if null, returns all results starting from the date passed in fromDate.
          * @example 100
          */
         maxResults?: number
