@@ -10,20 +10,12 @@ export default class BlockVisitDatesPage extends AbstractPage {
   readonly noBlockedDates: Locator
 
   constructor(page: Page) {
-    super(page)
+    super(page, 'Block visit dates')
 
     this.datePicker = new DatePickerComponent(page)
 
     this.continueButton = page.getByTestId('submit')
     this.noBlockedDates = page.getByTestId('no-blocked-dates')
-  }
-
-  static async verifyOnPage(page: Page): Promise<BlockVisitDatesPage> {
-    const blockVisitDatesPage = new BlockVisitDatesPage(page)
-    // Use the new verifyHeading method from AbstractPage
-    await blockVisitDatesPage.verifyHeading('Block visit dates')
-    await blockVisitDatesPage.verifyNoAccessViolationsOnPage()
-    return blockVisitDatesPage
   }
 
   blockedDate(index: number): Locator {
