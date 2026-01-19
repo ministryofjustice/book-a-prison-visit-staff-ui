@@ -264,10 +264,29 @@ describe('Visit details page', () => {
     })
 
     describe('Back links', () => {
-      it('should set correct back link when arriving from upcoming visits listing page', () => {
-        const url =
-          '/visit/ab-cd-ef-gh?from=visit-search&query=searchBlock1%3Dab%26searchBlock2%3Dcd%26searchBlock3%3Def%26searchBlock4%3Dgh'
+      it.each([
+        [
+          'upcoming visits search listing page',
+          '/visit/ab-cd-ef-gh?from=visit-search&query=searchBlock1%3Dab%26searchBlock2%3Dcd%26searchBlock3%3Def%26searchBlock4%3Dgh',
+          '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
+        ],
 
+        [
+          'view visits by date page',
+          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
+          '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        ],
+
+        ['visit requests listing page', '/visit/ab-cd-ef-gh?from=request', '/requested-visits'],
+
+        ['visits for review listing page', '/visit/ab-cd-ef-gh?from=review', '/review'],
+
+        [
+          'visiting orders history page',
+          '/visit/ab-cd-ef-gh?from=vo-history',
+          '/prisoner/A1234BC/visiting-orders-history',
+        ],
+      ])('should set correct back link when arriving from %s', (_fromPage: string, url: string, backLink: string) => {
         return request(app)
           .get(url)
           .expect(200)
@@ -275,58 +294,7 @@ describe('Visit details page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('h1').text()).toBe('Visit booking details')
-            expect($('.govuk-back-link').attr('href')).toBe(
-              '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
-            )
-            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          })
-      })
-
-      it('should set correct back link when arriving from view visits by date page', () => {
-        const url =
-          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits'
-
-        return request(app)
-          .get(url)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text()).toBe('Visit booking details')
-            expect($('.govuk-back-link').attr('href')).toBe(
-              '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
-            )
-            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          })
-      })
-
-      it('should set correct back link when arriving from request listing page', () => {
-        const url = '/visit/ab-cd-ef-gh?from=request'
-
-        return request(app)
-          .get(url)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text()).toBe('Visit booking details')
-            expect($('.govuk-back-link').attr('href')).toBe('/requested-visits')
-            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
-          })
-      })
-
-      it('should set correct back link when arriving from review listing page', () => {
-        const url = '/visit/ab-cd-ef-gh?from=review'
-
-        return request(app)
-          .get(url)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text()).toBe('Visit booking details')
-            expect($('.govuk-back-link').attr('href')).toBe('/review')
-            expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+            expect($('.govuk-back-link').attr('href')).toBe(backLink)
           })
       })
     })
