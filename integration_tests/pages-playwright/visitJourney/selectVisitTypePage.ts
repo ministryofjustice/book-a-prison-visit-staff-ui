@@ -1,21 +1,12 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class SelectVisitTypePage extends AbstractPage {
   readonly submitButton: Locator
 
-  readonly header: Locator
-
-  private constructor(page: Page, title: string) {
-    super(page)
+  constructor(page: Page, title: string) {
+    super(page, title)
     this.submitButton = page.getByTestId('submit')
-  }
-
-  static async verifyOnPage(page: Page, title: string): Promise<SelectVisitTypePage> {
-    const visitTypePage = new SelectVisitTypePage(page, title)
-    await expect(visitTypePage.header).toBeVisible()
-    await visitTypePage.verifyNoAccessViolationsOnPage()
-    return visitTypePage
   }
 
   getPrisonerRestrictionType(index: number): Locator {

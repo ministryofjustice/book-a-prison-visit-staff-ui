@@ -23,10 +23,8 @@ export default class SearchForAPrisonerResultsPage extends AbstractPage {
 
   readonly firstResultLink: Locator
 
-  readonly header: Locator
-
-  private constructor(page: Page, title: string) {
-    super(page)
+  constructor(page: Page, title: string) {
+    super(page, title)
 
     this.searchForm = page.locator('[action="/search/prisoner"]')
     this.searchInput = page.locator('.moj-search__input')
@@ -37,14 +35,6 @@ export default class SearchForAPrisonerResultsPage extends AbstractPage {
     this.pagingLinks = page.locator('.moj-pagination__list')
     this.nextPageLink = page.locator('.moj-pagination__item--next a').first()
     this.firstResultLink = page.locator('.bapv-result-row').first()
-    this.header = page.locator('h1', { hasText: title })
-  }
-
-  static async verifyOnPage(page: Page, title: string): Promise<SearchForAPrisonerResultsPage> {
-    const resultsPage = new SearchForAPrisonerResultsPage(page, title)
-    await expect(resultsPage.header).toBeVisible()
-    await resultsPage.verifyNoAccessViolationsOnPage()
-    return resultsPage
   }
 
   async checkResultRows(prisoners: Prisoner[], searchTerm: string): Promise<void> {

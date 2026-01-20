@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class CheckYourBookingPage extends AbstractPage {
@@ -30,10 +30,8 @@ export default class CheckYourBookingPage extends AbstractPage {
 
   readonly submitButton: Locator
 
-  readonly header: Locator
-
-  private constructor(page: Page, title: string) {
-    super(page)
+  constructor(page: Page, title: string) {
+    super(page, title)
 
     this.prisonerName = page.locator('.test-prisoner-name')
     this.visitDate = page.locator('.test-visit-date')
@@ -53,14 +51,6 @@ export default class CheckYourBookingPage extends AbstractPage {
     this.changeRequestMethod = page.getByTestId('change-request-method')
 
     this.submitButton = page.getByTestId('submit')
-    this.header = page.locator('h1', { hasText: title })
-  }
-
-  static async verifyOnPage(page: Page, title: string): Promise<CheckYourBookingPage> {
-    const bookingPage = new CheckYourBookingPage(page, title)
-
-    await expect(bookingPage.header).toBeVisible()
-    return bookingPage
   }
 
   visitorName(index: number): Locator {

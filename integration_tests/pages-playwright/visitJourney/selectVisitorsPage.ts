@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class SelectVisitorsPage extends AbstractPage {
@@ -8,21 +8,12 @@ export default class SelectVisitorsPage extends AbstractPage {
 
   readonly closeFullCommentLink: Locator
 
-  readonly header: Locator
-
-  private constructor(page: Page, title: string) {
-    super(page)
+  constructor(page: Page, title: string) {
+    super(page, title)
 
     this.continueButton = page.locator('[data-test=submit]')
     this.showFullCommentLink = page.locator('[data-test=show-full-comment]')
     this.closeFullCommentLink = page.locator('[data-test=close-full-comment]')
-    this.header = page.locator('h1', { hasText: title })
-  }
-
-  static async verifyOnPage(page: Page, title: string): Promise<SelectVisitorsPage> {
-    const selectVisitorsPage = new SelectVisitorsPage(page, title)
-    await expect(selectVisitorsPage.continueButton).toBeVisible()
-    return selectVisitorsPage
   }
 
   // Prisoner restrictions

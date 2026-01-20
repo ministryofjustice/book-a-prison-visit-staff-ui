@@ -95,26 +95,6 @@ test.describe('Book a visit', () => {
       }),
     )
 
-    // // --- Stub prisoner search API results ---
-    // await prisonerSearch.stubPrisoners({
-    //   term: offenderNo,
-    //   prisonId: 'HEI',
-    //   page: '0',
-    //   size: '10',
-    //   results: {
-    //     totalElements: 1,
-    //     totalPages: 1,
-    //     content: [
-    //       {
-    //         prisonerNumber: offenderNo,
-    //         firstName: 'John',
-    //         lastName: 'Smith',
-    //         dateOfBirth: '1990-01-01',
-    //       },
-    //     ],
-    //   },
-    // })
-
     await prisonerSearch.stubPrisoners({
       term: offenderNo,
       results: {

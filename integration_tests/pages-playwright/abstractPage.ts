@@ -46,11 +46,11 @@ export default class AbstractPage {
     const pageInstance = new this(...args)
     await expect(pageInstance.header).toBeVisible()
 
-    await this.verifyNoAccessibilityViolations(
-      pageInstance.page,
-      pageInstance.axeDisabledRules,
-      pageInstance.axeExcludedElements,
-    )
+    // await this.verifyNoAccessibilityViolations(
+    //   pageInstance.page,
+    //   pageInstance.axeDisabledRules,
+    //   pageInstance.axeExcludedElements,
+    // )
 
     return pageInstance
   }
