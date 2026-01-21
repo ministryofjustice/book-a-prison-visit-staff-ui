@@ -11,6 +11,7 @@ import {
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   PrisonDto,
+  PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
@@ -21,6 +22,7 @@ import {
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
+  VisitOrderHistoryDetailsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPreview,
@@ -968,6 +970,50 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitSessionsAndSchedule,
+      },
+    })
+  },
+
+  stubGetVoBalance: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisonerVoBalance().prisonerId,
+    prisonerVoBalance = TestData.prisonerVoBalance(),
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    prisonerVoBalance?: PrisonerBalanceDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: prisonerVoBalance,
+      },
+    })
+  },
+
+  stubGetVoHistory: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.visitOrderHistoryDetailsDto().prisonerId,
+    voHistoryDetails = TestData.visitOrderHistoryDetailsDto(),
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    voHistoryDetails?: VisitOrderHistoryDetailsDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: voHistoryDetails,
       },
     })
   },

@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns'
 import { GOVUKTableRow } from '../../@types/bapv'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../../data'
-import { VisitOrderHistoryDetailsDto, VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
+import { PrisonerBalanceDto, VisitOrderHistoryDetailsDto, VisitOrderHistoryDto } from '../../data/orchestrationApiTypes'
 import voHistoryReasonBuilder from './voHistoryReasonBuilder'
 
 export type VisitOrderHistoryPage = Pick<
@@ -19,8 +19,23 @@ export default class VisitOrdersService {
   private readonly VO_HISTORY_TYPES_DEFAULT_STYLE: VisitOrderHistoryDto['visitOrderHistoryType'][] = [
     'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED',
     'ALLOCATION_USED_BY_VISIT',
-    // TODO check this list is complete (when VB-4260 done)
+    'MANUAL_PRISONER_BALANCE_ADJUSTMENT',
   ]
+
+  async getVoBalance({
+    username,
+    prisonId,
+    prisonerId,
+  }: {
+    username: string
+    prisonId: string
+    prisonerId: string
+  }): Promise<PrisonerBalanceDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
+  }
 
   async getVoHistory({
     username,

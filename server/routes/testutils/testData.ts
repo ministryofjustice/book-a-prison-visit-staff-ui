@@ -7,6 +7,7 @@ import {
   ExcludeDateDto,
   OffenderRestriction,
   PrisonDto,
+  PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonerScheduledEventDto,
   PrisonVisitorRequestDto,
@@ -511,6 +512,20 @@ export default class TestData {
       webAddress,
       clients,
     }) as PrisonDto
+
+  static prisonerVoBalance = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    voBalance = 5,
+    pvoBalance = 2,
+  }: Partial<PrisonerBalanceDto> = {}): PrisonerBalanceDto => ({
+    prisonerId,
+    firstName,
+    lastName,
+    voBalance,
+    pvoBalance,
+  })
 
   static visit = ({
     applicationReference = 'aaa-bbb-ccc',

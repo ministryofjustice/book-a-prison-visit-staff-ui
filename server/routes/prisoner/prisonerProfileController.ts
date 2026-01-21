@@ -4,7 +4,6 @@ import { VisitSessionData } from '../../@types/bapv'
 import { clearSession } from '../visitorUtils'
 import { AuditService, PrisonerProfileService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
-import config from '../../config'
 
 export default class PrisonerProfileController {
   public constructor(
@@ -32,8 +31,6 @@ export default class PrisonerProfileController {
         operationId: res.locals.appInsightsOperationId,
       })
 
-      const showVoHistoryButton = config.features.voHistory.enabled
-
       return res.render('pages/prisoner/profile', {
         messages: req.flash('messages'),
         errors: req.flash('errors'),
@@ -41,7 +38,6 @@ export default class PrisonerProfileController {
         prisonerName: `${prisonerProfile.prisonerDetails.lastName}, ${prisonerProfile.prisonerDetails.firstName}`,
         queryParamsForBackLink,
         prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(prisonerId),
-        showVoHistoryButton,
       })
     }
   }

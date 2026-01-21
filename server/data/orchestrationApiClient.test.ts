@@ -1020,6 +1020,22 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getVoBalance', () => {
+    it('should return visit order balance for given prisoner', async () => {
+      const prisonerVoBalance = TestData.prisonerVoBalance()
+      const { prisonerId } = prisonerVoBalance
+
+      fakeOrchestrationApi
+        .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, prisonerVoBalance)
+
+      const output = await orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
+
+      expect(output).toStrictEqual(prisonerVoBalance)
+    })
+  })
+
   describe('getVoHistory', () => {
     it('should return voHistoryDetails for selected prisoner (for past 3 months', async () => {
       const fakeDate = new Date('2025-12-01')

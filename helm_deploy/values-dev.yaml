@@ -26,6 +26,7 @@ generic-service:
     MATOMO_ENABLED: "true"
 
     FEATURE_VISITOR_REQUESTS: "true"
+    FEATURE_VO_ADJUSTMENT: "true"
     FEATURE_VO_HISTORY: "true"
 
   allowlist:
