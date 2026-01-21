@@ -24,6 +24,7 @@ generic-service:
     MATOMO_CONTAINER_ID: "C8N6ELL4_dev_ee2d6160af4f7e47066b22e2"
     MATOMO_SITE_ID: "1"
     MATOMO_ENABLED: "true"
+    MATOMO_URL: "https://matomo-dev.hmpps.service.justice.gov.uk"
 
     FEATURE_VISITOR_REQUESTS: "true"
     FEATURE_VO_ADJUSTMENT: "true"

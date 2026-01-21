@@ -70,6 +70,7 @@ export default {
     enabled: get('MATOMO_ENABLED', 'false', requiredInProduction) === 'true',
     matomoContainerId: get('MATOMO_CONTAINER_ID', '', requiredInProduction),
     matomoSiteId: get('MATOMO_SITE_ID', '', requiredInProduction),
+    matomoUrl: get('MATOMO_URL', '', requiredInProduction),
   },
   apis: {
     hmppsAuth: {
