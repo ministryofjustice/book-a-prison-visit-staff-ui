@@ -57,7 +57,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.bookerEmail).toContainText(email)
       await expect(bookerDetailsPage.bookerReference).toContainText(bookerDetails.reference)
-      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText
+      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText(
         'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
       )
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
