@@ -63,7 +63,7 @@ export default function createApp(services: Services): express.Application {
     }),
   )
   app.use(setUpCurrentUser())
-  app.use(setUpAnalytics(config.analytics.matomoContainerId, config.analytics.matomoSiteId, config.analytics.enabled))
+  app.use(setUpAnalytics(config.analytics))
 
   app.use(maintenancePageRoute())
 

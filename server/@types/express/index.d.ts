@@ -72,6 +72,7 @@ export declare global {
       matomoEnabled?: boolean
       matomoContainerId?: string
       matomoSiteId?: string
+      matomoUrl?: string
     }
   }
 }
