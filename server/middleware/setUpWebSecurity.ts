@@ -17,7 +17,7 @@ export default function setUpWebSecurity(): Router {
     helmet({
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ["'self'", 'https://matomo*.hmpps.service.justice.gov.uk'],
+          defaultSrc: ["'self'", 'https://matomo-dev.hmpps.service.justice.gov.uk'],
           // This nonce allows us to use scripts with the use of the `cspNonce` local, e.g (in a Nunjucks template):
           // <script nonce="{{ cspNonce }}">
           // or
@@ -27,7 +27,7 @@ export default function setUpWebSecurity(): Router {
           scriptSrc: [
             "'self'",
             (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
-            'https://matomo*.hmpps.service.justice.gov.uk',
+            'https://matomo-dev.hmpps.service.justice.gov.uk',
           ],
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           fontSrc: ["'self'"],
