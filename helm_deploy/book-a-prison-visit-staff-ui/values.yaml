@@ -33,6 +33,7 @@ generic-service:
     MAINTENANCE_MODE: "false"
     # Optional maintenance end date (in ISO format, YYYY-MM-DDTHH:MM)
     MAINTENANCE_MODE_END_DATE_TIME: ""
+    MATOMO_ENABLED: "false"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
