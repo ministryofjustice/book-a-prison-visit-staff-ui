@@ -19,7 +19,7 @@ export default class VisitOrdersService {
   private readonly VO_HISTORY_TYPES_DEFAULT_STYLE: VisitOrderHistoryDto['visitOrderHistoryType'][] = [
     'ALLOCATION_REFUNDED_BY_VISIT_CANCELLED',
     'ALLOCATION_USED_BY_VISIT',
-    // TODO check this list is complete (when VB-4260 done)
+    'MANUAL_PRISONER_BALANCE_ADJUSTMENT',
   ]
 
   async getVoBalance({
