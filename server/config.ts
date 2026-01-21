@@ -68,9 +68,9 @@ export default {
   ),
   analytics: {
     enabled: get('MATOMO_ENABLED', 'false', requiredInProduction) === 'true',
-    matomoContainerId: get('MATOMO_CONTAINER_ID', '', requiredInProduction),
-    matomoSiteId: get('MATOMO_SITE_ID', '', requiredInProduction),
-    matomoUrl: get('MATOMO_URL', '', requiredInProduction),
+    matomoContainerId: get('MATOMO_CONTAINER_ID', ''),
+    matomoSiteId: get('MATOMO_SITE_ID', ''),
+    matomoUrl: get('MATOMO_URL', ''),
   },
   apis: {
     hmppsAuth: {
