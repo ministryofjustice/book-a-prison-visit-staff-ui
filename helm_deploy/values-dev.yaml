@@ -21,6 +21,9 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
+    MATOMO_CONTAINER_ID: "dev_ee2d6160af4f7e47066b22e2"
+    MATOMO_SITE_ID: "1"
+    MATOMO_ENABLED: "true"
 
     FEATURE_VISITOR_REQUESTS: "true"
     FEATURE_VO_HISTORY: "true"
