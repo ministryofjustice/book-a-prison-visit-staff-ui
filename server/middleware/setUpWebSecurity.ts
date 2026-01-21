@@ -36,7 +36,7 @@ export default function setUpWebSecurity(): Router {
           upgradeInsecureRequests: process.env.NODE_ENV === 'development' ? null : [],
         },
       },
-      crossOriginEmbedderPolicy: true,
+      crossOriginEmbedderPolicy: false,
     }),
   )
   return router
