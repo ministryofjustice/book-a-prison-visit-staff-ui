@@ -2,6 +2,8 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class AdditionalSupportPage extends AbstractPage {
+  static readonly title = 'Is additional support needed for any of the visitors?'
+
   readonly axeExcludedElements = [
     // Known issue with radio conditional reveal
     // See: https://github.com/alphagov/govuk-frontend/issues/979
@@ -16,11 +18,11 @@ export default class AdditionalSupportPage extends AbstractPage {
 
   readonly continueButton: Locator
 
-  constructor(page: Page, title: string) {
-    super(page, title)
+  constructor(page: Page) {
+    super(page, AdditionalSupportPage.title)
 
-    this.additionalSupportRequired = page.locator('[data-test=support-required-yes]')
-    this.additionalSupportNotRequired = page.locator('[data-test=support-required-no]')
+    this.additionalSupportRequired = page.getByTestId('support-required-yes')
+    this.additionalSupportNotRequired = page.getByTestId('support-required-no')
     this.additionalSupportInput = page.locator('#additionalSupport')
     this.continueButton = page.getByTestId('submit')
   }

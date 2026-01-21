@@ -1,7 +1,9 @@
-import { type Locator, type Page } from '@playwright/test'
+import { type Locator, type Page, expect } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class CheckYourBookingPage extends AbstractPage {
+  static readonly title = 'Check the visit details before booking'
+
   readonly prisonerName: Locator
 
   readonly visitDate: Locator
@@ -30,8 +32,8 @@ export default class CheckYourBookingPage extends AbstractPage {
 
   readonly submitButton: Locator
 
-  constructor(page: Page, title: string) {
-    super(page, title)
+  constructor(page: Page) {
+    super(page, CheckYourBookingPage.title)
 
     this.prisonerName = page.locator('.test-prisoner-name')
     this.visitDate = page.locator('.test-visit-date')
@@ -51,6 +53,22 @@ export default class CheckYourBookingPage extends AbstractPage {
     this.changeRequestMethod = page.getByTestId('change-request-method')
 
     this.submitButton = page.getByTestId('submit')
+  }
+
+  async clickDisabledOnSubmitButton() {
+    // Wait for button to be attached and visible first
+    await expect(this.submitButton).toBeVisible()
+
+    // Click the button, then assert it is disabled before navigation
+    await Promise.all([
+      this.page.waitForTimeout(100), // tiny wait to let JS disable it
+      this.submitButton.click(),
+    ])
+
+    // Only check disabled if it still exists
+    if ((await this.submitButton.count()) > 0) {
+      await expect(this.submitButton).toBeDisabled({ timeout: 1000 })
+    }
   }
 
   visitorName(index: number): Locator {

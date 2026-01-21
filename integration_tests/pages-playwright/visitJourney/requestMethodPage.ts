@@ -2,10 +2,12 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class RequestMethodPage extends AbstractPage {
+  static readonly title = 'How was this booking requested?'
+
   readonly continueButton: Locator
 
-  constructor(page: Page, title: string) {
-    super(page, title)
+  constructor(page: Page) {
+    super(page, RequestMethodPage.title)
     this.continueButton = page.getByTestId('submit')
   }
 

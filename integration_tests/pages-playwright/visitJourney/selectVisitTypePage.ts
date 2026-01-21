@@ -14,10 +14,10 @@ export default class SelectVisitTypePage extends AbstractPage {
   }
 
   selectOpenVisitType(): void {
-    this.page.locator('[data-test="visit-type-open"]').check()
+    this.page.getByTestId('visit-type-open').check()
   }
 
   selectClosedVisitType(): void {
-    this.page.locator('[data-test="visit-type-closed"]').check()
+    this.page.getByTestId('visit-type-closed').check()
   }
 }

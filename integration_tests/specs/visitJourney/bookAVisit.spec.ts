@@ -50,24 +50,8 @@ test.describe('Book a visit', () => {
         dateOfBirth: childDob,
         relationshipCode: 'SON',
         relationshipDescription: 'Son',
-        restrictions: [],
-        addresses: [TestData.address()],
       }),
     ]
-    // Social contacts
-    const socialContacts = contacts.map(contact => ({
-      personId: contact.personId!,
-      firstName: contact.firstName,
-      lastName: contact.lastName!,
-      dateOfBirth: contact.dateOfBirth!,
-      restrictions: contact.restrictions || [],
-      addresses: contact.addresses || [],
-      relationshipCode: contact.relationshipCode || 'OTHER',
-      contactType: 'SOCIAL',
-      approvedVisitor: true,
-      emergencyContact: false,
-      nextOfKin: false,
-    }))
 
     const prisoner = TestData.prisoner()
     const { prisonerNumber: offenderNo } = prisoner
@@ -91,7 +75,7 @@ test.describe('Book a visit', () => {
             active: true,
           },
         ],
-        prisonerRestrictions: [TestData.offenderRestriction()],
+        prisonerRestrictions,
       }),
     )
 
@@ -133,14 +117,14 @@ test.describe('Book a visit', () => {
     await homePage.bookOrChangeVisitTile.click()
 
     // --- Navigate to search page ---
-    const searchPage = await SearchForAPrisonerPage.verifyOnPage(page, 'Search for a prisoner')
+    const searchPage = await SearchForAPrisonerPage.verifyOnPage(page)
 
     // --- Perform search ---
     await searchPage.searchInput.fill(offenderNo)
     await searchPage.searchButton.click()
 
     // --- Verify search results page ---
-    const searchResultsPage = await SearchForAPrisonerResultsPage.verifyOnPage(page, 'Search for a prisoner')
+    const searchResultsPage = await SearchForAPrisonerResultsPage.verifyOnPage(page)
     await expect(searchResultsPage.resultRows.first()).toBeVisible()
     await expect(searchResultsPage.resultRows).toHaveCount(1)
     await expect(searchResultsPage.firstResultLink).toHaveText('Smith, John')
@@ -150,12 +134,12 @@ test.describe('Book a visit', () => {
     const profilePage = await PrisonerProfilePage.verifyOnPage(page, 'Smith, John')
     await prisonerContactRegistry.stubPrisonerSocialContacts({
       offenderNo,
-      contacts: socialContacts,
+      contacts,
     })
     await profilePage.bookAVisitButton.click()
 
     // // --- Select visitors page ---
-    const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page, 'Select visitors')
+    const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page)
     await expect(selectVisitorsPage.getPrisonerRestrictionType(1)).toHaveText(
       prisonerRestrictions[0].restrictionTypeDescription,
     )
@@ -187,21 +171,18 @@ test.describe('Book a visit', () => {
     )
 
     await selectVisitorsPage.continueButton.click()
-    const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page, 'Select date and time of visit')
+    const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
 
     // Additional support
     await selectVisitDateAndTime.continueButton.click()
-    const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(
-      page,
-      'Is additional support needed for any of the visitors?',
-    )
+    const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(page)
     await additionalSupportPage.additionalSupportRequired.check()
     await additionalSupportPage.additionalSupportInput.fill('Wheelchair ramp, Some extra help!')
 
     // Main contact
     await additionalSupportPage.continueButton.click()
-    const mainContactPage = await MainContactPage.verifyOnPage(page, 'Who is the main contact for this booking?')
+    const mainContactPage = await MainContactPage.verifyOnPage(page)
     await mainContactPage.firstContact.check()
     await mainContactPage.phoneNumberYesRadio.click()
     await mainContactPage.phoneNumberInput.fill('07712 000 000')
@@ -225,19 +206,19 @@ test.describe('Book a visit', () => {
     )
     // Request method
     mainContactPage.continueButton.click()
-    const requestMethodPage = await RequestMethodPage.verifyOnPage(page, 'How was this booking requested?')
+    const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
     await expect(requestMethodPage.getRequestLabelByValue('PHONE')).toContainText('Phone call')
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
     await requestMethodPage.continueButton.click()
 
     // Check booking details
-    const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page, 'Check the visit details before booking')
+    const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page)
     await expect(checkYourBookingPage.prisonerName).toContainText('John Smith')
     await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn7Days, longDateFormat))
     await expect(checkYourBookingPage.visitTime).toContainText('10am to 11am')
     await expect(checkYourBookingPage.visitType).toContainText('Open')
-    await expect(checkYourBookingPage.visitorName(1)).toContainText('Jeanette Smith')
-    await expect(checkYourBookingPage.visitorName(2)).toContainText('Bob Smith')
+    await expect(checkYourBookingPage.visitorName(1)).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(checkYourBookingPage.visitorName(2)).toContainText('Bob Smith (son of the prisoner)')
     await expect(checkYourBookingPage.additionalSupport).toContainText('Wheelchair ramp, Some extra help!')
     await expect(checkYourBookingPage.mainContactName).toContainText('Jeanette Smith')
     await expect(checkYourBookingPage.mainContactNumber).toContainText('07712 000 000')
@@ -271,8 +252,8 @@ test.describe('Book a visit', () => {
       ],
     })
 
-    await checkYourBookingPage.submitButton.click()
-    const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit confirmed')
+    await checkYourBookingPage.clickDisabledOnSubmitButton()
+    const confirmationPage = await ConfirmationPage.verifyOnPage(page)
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')
     await expect(confirmationPage.prisonerNumber).toContainText(offenderNo)
@@ -280,10 +261,10 @@ test.describe('Book a visit', () => {
     await expect(confirmationPage.visitDate).toContainText(format(dateIn7Days, longDateFormat))
     await expect(confirmationPage.visitTime).toContainText('10am to 11am')
     await expect(confirmationPage.visitType).toContainText('Open')
-    await expect(confirmationPage.visitorName(1)).toContainText('Jeanette Smith')
-    await expect(confirmationPage.visitorName(2)).toContainText('Bob Smith')
+    await expect(confirmationPage.visitorName(1)).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(confirmationPage.visitorName(2)).toContainText('Bob Smith (son of the prisoner)')
     await expect(confirmationPage.additionalSupport).toContainText('Wheelchair ramp, Some extra help!')
-    await expect(confirmationPage.mainContactName).toContainText('Jeanette Smith')
+    await expect(confirmationPage.mainContactName).toContainText('Jeanette Smith (wife of the prisoner)')
     await expect(confirmationPage.mainContactNumber).toContainText('07712 000 000')
     await confirmationPage.viewPrisonersProfileButton(offenderNo)
   })
