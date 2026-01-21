@@ -69,6 +69,10 @@ export declare global {
         sharedData?: HeaderFooterSharedData
       }
       appInsightsOperationId?: string
+      matomoEnabled?: boolean
+      matomoContainerId?: string
+      matomoSiteId?: string
+      matomoUrl?: string
     }
   }
 }

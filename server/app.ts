@@ -35,6 +35,7 @@ import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
 import bapvUserRoles from './constants/bapvUserRoles'
+import setUpAnalytics from './middleware/setUpAnalytics'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -62,6 +63,7 @@ export default function createApp(services: Services): express.Application {
     }),
   )
   app.use(setUpCurrentUser())
+  app.use(setUpAnalytics(config.analytics))
 
   app.use(maintenancePageRoute())
 
