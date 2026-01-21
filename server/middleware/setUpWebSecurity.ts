@@ -32,7 +32,6 @@ export default function setUpWebSecurity(): Router {
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           fontSrc: ["'self'"],
           formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
-          connectSrc: ['https://matomo-dev.hmpps.service.justice.gov.uk'],
           upgradeInsecureRequests: process.env.NODE_ENV === 'development' ? null : [],
         },
       },
