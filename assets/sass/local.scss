@@ -301,6 +301,7 @@ p.bapv-visit-details__restriction--flagged {
   display: grid;
   grid-template-columns: max-content auto;
   gap: govuk-spacing(2) govuk-spacing(4);
+  margin-top: govuk-spacing(8);
   margin-bottom: govuk-spacing(8);
 
   & dt {
