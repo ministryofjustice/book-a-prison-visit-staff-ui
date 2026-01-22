@@ -14,7 +14,7 @@
         {{ mojAlert(message) }}
       {% endfor %}
 
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       {# Booker details #}
       <dl class="govuk-list bapv-booker-details">
@@ -34,7 +34,7 @@
           {% set prisonerName = (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName %}
           {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
 
-          <h2 class="govuk-heading-l" data-test="{{ prisonerIndex }}">Visits to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}</h2>
+          <h2 class="govuk-heading-m" data-test="{{ prisonerIndex }}">Visitors linked to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}</h2>
 
           {# Visitors #}
           {% if prisoner.permittedVisitors | length %}
@@ -77,8 +77,6 @@
             {% endfor -%}
 
             {{ govukTable({
-              caption: "Linked visitors",
-              captionClasses: "govuk-table__caption--m",
               classes: "govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
               firstCellIsHeader: true,
               head: [
