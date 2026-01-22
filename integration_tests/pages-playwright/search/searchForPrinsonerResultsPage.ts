@@ -5,8 +5,6 @@ import { properCase } from '../../../server/utils/utils'
 import AbstractPage from '../abstractPage'
 
 export default class SearchForAPrisonerResultsPage extends AbstractPage {
-  static readonly title = 'Search for a prisoner'
-
   readonly searchForm: Locator
 
   readonly searchInput: Locator
@@ -26,7 +24,7 @@ export default class SearchForAPrisonerResultsPage extends AbstractPage {
   readonly firstResultLink: Locator
 
   constructor(page: Page) {
-    super(page, SearchForAPrisonerResultsPage.title)
+    super(page, 'Search for a prisoner')
 
     this.searchForm = page.locator('[action="/search/prisoner"]')
     this.searchInput = page.locator('.moj-search__input')

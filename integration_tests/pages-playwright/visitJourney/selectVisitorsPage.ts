@@ -11,9 +11,9 @@ export default class SelectVisitorsPage extends AbstractPage {
   constructor(page: Page) {
     super(page, 'Select visitor')
 
-    this.continueButton = page.locator('[data-test=submit]')
-    this.showFullCommentLink = page.locator('[data-test=show-full-comment]')
-    this.closeFullCommentLink = page.locator('[data-test=close-full-comment]')
+    this.continueButton = page.getByTestId('submit')
+    this.showFullCommentLink = page.getByTestId('show-full-comment')
+    this.closeFullCommentLink = page.getByTestId('close-full-comment')
   }
 
   // Prisoner restrictions
