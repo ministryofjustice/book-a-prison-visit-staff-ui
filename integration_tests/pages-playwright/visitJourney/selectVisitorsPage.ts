@@ -2,8 +2,6 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class SelectVisitorsPage extends AbstractPage {
-  static readonly title = 'Select visitor'
-
   readonly continueButton: Locator
 
   readonly showFullCommentLink: Locator
@@ -11,7 +9,7 @@ export default class SelectVisitorsPage extends AbstractPage {
   readonly closeFullCommentLink: Locator
 
   constructor(page: Page) {
-    super(page, SelectVisitorsPage.title)
+    super(page, 'Select visitor')
 
     this.continueButton = page.locator('[data-test=submit]')
     this.showFullCommentLink = page.locator('[data-test=show-full-comment]')

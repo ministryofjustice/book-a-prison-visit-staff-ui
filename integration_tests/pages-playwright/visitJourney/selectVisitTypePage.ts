@@ -2,11 +2,8 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class SelectVisitTypePage extends AbstractPage {
-  readonly submitButton: Locator
-
-  constructor(page: Page, title: string) {
-    super(page, title)
-    this.submitButton = page.getByTestId('submit')
+  constructor(page: Page) {
+    super(page, "Check the prisoner's closed visit restrictions")
   }
 
   getPrisonerRestrictionType(index: number): Locator {

@@ -2,8 +2,6 @@ import { expect, type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class ConfirmationPage extends AbstractPage {
-  static readonly title = 'Visit confirmed'
-
   readonly bookingReference: Locator
 
   readonly prisonerName: Locator
@@ -29,7 +27,7 @@ export default class ConfirmationPage extends AbstractPage {
   readonly prisonName: Locator
 
   constructor(page: Page) {
-    super(page, ConfirmationPage.title)
+    super(page, 'Visit confirmed')
 
     this.bookingReference = page.locator('.test-booking-reference')
     this.prisonerName = page.locator('.test-visit-prisoner-name')

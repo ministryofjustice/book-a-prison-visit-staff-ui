@@ -2,8 +2,6 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class MainContactPage extends AbstractPage {
-  static readonly title = 'Who is the main contact for this booking?'
-
   readonly axeExcludedElements = [
     // Known issue with radio conditional reveal
     // See: https://github.com/alphagov/govuk-frontend/issues/979
@@ -21,7 +19,7 @@ export default class MainContactPage extends AbstractPage {
   readonly continueButton: Locator
 
   constructor(page: Page) {
-    super(page, MainContactPage.title)
+    super(page, 'Who is the main contact for this booking?')
 
     this.firstContact = page.locator('#contact')
     this.phoneNumberYesRadio = page.locator('#phoneNumber')

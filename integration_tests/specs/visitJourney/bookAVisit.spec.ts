@@ -252,7 +252,7 @@ test.describe('Book a visit', () => {
       ],
     })
 
-    await checkYourBookingPage.clickDisabledOnSubmitButton()
+    await checkYourBookingPage.submitButton.click()
     const confirmationPage = await ConfirmationPage.verifyOnPage(page)
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')

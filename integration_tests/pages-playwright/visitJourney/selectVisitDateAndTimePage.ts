@@ -2,14 +2,12 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class SelectVisitDateAndTimePage extends AbstractPage {
-  static readonly title = 'Select date and time of visit'
-
   readonly visitRestriction: Locator
 
   readonly continueButton: Locator
 
   constructor(page: Page) {
-    super(page, SelectVisitDateAndTimePage.title)
+    super(page, 'Select date and time of visit')
     this.visitRestriction = page.getByTestId('visit-restriction')
     this.continueButton = page.getByTestId('submit')
   }
