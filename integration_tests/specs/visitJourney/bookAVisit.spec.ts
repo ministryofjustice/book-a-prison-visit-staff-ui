@@ -17,6 +17,7 @@ import RequestMethodPage from '../../pages-playwright/visitJourney/requestMethod
 import CheckYourBookingPage from '../../pages-playwright/visitJourney/checkYourBookingPage'
 import ConfirmationPage from '../../pages-playwright/visitJourney/confirmationPage'
 import prisonerSearch from '../../mockApis/prisonerSearch'
+import SelectVisitTypePage from '../../pages-playwright/visitJourney/selectVisitTypePage'
 
 test.describe('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -267,5 +268,88 @@ test.describe('Book a visit', () => {
     await expect(confirmationPage.mainContactName).toContainText('Jeanette Smith (wife of the prisoner)')
     await expect(confirmationPage.mainContactNumber).toContainText('07712 000 000')
     await confirmationPage.viewPrisonersProfileButton(offenderNo)
+  })
+  test('Should allow VO balance override', async ({ page }) => {
+    const prisonerDisplayName = 'Smith, John'
+    const profile = TestData.prisonerProfile()
+    profile.visitBalances.remainingVo = 0
+    profile.visitBalances.remainingPvo = 0
+    const { prisonerId: offenderNo } = profile
+    // --- Stubs --
+    await orchestrationApi.stubPrisonerProfile(profile)
+    await prisonerContactRegistry.stubPrisonerSocialContacts({
+      offenderNo,
+      contacts: [],
+    })
+    // --- Login & navigate directly to prisoner profile ---
+    await login(page)
+    await page.goto(`/prisoner/${offenderNo}`)
+    const prisonerProfilePage = await PrisonerProfilePage.verifyOnPage(page, prisonerDisplayName)
+    // --- Assertions ---
+    await expect(prisonerProfilePage.bookAVisitButton).toBeDisabled()
+    await expect(prisonerProfilePage.voOverrideText).toContainText(
+      'The prisoner has no available visiting orders. Select the box if a booking can still be made.',
+    )
+    // --- Override and continue ---
+    await prisonerProfilePage.voOverrideButton.click()
+    await expect(prisonerProfilePage.bookAVisitButton).toBeEnabled()
+    await prisonerProfilePage.bookAVisitButton.click()
+    // --- Next page ---
+    await SelectVisitorsPage.verifyOnPage(page)
+  })
+  test('Should prompt for visit type selection for prisoner with closed restriction', async ({ page }) => {
+    const prisonerDisplayName = 'Smith, John'
+    const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule()
+    const contacts = [TestData.contact({ personId: 4321 }), TestData.contact({ personId: 4322 })]
+    const prisonerRestrictions = [
+      TestData.offenderRestriction({
+        restrictionType: 'CLOSED',
+        restrictionTypeDescription: 'Closed',
+        startDate: '2022-01-03',
+      }),
+    ]
+
+    const profile = TestData.prisonerProfile({ prisonerRestrictions })
+    const { prisonerId: offenderNo } = profile
+
+    // --- Stubs ---
+    await orchestrationApi.stubPrisonerProfile(profile)
+    await prisonerContactRegistry.stubPrisonerSocialContacts({
+      offenderNo,
+      contacts,
+    })
+
+    // --- Login & navigate ---
+    await login(page)
+    await page.goto(`/prisoner/${offenderNo}`)
+
+    // --- Prisoner profile ---
+    const prisonerProfilePage = await PrisonerProfilePage.verifyOnPage(page, prisonerDisplayName)
+    await prisonerProfilePage.bookAVisitButton.click()
+
+    // --- Select visitors ---
+    const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page)
+    await selectVisitorsPage.getVisitor(contacts[0].personId).check()
+    await selectVisitorsPage.getVisitor(contacts[1].personId).check()
+    await selectVisitorsPage.continueButton.click()
+
+    // --- Select visit type (Closed restriction) ---
+    const selectVisitTypePage = await SelectVisitTypePage.verifyOnPage(page)
+    await expect(selectVisitTypePage.getPrisonerRestrictionType(1)).toContainText('Closed')
+    await selectVisitTypePage.selectClosedVisitType()
+
+    // --- Stub sessions AFTER visit type selection (matches Cypress timing) ---
+    await orchestrationApi.stubGetVisitSessionsAndSchedule({
+      prisonId: 'HEI',
+      prisonerId: offenderNo,
+      minNumberOfDays: 3,
+      username: 'USER1',
+      visitSessionsAndSchedule,
+    })
+
+    await selectVisitTypePage.continueButton.click()
+    // --- Select date & time ---
+    const selectVisitDateAndTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
+    await expect(selectVisitDateAndTimePage.visitRestriction).toContainText('Closed')
   })
 })
