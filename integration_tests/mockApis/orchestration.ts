@@ -944,17 +944,17 @@ export default {
 
   stubGetVisitSessionsAndSchedule: ({
     prisonId = 'HEI',
-    prisonerId,
+    prisonerId = 'A1234BC',
     minNumberOfDays = 3,
     username = 'USER1',
     visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
   }: {
-    prisonId: string
-    prisonerId: string
-    minNumberOfDays: number
-    username: string
-    visitSessionsAndSchedule: VisitSessionsAndScheduleDto
-  }): SuperAgentRequest => {
+    prisonId?: string
+    prisonerId?: string
+    minNumberOfDays?: number
+    username?: string
+    visitSessionsAndSchedule?: VisitSessionsAndScheduleDto
+  } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

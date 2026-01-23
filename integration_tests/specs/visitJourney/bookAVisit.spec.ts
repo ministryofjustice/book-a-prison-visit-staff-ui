@@ -299,7 +299,6 @@ test.describe('Book a visit', () => {
   })
   test('Should prompt for visit type selection for prisoner with closed restriction', async ({ page }) => {
     const prisonerDisplayName = 'Smith, John'
-    const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule()
     const contacts = [TestData.contact({ personId: 4321 }), TestData.contact({ personId: 4322 })]
     const prisonerRestrictions = [
       TestData.offenderRestriction({
@@ -337,16 +336,7 @@ test.describe('Book a visit', () => {
     const selectVisitTypePage = await SelectVisitTypePage.verifyOnPage(page)
     await expect(selectVisitTypePage.getPrisonerRestrictionType(1)).toContainText('Closed')
     await selectVisitTypePage.selectClosedVisitType()
-
-    // --- Stub sessions AFTER visit type selection (matches Cypress timing) ---
-    await orchestrationApi.stubGetVisitSessionsAndSchedule({
-      prisonId: 'HEI',
-      prisonerId: offenderNo,
-      minNumberOfDays: 3,
-      username: 'USER1',
-      visitSessionsAndSchedule,
-    })
-
+    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId: offenderNo })
     await selectVisitTypePage.continueButton.click()
     // --- Select date & time ---
     const selectVisitDateAndTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
