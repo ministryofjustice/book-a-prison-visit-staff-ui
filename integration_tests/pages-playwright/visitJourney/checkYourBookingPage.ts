@@ -49,10 +49,15 @@ export default class CheckYourBookingPage extends AbstractPage {
 
     this.requestMethod = page.locator('.test-request-method')
     this.changeRequestMethod = page.getByTestId('change-request-method')
+
     this.submitButton = page.getByTestId('submit')
   }
 
   visitorName(index: number): Locator {
     return this.page.locator(`.test-visitor-name${index}`)
+  }
+
+  async submitBooking(): Promise<void> {
+    await this.submitButton.click()
   }
 }

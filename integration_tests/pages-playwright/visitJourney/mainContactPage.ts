@@ -27,4 +27,24 @@ export default class MainContactPage extends AbstractPage {
     this.emailInput = page.locator('#email')
     this.continueButton = page.getByTestId('submit')
   }
+
+  async selectFirstContact(): Promise<void> {
+    await this.firstContact.check()
+  }
+
+  async choosePhoneNumberYes(): Promise<void> {
+    await this.phoneNumberYesRadio.click()
+  }
+
+  async enterPhoneNumber(phone: string): Promise<void> {
+    await this.phoneNumberInput.fill(phone)
+  }
+
+  async enterEmail(email: string): Promise<void> {
+    await this.emailInput.fill(email)
+  }
+
+  async continue(): Promise<void> {
+    await this.continueButton.click()
+  }
 }
