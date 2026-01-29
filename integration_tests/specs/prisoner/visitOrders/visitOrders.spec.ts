@@ -33,7 +33,7 @@ test.describe('Visiting orders', () => {
     // Select visiting orders tab
     await orchestrationApi.stubGetVoHistory()
     await prisonerProfilePage.visitingOrdersTab.click()
-    await prisonerProfilePage.visitsTabShowVoHistoryLink.click()
+    await prisonerProfilePage.visitingOrdersTabShowVoHistoryLink.click()
 
     // Visiting orders history page - prisoner details
     const visitOrdersHistoryPage = await VisitOrdersHistoryPage.verifyOnPage(page)
@@ -59,7 +59,7 @@ test.describe('Visiting orders', () => {
     // Select visiting orders tab
     await orchestrationApi.stubGetVoBalance()
     await prisonerProfilePage.visitingOrdersTab.click()
-    await prisonerProfilePage.visitsTabEditVoLink.click()
+    await prisonerProfilePage.visitingOrdersTabEditVoLink.click()
 
     // Edit vo balance page
     const editVoBalancePage = await EditVoBalancePage.verifyOnPage(page)
