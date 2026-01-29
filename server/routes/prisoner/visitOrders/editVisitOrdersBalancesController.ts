@@ -125,7 +125,7 @@ export default class EditVisitOrdersBalancesController {
     const enterANumberMessage = 'Enter a number.'
     const enterAReasonMessage = 'Enter a reason for this change.'
     const reasonAllowedCharsMessage =
-      'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets'
+      'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets.'
     const reasonMaxLengthMessage = 'Reason must be 512 characters or less'
 
     return [

@@ -449,7 +449,7 @@ describe('Edit visit order balances', () => {
             expect(flashProvider).toHaveBeenCalledWith('errors', [
               {
                 location: 'body',
-                msg: 'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets',
+                msg: 'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets.',
                 path: 'otherDetails',
                 type: 'field',
                 value: invalidTextInput,
