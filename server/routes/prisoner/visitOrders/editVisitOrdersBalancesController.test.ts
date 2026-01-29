@@ -427,7 +427,48 @@ describe('Edit visit order balances', () => {
             })
           })
       })
+
+      it('should handle invalid text input', () => {
+        const invalidTextInput = 'some invalid text <🙂>'
+
+        return request(app)
+          .post(url)
+          .send({
+            voChange: 'ADD',
+            addVoAmount: '1',
+            pvoChange: 'NO_CHANGE',
+            reason: 'OTHER',
+            otherDetails: invalidTextInput,
+          })
+          .expect(302)
+          .expect('Location', url)
+          .expect(() => {
+            expect(visitOrdersService.changeVoBalance).not.toHaveBeenCalled()
+            expect(auditService.adjustedVisitBalance).not.toHaveBeenCalled()
+
+            expect(flashProvider).toHaveBeenCalledWith('errors', [
+              {
+                location: 'body',
+                msg: 'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets',
+                path: 'otherDetails',
+                type: 'field',
+                value: invalidTextInput,
+              },
+            ])
+            expect(flashProvider).toHaveBeenCalledWith('formValues', {
+              voChange: 'ADD',
+              addVoAmount: 1,
+              removeVoAmount: NaN,
+              pvoChange: 'NO_CHANGE',
+              addPvoAmount: NaN,
+              removePvoAmount: NaN,
+              reason: 'OTHER',
+              otherDetails: invalidTextInput,
+            })
+          })
+      })
     })
+
     describe('API validation errors', () => {
       it('should handle API 422 validation errors', () => {
         const error: SanitisedError<PrisonerBalanceAdjustmentValidationErrorResponse> = {
