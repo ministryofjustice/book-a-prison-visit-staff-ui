@@ -9,6 +9,7 @@ import { createMockAuditService, createMockBookerService } from '../../../servic
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
 import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
+import { VisitorRequestForReviewDto } from '../../../data/orchestrationApiTypes'
 
 let app: Express
 let flashData: FlashData
@@ -18,7 +19,7 @@ const auditService = createMockAuditService()
 const bookerService = createMockBookerService()
 
 const visitorRequestForReview = TestData.visitorRequestForReview()
-const linkedVisitor = TestData.visitorInfo()
+const linkedVisitors = [TestData.visitorInfo()]
 const url = `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/check-linked-visitors`
 const fakeDateTime = new Date('2025-10-01T09:00')
 
@@ -28,7 +29,12 @@ beforeEach(() => {
   flashData = { errors: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
-  sessionData = {} as SessionData
+  sessionData = {
+    visitorRequestJourney: {
+      visitorRequest: visitorRequestForReview,
+      linkedVisitors,
+    },
+  } as SessionData
 
   app = appWithAllRoutes({
     services: { auditService, bookerService },
@@ -56,19 +62,19 @@ describe('Booker management - visitor requests - check linked visitors', () => {
     })
 
     it('should redirect to manage bookers page if no visitor request details in session', () => {
+      delete sessionData.visitorRequestJourney
       return request(app).get(url).expect(302).expect('location', '/manage-bookers')
     })
 
     it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
-      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
+      sessionData.visitorRequestJourney.visitorRequest = {
+        reference: 'a-different-reference',
+      } as VisitorRequestForReviewDto
 
       return request(app).get(url).expect(302).expect('location', '/manage-bookers')
     })
 
     it('should render check if visitor already linked page', () => {
-      sessionData.visitorRequest = visitorRequestForReview
-      bookerService.getLinkedVisitors.mockResolvedValue([linkedVisitor])
-
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
@@ -83,10 +89,9 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect($('h1').text().trim()).toBe('Check if the visitor is already linked')
 
           // Visitor request details
-          expect($('[data-test=no-linked-visitors]').length).toBe(0)
           expect($('[data-test=booker-email]').text()).toBe(visitorRequestForReview.bookerEmail)
-          expect($('[data-test=visitor-name]').text()).toBe('Mike Jones')
-          expect($('[data-test=visitor-dob]').text()).toBe('10 November 1999')
+          expect($('[data-test=requested-visitor-name]').text()).toBe('Mike Jones')
+          expect($('[data-test=requested-visitor-dob]').text()).toBe('10 November 1999')
 
           // Linked visitor list
           expect($('[data-test=visitor-1-name]').text()).toBe('Jeanette Smith')
@@ -96,34 +101,10 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect($('input[name=rejectionReason]').length).toBe(2)
           expect($('[data-test=reject-request]').parent('form').attr('action')).toBe(url)
           expect($('[data-test=reject-request]').text().trim()).toBe('Confirm')
-
-          expect(bookerService.getLinkedVisitors).toHaveBeenCalledWith({
-            username: 'user1',
-            bookerReference: visitorRequestForReview.bookerReference,
-            prisonerId: visitorRequestForReview.prisonerId,
-          })
-        })
-    })
-
-    it('should handle booker having no linked visitors', () => {
-      sessionData.visitorRequest = visitorRequestForReview
-      bookerService.getLinkedVisitors.mockResolvedValue([])
-
-      return request(app)
-        .get(url)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test=no-linked-visitors]').text()).toContain('no linked visitors')
-          expect($('input[name=rejectionReason]').length).toBe(1)
-          expect($('input[name=rejectionReason]').val()).toBe('REJECT')
         })
     })
 
     it('should render validation errors', () => {
-      sessionData.visitorRequest = visitorRequestForReview
-      bookerService.getLinkedVisitors.mockResolvedValue([linkedVisitor])
-
       flashData.errors = <FieldValidationError[]>[{ msg: 'Select an answer', path: 'rejectionReason' }]
 
       return request(app)
@@ -150,10 +131,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
 
     it('should reject request, send audit, set message, clear session and redirect to manage bookers page - REJECT', () => {
       const rejectedVisitorRequest = TestData.visitorRequest()
-
       bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
-
-      sessionData.visitorRequest = visitorRequestForReview
 
       return request(app)
         .post(url)
@@ -179,16 +157,13 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             operationId: undefined,
           })
 
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should reject request, send audit, set message, clear session and redirect to manage bookers page - ALREADY_LINKED', () => {
       const rejectedVisitorRequest = TestData.visitorRequest()
-
       bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
-
-      sessionData.visitorRequest = visitorRequestForReview
 
       return request(app)
         .post(url)
@@ -214,12 +189,11 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             operationId: undefined,
           })
 
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should redirect to booker management with message if reject returns HTP 400 (request already reviewed)', () => {
-      sessionData.visitorRequest = visitorRequestForReview
       bookerService.rejectVisitorRequest.mockRejectedValue(new BadRequest())
 
       return request(app)
@@ -235,20 +209,12 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           })
 
           expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
-
-          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
-            requestReference: visitorRequestForReview.reference,
-            rejectionReason: 'REJECT',
-            username: 'user1',
-            operationId: undefined,
-          })
-
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should propagate any other API errors', () => {
-      sessionData.visitorRequest = visitorRequestForReview
       bookerService.rejectVisitorRequest.mockRejectedValue(new InternalServerError())
 
       return request(app)
@@ -263,11 +229,15 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           })
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest).toStrictEqual(visitorRequestForReview)
+          expect(sessionData.visitorRequestJourney).toStrictEqual({
+            visitorRequest: visitorRequestForReview,
+            linkedVisitors,
+          })
         })
     })
 
     it('should redirect to manage bookers page if no visitor request details in session', () => {
+      delete sessionData.visitorRequestJourney
       return request(app)
         .post(url)
         .send({ rejectionReason: 'REJECT' })
@@ -281,7 +251,9 @@ describe('Booker management - visitor requests - check linked visitors', () => {
     })
 
     it('should redirect to manage bookers page if visitor request details in session do not match URL', () => {
-      sessionData.visitorRequest = { reference: 'a-different-reference' } as SessionData['visitorRequest']
+      sessionData.visitorRequestJourney.visitorRequest = {
+        reference: 'a-different-reference',
+      } as VisitorRequestForReviewDto
 
       return request(app)
         .post(url)
@@ -292,15 +264,11 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect(bookerService.rejectVisitorRequest).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
           expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
-          expect(sessionData.visitorRequest).toBeUndefined()
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
     })
 
     it('should set validation error if no rejection reason selected and redirect to original page', () => {
-      sessionData.visitorRequest = {
-        reference: visitorRequestForReview.reference,
-      } as SessionData['visitorRequest']
-
       return request(app)
         .post(url)
         .send({})
@@ -317,10 +285,6 @@ describe('Booker management - visitor requests - check linked visitors', () => {
     })
 
     it('should set validation error if invalid rejection reason selected and redirect to original page', () => {
-      sessionData.visitorRequest = {
-        reference: visitorRequestForReview.reference,
-      } as SessionData['visitorRequest']
-
       return request(app)
         .post(url)
         .send({ rejectionReason: 'XYZ' })

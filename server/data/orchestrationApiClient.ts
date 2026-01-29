@@ -1,3 +1,4 @@
+import { format, subMonths } from 'date-fns'
 import RestClient from './restClient'
 import config, { ApiConfig } from '../config'
 import {
@@ -22,6 +23,8 @@ import {
   NotificationTypeRaw,
   PageVisitDto,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
+  PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
@@ -37,6 +40,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitOrderHistoryDetailsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitorRequestsCountByPrisonCodeDto,
@@ -551,6 +555,48 @@ export default class OrchestrationApiClient {
         prisonerId,
         min: minNumberOfDays.toString(),
         username,
+      }).toString(),
+    })
+  }
+
+  // visit-orders-controller
+  async getVoBalance({ prisonId, prisonerId }: { prisonId: string; prisonerId: string }): Promise<PrisonerBalanceDto> {
+    return this.restClient.get({
+      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+    })
+  }
+
+  async changeVoBalance({
+    prisonId,
+    prisonerId,
+    prisonerBalanceAdjustmentDto,
+  }: {
+    prisonId: string
+    prisonerId: string
+    prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
+  }): Promise<void> {
+    await this.restClient.put({
+      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      data: prisonerBalanceAdjustmentDto,
+    })
+  }
+
+  async getVoHistory({
+    prisonId,
+    prisonerId,
+  }: {
+    prisonId: string
+    prisonerId: string
+  }): Promise<VisitOrderHistoryDetailsDto> {
+    // fixed to get past 3 months of VO history
+    const date3MonthsAgo = subMonths(new Date(), 3)
+    const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
+
+    return this.restClient.get({
+      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`,
+      query: new URLSearchParams({
+        fromDate,
+        maxResults: '30',
       }).toString(),
     })
   }

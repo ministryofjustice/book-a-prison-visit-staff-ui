@@ -7,6 +7,8 @@ import {
   ExcludeDateDto,
   OffenderRestriction,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
+  PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonerScheduledEventDto,
   PrisonVisitorRequestDto,
@@ -22,6 +24,8 @@ import {
   VisitNotificationEventRaw,
   VisitNotifications,
   VisitNotificationsRaw,
+  VisitOrderHistoryDetailsDto,
+  VisitOrderHistoryDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPreview,
@@ -35,6 +39,7 @@ import {
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
+import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
 
 export default class TestData {
   static address = ({
@@ -317,6 +322,20 @@ export default class TestData {
       locationDescription,
     }) as Prisoner
 
+  static prisonerBalanceAdjustmentDto = ({
+    voAmount = 1,
+    pvoAmount = 2,
+    adjustmentReasonType = 'GOVERNOR_ADJUSTMENT',
+    adjustmentReasonText = 'adjustment reason',
+    userName = 'user1',
+  }: Partial<PrisonerBalanceAdjustmentDto> = {}): PrisonerBalanceAdjustmentDto => ({
+    voAmount,
+    pvoAmount,
+    adjustmentReasonType,
+    adjustmentReasonText,
+    userName,
+  })
+
   static prisonerProfile = ({
     prisonerId = 'A1234BC',
     prisonId = 'HEI',
@@ -465,6 +484,7 @@ export default class TestData {
     maxAdultVisitors = this.prisonDto().maxAdultVisitors,
     maxChildVisitors = this.prisonDto().maxChildVisitors,
     adultAgeYears = this.prisonDto().adultAgeYears,
+    webAddress = this.prisonDto().webAddress,
     clients = this.prisonDto().clients,
   }: Partial<Prison> = {}): Prison =>
     ({
@@ -477,6 +497,7 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      webAddress,
       clients,
     }) as Prison
 
@@ -490,6 +511,7 @@ export default class TestData {
     maxAdultVisitors = 3,
     maxChildVisitors = 4,
     adultAgeYears = 18,
+    webAddress = 'https://www.example.com/hewell',
     clients = [{ userType: 'STAFF', active: true }],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
@@ -502,8 +524,23 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
+      webAddress,
       clients,
     }) as PrisonDto
+
+  static prisonerVoBalance = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    voBalance = 5,
+    pvoBalance = 2,
+  }: Partial<PrisonerBalanceDto> = {}): PrisonerBalanceDto => ({
+    prisonerId,
+    firstName,
+    lastName,
+    voBalance,
+    pvoBalance,
+  })
 
   static visit = ({
     applicationReference = 'aaa-bbb-ccc',
@@ -762,6 +799,73 @@ export default class TestData {
     bookedByName,
     visitDate,
     notifications,
+  })
+
+  static visitOrderHistoryDto = ({
+    visitOrderHistoryType = 'VO_ALLOCATION',
+    createdTimeStamp = '2025-12-01T10:00:00',
+    voBalance = 5,
+    voBalanceChange = 1,
+    pvoBalance = 2,
+    pvoBalanceChange = 0,
+    userName = 'SYSTEM',
+    comment = null,
+    attributes = [{ attributeType: 'INCENTIVE_LEVEL', attributeValue: 'Standard' }],
+  }: Partial<VisitOrderHistoryDto> = {}): VisitOrderHistoryDto => ({
+    visitOrderHistoryType,
+    createdTimeStamp,
+    voBalance,
+    voBalanceChange,
+    pvoBalance,
+    pvoBalanceChange,
+    userName,
+    comment,
+    attributes,
+  })
+
+  static visitOrderHistoryDetailsDto = ({
+    prisonerId = 'A1234BC',
+    firstName = 'JOHN',
+    lastName = 'SMITH',
+    convictedStatus = 'Convicted',
+    incentiveLevel = 'Standard',
+    category = 'Cat C',
+    visitOrderHistory = [this.visitOrderHistoryDto()],
+  }: Partial<VisitOrderHistoryDetailsDto> = {}): VisitOrderHistoryDetailsDto => ({
+    prisonerId,
+    firstName,
+    lastName,
+    convictedStatus,
+    incentiveLevel,
+    category,
+    visitOrderHistory,
+  })
+
+  static visitOrderHistoryPage = ({
+    prisonerId = this.visitOrderHistoryDetailsDto().prisonerId,
+    firstName = this.visitOrderHistoryDetailsDto().firstName,
+    lastName = this.visitOrderHistoryDetailsDto().lastName,
+    convictedStatus = this.visitOrderHistoryDetailsDto().convictedStatus,
+    incentiveLevel = this.visitOrderHistoryDetailsDto().incentiveLevel,
+    category = this.visitOrderHistoryDetailsDto().category,
+    voHistoryRows = [
+      [
+        { text: '1/12/2025', classes: 'bapv-secondary-text', attributes: { 'data-test': 'date-0' } },
+        { html: 'VO expired', classes: 'bapv-secondary-text', attributes: { 'data-test': 'reason-0' } },
+        { text: '1', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-change-0' } },
+        { text: '5', classes: 'bapv-secondary-text', attributes: { 'data-test': 'vo-balance-0' } },
+        { text: '0', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-change-0' } },
+        { text: '2', classes: 'bapv-secondary-text', attributes: { 'data-test': 'pvo-balance-0' } },
+      ],
+    ],
+  }: Partial<VisitOrderHistoryPage> = {}): VisitOrderHistoryPage => ({
+    prisonerId,
+    firstName,
+    lastName,
+    convictedStatus,
+    incentiveLevel,
+    category,
+    voHistoryRows,
   })
 
   static visitorInfo = ({

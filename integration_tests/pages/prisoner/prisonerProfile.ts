@@ -1,3 +1,6 @@
+// This page has been moved over to Playwright; this Cypress file can go once remaining
+// Cypress integration tests depending on it are migrated.
+
 import Page, { PageElement } from '../page'
 
 export default class PrisonerProfilePage extends Page {
@@ -44,6 +47,8 @@ export default class PrisonerProfilePage extends Page {
   visitTabPVOLastAdjustment = (): PageElement => cy.get('[data-test="tab-pvo-last-date"]')
 
   visitTabPVONextAdjustment = (): PageElement => cy.get('[data-test="tab-pvo-next-date"]')
+
+  visitsTabShowVoHistoryLink = (): PageElement => cy.get('[data-test="view-vo-history"]')
 
   alertsLink = (): PageElement => cy.get('[data-test="all-alerts-link"]')
 

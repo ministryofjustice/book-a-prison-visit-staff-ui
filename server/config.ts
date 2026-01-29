@@ -66,6 +66,12 @@ export default {
     'https://prisoner-dev.digital.prison.service.justice.gov.uk/',
     requiredInProduction,
   ),
+  analytics: {
+    enabled: get('MATOMO_ENABLED', 'false', requiredInProduction) === 'true',
+    matomoContainerId: get('MATOMO_CONTAINER_ID', ''),
+    matomoSiteId: get('MATOMO_SITE_ID', ''),
+    matomoUrl: get('MATOMO_URL', ''),
+  },
   apis: {
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
@@ -152,6 +158,12 @@ export default {
     },
     visitorRequests: {
       enabled: get('FEATURE_VISITOR_REQUESTS', 'false') === 'true',
+    },
+    voAdjustment: {
+      enabled: get('FEATURE_VO_ADJUSTMENT', 'false') === 'true',
+    },
+    voHistory: {
+      enabled: get('FEATURE_VO_HISTORY', 'false') === 'true',
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),

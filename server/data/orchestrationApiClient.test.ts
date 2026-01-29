@@ -35,6 +35,7 @@ describe('orchestrationApiClient', () => {
   let orchestrationApiClient: OrchestrationApiClient
   const token = 'token-1'
   const prisonId = 'HEI'
+  const prisonerId = 'A1234BC'
 
   beforeEach(() => {
     fakeOrchestrationApi = nock(config.apis.orchestration.url)
@@ -493,7 +494,6 @@ describe('orchestrationApiClient', () => {
     it('should get visitors linked to a prisoner for given booker account', async () => {
       const visitors = [TestData.visitorInfo()]
       const bookerReference = 'aaaa-bbbb-cccc'
-      const prisonerId = 'A1234BC'
 
       fakeOrchestrationApi
         .get(`/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`)
@@ -576,10 +576,8 @@ describe('orchestrationApiClient', () => {
 
   describe('getNonLinkedSocialContacts', () => {
     it('should return all non-linked social contacts for given prisoner number and booker reference', async () => {
-      const { reference, permittedPrisoners } = TestData.bookerDetailedInfo()
+      const { reference } = TestData.bookerDetailedInfo()
       const socialContacts = [TestData.socialContact()]
-
-      const prisonerId = permittedPrisoners[0].prisoner.prisonId
 
       fakeOrchestrationApi
         .get(`/public/booker/${reference}/prisoners/${prisonerId}/social-contacts`)
@@ -595,7 +593,6 @@ describe('orchestrationApiClient', () => {
   describe('linkBookerVisitor', () => {
     it('should link a visitor to a booker account for given prisoner', async () => {
       const reference = 'aaa-bbb-ccc'
-      const prisonerId = 'A1234BC'
       const visitorId = 123
       const sendNotification = true
 
@@ -614,7 +611,6 @@ describe('orchestrationApiClient', () => {
 
   describe('unlinkBookerVisitor', () => {
     const reference = 'aaa-bbb-ccc'
-    const prisonerId = 'A1234BC'
     const visitorId = 123
 
     it('should unlink a visitor from a booker account', async () => {
@@ -999,7 +995,6 @@ describe('orchestrationApiClient', () => {
   describe('getVisitSessionsAndSchedule', () => {
     it('should return array of visit sessions and events for specified prisoner', async () => {
       const visitSessionsAndScheduleDto = TestData.visitSessionsAndSchedule()
-      const prisonerId = 'A1234BC'
       const minNumberOfDays = 2
       const username = 'user1'
 
@@ -1017,6 +1012,63 @@ describe('orchestrationApiClient', () => {
       })
 
       expect(output).toStrictEqual(visitSessionsAndScheduleDto)
+    })
+  })
+
+  describe('getVoBalance', () => {
+    it('should return visit order balance for given prisoner', async () => {
+      const prisonerVoBalance = TestData.prisonerVoBalance()
+
+      fakeOrchestrationApi
+        .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, prisonerVoBalance)
+
+      const output = await orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
+
+      expect(output).toStrictEqual(prisonerVoBalance)
+    })
+  })
+
+  describe('changeVoBalance', () => {
+    it('should call adjust visit order balance API for given prisoner', async () => {
+      const prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto()
+
+      fakeOrchestrationApi
+        .put(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
+
+  describe('getVoHistory', () => {
+    it('should return voHistoryDetails for selected prisoner (for past 3 months', async () => {
+      const fakeDate = new Date('2025-12-01')
+      const fakeDateMinus3Months = '2025-09-01'
+      const maxResults = 30
+
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+
+      const visitOrderHistoryDetailsDto = TestData.visitOrderHistoryDetailsDto()
+
+      fakeOrchestrationApi
+        .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`)
+        .query({
+          fromDate: fakeDateMinus3Months,
+          maxResults,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitOrderHistoryDetailsDto)
+
+      const output = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
+
+      expect(output).toStrictEqual(visitOrderHistoryDetailsDto)
+
+      jest.useRealTimers()
     })
   })
 

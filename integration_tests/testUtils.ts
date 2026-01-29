@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test'
+import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import tokenVerification from './mockApis/tokenVerification'
 import hmppsAuth, { type UserToken } from './mockApis/hmppsAuth'
 import { resetStubs } from './mockApis/wiremock'
@@ -19,7 +20,13 @@ export const attemptHmppsAuthLogin = async (page: Page) => {
 
 export const login = async (
   page: Page,
-  { name, roles = DEFAULT_ROLES, active = true, authSource = 'nomis' }: UserToken & { active?: boolean } = {},
+  {
+    name,
+    roles = DEFAULT_ROLES,
+    active = true,
+    authSource = 'nomis',
+    caseLoad = TestData.caseLoad(),
+  }: UserToken & { active?: boolean; caseLoad?: CaseLoad } = {},
 ) => {
   await Promise.all([
     hmppsAuth.favicon(),
@@ -27,7 +34,7 @@ export const login = async (
     hmppsAuth.stubSignOutPage(),
     hmppsAuth.token({ name, roles, authSource }),
     tokenVerification.stubVerifyToken(active),
-    stubComponents({ username: name, caseLoad: TestData.caseLoad() }),
+    stubComponents({ username: name, caseLoad }),
   ])
   await attemptHmppsAuthLogin(page)
 }

@@ -4,11 +4,7 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "components/contactMethodText.njk" import contactMethodText %}
 
-{% if isUpdate %}
-  {% set pageHeaderTitle = "Booking updated" %}
-{% else %}
-  {% set pageHeaderTitle = "Booking confirmed" %}
-{% endif %}
+{% set pageHeaderTitle = "Visit updated" if isUpdate else "Visit confirmed" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -26,25 +22,37 @@
 
       {% if isUpdate %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-        <p>The visit booking has been updated.</p>
+        <p>The visit has been updated.</p>
         {% if hasEmailAddress or hasMobileNumber %}
           <p data-test="contact-method-text">The main contact will get {{ contactMethodText(hasEmailAddress, hasMobileNumber) }} to confirm the updated booking. This will include the booking reference.</p>
         {% endif %}
       {% else %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">What to do next</h2>
-        <p>Let the caller know:</p>
+        <p>Let the booker know:</p>
         <ul class="govuk-body">
-          <li>if they gave a UK mobile number, the main contact will receive a text message with the booking reference and visit details</li>
-          <li>they will need the booking reference to <a href="/search/visit">cancel the booking</a></li>
-          <li>changes to the booking can be made up to 2 working days before the visit</li>
-          <li>who can <a class="govuk-link--no-visited-state" href="https://www.gov.uk/help-with-prison-visits">get help with the cost of visits</a></li>
+          {% if hasEmailAddress or hasMobileNumber %}
+            <li data-test="contact-method-text">{{ contactMethodText(hasEmailAddress, hasMobileNumber) }} with the booking reference will be sent to the main contact</li>
+          {% endif %}
+          <li>the booking reference is needed to <a href="/search/visit">cancel or update the booking</a></li>
+          <li>
+            changes can be made up to 
+            <span data-test="booking-changes-days">{{ selectedEstablishment.policyNoticeDaysMin }} {{ "day" | pluralise(selectedEstablishment.policyNoticeDaysMin) }}</span>
+            before the visit
+          </li>
         </ul>
-        <p>To prepare for the visit day, tell them:</p>
+        <p>To prepare for the visit day, tell the booker:</p>
         <ul class="govuk-body">
           <li>what time to arrive for the visit</li>
-          <li>all adult visitors will need to bring <a class="govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a">acceptable forms of ID</a></li>
-          <li>any COVID-19 requirements (such as face coverings and lateral flow tests)</li>
+          <li>
+            all visitors 16 years old or older will need to bring
+            <a class="govuk-link--no-visited-state" href="https://www.gov.uk/government/publications/management-of-security-at-visits-policy-framework-open-estate/acceptable-forms-of-identification-id-when-visiting-a-prison-in-england-and-wales-annex-a">acceptable forms of ID</a>
+          </li>
           <li>any prison specific rules (such as clothing guidelines)</li>
+          <li>
+            they can find more information on
+            <a data-test="prison-website" href="{{ selectedEstablishment.webAddress }}">{{ selectedEstablishment.prisonName }}’s GOV.UK page</a>
+          </li>
+          <li>some people can <a class="govuk-link--no-visited-state" href="https://www.gov.uk/help-with-prison-visits">get help with the cost of visits</a></li>
         </ul>
       {% endif %}
       <div>
@@ -80,11 +88,20 @@
     },
     {
       key: {
-        text: "Prisoner number"
+        text: "Prison number"
       },
       value: {
         text: prisoner.offenderNo,
         classes: "test-visit-prisoner-number"
+      }
+    },
+    {
+      key: {
+        text: "Establishment"
+      },
+      value: {
+        text: selectedEstablishment.prisonName,
+        classes: "test-visit-prison"
       }
     },
     {

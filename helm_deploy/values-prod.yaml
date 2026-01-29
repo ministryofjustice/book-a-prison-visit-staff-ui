@@ -19,6 +19,9 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner.digital.prison.service.justice.gov.uk/"
     ENVIRONMENT_NAME: prod
 
+    FEATURE_VISITOR_REQUESTS: "true"
+    FEATURE_VO_HISTORY: "true"
+
     REDIS_KEY: "bapv-staff-prod"
 
 generic-prometheus-alerts:

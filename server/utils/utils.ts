@@ -182,3 +182,7 @@ export const formatStartToEndTime = (startTime: string, endTime: string): string
     return ''
   }
 }
+
+export const pluralise = (word: string, count: string | number, plural = `${word}s`): string => {
+  return parseInt(count.toString(), 10) === 1 ? word : plural
+}

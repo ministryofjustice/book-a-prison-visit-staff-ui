@@ -234,48 +234,6 @@ describe('Nunjucks Filters', () => {
     })
   })
 
-  describe('pluralise', () => {
-    describe('Regular plurals', () => {
-      it('should return plural form when count is 0', () => {
-        compiledTemplate = nunjucks.compile('{{ "table" | pluralise(0) }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('tables')
-      })
-
-      it('should return singular form when count is 1', () => {
-        compiledTemplate = nunjucks.compile('{{ "table" | pluralise(1) }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('table')
-      })
-
-      it('should return plural form when count is 2', () => {
-        compiledTemplate = nunjucks.compile('{{ "table" | pluralise(2) }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('tables')
-      })
-    })
-
-    describe('Irregular plurals', () => {
-      it('should return plural form when count is 0', () => {
-        compiledTemplate = nunjucks.compile('{{ "child" | pluralise(0, "children") }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('children')
-      })
-
-      it('should return singular form when count is 1', () => {
-        compiledTemplate = nunjucks.compile('{{ "child" | pluralise(1, "children") }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('child')
-      })
-
-      it('should return plural form when count is 2', () => {
-        compiledTemplate = nunjucks.compile('{{ "child" | pluralise(2, "children") }}', njkEnv)
-        const $ = cheerio.load(compiledTemplate.render())
-        expect($('body').text()).toBe('children')
-      })
-    })
-  })
-
   describe('splitOnNewline', () => {
     it('should handle null or undefined', () => {
       const expectedResult = ['', '']

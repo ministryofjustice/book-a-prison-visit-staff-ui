@@ -51,18 +51,18 @@
 
       {% include "partials/errorSummary.njk" %}
 
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p class="govuk-body-l">
         <span data-test="booker-email">{{ visitorRequest.bookerEmail }}</span> has requested to link:
       </p>
       <p class="govuk-body-l">
-        <span data-test="visitor-name" class="govuk-!-font-weight-bold">{{ visitorRequest.firstName }} {{ visitorRequest.lastName }}</span>,
+        <span data-test="requested-visitor-name" class="govuk-!-font-weight-bold">{{ visitorRequest.firstName }} {{ visitorRequest.lastName }}</span>,
         born on
-        <span data-test="visitor-dob" class="govuk-!-font-weight-bold">{{ visitorRequest.dateOfBirth | formatDate }}</span>
+        <span data-test="requested-visitor-dob" class="govuk-!-font-weight-bold">{{ visitorRequest.dateOfBirth | formatDate }}</span>
       </p>
 
-      <h2 class="govuk-heading-l">
+      <h2 class="govuk-heading-m">
         <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>’s visitors
       </h2>
 
@@ -111,14 +111,18 @@
               rows: contactRows
             }) }}
 
-            {# Add 'None' option #}
+            {# Add 'None' option - with value 'none' / 'reject' #}
             {% if atLeastOneSelectableContact %}
               <div class="govuk-radios__divider">or</div>
 
               <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="visitor-none" name="visitorId" type="radio" value="none">
+                <input class="govuk-radios__input" id="visitor-none" name="visitorId" type="radio" value="{{ "none" if hasLinkedVisitors else "reject" }}">
                 <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="visitor-none">
-                  None of the above
+                  {%- if hasLinkedVisitors -%}
+                    None of the above
+                  {%- else -%}
+                    None of the above, reject the request
+                  {%- endif -%}
                 </label>
               </div>
             {% endif %}

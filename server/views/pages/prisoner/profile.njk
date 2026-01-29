@@ -350,6 +350,24 @@
           ]
         ]
       }) }}
+
+      <div class="govuk-button-group govuk-!-margin-top-3">
+        {{ govukButton({
+          text: "Edit visiting orders balances",
+          classes: "govuk-button--secondary",
+          href: "/prisoner/" + prisonerDetails.prisonerId + '/edit-visiting-orders-balances',
+          attributes: { "data-test": "edit-vo-balances" },
+          preventDoubleClick: true
+        }) if features.voAdjustment.enabled }}
+
+        {{ govukButton({
+          text: "View visiting orders history",
+          classes: "govuk-button--secondary",
+          href: "/prisoner/" + prisonerDetails.prisonerId + '/visiting-orders-history',
+          attributes: { "data-test": "view-vo-history" },
+          preventDoubleClick: true
+        }) if features.voHistory.enabled }}
+      </div>
     {% endset %}
 
     {{ govukTabs({

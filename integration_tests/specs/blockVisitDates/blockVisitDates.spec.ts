@@ -3,8 +3,9 @@ import { format } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
 import HomePage from '../../pages-playwright/homePage'
-import BlockVisitDateConfirmationPage from '../../pages-playwright/blockVisitDates/blockVisitConfirmationPage'
+
 import BlockVisitDatesPage from '../../pages-playwright/blockVisitDates/blockVisitDatesPage'
+import BlockVisitDateConfirmationPage from '../../pages-playwright/blockVisitDates/blockVisitDateConfirmationPage'
 import TestData from '../../../server/routes/testutils/testData'
 
 test.describe('Block visit dates', () => {
@@ -33,14 +34,13 @@ test.describe('Block visit dates', () => {
     await homePage.blockDatesTile.click()
 
     // verify page
-    const blockedDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
-    await blockedDatesPage.verifyHeading('Blocked dates', 2)
-    await expect(blockedDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
+    const blockVisitDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
+    await expect(blockVisitDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
 
     // select the 1st day of next month
-    await blockedDatesPage.datePicker.toggleCalendar()
-    await blockedDatesPage.datePicker.goToNextMonth()
-    await blockedDatesPage.datePicker.selectDay(1)
+    await blockVisitDatesPage.datePicker.toggleCalendar()
+    await blockVisitDatesPage.datePicker.goToNextMonth()
+    await blockVisitDatesPage.datePicker.selectDay(1)
 
     // Stub booked visits count
     await orchestrationApi.stubGetBookedVisitCountByDate({
@@ -49,10 +49,10 @@ test.describe('Block visit dates', () => {
       count: 0,
     })
 
-    await blockedDatesPage.continueButton.click()
+    await blockVisitDatesPage.continueButton.click()
 
     // Confirmation page
-    const confirmPage = await BlockVisitDateConfirmationPage.verifyOnPage(page, firstOfNextMonthLong)
+    const blockVisitDateConfirmationPage = await BlockVisitDateConfirmationPage.verifyOnPage(page, firstOfNextMonthLong)
 
     // Stub block visit date correctly
     await orchestrationApi.stubBlockVisitDate({
@@ -66,15 +66,15 @@ test.describe('Block visit dates', () => {
       blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
     })
 
-    await confirmPage.selectYes()
-    await confirmPage.continue()
-    const successMessage = blockedDatesPage.getSuccessMessage()
+    await blockVisitDateConfirmationPage.selectYes()
+    await blockVisitDateConfirmationPage.continue()
+    const successMessage = blockVisitDatesPage.getSuccessMessage()
     await expect(successMessage).toBeVisible()
     await expect(successMessage).toContainText(`Visits are blocked for ${firstOfNextMonthLong}.`)
 
-    await expect(blockedDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
-    await expect(blockedDatesPage.blockedBy(1)).toContainText('User one')
-    await expect(blockedDatesPage.unblockLink(1)).toContainText('Unblock')
+    await expect(blockVisitDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
+    await expect(blockVisitDatesPage.blockedBy(1)).toContainText('User one')
+    await expect(blockVisitDatesPage.unblockLink(1)).toContainText('Unblock')
   })
 
   test('should go to block dates listing page and unblock a date', async ({ page }) => {
@@ -89,12 +89,12 @@ test.describe('Block visit dates', () => {
     const homePage = await HomePage.verifyOnPage(page)
     await homePage.blockDatesTile.click()
 
-    const blockedDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
+    const blockVisitDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
 
     // Verify blocked date exists
-    await expect(blockedDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
-    await expect(blockedDatesPage.blockedBy(1)).toContainText('User one')
-    await expect(blockedDatesPage.unblockLink(1)).toBeVisible()
+    await expect(blockVisitDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
+    await expect(blockVisitDatesPage.blockedBy(1)).toContainText('User one')
+    await expect(blockVisitDatesPage.unblockLink(1)).toBeVisible()
 
     // Stub API for unblocking
     await orchestrationApi.stubUnblockVisitDate({
@@ -110,14 +110,14 @@ test.describe('Block visit dates', () => {
     })
 
     // Click unblock
-    await blockedDatesPage.unblockLink(1).click()
+    await blockVisitDatesPage.unblockLink(1).click()
 
     // Verify success message
-    const successMessage = blockedDatesPage.getSuccessMessage()
+    const successMessage = blockVisitDatesPage.getSuccessMessage()
     await expect(successMessage).toBeVisible()
     await expect(successMessage).toContainText(`Visits are unblocked for ${firstOfNextMonthLong}.`)
 
     // Verify no upcoming blocked dates
-    await expect(blockedDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
+    await expect(blockVisitDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
   })
 })

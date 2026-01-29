@@ -1,0 +1,60 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set pageHeaderTitle = "Visiting orders history" %}
+
+{% set backLinkHref = "/prisoner/" + prisonerDetails.prisonerId + "#visiting-orders" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <ul class="vo-history-prisoner-details">
+        <li>
+          <strong>Prisoner name</strong>
+          <span data-test="prisoner-name">{{ (prisonerDetails.firstName + " " + prisonerDetails.lastName) | properCaseFullName }}</span>
+        </li>
+        <li>
+          <strong>Category</strong>
+          <span data-test="prisoner-category">{{ prisonerDetails.category }}</span>
+        </li>
+        <li>
+          <strong>Conviction status</strong>
+          <span data-test="prisoner-convicted-status">{{ prisonerDetails.convictedStatus }}</span>
+        </li>
+        <li>
+          <strong>Incentive level</strong>
+          <span data-test="prisoner-incentive-level">{{ prisonerDetails.incentiveLevel }}</span>
+        </li>
+      </ul>
+
+      {{ govukTable({
+          head: [
+            {
+              text: "Date"
+            },
+            {
+              text: "Reason"
+            },
+            {
+              text: "VO change"
+            },
+            {
+              text: "VO balance"
+            },
+            {
+              text: "PVO change"
+            },
+            {
+              text: "PVO balance"
+            }
+          ],
+          classes: "vo-history-table",
+          rows: voHistoryRows
+        }) }}
+    </div>
+  </div>
+
+{% endblock %}
