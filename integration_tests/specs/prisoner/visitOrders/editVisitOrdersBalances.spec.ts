@@ -5,7 +5,7 @@ import TestData from '../../../../server/routes/testutils/testData'
 import PrisonerProfilePage from '../../../pages-playwright/prisoner/prisonerProfilePage'
 import EditVoBalancePage from '../../../pages-playwright/prisoner/visitOrders/editVoBalancePage'
 
-test.describe('Visiting orders history', () => {
+test.describe('Visiting orders - edit balances', () => {
   const profile = TestData.prisonerProfile()
   const { prisonerId } = profile
 
