@@ -4,9 +4,8 @@ import { login, resetStubs } from '../../../testUtils'
 import TestData from '../../../../server/routes/testutils/testData'
 import PrisonerProfilePage from '../../../pages-playwright/prisoner/prisonerProfilePage'
 import VisitOrdersHistoryPage from '../../../pages-playwright/prisoner/visitOrders/visitOrdersHistoryPage'
-import EditVoBalancePage from '../../../pages-playwright/prisoner/visitOrders/editVoBalancePage'
 
-test.describe('Visiting orders', () => {
+test.describe('Visiting orders history', () => {
   const profile = TestData.prisonerProfile()
   const { prisonerId } = profile
 
@@ -49,26 +48,5 @@ test.describe('Visiting orders', () => {
     await expect(visitOrdersHistoryPage.voBalance(0)).toContainText('5')
     await expect(visitOrdersHistoryPage.pvoChange(0)).toContainText('0')
     await expect(visitOrdersHistoryPage.pvoBalance(0)).toContainText('2')
-  })
-
-  test('should navigate to edit visit orders page from prisoner profile', async ({ page }) => {
-    // Go to prisoner profile page
-    await page.goto(`/prisoner/${prisonerId}`)
-    const prisonerProfilePage = await PrisonerProfilePage.verifyOnPage(page, 'Smith, John')
-
-    // Select visiting orders tab
-    await orchestrationApi.stubGetVoBalance()
-    await prisonerProfilePage.visitingOrdersTab.click()
-    await prisonerProfilePage.visitingOrdersTabEditVoLink.click()
-
-    // Edit vo balance page
-    const editVoBalancePage = await EditVoBalancePage.verifyOnPage(page)
-    await expect(editVoBalancePage.prisonerName).toContainText('John Smith')
-    await expect(editVoBalancePage.voBalance).toContainText('5')
-    await expect(editVoBalancePage.pvoBalance).toContainText('2')
-
-    await editVoBalancePage.changeBalance('VO', 'Add', '2')
-    await editVoBalancePage.changeBalance('PVO', 'Remove', '1')
-    await editVoBalancePage.enterChangeReason('Governor’s adjustment', 'a reason for extra visits')
   })
 })
