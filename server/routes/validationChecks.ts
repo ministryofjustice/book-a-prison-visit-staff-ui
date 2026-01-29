@@ -1,3 +1,5 @@
+export const TEXT_INPUT_SINGLE_LINE_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\p{P}\p{Sc} ]*$/u
+
 const BOOKER_REFERENCE_REGEX = /^[a-z]{4}-[a-z]{4}-[a-z]{4}$/
 
 const PRISON_NUMBER_REGEX = /^[A-Z][0-9]{4}[A-Z]{2}$/

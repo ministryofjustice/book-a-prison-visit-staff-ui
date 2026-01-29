@@ -10,6 +10,7 @@ import {
 } from '../../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../../sanitisedError'
 import { apiValidationErrorToFieldValidationError, transformErrorCodesToMessage } from './visitOrdersUtils'
+import { TEXT_INPUT_SINGLE_LINE_REGEX } from '../../validationChecks'
 
 const balanceChangeActions = ['NO_CHANGE', 'ADD', 'REMOVE'] as const
 type BalanceChangeActions = (typeof balanceChangeActions)[number]
@@ -123,6 +124,8 @@ export default class EditVisitOrdersBalancesController {
     const atLeastZeroMessage = 'Enter a number greater than zero.'
     const enterANumberMessage = 'Enter a number.'
     const enterAReasonMessage = 'Enter a reason for this change.'
+    const reasonAllowedCharsMessage =
+      'Reason must only include letters, numbers and special characters such as hyphens, apostrophes and brackets'
     const reasonMaxLengthMessage = 'Reason must be 512 characters or less'
 
     return [
@@ -205,6 +208,8 @@ export default class EditVisitOrdersBalancesController {
         .trim()
         .notEmpty()
         .withMessage(enterAReasonMessage)
+        .matches(TEXT_INPUT_SINGLE_LINE_REGEX)
+        .withMessage(reasonAllowedCharsMessage)
         .isLength({ max: 512 })
         .withMessage(reasonMaxLengthMessage),
       // Reason required if 'Something else' reason selected
@@ -213,6 +218,8 @@ export default class EditVisitOrdersBalancesController {
         .trim()
         .notEmpty()
         .withMessage(enterAReasonMessage)
+        .matches(TEXT_INPUT_SINGLE_LINE_REGEX)
+        .withMessage(reasonAllowedCharsMessage)
         .isLength({ max: 512 })
         .withMessage(reasonMaxLengthMessage),
     ]
