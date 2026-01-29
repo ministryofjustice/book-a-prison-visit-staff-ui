@@ -7,6 +7,7 @@ import {
   ExcludeDateDto,
   OffenderRestriction,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonerScheduledEventDto,
@@ -320,6 +321,20 @@ export default class TestData {
       currentIncentive,
       locationDescription,
     }) as Prisoner
+
+  static prisonerBalanceAdjustmentDto = ({
+    voAmount = 1,
+    pvoAmount = 2,
+    adjustmentReasonType = 'GOVERNOR_ADJUSTMENT',
+    adjustmentReasonText = 'adjustment reason',
+    userName = 'user1',
+  }: Partial<PrisonerBalanceAdjustmentDto> = {}): PrisonerBalanceAdjustmentDto => ({
+    voAmount,
+    pvoAmount,
+    adjustmentReasonType,
+    adjustmentReasonText,
+    userName,
+  })
 
   static prisonerProfile = ({
     prisonerId = 'A1234BC',
