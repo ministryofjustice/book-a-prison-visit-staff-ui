@@ -14,10 +14,12 @@ export default class SearchForBookingByReferenceResultsPage extends AbstractPage
 
   constructor(page: Page) {
     super(page, 'Search for a booking')
-    this.visitReference = page.locator('[data-test="visit-reference"]')
-    this.visitReferenceLink = page.locator('[data-test="visit-reference"] > a')
-    this.prisonerName = page.locator('[data-test="prisoner-name"]')
-    this.prisonerNumber = page.locator('[data-test="prisoner-number"]')
-    this.visitStatus = page.locator('[data-test="visit-status"]')
+
+    this.visitReference = page.getByTestId('visit-reference')
+    this.visitReferenceLink = this.visitReference.getByRole('link')
+
+    this.prisonerName = page.getByTestId('prisoner-name')
+    this.prisonerNumber = page.getByTestId('prisoner-number')
+    this.visitStatus = page.getByTestId('visit-status')
   }
 }

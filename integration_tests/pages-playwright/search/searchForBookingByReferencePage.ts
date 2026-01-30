@@ -15,7 +15,7 @@ export default class SearchForBookingByReferencePage extends AbstractPage {
     await this.page.locator('#searchBlock4').fill(blocks[3])
   }
 
-  continueButton = (): Locator => this.page.locator('[data-test="search"]')
+  continueButton = (): Locator => this.page.getByTestId('search')
 
-  searchByPrisonerLink = (): Locator => this.page.locator('[data-test="search-by-prisoner"]')
+  searchByPrisonerLink = (): Locator => this.page.getByTestId('search-by-prisoner')
 }

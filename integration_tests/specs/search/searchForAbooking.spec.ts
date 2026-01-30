@@ -47,7 +47,7 @@ test.describe('Search for a booking by reference', () => {
     await searchForBookingByReferencePage.continueButton().click()
 
     const searchBookingByReferenceResultsPage = await SearchForBookingByReferenceResultsPage.verifyOnPage(page)
-    // await searchBookingByReferenceResultsPage.
+
     await expect(searchBookingByReferenceResultsPage.visitReference).toHaveText('ab-cd-ef-gh')
     await expect(searchBookingByReferenceResultsPage.prisonerName).toHaveText('John Smith')
     await expect(searchBookingByReferenceResultsPage.prisonerNumber).toHaveText(offenderNo)

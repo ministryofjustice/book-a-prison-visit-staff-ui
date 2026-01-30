@@ -12,8 +12,8 @@ export default class SearchForBookingByPrisonerPage extends AbstractPage {
     super(page, 'Search for a prisoner')
 
     this.searchInput = page.locator('#search')
-    this.searchByReferenceLink = page.locator('[data-test="search-by-reference"]')
-    this.continueButton = page.locator('[data-test="search"]')
+    this.searchByReferenceLink = page.getByTestId('search-by-reference')
+    this.continueButton = page.getByTestId('search')
   }
 
   async enterSearchTerm(term: string): Promise<void> {

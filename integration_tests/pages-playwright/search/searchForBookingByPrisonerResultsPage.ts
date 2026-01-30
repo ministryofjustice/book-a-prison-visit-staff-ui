@@ -4,16 +4,22 @@ import AbstractPage from '../abstractPage'
 export default class SearchForBookingByPrisonerResultsPage extends AbstractPage {
   readonly resultRows: Locator
 
-  readonly prisonerLink: Locator
+  readonly prisonerLinks: Locator
 
   constructor(page: Page) {
     super(page, 'Search for a prisoner')
-    this.resultRows = page.locator('.govuk-table__row').nth(1)
-    this.prisonerLink = page.locator('.govuk-table__row > :nth-child(1) > a')
+
+    // All data rows
+    this.resultRows = page.getByRole('row').filter({
+      has: page.getByRole('link'),
+    })
+
+    // Prisoner name links inside rows
+    this.prisonerLinks = this.resultRows.getByRole('link')
   }
 
   async selectFirstPrisoner(): Promise<void> {
-    await this.prisonerLink.first().click()
+    await this.prisonerLinks.first().click()
   }
 
   async expectFirstRowContains(text: string): Promise<void> {
@@ -21,6 +27,6 @@ export default class SearchForBookingByPrisonerResultsPage extends AbstractPage 
   }
 
   async expectPrisonerLinkContains(text: string): Promise<void> {
-    await expect(this.prisonerLink.first()).toContainText(text)
+    await expect(this.prisonerLinks.first()).toContainText(text)
   }
 }
