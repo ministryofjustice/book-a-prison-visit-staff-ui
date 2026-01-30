@@ -2,6 +2,7 @@ import { type Locator, type Page } from '@playwright/test'
 import AbstractPage from '../abstractPage'
 
 export default class PrisonerProfilePage extends AbstractPage {
+  // Prisoner details
   readonly flaggedAlerts: Locator
 
   readonly prisonNumber: Locator
@@ -12,9 +13,9 @@ export default class PrisonerProfilePage extends AbstractPage {
 
   readonly category: Locator
 
-  readonly incentiveLevel: Locator
-
   readonly convictionStatus: Locator
+
+  readonly incentiveLevel: Locator
 
   readonly alertCount: Locator
 
@@ -24,39 +25,12 @@ export default class PrisonerProfilePage extends AbstractPage {
 
   readonly bookAVisitButton: Locator
 
+  readonly voOverrideButton: Locator
+
+  readonly voOverrideText: Locator
+
+  // Visits tab
   readonly visitsTab: Locator
-
-  readonly activeAlertsTab: Locator
-
-  readonly visitingOrdersTab: Locator
-
-  readonly visitTabVORemaining: Locator
-
-  readonly visitTabVOLastAdjustment: Locator
-
-  readonly visitTabVONextAdjustment: Locator
-
-  readonly visitTabPVORemaining: Locator
-
-  readonly visitTabPVOLastAdjustment: Locator
-
-  readonly visitTabPVONextAdjustment: Locator
-
-  readonly visitsTabEditVoLink: Locator
-
-  readonly visitsTabShowVoHistoryLink: Locator
-
-  readonly alertsLink: Locator
-
-  readonly alertsTabType: Locator
-
-  readonly alertsTabCode: Locator
-
-  readonly alertsTabComment: Locator
-
-  readonly alertsTabStart: Locator
-
-  readonly alertsTabEnd: Locator
 
   readonly visitTabType: Locator
 
@@ -70,9 +44,39 @@ export default class PrisonerProfilePage extends AbstractPage {
 
   readonly visitTabViewFullHistory: Locator
 
-  readonly voOverrideButton: Locator
+  // Alerts tab
+  readonly activeAlertsTab: Locator
 
-  readonly voOverrideText: Locator
+  readonly alertsLink: Locator
+
+  readonly alertsTabType: Locator
+
+  readonly alertsTabCode: Locator
+
+  readonly alertsTabComment: Locator
+
+  readonly alertsTabStart: Locator
+
+  readonly alertsTabEnd: Locator
+
+  // Visiting orders tab
+  readonly visitingOrdersTab: Locator
+
+  readonly visitingOrdersTabVORemaining: Locator
+
+  readonly visitingOrdersTabVOLastAdjustment: Locator
+
+  readonly visitingOrdersTabVONextAdjustment: Locator
+
+  readonly visitingOrdersTabPVORemaining: Locator
+
+  readonly visitingOrdersTabPVOLastAdjustment: Locator
+
+  readonly visitingOrdersTabPVONextAdjustment: Locator
+
+  readonly visitingOrdersTabEditVoLink: Locator
+
+  readonly visitingOrdersTabShowVoHistoryLink: Locator
 
   constructor(page: Page, title: string) {
     super(page, title)
@@ -105,21 +109,21 @@ export default class PrisonerProfilePage extends AbstractPage {
 
     this.visitingOrdersTab = page.getByRole('tab', { name: 'Visiting orders' })
 
-    this.visitTabVORemaining = page.getByTestId('tab-vo-remaining')
+    this.visitingOrdersTabVORemaining = page.getByTestId('tab-vo-remaining')
 
-    this.visitTabVOLastAdjustment = page.getByTestId('tab-vo-last-date')
+    this.visitingOrdersTabVOLastAdjustment = page.getByTestId('tab-vo-last-date')
 
-    this.visitTabVONextAdjustment = page.getByTestId('tab-vo-next-date')
+    this.visitingOrdersTabVONextAdjustment = page.getByTestId('tab-vo-next-date')
 
-    this.visitTabPVORemaining = page.getByTestId('tab-pvo-remaining')
+    this.visitingOrdersTabPVORemaining = page.getByTestId('tab-pvo-remaining')
 
-    this.visitTabPVOLastAdjustment = page.getByTestId('tab-pvo-last-date')
+    this.visitingOrdersTabPVOLastAdjustment = page.getByTestId('tab-pvo-last-date')
 
-    this.visitTabPVONextAdjustment = page.getByTestId('tab-pvo-next-date')
+    this.visitingOrdersTabPVONextAdjustment = page.getByTestId('tab-pvo-next-date')
 
-    this.visitsTabEditVoLink = page.getByTestId('edit-vo-balances')
+    this.visitingOrdersTabEditVoLink = page.getByTestId('edit-vo-balances')
 
-    this.visitsTabShowVoHistoryLink = page.getByTestId('view-vo-history')
+    this.visitingOrdersTabShowVoHistoryLink = page.getByTestId('view-vo-history')
 
     this.alertsLink = page.getByTestId('all-alerts-link')
 

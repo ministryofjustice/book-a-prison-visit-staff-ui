@@ -12,6 +12,7 @@ import {
   IgnoreVisitNotificationsDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
+  PrisonerBalanceAdjustmentValidationError,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
@@ -1012,13 +1013,41 @@ export default {
         url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
         bodyPatterns: [
           {
-            equalToJson: { prisonerBalanceAdjustmentDto },
+            equalToJson: prisonerBalanceAdjustmentDto,
           },
         ],
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      },
+    })
+  },
+
+  stubChangeVoBalanceFail: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisoner().prisonerNumber,
+    validationErrors,
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    validationErrors: PrisonerBalanceAdjustmentValidationError[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      },
+      response: {
+        status: 422,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          status: 422,
+          errorCode: null,
+          userMessage: 'Manually adjust prisoner balance request failed',
+          developerMessage: null,
+          validationErrors,
+        },
       },
     })
   },
