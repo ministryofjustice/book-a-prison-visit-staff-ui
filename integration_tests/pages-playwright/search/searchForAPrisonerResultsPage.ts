@@ -33,7 +33,7 @@ export default class SearchForAPrisonerResultsPage extends AbstractPage {
     this.hasResults = page.locator('#search-results-true')
     this.resultRows = page.locator('.bapv-result-row').locator('xpath=ancestor::tr')
     this.pagingLinks = page.locator('.moj-pagination__list')
-    this.nextPageLink = page.locator('.moj-pagination__item--next a').first()
+    this.nextPageLink = page.getByRole('link', { name: 'Next' })
     this.firstResultLink = page.locator('.bapv-result-row').first()
   }
 
