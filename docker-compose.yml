@@ -44,6 +44,7 @@ services:
       - API_CLIENT_SECRET=client-secret
       - SYSTEM_CLIENT_ID=system-client-id
       - SYSTEM_CLIENT_SECRET=system-client-secret
+      - AWS_REGION=eu-west-2
 
 networks:
   hmpps:

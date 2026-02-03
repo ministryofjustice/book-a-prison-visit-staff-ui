@@ -40,6 +40,7 @@ export interface ApiConfig {
 }
 
 export default {
+  awsRegion: get('AWS_REGION', 'eu-west-2', requiredInProduction),
   applicationName: 'Manage prison visits',
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
