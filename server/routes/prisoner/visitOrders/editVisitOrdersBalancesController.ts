@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitOrdersService } from '../../../services'
 import { PVO_MAX, visitBalanceAdjustmentReasons, VO_MAX } from '../../../constants/visitOrders'
+import { PrisonerParams } from '../../../@types/requestParameterTypes'
 import {
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceAdjustmentReason,
@@ -33,7 +34,7 @@ export default class EditVisitOrdersBalancesController {
     private readonly visitOrdersService: VisitOrdersService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<PrisonerParams> {
     return async (req, res) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment
@@ -58,7 +59,7 @@ export default class EditVisitOrdersBalancesController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<PrisonerParams> {
     return async (req, res, next) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment

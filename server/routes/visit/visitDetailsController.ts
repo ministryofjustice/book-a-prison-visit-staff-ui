@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import {
   getAvailableVisitActions,
   getPrisonerLocation,
@@ -16,7 +17,7 @@ export default class VisitDetailsController {
     private readonly visitService: VisitService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
       const { selectedEstablishment } = req.session
