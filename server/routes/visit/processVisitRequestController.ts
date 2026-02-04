@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { VisitRequestsService, VisitService } from '../../services'
 import { MoJAlert } from '../../@types/bapv'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
 import { isValidPrisonerNumber } from '../validationChecks'
@@ -13,7 +14,7 @@ export default class ProcessVisitRequestController {
     private readonly visitService: VisitService,
   ) {}
 
-  public processRequest(action: RequestAction): RequestHandler {
+  public processRequest(action: RequestAction): RequestHandler<VisitReferenceParams> {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user

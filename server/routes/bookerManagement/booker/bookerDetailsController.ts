@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { AuditService, BookerService } from '../../../services'
 import { MoJAlert } from '../../../@types/bapv'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
 
 export default class BookerDetailsController {
   public constructor(
@@ -8,7 +9,7 @@ export default class BookerDetailsController {
     private readonly bookerService: BookerService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
       const { username } = res.locals.user

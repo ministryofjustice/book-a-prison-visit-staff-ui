@@ -4,6 +4,7 @@ import { VisitSessionData } from '../../@types/bapv'
 import { clearSession } from '../visitorUtils'
 import { AuditService, PrisonerProfileService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import { PrisonerParams } from '../../@types/requestParameterTypes'
 
 export default class PrisonerProfileController {
   public constructor(
@@ -11,7 +12,7 @@ export default class PrisonerProfileController {
     private readonly prisonerProfileService: PrisonerProfileService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<PrisonerParams> {
     return async (req, res) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment
@@ -42,7 +43,7 @@ export default class PrisonerProfileController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<PrisonerParams> {
     return async (req, res) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment

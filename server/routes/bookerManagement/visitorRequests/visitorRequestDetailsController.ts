@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
 import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
+import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
 
 export default class VisitorRequestDetailsController {
   public constructor(
@@ -9,7 +10,7 @@ export default class VisitorRequestDetailsController {
     private readonly bookerService: BookerService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitorRequestParams> {
     return async (req, res) => {
       const { requestReference } = req.params
       const { username } = res.locals.user
@@ -42,7 +43,7 @@ export default class VisitorRequestDetailsController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<VisitorRequestParams> {
     return async (req, res, next) => {
       const { requestReference } = req.params
       const { visitorRequestJourney } = req.session

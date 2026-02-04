@@ -1,7 +1,7 @@
 services:
 
   redis:
-    image: 'redis:8.4'
+    image: 'redis:7'
     networks:
       - hmpps_int
     ports:
