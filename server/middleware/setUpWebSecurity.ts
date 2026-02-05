@@ -17,25 +17,21 @@ export default function setUpWebSecurity(): Router {
     helmet({
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ["'self'", config.analytics.matomoUrl],
+          defaultSrc: ["'self'"],
           // This nonce allows us to use scripts with the use of the `cspNonce` local, e.g (in a Nunjucks template):
           // <script nonce="{{ cspNonce }}">
           // or
           // <link href="http://example.com/" rel="stylesheet" nonce="{{ cspNonce }}">
           // This ensures only scripts we trust are loaded, and not anything injected into the
           // page by an attacker.
-          scriptSrc: [
-            "'self'",
-            (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
-            config.analytics.matomoUrl,
-          ],
+          scriptSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           fontSrc: ["'self'"],
           formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
           upgradeInsecureRequests: process.env.NODE_ENV === 'development' ? null : [],
         },
       },
-      crossOriginEmbedderPolicy: false,
+      crossOriginEmbedderPolicy: true,
     }),
   )
   return router
