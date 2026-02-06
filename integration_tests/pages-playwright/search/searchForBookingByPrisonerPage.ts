@@ -13,7 +13,7 @@ export default class SearchForBookingByPrisonerPage extends AbstractPage {
 
     this.searchInput = page.locator('#search')
     this.searchByReferenceLink = page.getByTestId('search-by-reference')
-    this.continueButton = page.getByTestId('search')
+    this.continueButton = page.getByRole('button', { name: 'Search' })
   }
 
   async enterSearchTerm(term: string): Promise<void> {
