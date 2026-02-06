@@ -206,7 +206,7 @@ test.describe('Book a visit', () => {
       }),
     )
     // Request method
-    mainContactPage.continueButton.click()
+    await mainContactPage.continueButton.click()
     const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
     await expect(requestMethodPage.getRequestLabelByValue('PHONE')).toContainText('Phone call')
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
