@@ -26,8 +26,8 @@ export default class ConfirmationPage extends AbstractPage {
 
   readonly prisonName: Locator
 
-  constructor(page: Page) {
-    super(page, 'Visit confirmed')
+  constructor(page: Page, title: 'Visit confirmed' | 'Visit updated' = 'Visit confirmed') {
+    super(page, title)
 
     this.bookingReference = page.locator('.test-booking-reference')
     this.prisonerName = page.locator('.test-visit-prisoner-name')
