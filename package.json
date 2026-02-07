@@ -37,7 +37,7 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.982.0",
+    "@aws-sdk/client-sqs": "^3.983.0",
     "@axe-core/playwright": "4.11.1",
     "@ministryofjustice/frontend": "^8.0.0",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.2.3",
