@@ -1,7 +1,7 @@
 services:
 
   redis-bapv:
-    image: 'redis:7'
+    image: 'redis:8'
     networks:
       - hmpps
     container_name: redis-bapv
