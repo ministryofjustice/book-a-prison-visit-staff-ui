@@ -85,20 +85,24 @@ test.describe('Update a visit', () => {
     await orchestrationApi.stubGetVisitDetailed(originalVisit)
 
     await login(page)
+    // Visit details page
     await page.goto('/visit/ab-cd-ef-gh')
 
     const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'booking')
     await expect(visitDetailsPage.visitReference).toContainText('ab-cd-ef-gh')
     await expect(visitDetailsPage.prisonerName).toContainText('John Smith')
 
+    // Start update journey
     await prisonerContactRegistry.stubPrisonerSocialContacts({ offenderNo, contacts })
     await visitDetailsPage.updateBooking.click()
 
+    // Select visitors page - existing visitor selected then add another
     const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page)
     await expect(selectVisitorsPage.getVisitor(contacts[0].personId)).toBeChecked()
     await expect(selectVisitorsPage.getVisitor(contacts[1].personId)).not.toBeChecked()
     await selectVisitorsPage.getVisitor(contacts[1].personId).check()
 
+    // Select date and time - current slot pre-selected
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId: offenderNo,
       visitSessionsAndSchedule,
@@ -109,6 +113,7 @@ test.describe('Update a visit', () => {
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await expect(dateTimePage.getSessionLabel(dateIn7Days, 0)).toContainText('Original booking')
 
+    // Select date and time - choose different time
     const updatedApplication = TestData.application({
       startTimestamp: session8Start,
       endTimestamp: session8End,
@@ -127,17 +132,18 @@ test.describe('Update a visit', () => {
     })
 
     await dateTimePage.clickCalendarDay(dateIn8Days).click()
-    // await dateTimePage.selectSession(dateIn8Days, 0)
     const session = dateTimePage.selectSession(dateIn8Days, 0)
     await session.waitFor({ state: 'visible' })
     await session.click()
     await dateTimePage.continueButton.click()
 
+    // Additional support - add details
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
     await supportPage.additionalSupportRequired.check()
     await supportPage.additionalSupportInput.fill('Wheelchair ramp, Some extra help!')
     await supportPage.continueButton.click()
 
+    // Main contact - check pre-populated then change phone number
     const mainContactPage = await MainContactPage.verifyOnPage(page)
     await expect(mainContactPage.phoneNumberInput).toHaveValue(originalVisit.visitContact.telephone)
     await mainContactPage.phoneNumberInput.fill('09876 543 321')
@@ -160,12 +166,13 @@ test.describe('Update a visit', () => {
     )
 
     await mainContactPage.continueButton.click()
-
+    // Request method
     const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
     await expect(requestMethodPage.getRequestLabelByValue('PHONE')).toContainText('Phone call')
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
     await requestMethodPage.continueButton.click()
 
+    // Check your booking page
     const checkPage = await CheckYourBookingPage.verifyOnPage(page)
     await expect(checkPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))
     await expect(checkPage.visitTime).toContainText('1:30pm to 3pm')
@@ -186,10 +193,18 @@ test.describe('Update a visit', () => {
     })
 
     await checkPage.submitButton.click()
-
+    // Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit updated')
     await expect(confirmationPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))
     await expect(confirmationPage.mainContactNumber).toContainText('09876 543 321')
+    await expect(confirmationPage.mainContactName).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(confirmationPage.additionalSupport).toContainText('Wheelchair ramp, Some extra help!')
+    await expect(confirmationPage.visitorName(1)).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(confirmationPage.visitorName(2)).toContainText('Bob Smith (son of the prisoner)')
+    await expect(confirmationPage.visitType).toContainText('Open')
+    await expect(confirmationPage.prisonerName).toContainText('John Smith')
+    await expect(confirmationPage.prisonerNumber).toContainText(offenderNo)
+    await expect(confirmationPage.visitTime).toContainText('1:30pm to 3pm')
   })
 
   test('should redirect to confirm update page if outside booking window limit', async ({ page }) => {
@@ -202,18 +217,22 @@ test.describe('Update a visit', () => {
     await orchestrationApi.stubGetVisitDetailed(originalVisit)
 
     await login(page)
+    // Visit details page
     await page.goto('/visit/ab-cd-ef-gh')
 
     const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'booking')
     await expect(visitDetailsPage.visitReference).toContainText('ab-cd-ef-gh')
 
+    // Start update journey
     await prisonerContactRegistry.stubPrisonerSocialContacts({ offenderNo, contacts })
     await visitDetailsPage.updateBooking.click()
 
+    // Confirm update page - check yes
     const confirmUpdatePage = await ConfirmUpdatePage.verifyOnPage(page)
     await confirmUpdatePage.confirmUpdateYesRadio.check()
     await confirmUpdatePage.submitButton.click()
 
+    // Select visitors page - existing visitor selected then add another
     const selectVisitorsPage = await SelectVisitorsPage.verifyOnPage(page)
     await expect(selectVisitorsPage.getVisitor(contacts[0].personId)).toBeChecked()
     await expect(selectVisitorsPage.getVisitor(contacts[1].personId)).not.toBeChecked()
