@@ -37,7 +37,7 @@ import {
   VisitSummary,
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
-import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
+import { Address, Contact, ContactDto, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
 import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
 
@@ -224,7 +224,7 @@ export default class TestData {
     emergencyContact = false,
     nextOfKin = false,
     restrictions = [],
-    addresses = [this.address()],
+    address = this.address(),
   }: Partial<Contact> = {}): Contact =>
     ({
       personId,
@@ -238,8 +238,38 @@ export default class TestData {
       emergencyContact,
       nextOfKin,
       restrictions,
-      addresses,
+      address,
     }) as Contact
+
+  // TODO remove when 'addresses' removed in VB-6423
+  static contactDto = ({
+    personId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    relationshipCode = 'WIFE',
+    relationshipDescription = 'Wife',
+    contactType = 'S',
+    approvedVisitor = true,
+    emergencyContact = false,
+    nextOfKin = false,
+    restrictions = [],
+    addresses = [this.address()],
+  }: Partial<ContactDto> = {}): ContactDto =>
+    ({
+      personId,
+      firstName,
+      lastName,
+      dateOfBirth,
+      relationshipCode,
+      relationshipDescription,
+      contactType,
+      approvedVisitor,
+      emergencyContact,
+      nextOfKin,
+      restrictions,
+      addresses,
+    }) as ContactDto
 
   static currentIncentive = ({
     level = {

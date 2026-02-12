@@ -1,6 +1,6 @@
 import { URLSearchParams } from 'url'
 import RestClient from './restClient'
-import { Contact } from './prisonerContactRegistryApiTypes'
+import { Contact, ContactDto } from './prisonerContactRegistryApiTypes'
 import config, { ApiConfig } from '../config'
 
 export default class PrisonerContactRegistryApiClient {
@@ -14,23 +14,31 @@ export default class PrisonerContactRegistryApiClient {
     )
   }
 
+  // TODO remove mapping from ContactDto => Contact in VB-6423
   async getPrisonersApprovedSocialContacts(offenderNo: string): Promise<Contact[]> {
-    let socialContacts: Contact[] = []
-
     try {
-      socialContacts = await this.restClient.get({
+      const contactDtos = await this.restClient.get<ContactDto[]>({
         path: `/v2/prisoners/${offenderNo}/contacts/social/approved`,
         query: new URLSearchParams({
           hasDateOfBirth: 'false',
           withAddress: 'true',
         }).toString(),
       })
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e
-      }
-    }
 
-    return socialContacts
+      const contacts: Contact[] = contactDtos.map(contactDto => {
+        const { addresses, ...allOtherProperties } = contactDto
+
+        const address = addresses.find(a => a.primary) || addresses[0] || { primary: false, noFixedAddress: false }
+        return { ...allOtherProperties, address }
+      })
+
+      return contacts
+    } catch (error) {
+      if (error.status !== 404) {
+        throw error
+      }
+
+      return []
+    }
   }
 }

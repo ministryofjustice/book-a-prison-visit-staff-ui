@@ -23,9 +23,10 @@ describe('prisonerContactRegistryApiClient', () => {
   })
 
   describe('getPrisonersApprovedSocialContacts', () => {
-    it('should return an array of Contacts from the Prisoner Contact Registry API', async () => {
+    it('should return an array of Contacts from the Prisoner Contact Registry API with addresses mapped to address', async () => {
       const offenderNo = 'A1234BC'
-      const contact = TestData.contact()
+      const contactDtos = [TestData.contactDto()]
+      const expectedContacts = [TestData.contact()]
 
       fakePrisonerContactRegistryApi
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
@@ -34,11 +35,11 @@ describe('prisonerContactRegistryApiClient', () => {
           withAddress: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, contact)
+        .reply(200, contactDtos)
 
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
-      expect(output).toEqual(contact)
+      expect(output).toStrictEqual(expectedContacts)
     })
 
     it('should return an empty array if prisoner not found', async () => {
@@ -55,7 +56,7 @@ describe('prisonerContactRegistryApiClient', () => {
 
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
-      expect(output).toEqual([])
+      expect(output).toStrictEqual([])
     })
   })
 })
