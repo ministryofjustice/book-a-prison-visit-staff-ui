@@ -77,8 +77,6 @@ describe('Prisoner visitor service', () => {
               street: 'non primary addr',
               primary: false,
               noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
             },
             {
               flat: '23B',
@@ -91,8 +89,6 @@ describe('Prisoner visitor service', () => {
               country: 'England',
               primary: true,
               noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
             },
           ],
         },
@@ -112,15 +108,11 @@ describe('Prisoner visitor service', () => {
               street: '1st listed address', // no primary; should show first
               primary: false,
               noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
             },
             {
               street: '2nd listed address',
               primary: false,
               noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
             },
           ],
         },

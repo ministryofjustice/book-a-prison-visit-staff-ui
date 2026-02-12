@@ -2120,11 +2120,6 @@ export interface components {
     /** @description An address */
     AddressDto: {
       /**
-       * @description Address Type
-       * @example BUS
-       */
-      addressType?: string
-      /**
        * @description Flat
        * @example 3B
        */
@@ -2179,40 +2174,6 @@ export interface components {
        * @example false
        */
       noFixedAddress: boolean
-      /**
-       * Format: date
-       * @description Date Added
-       * @example 2000-10-31
-       */
-      startDate?: string
-      /**
-       * Format: date
-       * @description Date ended
-       * @example 2000-10-31
-       */
-      endDate?: string
-      /** @description The phone number associated with the address */
-      phones: components['schemas']['TelephoneDto'][]
-      /** @description The address usages/types */
-      addressUsages: components['schemas']['AddressUsageDto'][]
-    }
-    /** @description An Offender's address usage */
-    AddressUsageDto: {
-      /**
-       * @description The address usages
-       * @example HDC
-       */
-      addressUsage?: string
-      /**
-       * @description The address usages description
-       * @example HDC Address
-       */
-      addressUsageDescription?: string
-      /**
-       * @description Active Flag
-       * @example true
-       */
-      activeFlag?: boolean
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
@@ -2456,24 +2417,6 @@ export interface components {
        * @example This is a comment text
        */
       comment?: string
-    }
-    /** @description Telephone Details */
-    TelephoneDto: {
-      /**
-       * @description Telephone number
-       * @example 0114 2345678
-       */
-      number: string
-      /**
-       * @description Telephone type
-       * @example TEL
-       */
-      type: string
-      /**
-       * @description Telephone extension number
-       * @example 123
-       */
-      ext?: string
     }
     VisitBookingDetailsDto: {
       /**
@@ -3598,6 +3541,11 @@ export interface components {
       dateOfBirth?: string
       /** @description Relevant visitor restrictions that impact visits or empty list if none */
       visitorRestrictions: components['schemas']['VisitorRestrictionDto'][]
+      /**
+       * @description A flag to signify if the visitor is on the approved social contact list
+       * @example true
+       */
+      approved: boolean
     }
     /** @description Visitor restriction */
     VisitorRestrictionDto: {

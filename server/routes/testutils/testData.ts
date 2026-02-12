@@ -53,8 +53,6 @@ export default class TestData {
     country = 'England',
     primary = true,
     noFixedAddress = false,
-    phones = [],
-    addressUsages = [],
   }: Partial<Address> = {}): Address =>
     ({
       flat,
@@ -67,8 +65,6 @@ export default class TestData {
       country,
       primary,
       noFixedAddress,
-      phones,
-      addressUsages,
     }) as Address
 
   static alert = ({
@@ -663,8 +659,6 @@ export default class TestData {
           town: 'Coventry',
           primary: true,
           noFixedAddress: false,
-          phones: [],
-          addressUsages: [],
         },
       },
     ],
@@ -874,12 +868,14 @@ export default class TestData {
     lastName = 'Smith',
     dateOfBirth = '1986-07-28',
     visitorRestrictions = [],
+    approved = true,
   }: Partial<VisitorInfoDto> = {}): VisitorInfoDto => ({
     visitorId,
     firstName,
     lastName,
     dateOfBirth,
     visitorRestrictions,
+    approved,
   })
 
   static visitorRequest = ({
