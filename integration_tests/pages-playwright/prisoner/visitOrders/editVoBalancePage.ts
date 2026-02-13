@@ -14,12 +14,15 @@ export default class EditVoBalancePage extends AbstractPage {
 
   readonly pvoBalance: Locator
 
+  readonly editBalanceButton: Locator
+
   constructor(page: Page) {
     super(page, 'Edit visiting orders balances')
 
     this.prisonerName = page.getByTestId('prisoner-name')
     this.voBalance = page.getByTestId('vo-balance')
     this.pvoBalance = page.getByTestId('pvo-balance')
+    this.editBalanceButton = page.getByTestId('edit-balance')
   }
 
   changeBalance = async (type: 'VO' | 'PVO', action: 'Add' | 'Remove', amount: string): Promise<void> => {

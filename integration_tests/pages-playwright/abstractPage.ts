@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from '@playwright/test'
-import AxeBuilder from '@axe-core/playwright'
+import { AxeBuilder } from '@axe-core/playwright'
 
 export default class AbstractPage {
   readonly page: Page
@@ -19,6 +19,9 @@ export default class AbstractPage {
   /** top of page MoJ alert messages */
   readonly messages: Locator
 
+  /** GOV.UK Error summary */
+  readonly errorSummary: Locator
+
   readonly header: Locator
 
   /** Axe rules to disable for a page */
@@ -37,6 +40,7 @@ export default class AbstractPage {
     this.header = page.getByRole('heading', { level: 1, name: title })
 
     this.messages = page.locator('.moj-alert')
+    this.errorSummary = page.locator('.govuk-error-summary')
   }
 
   static async verifyOnPage<T extends AbstractPage, Args extends unknown[]>(
@@ -74,5 +78,9 @@ export default class AbstractPage {
 
   async clickManageUserDetails() {
     await this.manageUserDetails.first().click()
+  }
+
+  getErrorSummaryMessage = (name: string): Locator => {
+    return this.errorSummary.getByRole('link', { name })
   }
 }

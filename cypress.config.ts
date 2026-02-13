@@ -9,6 +9,7 @@ import prisonerContactRegistry from './integration_tests/mockApis/prisonerContac
 import prisonerSearch from './integration_tests/mockApis/prisonerSearch'
 
 export default defineConfig({
+  allowCypressEnv: false,
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
   screenshotsFolder: 'integration_tests/screenshots',

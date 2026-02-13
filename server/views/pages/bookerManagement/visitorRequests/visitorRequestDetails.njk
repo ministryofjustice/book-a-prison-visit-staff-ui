@@ -51,7 +51,7 @@
 
       {% include "partials/errorSummary.njk" %}
 
-      <h1 class="govuk-heading-xl">{{ pageHeaderTitle }}</h1>
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
       <p class="govuk-body-l">
         <span data-test="booker-email">{{ visitorRequest.bookerEmail }}</span> has requested to link:
@@ -62,7 +62,7 @@
         <span data-test="requested-visitor-dob" class="govuk-!-font-weight-bold">{{ visitorRequest.dateOfBirth | formatDate }}</span>
       </p>
 
-      <h2 class="govuk-heading-l">
+      <h2 class="govuk-heading-m">
         <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>’s visitors
       </h2>
 

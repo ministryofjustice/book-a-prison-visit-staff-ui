@@ -70,12 +70,12 @@ test.describe('Prisoner profile page', () => {
 
     // Visiting orders tab
     await prisonerProfilePage.visitingOrdersTab.click()
-    await expect(prisonerProfilePage.visitTabVORemaining).toContainText('1')
-    await expect(prisonerProfilePage.visitTabVOLastAdjustment).toContainText('21 April 2021')
-    await expect(prisonerProfilePage.visitTabVONextAdjustment).toContainText('5 May 2021')
-    await expect(prisonerProfilePage.visitTabPVORemaining).toContainText('2')
-    await expect(prisonerProfilePage.visitTabPVOLastAdjustment).toContainText('1 December 2021')
-    await expect(prisonerProfilePage.visitTabPVONextAdjustment).toContainText('1 January 2022')
+    await expect(prisonerProfilePage.visitingOrdersTabVORemaining).toContainText('1')
+    await expect(prisonerProfilePage.visitingOrdersTabVOLastAdjustment).toContainText('21 April 2021')
+    await expect(prisonerProfilePage.visitingOrdersTabVONextAdjustment).toContainText('5 May 2021')
+    await expect(prisonerProfilePage.visitingOrdersTabPVORemaining).toContainText('2')
+    await expect(prisonerProfilePage.visitingOrdersTabPVOLastAdjustment).toContainText('1 December 2021')
+    await expect(prisonerProfilePage.visitingOrdersTabPVONextAdjustment).toContainText('1 January 2022')
 
     // Active alerts tab
     await prisonerProfilePage.activeAlertsTab.click()

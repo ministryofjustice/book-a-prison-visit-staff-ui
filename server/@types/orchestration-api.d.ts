@@ -2120,11 +2120,6 @@ export interface components {
     /** @description An address */
     AddressDto: {
       /**
-       * @description Address Type
-       * @example BUS
-       */
-      addressType?: string
-      /**
        * @description Flat
        * @example 3B
        */
@@ -2179,40 +2174,6 @@ export interface components {
        * @example false
        */
       noFixedAddress: boolean
-      /**
-       * Format: date
-       * @description Date Added
-       * @example 2000-10-31
-       */
-      startDate?: string
-      /**
-       * Format: date
-       * @description Date ended
-       * @example 2000-10-31
-       */
-      endDate?: string
-      /** @description The phone number associated with the address */
-      phones: components['schemas']['TelephoneDto'][]
-      /** @description The address usages/types */
-      addressUsages: components['schemas']['AddressUsageDto'][]
-    }
-    /** @description An Offender's address usage */
-    AddressUsageDto: {
-      /**
-       * @description The address usages
-       * @example HDC
-       */
-      addressUsage?: string
-      /**
-       * @description The address usages description
-       * @example HDC Address
-       */
-      addressUsageDescription?: string
-      /**
-       * @description Active Flag
-       * @example true
-       */
-      activeFlag?: boolean
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
@@ -2456,24 +2417,6 @@ export interface components {
        * @example This is a comment text
        */
       comment?: string
-    }
-    /** @description Telephone Details */
-    TelephoneDto: {
-      /**
-       * @description Telephone number
-       * @example 0114 2345678
-       */
-      number: string
-      /**
-       * @description Telephone type
-       * @example TEL
-       */
-      type: string
-      /**
-       * @description Telephone extension number
-       * @example 123
-       */
-      ext?: string
     }
     VisitBookingDetailsDto: {
       /**
@@ -3598,6 +3541,11 @@ export interface components {
       dateOfBirth?: string
       /** @description Relevant visitor restrictions that impact visits or empty list if none */
       visitorRestrictions: components['schemas']['VisitorRestrictionDto'][]
+      /**
+       * @description A flag to signify if the visitor is on the approved social contact list
+       * @example true
+       */
+      approved: boolean
     }
     /** @description Visitor restriction */
     VisitorRestrictionDto: {
@@ -5013,7 +4961,6 @@ export interface operations {
             | '101 SWITCHING_PROTOCOLS'
             | '102 PROCESSING'
             | '103 EARLY_HINTS'
-            | '103 CHECKPOINT'
             | '200 OK'
             | '201 CREATED'
             | '202 ACCEPTED'
@@ -5027,10 +4974,8 @@ export interface operations {
             | '300 MULTIPLE_CHOICES'
             | '301 MOVED_PERMANENTLY'
             | '302 FOUND'
-            | '302 MOVED_TEMPORARILY'
             | '303 SEE_OTHER'
             | '304 NOT_MODIFIED'
-            | '305 USE_PROXY'
             | '307 TEMPORARY_REDIRECT'
             | '308 PERMANENT_REDIRECT'
             | '400 BAD_REQUEST'
@@ -5046,17 +4991,15 @@ export interface operations {
             | '410 GONE'
             | '411 LENGTH_REQUIRED'
             | '412 PRECONDITION_FAILED'
+            | '413 CONTENT_TOO_LARGE'
             | '413 PAYLOAD_TOO_LARGE'
-            | '413 REQUEST_ENTITY_TOO_LARGE'
             | '414 URI_TOO_LONG'
-            | '414 REQUEST_URI_TOO_LONG'
             | '415 UNSUPPORTED_MEDIA_TYPE'
             | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
             | '417 EXPECTATION_FAILED'
             | '418 I_AM_A_TEAPOT'
-            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
-            | '420 METHOD_FAILURE'
-            | '421 DESTINATION_LOCKED'
+            | '421 MISDIRECTED_REQUEST'
+            | '422 UNPROCESSABLE_CONTENT'
             | '422 UNPROCESSABLE_ENTITY'
             | '423 LOCKED'
             | '424 FAILED_DEPENDENCY'
@@ -5148,7 +5091,6 @@ export interface operations {
             | '101 SWITCHING_PROTOCOLS'
             | '102 PROCESSING'
             | '103 EARLY_HINTS'
-            | '103 CHECKPOINT'
             | '200 OK'
             | '201 CREATED'
             | '202 ACCEPTED'
@@ -5162,10 +5104,8 @@ export interface operations {
             | '300 MULTIPLE_CHOICES'
             | '301 MOVED_PERMANENTLY'
             | '302 FOUND'
-            | '302 MOVED_TEMPORARILY'
             | '303 SEE_OTHER'
             | '304 NOT_MODIFIED'
-            | '305 USE_PROXY'
             | '307 TEMPORARY_REDIRECT'
             | '308 PERMANENT_REDIRECT'
             | '400 BAD_REQUEST'
@@ -5181,17 +5121,15 @@ export interface operations {
             | '410 GONE'
             | '411 LENGTH_REQUIRED'
             | '412 PRECONDITION_FAILED'
+            | '413 CONTENT_TOO_LARGE'
             | '413 PAYLOAD_TOO_LARGE'
-            | '413 REQUEST_ENTITY_TOO_LARGE'
             | '414 URI_TOO_LONG'
-            | '414 REQUEST_URI_TOO_LONG'
             | '415 UNSUPPORTED_MEDIA_TYPE'
             | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
             | '417 EXPECTATION_FAILED'
             | '418 I_AM_A_TEAPOT'
-            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
-            | '420 METHOD_FAILURE'
-            | '421 DESTINATION_LOCKED'
+            | '421 MISDIRECTED_REQUEST'
+            | '422 UNPROCESSABLE_CONTENT'
             | '422 UNPROCESSABLE_ENTITY'
             | '423 LOCKED'
             | '424 FAILED_DEPENDENCY'
@@ -5283,7 +5221,6 @@ export interface operations {
             | '101 SWITCHING_PROTOCOLS'
             | '102 PROCESSING'
             | '103 EARLY_HINTS'
-            | '103 CHECKPOINT'
             | '200 OK'
             | '201 CREATED'
             | '202 ACCEPTED'
@@ -5297,10 +5234,8 @@ export interface operations {
             | '300 MULTIPLE_CHOICES'
             | '301 MOVED_PERMANENTLY'
             | '302 FOUND'
-            | '302 MOVED_TEMPORARILY'
             | '303 SEE_OTHER'
             | '304 NOT_MODIFIED'
-            | '305 USE_PROXY'
             | '307 TEMPORARY_REDIRECT'
             | '308 PERMANENT_REDIRECT'
             | '400 BAD_REQUEST'
@@ -5316,17 +5251,15 @@ export interface operations {
             | '410 GONE'
             | '411 LENGTH_REQUIRED'
             | '412 PRECONDITION_FAILED'
+            | '413 CONTENT_TOO_LARGE'
             | '413 PAYLOAD_TOO_LARGE'
-            | '413 REQUEST_ENTITY_TOO_LARGE'
             | '414 URI_TOO_LONG'
-            | '414 REQUEST_URI_TOO_LONG'
             | '415 UNSUPPORTED_MEDIA_TYPE'
             | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
             | '417 EXPECTATION_FAILED'
             | '418 I_AM_A_TEAPOT'
-            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
-            | '420 METHOD_FAILURE'
-            | '421 DESTINATION_LOCKED'
+            | '421 MISDIRECTED_REQUEST'
+            | '422 UNPROCESSABLE_CONTENT'
             | '422 UNPROCESSABLE_ENTITY'
             | '423 LOCKED'
             | '424 FAILED_DEPENDENCY'
@@ -5418,7 +5351,6 @@ export interface operations {
             | '101 SWITCHING_PROTOCOLS'
             | '102 PROCESSING'
             | '103 EARLY_HINTS'
-            | '103 CHECKPOINT'
             | '200 OK'
             | '201 CREATED'
             | '202 ACCEPTED'
@@ -5432,10 +5364,8 @@ export interface operations {
             | '300 MULTIPLE_CHOICES'
             | '301 MOVED_PERMANENTLY'
             | '302 FOUND'
-            | '302 MOVED_TEMPORARILY'
             | '303 SEE_OTHER'
             | '304 NOT_MODIFIED'
-            | '305 USE_PROXY'
             | '307 TEMPORARY_REDIRECT'
             | '308 PERMANENT_REDIRECT'
             | '400 BAD_REQUEST'
@@ -5451,17 +5381,15 @@ export interface operations {
             | '410 GONE'
             | '411 LENGTH_REQUIRED'
             | '412 PRECONDITION_FAILED'
+            | '413 CONTENT_TOO_LARGE'
             | '413 PAYLOAD_TOO_LARGE'
-            | '413 REQUEST_ENTITY_TOO_LARGE'
             | '414 URI_TOO_LONG'
-            | '414 REQUEST_URI_TOO_LONG'
             | '415 UNSUPPORTED_MEDIA_TYPE'
             | '416 REQUESTED_RANGE_NOT_SATISFIABLE'
             | '417 EXPECTATION_FAILED'
             | '418 I_AM_A_TEAPOT'
-            | '419 INSUFFICIENT_SPACE_ON_RESOURCE'
-            | '420 METHOD_FAILURE'
-            | '421 DESTINATION_LOCKED'
+            | '421 MISDIRECTED_REQUEST'
+            | '422 UNPROCESSABLE_CONTENT'
             | '422 UNPROCESSABLE_ENTITY'
             | '423 LOCKED'
             | '424 FAILED_DEPENDENCY'

@@ -4,7 +4,25 @@ import {
   isValidVisitReference,
   isValidBookerReference,
   isValidVisitorRequestReference,
+  TEXT_INPUT_SINGLE_LINE_REGEX,
 } from './validationChecks'
+
+describe('textInputSingleLineRegex', () => {
+  it.each([
+    ['Valid input with letters and numbers', 'Hello World 123', true],
+    ['Valid input with punctuation, symbols and currency', '!.? &()"\'[]{}- £$€', true],
+    ['Valid input with accented characters', 'Café', true],
+    ['Valid input (empty string)', '', true],
+
+    ['Invalid input with non-Latin characters', 'Привет 你好', false],
+    ['Invalid input with newline', 'Hello\nWorld', false],
+    ['Invalid input with tab', 'Hello\tWorld', false],
+    ['Invalid input with emoji', 'Hello 😊 World', false],
+  ])('%s', (_: string, input: string, expected: boolean) => {
+    const result = TEXT_INPUT_SINGLE_LINE_REGEX.test(input)
+    expect(result).toBe(expected)
+  })
+})
 
 describe('isValidBookerReference', () => {
   it('valid', () => {

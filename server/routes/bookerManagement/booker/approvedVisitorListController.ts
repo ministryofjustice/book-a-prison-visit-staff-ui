@@ -2,11 +2,12 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
+import { BookerPrisonerParams } from '../../../@types/requestParameterTypes'
 
 export default class ApprovedVisitorListController {
   public constructor(private readonly bookerService: BookerService) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<BookerPrisonerParams> {
     return async (req, res) => {
       const { reference, prisonerId } = req.params
       const { username } = res.locals.user
@@ -40,7 +41,7 @@ export default class ApprovedVisitorListController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<BookerPrisonerParams> {
     return async (req, res) => {
       const { reference, prisonerId } = req.params
 

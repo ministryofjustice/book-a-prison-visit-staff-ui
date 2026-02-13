@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { VisitService } from '../../services'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { clearSession } from '../visitorUtils'
 import { VisitSessionData } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
@@ -9,7 +10,7 @@ import { getPrisonerLocation, isPublicBooking } from './visitUtils'
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
 
-  public startVisitUpdate(): RequestHandler {
+  public startVisitUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
       const { username } = res.locals.user

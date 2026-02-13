@@ -4,7 +4,7 @@ import nunjucks, { Environment } from 'nunjucks'
 import express from 'express'
 import { format, formatDuration, intervalToDuration, isAfter, parseISO } from 'date-fns'
 import { FieldValidationError } from 'express-validator'
-import { formatStartToEndTime, initialiseName, properCaseFullName } from './utils'
+import { formatStartToEndTime, initialiseName, pluralise, properCaseFullName } from './utils'
 import config from '../config'
 import { ApplicationInfo } from '../applicationInfo'
 import { Address } from '../data/prisonerContactRegistryApiTypes'
@@ -132,7 +132,7 @@ export function registerNunjucks(app?: express.Express): Environment {
     }
   })
 
-  njkEnv.addFilter('pluralise', (word, count, plural = `${word}s`) => (count === 1 ? word : plural))
+  njkEnv.addFilter('pluralise', pluralise)
 
   // split string on first newline (if present), returning trimmed [firstLine, remainingText]
   njkEnv.addFilter('splitOnNewline', (rawComment: string): [string, string] => {

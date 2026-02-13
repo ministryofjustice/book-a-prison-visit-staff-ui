@@ -3,6 +3,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { AuditService, BookerService } from '../../../services'
 import { RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
 import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
+import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
 
 export default class CheckLinkedVisitorsController {
   public constructor(
@@ -12,7 +13,7 @@ export default class CheckLinkedVisitorsController {
 
   private readonly REJECTION_REASONS: RejectVisitorRequestDto['rejectionReason'][] = ['ALREADY_LINKED', 'REJECT']
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitorRequestParams> {
     return async (req, res) => {
       const { requestReference } = req.params
       const { visitorRequestJourney } = req.session
@@ -31,7 +32,7 @@ export default class CheckLinkedVisitorsController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<VisitorRequestParams> {
     return async (req, res, next) => {
       const { requestReference } = req.params
       const { visitorRequestJourney } = req.session

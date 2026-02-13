@@ -23,6 +23,7 @@ import {
   NotificationTypeRaw,
   PageVisitDto,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
@@ -562,6 +563,21 @@ export default class OrchestrationApiClient {
   async getVoBalance({ prisonId, prisonerId }: { prisonId: string; prisonerId: string }): Promise<PrisonerBalanceDto> {
     return this.restClient.get({
       path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+    })
+  }
+
+  async changeVoBalance({
+    prisonId,
+    prisonerId,
+    prisonerBalanceAdjustmentDto,
+  }: {
+    prisonId: string
+    prisonerId: string
+    prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
+  }): Promise<void> {
+    await this.restClient.put({
+      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      data: prisonerBalanceAdjustmentDto,
     })
   }
 

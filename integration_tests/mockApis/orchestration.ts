@@ -11,6 +11,8 @@ import {
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
   PrisonDto,
+  PrisonerBalanceAdjustmentDto,
+  PrisonerBalanceAdjustmentValidationError,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
@@ -944,17 +946,17 @@ export default {
 
   stubGetVisitSessionsAndSchedule: ({
     prisonId = 'HEI',
-    prisonerId,
+    prisonerId = 'A1234BC',
     minNumberOfDays = 3,
     username = 'USER1',
     visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
   }: {
-    prisonId: string
-    prisonerId: string
-    minNumberOfDays: number
-    username: string
-    visitSessionsAndSchedule: VisitSessionsAndScheduleDto
-  }): SuperAgentRequest => {
+    prisonId?: string
+    prisonerId?: string
+    minNumberOfDays?: number
+    username?: string
+    visitSessionsAndSchedule?: VisitSessionsAndScheduleDto
+  } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
@@ -992,6 +994,60 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: prisonerVoBalance,
+      },
+    })
+  },
+
+  stubChangeVoBalance: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisoner().prisonerNumber,
+    prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto(),
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    prisonerBalanceAdjustmentDto?: PrisonerBalanceAdjustmentDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+        bodyPatterns: [
+          {
+            equalToJson: prisonerBalanceAdjustmentDto,
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      },
+    })
+  },
+
+  stubChangeVoBalanceFail: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisoner().prisonerNumber,
+    validationErrors,
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    validationErrors: PrisonerBalanceAdjustmentValidationError[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      },
+      response: {
+        status: 422,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          status: 422,
+          errorCode: null,
+          userMessage: 'Manually adjust prisoner balance request failed',
+          developerMessage: null,
+          validationErrors,
+        },
       },
     })
   },

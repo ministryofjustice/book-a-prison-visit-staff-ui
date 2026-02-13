@@ -2,8 +2,9 @@ import { components } from '../@types/prisoner-contact-registry-api'
 
 export type Address = components['schemas']['AddressDto']
 
-export type Contact = components['schemas']['ContactDto']
+// TODO transitional - remove when 'addresses' removed in VB-6423
+export type ContactDto = components['schemas']['ContactDto']
+
+export type Contact = Omit<ContactDto, 'addresses'>
 
 export type Restriction = components['schemas']['RestrictionDto']
-
-export type AddressUsage = components['schemas']['AddressUsageDto']
