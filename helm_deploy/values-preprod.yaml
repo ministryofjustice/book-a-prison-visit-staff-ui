@@ -23,7 +23,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-preprod"
     ENVIRONMENT_NAME: preprod
 
-    FEATURE_VISITOR_REQUESTS: "true"
     FEATURE_VO_ADJUSTMENT: "true"
     FEATURE_VO_HISTORY: "true"
 
