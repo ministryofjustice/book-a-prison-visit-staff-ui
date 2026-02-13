@@ -150,9 +150,6 @@ export default {
         ).split(',')
       ),
     },
-    visitorRequests: {
-      enabled: get('FEATURE_VISITOR_REQUESTS', 'false') === 'true',
-    },
     voAdjustment: {
       enabled: get('FEATURE_VO_ADJUSTMENT', 'false') === 'true',
     },
