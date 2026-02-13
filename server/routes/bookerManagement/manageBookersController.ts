@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../services'
-import config from '../../config'
 
 export default class ManageBookersController {
   public constructor(
@@ -17,9 +16,7 @@ export default class ManageBookersController {
 
       const noBookerFound = req.query['no-booker-found'] === ''
 
-      const visitorRequests = config.features.visitorRequests.enabled
-        ? await this.bookerService.getVisitorRequests({ username, prisonId })
-        : []
+      const visitorRequests = await this.bookerService.getVisitorRequests({ username, prisonId })
 
       res.render('pages/bookerManagement/manageBookers', {
         errors: req.flash('errors'),

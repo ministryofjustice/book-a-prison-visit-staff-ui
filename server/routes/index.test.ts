@@ -12,7 +12,6 @@ import {
 import TestData from './testutils/testData'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
-import { setFeature } from '../data/testutils/mockFeature'
 
 let app: Express
 
@@ -202,7 +201,6 @@ describe('GET /', () => {
     })
 
     it('should render tile with visitor request count badge if feature enabled, prison is public-enabled and role is present', () => {
-      setFeature('visitorRequests', { enabled: true })
       selectedEstablishment.isEnabledForPublic = true
 
       app = appWithAllRoutes({
