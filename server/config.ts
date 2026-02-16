@@ -150,12 +150,6 @@ export default {
         ).split(',')
       ),
     },
-    voAdjustment: {
-      enabled: get('FEATURE_VO_ADJUSTMENT', 'false') === 'true',
-    },
-    voHistory: {
-      enabled: get('FEATURE_VO_HISTORY', 'false') === 'true',
-    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: translateEnvironment(get('ENVIRONMENT_NAME', '')),

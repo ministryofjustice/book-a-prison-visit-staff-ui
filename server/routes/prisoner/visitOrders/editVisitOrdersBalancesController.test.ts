@@ -6,7 +6,6 @@ import { InternalServerError } from 'http-errors'
 import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import { createMockAuditService, createMockVisitOrdersService } from '../../../services/testutils/mocks'
 import TestData from '../../testutils/testData'
-import { setFeature } from '../../../data/testutils/mockFeature'
 import { PVO_MAX, VO_MAX } from '../../../constants/visitOrders'
 import { PrisonerBalanceAdjustmentValidationErrorResponse } from '../../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../../sanitisedError'
@@ -23,8 +22,6 @@ const { prisonerId } = prisonerVoBalance
 const url = `/prisoner/${prisonerId}/edit-visiting-orders-balances`
 
 beforeEach(() => {
-  setFeature('voAdjustment', { enabled: true })
-
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
@@ -39,14 +36,6 @@ afterEach(() => {
 
 describe('Edit visit order balances', () => {
   describe(`GET ${url}`, () => {
-    it('should return a 404 if FEATURE_VO_ADJUSTMENT not enabled', () => {
-      setFeature('voAdjustment', { enabled: false })
-
-      app = appWithAllRoutes({ services: { auditService, visitOrdersService } })
-
-      return request(app).get(url).expect(404)
-    })
-
     it('should render edit visiting orders balances page', () => {
       return request(app)
         .get(url)
@@ -132,14 +121,6 @@ describe('Edit visit order balances', () => {
   })
 
   describe(`POST ${url}`, () => {
-    it('should return a 404 if FEATURE_VO_ADJUSTMENT not enabled', () => {
-      setFeature('voAdjustment', { enabled: false })
-
-      app = appWithAllRoutes({ services: { auditService, visitOrdersService } })
-
-      return request(app).post(url).expect(404)
-    })
-
     it('should send VO/PVO balance adjustment, audit and redirect to profile page', () => {
       const prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto({ voAmount: 1, pvoAmount: -2 })
 

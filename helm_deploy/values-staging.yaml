@@ -23,9 +23,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: staging
 
-    FEATURE_VO_ADJUSTMENT: "true"
-    FEATURE_VO_HISTORY: "true"
-
   allowlist:
     groups:
       - internal
