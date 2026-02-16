@@ -6,10 +6,13 @@ export default class SelectVisitDateAndTimePage extends AbstractPage {
 
   readonly continueButton: Locator
 
+  readonly alertOnPage: Locator
+
   constructor(page: Page) {
     super(page, 'Select date and time of visit')
     this.visitRestriction = page.getByTestId('visit-restriction')
     this.continueButton = page.getByTestId('submit')
+    this.alertOnPage = page.locator('.moj-alert__content')
   }
 
   // Dynamic locators for calendar days
