@@ -22,9 +22,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
 
-    FEATURE_VO_ADJUSTMENT: "true"
-    FEATURE_VO_HISTORY: "true"
-
   allowlist:
     groups:
       - internal
