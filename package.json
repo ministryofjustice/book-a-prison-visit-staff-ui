@@ -34,7 +34,7 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.989.0",
+    "@aws-sdk/client-sqs": "3.893.0",
     "@axe-core/playwright": "4.11.1",
     "@ministryofjustice/frontend": "^8.0.0",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.3.1",
@@ -95,7 +95,7 @@
     "jest-junit": "^16.0.0",
     "jsonwebtoken": "^9.0.3",
     "lint-staged": "^16.2.7",
-    "mocha": "11.7.5",
+    "mocha": "11.3.0",
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^14.0.11",
     "nodemon": "^3.1.11",
