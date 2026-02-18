@@ -25,7 +25,7 @@ export declare module 'express-session' {
     // matched booker accounts from an email search (sorted, most recent 'active' account first)
     matchedBookers?: BookerSearchResultsDto[]
 
-    // non-linked approved visitors for linking to a booker's prisoner
+    // non-linked visitors for linking to a booker's prisoner
     bookerLinkVisitor?: {
       reference: string
       prisonerId: string

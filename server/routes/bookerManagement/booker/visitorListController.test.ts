@@ -40,7 +40,7 @@ afterEach(() => {
   jest.useRealTimers()
 })
 
-describe('Booker management - approved visitor list', () => {
+describe('Booker management - visitor list', () => {
   describe(`GET ${url}`, () => {
     it('should require booker admin role', () => {
       app = appWithAllRoutes({ services: { auditService, bookerService } })
@@ -53,7 +53,7 @@ describe('Booker management - approved visitor list', () => {
         .expect(400)
     })
 
-    it('should render non-linked approved visitor list page and save data to session', () => {
+    it('should render non-linked visitor list page and save data to session', () => {
       const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
       bookerService.getNonLinkedSocialContacts.mockResolvedValue([socialContact])
@@ -99,7 +99,7 @@ describe('Booker management - approved visitor list', () => {
         })
     })
 
-    it('should render non-linked approved visitor list page - with missing DoB warning', () => {
+    it('should render non-linked visitor list page - with missing DoB warning', () => {
       const socialContact = TestData.socialContact({ dateOfBirth: null, lastApprovedForVisitDate: null })
       bookerService.getBookerDetails.mockResolvedValue(booker)
       bookerService.getNonLinkedSocialContacts.mockResolvedValue([socialContact])
