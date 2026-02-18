@@ -4,7 +4,7 @@ import { BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
 import { BookerPrisonerParams } from '../../../@types/requestParameterTypes'
 
-export default class ApprovedVisitorListController {
+export default class VisitorListController {
   public constructor(private readonly bookerService: BookerService) {}
 
   public view(): RequestHandler<BookerPrisonerParams> {
@@ -30,7 +30,7 @@ export default class ApprovedVisitorListController {
 
       req.session.bookerLinkVisitor = { reference, prisonerId, nonLinkedContacts }
 
-      return res.render('pages/bookerManagement/booker/approvedVisitorList', {
+      return res.render('pages/bookerManagement/booker/visitorList', {
         backLinkHref: bookerDetailsPageUrl,
         errors: req.flash('errors'),
         nonLinkedContacts,
