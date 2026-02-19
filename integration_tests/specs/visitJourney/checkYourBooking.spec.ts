@@ -378,6 +378,6 @@ test.describe('Check visit details page', () => {
     )
 
     // Check alert on select date and time page
-    await expect(dateTimePage.alertOnPage).toContainText('Select a new visit time.')
+    await expect(dateTimePage.messages).toContainText('Select a new visit time.')
   })
 })
