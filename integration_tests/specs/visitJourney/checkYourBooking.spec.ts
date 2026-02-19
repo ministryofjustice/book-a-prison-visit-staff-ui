@@ -74,6 +74,7 @@ test.describe('Check visit details page', () => {
   })
 
   test('should complete the book a visit journey and change details before booking', async ({ page }) => {
+    // Start - Prisoner profile page
     await prisonerContactRegistry.stubPrisonerSocialContacts({ offenderNo: prisonerId, contacts })
     await orchestrationApi.stubPrisonerProfile(profile)
 
@@ -81,12 +82,13 @@ test.describe('Check visit details page', () => {
     await page.goto(`/prisoner/${prisonerId}`)
 
     const prisonerProfilePage = await PrisonerProfilePage.verifyOnPage(page, 'Smith, John')
-    await prisonerProfilePage.bookAVisitButton.click()
 
+    // Select visitors - first of two
+    await prisonerProfilePage.bookAVisitButton.click()
     const visitorsPage = await SelectVisitorsPage.verifyOnPage(page)
     await visitorsPage.getVisitor(contacts[0].personId).check()
-    await visitorsPage.getVisitor(contacts[1].personId).check()
 
+    // Select date and time
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId,
       visitSessionsAndSchedule,
@@ -96,7 +98,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
-        visitors: [{ nomisPersonId: contacts[0].personId }, { nomisPersonId: contacts[1].personId }],
+        visitors: [{ nomisPersonId: contacts[0].personId }],
         sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
     )
@@ -107,10 +109,12 @@ test.describe('Check visit details page', () => {
     await dateTimePage.selectSession(dateIn7Days, 0).click()
     await dateTimePage.continueButton.click()
 
+    // Additional support
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
     await supportPage.additionalSupportNotRequired.check()
     await supportPage.continueButton.click()
 
+    // Main contact
     const contactPage = await MainContactPage.verifyOnPage(page)
     await contactPage.firstContact.check()
     await contactPage.phoneNumberYesRadio.click()
@@ -121,10 +125,7 @@ test.describe('Check visit details page', () => {
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
         visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
-        visitors: [
-          { nomisPersonId: contacts[0].personId, visitContact: true },
-          { nomisPersonId: contacts[1].personId, visitContact: false },
-        ],
+        visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
         sessionTemplateReference: sessionIn7DaysTemplateReference,
       }),
@@ -132,22 +133,54 @@ test.describe('Check visit details page', () => {
 
     await contactPage.continueButton.click()
 
+    // Request method
     const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
     await requestMethodPage.continueButton.click()
 
+    // Check visit details
     const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page)
     await expect(checkYourBookingPage.prisonerName).toContainText('John Smith')
+    await expect(checkYourBookingPage.visitorName(1)).toContainText('Jeanette Smith (wife of the prisoner)')
     await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn7Days, longDateFormat))
     await expect(checkYourBookingPage.visitTime).toContainText('10am to 11am')
     await expect(checkYourBookingPage.visitType).toContainText('Open')
+    await expect(checkYourBookingPage.additionalSupport).toHaveText('None')
     await expect(checkYourBookingPage.requestMethod).toContainText('Phone call')
+    await expect(checkYourBookingPage.mainContactName).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(checkYourBookingPage.mainContactNumber).toContainText('01234 567890')
 
     // Change visit date  - then proceed through journey
     await checkYourBookingPage.changeVisitDate.click()
 
     await dateTimePage.clickCalendarDay(dateIn8Days).click()
     await dateTimePage.selectSession(dateIn8Days, 0).click({ force: true })
+    await orchestrationApi.stubChangeVisitApplication(
+      TestData.application({
+        startTimestamp: sessionIn8DaysStartTimestamp,
+        endTimestamp: sessionIn8DaysEndTimestamp,
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
+        visitorSupport: { description: '' },
+        sessionTemplateReference: sessionIn8DaysTemplateReference,
+      }),
+    )
+
+    await dateTimePage.continueButton.click()
+    await supportPage.continueButton.click()
+    await contactPage.continueButton.click()
+    await requestMethodPage.continueButton.click()
+
+    await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))
+    await expect(checkYourBookingPage.visitTime).toContainText('1:30pm to 3pm')
+
+    // Check details - Change visitors
+    await checkYourBookingPage.changeVisitors.click()
+    await expect(visitorsPage.getVisitor(contacts[0].personId)).toBeChecked()
+    await expect(visitorsPage.getVisitor(contacts[1].personId)).not.toBeChecked()
+    await visitorsPage.getVisitor(contacts[1].personId).check()
+    await visitorsPage.continueButton.click()
+
     await orchestrationApi.stubChangeVisitApplication(
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
@@ -167,8 +200,9 @@ test.describe('Check visit details page', () => {
     await contactPage.continueButton.click()
     await requestMethodPage.continueButton.click()
 
-    await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))
-    await expect(checkYourBookingPage.visitTime).toContainText('1:30pm to 3pm')
+    // Check the second visitor is added
+    await expect(checkYourBookingPage.visitorName(1)).toContainText('Jeanette Smith (wife of the prisoner)')
+    await expect(checkYourBookingPage.visitorName(2)).toContainText('Bob Smith (son of the prisoner)')
 
     /// Check details - change additional support - then proceed through journey
     await checkYourBookingPage.changeAdditionalSupport.click()
@@ -238,6 +272,7 @@ test.describe('Check visit details page', () => {
 
     await checkYourBookingPage.submitBooking()
 
+    // Check details on the Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit confirmed')
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')
@@ -319,7 +354,7 @@ test.describe('Check visit details page', () => {
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
     await requestMethodPage.continueButton.click()
 
-    // Check booking page
+    // Check visit details
     const checkYourBookingPage = await CheckYourBookingPage.verifyOnPage(page)
     await expect(checkYourBookingPage.prisonerName).toContainText('John Smith')
     await expect(checkYourBookingPage.visitDate).toContainText(format(dateIn7Days, longDateFormat))
@@ -337,12 +372,12 @@ test.describe('Check visit details page', () => {
     // Should return to date/time page with alert
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
 
-    // Check the first message
+    // Check date on select date and time page
     await expect(dateTimePage.messages.first()).toContainText(
       `John Smith now has a non-association on ${format(dateIn7Days, dayMonthFormat)}.`,
     )
 
-    // Wait for the alert body to appear and have the expected text
+    // Check alert on select date and time page
     await expect(dateTimePage.alertOnPage).toContainText('Select a new visit time.')
   })
 })

@@ -30,6 +30,8 @@ export default class CheckYourBookingPage extends AbstractPage {
 
   readonly submitButton: Locator
 
+  readonly changeVisitors: Locator
+
   constructor(page: Page) {
     super(page, 'Check the visit details before booking')
 
@@ -51,6 +53,7 @@ export default class CheckYourBookingPage extends AbstractPage {
     this.changeRequestMethod = page.getByTestId('change-request-method')
 
     this.submitButton = page.getByTestId('submit')
+    this.changeVisitors = page.getByTestId('change-visitors')
   }
 
   visitorName(index: number): Locator {
