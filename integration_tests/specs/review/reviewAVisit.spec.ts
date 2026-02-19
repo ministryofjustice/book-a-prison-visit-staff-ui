@@ -5,7 +5,6 @@ import VisitDetailsPage from '../../pages-playwright/visit/visitDetailsPage'
 import ClearNotificationsPage from '../../pages-playwright/visit/clearNotificationsPage'
 import eventAuditTypes from '../../../server/constants/eventAudit'
 import { notificationTypeAlerts, notificationTypes } from '../../../server/constants/notifications'
-import auth from '../../mockApis/auth'
 import orchestrationApi from '../../mockApis/orchestration'
 import { resetStubs, login } from '../../testUtils'
 
@@ -16,7 +15,6 @@ test.describe('Review a visit', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({})

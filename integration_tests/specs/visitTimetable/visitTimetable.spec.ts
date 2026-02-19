@@ -4,7 +4,6 @@ import TestData from '../../../server/routes/testutils/testData'
 import HomePage from '../../pages-playwright/homePage'
 import VisitTimetablePage from '../../pages-playwright/visitTimetable/visitTimetablePage'
 import orchestrationApi from '../../mockApis/orchestration'
-import auth from '../../mockApis/auth'
 import { login, resetStubs } from '../../testUtils'
 
 test.describe('View visit schedule timetable', () => {
@@ -15,7 +14,6 @@ test.describe('View visit schedule timetable', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({})

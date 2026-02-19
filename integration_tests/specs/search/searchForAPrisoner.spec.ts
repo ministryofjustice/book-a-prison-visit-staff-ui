@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
-import auth from '../../mockApis/auth'
-
 import HomePage from '../../pages-playwright/homePage'
 import SearchForAPrisonerPage from '../../pages-playwright/search/searchForAPrisonerPage'
 import SearchForAPrisonerResultsPage from '../../pages-playwright/search/searchForAPrisonerResultsPage'
@@ -15,7 +13,6 @@ test.describe('Search for a prisoner', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({})

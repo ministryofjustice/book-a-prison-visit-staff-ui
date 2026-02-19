@@ -88,7 +88,7 @@ test.describe('Book a visit', () => {
         content: [prisoner],
       },
     })
-    // generate array of dates over next month and add some visit sessions and events as defined in Cypress tests
+    // generate array of dates over next month and add some visit sessions and events
     const dateIn7Days = format(addDays(today, 7), shortDateFormat)
     const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
 

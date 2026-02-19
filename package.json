@@ -23,6 +23,7 @@
     "typecheck": "tsc && tsc -p integration_tests",
     "test": "jest",
     "test:ci": "jest --runInBand --coverage",
+    "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "npx playwright test",
     "int-test-ui": "npx playwright test --ui",
     "int-test-init:ci": "npx playwright install",
@@ -34,9 +35,9 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "3.893.0",
+    "@aws-sdk/client-sqs": "^3.993.0",
     "@axe-core/playwright": "4.11.1",
-    "@ministryofjustice/frontend": "^8.0.0",
+    "@ministryofjustice/frontend": "^8.0.1",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.3.1",
     "@ministryofjustice/hmpps-monitoring": "^1.0.2",
     "@ministryofjustice/hmpps-rest-client": "^1.0.1",
@@ -56,12 +57,12 @@
     "helmet": "^8.1.0",
     "http-errors": "^2.0.1",
     "jwt-decode": "^4.0.0",
-    "libphonenumber-js": "^1.12.36",
+    "libphonenumber-js": "^1.12.37",
     "nocache": "^4.0.0",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^5.10.0",
+    "redis": "^5.11.0",
     "superagent": "^10.3.0"
   },
   "devDependencies": {
@@ -95,8 +96,6 @@
     "jest-junit": "^16.0.0",
     "jsonwebtoken": "^9.0.3",
     "lint-staged": "^16.2.7",
-    "mocha": "11.3.0",
-    "mocha-junit-reporter": "^2.2.1",
     "nock": "^14.0.11",
     "nodemon": "^3.1.11",
     "openapi-typescript": "^7.13.0",
