@@ -23,7 +23,7 @@ export default {
     })
   },
 
-  stubPrisonerContactRegistryPing: () => {
+  stubPing: () => {
     return stubFor({
       request: {
         method: 'GET',

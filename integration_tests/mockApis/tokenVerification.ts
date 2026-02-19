@@ -2,8 +2,7 @@ import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
-  // TODO rename 'stubPing' to match template when Cypress removed
-  stubTokenVerificationPing: (httpStatus = 200): SuperAgentRequest =>
+  stubPing: (httpStatus = 200): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'GET',

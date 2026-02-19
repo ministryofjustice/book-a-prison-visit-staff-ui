@@ -59,7 +59,7 @@ export default {
     })
   },
 
-  stubPrisonerSearchPing: () => {
+  stubPing: () => {
     return stubFor({
       request: {
         method: 'GET',
