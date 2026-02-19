@@ -5,6 +5,7 @@ import EstablishmentNotSupportedPage from '../pages-playwright/establishmentNotS
 import HomePage from '../pages-playwright/homePage'
 import TestData from '../../server/routes/testutils/testData'
 import SearchForAPrisonerPage from '../pages-playwright/search/searchForAPrisonerPage'
+import stubComponents from '../mockApis/componentApi'
 
 test.describe('Establishment not supported', () => {
   test.beforeEach(async () => {
@@ -38,7 +39,8 @@ test.describe('Establishment not supported', () => {
 
     // User's active case load changes
     const unsupportedCaseLoad = TestData.caseLoad({ caseLoadId: 'XYZ', description: 'XYZ (HMP)' })
-    await login(page, { caseLoad: unsupportedCaseLoad })
+    await stubComponents({ caseLoad: unsupportedCaseLoad })
+    // await login(page, { caseLoad: unsupportedCaseLoad })
 
     // Attempt to search for a prisoner
     await searchForAPrisonerPage.searchInput.fill('smith')
