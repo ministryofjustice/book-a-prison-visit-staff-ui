@@ -5,7 +5,6 @@ import HomePage from '../../pages-playwright/homePage'
 import VisitsReviewListingPage from '../../pages-playwright/review/visitsReviewListingsPage'
 import { notificationTypes } from '../../../server/constants/notifications'
 import { resetStubs, login } from '../../testUtils'
-import auth from '../../mockApis/auth'
 import orchestrationApi from '../../mockApis/orchestration'
 
 test.describe('Bookings review listing page', () => {
@@ -30,7 +29,6 @@ test.describe('Bookings review listing page', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({ notificationCount })

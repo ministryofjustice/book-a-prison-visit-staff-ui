@@ -9,9 +9,9 @@ const headerHtml = `<header class="fallback-dps-header" role="banner"> <div clas
 
 const footerHtml = '<footer class="govuk-footer"></footer>'
 
-const stubComponents = ({ username, caseLoad }: { username: string; caseLoad: CaseLoad }) => {
-  const formattedUserName = initialiseName(convertToTitleCase(username))
-  const customHeaderHtml = headerHtml.replace('USER-NAME', formattedUserName)
+const stubComponents = ({ name = 'john smith', caseLoad }: { name?: string; caseLoad: CaseLoad }) => {
+  const formattedName = initialiseName(convertToTitleCase(name))
+  const customHeaderHtml = headerHtml.replace('USER-NAME', formattedName)
 
   const meta: HeaderFooterSharedData = {
     activeCaseLoad: caseLoad,

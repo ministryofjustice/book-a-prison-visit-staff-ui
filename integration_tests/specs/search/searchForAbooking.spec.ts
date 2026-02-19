@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../mockApis/orchestration'
-import auth from '../../mockApis/auth'
 import { login, resetStubs } from '../../testUtils'
 import TestData from '../../../server/routes/testutils/testData'
 import HomePage from '../../pages-playwright/homePage'
@@ -18,7 +17,6 @@ test.describe('Search for a booking by reference', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({})

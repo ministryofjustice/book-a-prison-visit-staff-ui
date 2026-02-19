@@ -16,11 +16,10 @@ test.describe('Health', () => {
     test.beforeEach(async () => {
       await Promise.all([
         hmppsAuth.stubPing(),
-        // TODO simplify the names of these ping stubs to remove duplication when Cypress removed
-        orchestrationApi.stubOrchestrationPing(),
-        prisonerContactRegistryApi.stubPrisonerContactRegistryPing(),
-        prisonerSearchApi.stubPrisonerSearchPing(),
-        tokenVerification.stubTokenVerificationPing(),
+        orchestrationApi.stubPing(),
+        prisonerContactRegistryApi.stubPing(),
+        prisonerSearchApi.stubPing(),
+        tokenVerification.stubPing(),
       ])
     })
 
@@ -57,10 +56,10 @@ test.describe('Health', () => {
     test.beforeEach(async () => {
       await Promise.all([
         hmppsAuth.stubPing(),
-        orchestrationApi.stubOrchestrationPing(),
-        prisonerContactRegistryApi.stubPrisonerContactRegistryPing(),
-        prisonerSearchApi.stubPrisonerSearchPing(),
-        tokenVerification.stubTokenVerificationPing(500),
+        orchestrationApi.stubPing(),
+        prisonerContactRegistryApi.stubPing(),
+        prisonerSearchApi.stubPing(),
+        tokenVerification.stubPing(500),
       ])
     })
 

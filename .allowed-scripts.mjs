@@ -4,8 +4,6 @@ export default configureAllowedScripts({
   allowlist: {
     // Needed by esbuild for watching files during development
     'node_modules/@parcel/watcher@2.5.6': 'ALLOW',
-    // TODO for Cypress - remove when Cypress => Playwright migration complete
-    'node_modules/cypress@15.10.0': 'ALLOW',
     // Provides native integration, supporting ability to write dtrace probes for bunyan
     'node_modules/dtrace-provider@0.8.8': 'ALLOW',
     // Needed by jest for running tests in watch mode

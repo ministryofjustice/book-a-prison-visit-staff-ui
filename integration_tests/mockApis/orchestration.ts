@@ -1125,7 +1125,7 @@ export default {
       },
     })
   },
-  stubOrchestrationPing: () => {
+  stubPing: () => {
     return stubFor({
       request: {
         method: 'GET',
