@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test'
 import { format, sub, addDays, eachDayOfInterval } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import PrisonerProfilePage from '../../pages-playwright/prisoner/prisonerProfilePage'
-import SelectVisitorsPage from '../../pages-playwright/visitJourney/selectVisitorsPage'
-import AdditionalSupportPage from '../../pages-playwright/visitJourney/additionalSupportPage'
-import MainContactPage from '../../pages-playwright/visitJourney/mainContactPage'
-import CheckYourBookingPage from '../../pages-playwright/visitJourney/checkYourBookingPage'
-import ConfirmationPage from '../../pages-playwright/visitJourney/confirmationPage'
-import SelectVisitDateAndTimePage from '../../pages-playwright/visitJourney/selectVisitDateAndTimePage'
-import RequestMethodPage from '../../pages-playwright/visitJourney/requestMethodPage'
+import PrisonerProfilePage from '../../pages/prisoner/prisonerProfilePage'
+import SelectVisitorsPage from '../../pages/visitJourney/selectVisitorsPage'
+import AdditionalSupportPage from '../../pages/visitJourney/additionalSupportPage'
+import MainContactPage from '../../pages/visitJourney/mainContactPage'
+import CheckYourBookingPage from '../../pages/visitJourney/checkYourBookingPage'
+import ConfirmationPage from '../../pages/visitJourney/confirmationPage'
+import SelectVisitDateAndTimePage from '../../pages/visitJourney/selectVisitDateAndTimePage'
+import RequestMethodPage from '../../pages/visitJourney/requestMethodPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import prisonerContactRegistry from '../../mockApis/prisonerContactRegistry'
 import { login, resetStubs } from '../../testUtils'
@@ -107,7 +107,7 @@ test.describe('Check visit details page', () => {
 
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await dateTimePage.selectSession(dateIn7Days, 0).click()
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
 
     // Additional support
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -166,7 +166,7 @@ test.describe('Check visit details page', () => {
       }),
     )
 
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
     await supportPage.continueButton.click()
     await contactPage.continueButton.click()
     await requestMethodPage.continueButton.click()
@@ -195,7 +195,7 @@ test.describe('Check visit details page', () => {
       }),
     )
 
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
     await supportPage.continueButton.click()
     await contactPage.continueButton.click()
     await requestMethodPage.continueButton.click()
@@ -270,7 +270,7 @@ test.describe('Check visit details page', () => {
       ],
     })
 
-    await checkYourBookingPage.submitBooking()
+    await checkYourBookingPage.clickSubmit()
 
     // Check details on the Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit confirmed')
@@ -322,7 +322,7 @@ test.describe('Check visit details page', () => {
     // Select date/time
     const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
-    await selectVisitDateAndTime.continueButton.click()
+    await selectVisitDateAndTime.clickContinue()
 
     // Additional support
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -367,7 +367,7 @@ test.describe('Check visit details page', () => {
 
     await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId })
 
-    await checkYourBookingPage.submitBooking()
+    await checkYourBookingPage.clickSubmit()
 
     // Should return to date/time page with alert
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)

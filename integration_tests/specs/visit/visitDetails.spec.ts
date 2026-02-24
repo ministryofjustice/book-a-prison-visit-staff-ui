@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { format, add } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import VisitDetailsPage from '../../pages-playwright/visit/visitDetailsPage'
+import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
 import { notificationTypeAlerts } from '../../../server/constants/notifications'

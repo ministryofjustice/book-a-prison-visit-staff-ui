@@ -83,4 +83,31 @@ export default class AbstractPage {
   getErrorSummaryMessage = (name: string): Locator => {
     return this.errorSummary.getByRole('link', { name })
   }
+
+  /**
+   * Clicks the given submit button and waits until it becomes disabled.
+   * This helps prevent duplicate form submissions by ensuring the button
+   * is disabled after the initial click.
+   *
+   * @param submitButton - The submit button to click and observe.
+   */
+  protected async clickButtonAndVerifyDisabled(submitButton: Locator) {
+    const disabledPromise = this.page.evaluate(() => {
+      return new Promise<void>(resolve => {
+        // @ts-expect-error - Browser context code
+        const form = document.querySelector('.disable-button-on-submit')
+        const button = form?.querySelector('button[type=submit]')
+        // @ts-expect-error - Browser context code
+        const observer = new MutationObserver(() => {
+          if (button.hasAttribute('disabled')) {
+            observer.disconnect()
+            resolve()
+          }
+        })
+        observer.observe(button, { attributes: true, attributeFilter: ['disabled'] })
+      })
+    })
+    await submitButton.click()
+    await disabledPromise
+  }
 }

@@ -1,15 +1,15 @@
 import { test, expect } from '@playwright/test'
 import { format, sub, addDays, eachDayOfInterval } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import VisitDetailsPage from '../../pages-playwright/visit/visitDetailsPage'
-import SelectVisitorsPage from '../../pages-playwright/visitJourney/selectVisitorsPage'
-import ConfirmUpdatePage from '../../pages-playwright/visit/confirmUpdatePage'
-import SelectVisitDateAndTimePage from '../../pages-playwright/visitJourney/selectVisitDateAndTimePage'
-import AdditionalSupportPage from '../../pages-playwright/visitJourney/additionalSupportPage'
-import MainContactPage from '../../pages-playwright/visitJourney/mainContactPage'
-import CheckYourBookingPage from '../../pages-playwright/visitJourney/checkYourBookingPage'
-import ConfirmationPage from '../../pages-playwright/visitJourney/confirmationPage'
-import RequestMethodPage from '../../pages-playwright/visitJourney/requestMethodPage'
+import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
+import SelectVisitorsPage from '../../pages/visitJourney/selectVisitorsPage'
+import ConfirmUpdatePage from '../../pages/visit/confirmUpdatePage'
+import SelectVisitDateAndTimePage from '../../pages/visitJourney/selectVisitDateAndTimePage'
+import AdditionalSupportPage from '../../pages/visitJourney/additionalSupportPage'
+import MainContactPage from '../../pages/visitJourney/mainContactPage'
+import CheckYourBookingPage from '../../pages/visitJourney/checkYourBookingPage'
+import ConfirmationPage from '../../pages/visitJourney/confirmationPage'
+import RequestMethodPage from '../../pages/visitJourney/requestMethodPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import prisonerContactRegistry from '../../mockApis/prisonerContactRegistry'
 import { login, resetStubs } from '../../testUtils'
@@ -135,7 +135,7 @@ test.describe('Update a visit', () => {
     const session = dateTimePage.selectSession(dateIn8Days, 0)
     await session.waitFor({ state: 'visible' })
     await session.click()
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
 
     // Additional support - add details
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -192,7 +192,7 @@ test.describe('Update a visit', () => {
       ],
     })
 
-    await checkPage.submitButton.click()
+    await checkPage.clickSubmit()
     // Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit updated')
     await expect(confirmationPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))

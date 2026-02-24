@@ -1,10 +1,10 @@
 import { test } from '@playwright/test'
 import { login, resetStubs } from '../testUtils'
 import orchestrationApi from '../mockApis/orchestration'
-import EstablishmentNotSupportedPage from '../pages-playwright/establishmentNotSupportedPage'
-import HomePage from '../pages-playwright/homePage'
+import EstablishmentNotSupportedPage from '../pages/establishmentNotSupportedPage'
+import HomePage from '../pages/homePage'
 import TestData from '../../server/routes/testutils/testData'
-import SearchForAPrisonerPage from '../pages-playwright/search/searchForAPrisonerPage'
+import SearchForAPrisonerPage from '../pages/search/searchForAPrisonerPage'
 import stubComponents from '../mockApis/componentApi'
 
 test.describe('Establishment not supported', () => {
