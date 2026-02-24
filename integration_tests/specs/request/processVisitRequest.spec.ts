@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import TestData from '../../../server/routes/testutils/testData'
-import HomePage from '../../pages-playwright/homePage'
-import VisitRequestsListingPage from '../../pages-playwright/request/visitRequestsListingPage'
-import VisitDetailsPage from '../../pages-playwright/visit/visitDetailsPage'
+import HomePage from '../../pages/homePage'
+import VisitRequestsListingPage from '../../pages/request/visitRequestsListingPage'
+import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import { resetStubs, login } from '../../testUtils'
 

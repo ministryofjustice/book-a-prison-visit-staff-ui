@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { addYears, format, nextMonday, nextWednesday, previousMonday } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import HomePage from '../../pages-playwright/homePage'
-import VisitTimetablePage from '../../pages-playwright/visitTimetable/visitTimetablePage'
+import HomePage from '../../pages/homePage'
+import VisitTimetablePage from '../../pages/visitTimetable/visitTimetablePage'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
 

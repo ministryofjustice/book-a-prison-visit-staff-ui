@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
-import SearchForAPrisonerPage from '../../pages-playwright/search/searchForAPrisonerPage'
-import SearchForAPrisonerResultsPage from '../../pages-playwright/search/searchForAPrisonerResultsPage'
+import HomePage from '../../pages/homePage'
+import SearchForAPrisonerPage from '../../pages/search/searchForAPrisonerPage'
+import SearchForAPrisonerResultsPage from '../../pages/search/searchForAPrisonerResultsPage'
 import TestData from '../../../server/routes/testutils/testData'
 import prisonerSearch from '../../mockApis/prisonerSearch'
 
