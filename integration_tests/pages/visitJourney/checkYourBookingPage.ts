@@ -28,7 +28,7 @@ export default class CheckYourBookingPage extends AbstractPage {
 
   readonly changeRequestMethod: Locator
 
-  readonly submitButton: Locator
+  private readonly submitButton: Locator
 
   readonly changeVisitors: Locator
 
@@ -60,7 +60,7 @@ export default class CheckYourBookingPage extends AbstractPage {
     return this.page.locator(`.test-visitor-name${index}`)
   }
 
-  async submitBooking(): Promise<void> {
-    await this.submitButton.click()
+  async clickSubmit() {
+    await this.clickButtonAndVerifyDisabled(this.submitButton)
   }
 }

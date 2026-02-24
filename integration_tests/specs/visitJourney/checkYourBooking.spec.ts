@@ -107,7 +107,7 @@ test.describe('Check visit details page', () => {
 
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await dateTimePage.selectSession(dateIn7Days, 0).click()
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
 
     // Additional support
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -166,7 +166,7 @@ test.describe('Check visit details page', () => {
       }),
     )
 
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
     await supportPage.continueButton.click()
     await contactPage.continueButton.click()
     await requestMethodPage.continueButton.click()
@@ -195,7 +195,7 @@ test.describe('Check visit details page', () => {
       }),
     )
 
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
     await supportPage.continueButton.click()
     await contactPage.continueButton.click()
     await requestMethodPage.continueButton.click()
@@ -270,7 +270,7 @@ test.describe('Check visit details page', () => {
       ],
     })
 
-    await checkYourBookingPage.submitBooking()
+    await checkYourBookingPage.clickSubmit()
 
     // Check details on the Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit confirmed')
@@ -322,7 +322,7 @@ test.describe('Check visit details page', () => {
     // Select date/time
     const selectVisitDateAndTime = await SelectVisitDateAndTimePage.verifyOnPage(page)
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
-    await selectVisitDateAndTime.continueButton.click()
+    await selectVisitDateAndTime.clickContinue()
 
     // Additional support
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -367,7 +367,7 @@ test.describe('Check visit details page', () => {
 
     await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId })
 
-    await checkYourBookingPage.submitBooking()
+    await checkYourBookingPage.clickSubmit()
 
     // Should return to date/time page with alert
     const dateTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
