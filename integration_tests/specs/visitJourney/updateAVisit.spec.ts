@@ -135,7 +135,7 @@ test.describe('Update a visit', () => {
     const session = dateTimePage.selectSession(dateIn8Days, 0)
     await session.waitFor({ state: 'visible' })
     await session.click()
-    await dateTimePage.continueButton.click()
+    await dateTimePage.clickContinue()
 
     // Additional support - add details
     const supportPage = await AdditionalSupportPage.verifyOnPage(page)
@@ -192,7 +192,7 @@ test.describe('Update a visit', () => {
       ],
     })
 
-    await checkPage.submitButton.click()
+    await checkPage.clickSubmit()
     // Confirmation page
     const confirmationPage = await ConfirmationPage.verifyOnPage(page, 'Visit updated')
     await expect(confirmationPage.visitDate).toContainText(format(dateIn8Days, longDateFormat))

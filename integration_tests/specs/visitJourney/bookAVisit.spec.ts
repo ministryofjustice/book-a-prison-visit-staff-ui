@@ -176,7 +176,7 @@ test.describe('Book a visit', () => {
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
 
     // Additional support
-    await selectVisitDateAndTime.continueButton.click()
+    await selectVisitDateAndTime.clickContinue()
     const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(page)
     await additionalSupportPage.additionalSupportRequired.check()
     await additionalSupportPage.additionalSupportInput.fill('Wheelchair ramp, Some extra help!')
@@ -253,7 +253,7 @@ test.describe('Book a visit', () => {
       ],
     })
 
-    await checkYourBookingPage.submitButton.click()
+    await checkYourBookingPage.clickSubmit()
     const confirmationPage = await ConfirmationPage.verifyOnPage(page)
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')

@@ -4,7 +4,7 @@ import AbstractPage from '../abstractPage'
 export default class SelectVisitDateAndTimePage extends AbstractPage {
   readonly visitRestriction: Locator
 
-  readonly continueButton: Locator
+  private readonly continueButton: Locator
 
   constructor(page: Page) {
     super(page, 'Select date and time of visit')
@@ -24,5 +24,9 @@ export default class SelectVisitDateAndTimePage extends AbstractPage {
 
   selectSession(date: string, index: number): Locator {
     return this.page.locator(`#day-group-${date} input`).nth(index)
+  }
+
+  async clickContinue() {
+    await this.clickButtonAndVerifyDisabled(this.continueButton)
   }
 }
