@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../../mockApis/orchestration'
 import { login, resetStubs } from '../../../testUtils'
 import TestData from '../../../../server/routes/testutils/testData'
-import PrisonerProfilePage from '../../../pages-playwright/prisoner/prisonerProfilePage'
-import EditVoBalancePage from '../../../pages-playwright/prisoner/visitOrders/editVoBalancePage'
+import PrisonerProfilePage from '../../../pages/prisoner/prisonerProfilePage'
+import EditVoBalancePage from '../../../pages/prisoner/visitOrders/editVoBalancePage'
 
 test.describe('Visiting orders - edit balances', () => {
   const profile = TestData.prisonerProfile()

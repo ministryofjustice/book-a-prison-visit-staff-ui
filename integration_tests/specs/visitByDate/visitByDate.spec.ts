@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 import { format, addDays } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
-import VisitsByDatePage from '../../pages-playwright/visitsByDate/visitsByDatePage'
+import HomePage from '../../pages/homePage'
+import VisitsByDatePage from '../../pages/visitsByDate/visitsByDatePage'
 import TestData from '../../../server/routes/testutils/testData'
 
 test.describe('View visits by date', () => {

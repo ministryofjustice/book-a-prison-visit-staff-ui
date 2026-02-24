@@ -3,7 +3,7 @@ import { format } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
 import TestData from '../../../server/routes/testutils/testData'
-import PrisonerProfilePage from '../../pages-playwright/prisoner/prisonerProfilePage'
+import PrisonerProfilePage from '../../pages/prisoner/prisonerProfilePage'
 
 test.describe('Prisoner profile page', () => {
   const prettyDateFormat = 'd MMMM yyyy'
