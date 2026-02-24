@@ -35,10 +35,10 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.993.0",
+    "@aws-sdk/client-sqs": "^3.995.0",
     "@axe-core/playwright": "4.11.1",
     "@ministryofjustice/frontend": "^8.0.1",
-    "@ministryofjustice/hmpps-connect-dps-components": "^5.3.1",
+    "@ministryofjustice/hmpps-connect-dps-components": "^5.3.2",
     "@ministryofjustice/hmpps-monitoring": "^1.0.2",
     "@ministryofjustice/hmpps-rest-client": "^1.0.1",
     "agentkeepalive": "^4.6.0",
@@ -97,7 +97,7 @@
     "jsonwebtoken": "^9.0.3",
     "lint-staged": "^16.2.7",
     "nock": "^14.0.11",
-    "nodemon": "^3.1.11",
+    "nodemon": "^3.1.14",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.8.1",
     "prettier-plugin-jinja-template": "^2.1.0",
