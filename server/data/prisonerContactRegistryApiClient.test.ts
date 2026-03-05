@@ -23,7 +23,6 @@ describe('prisonerContactRegistryApiClient', () => {
   })
 
   describe('getPrisonersApprovedSocialContacts', () => {
-    // NEW API FORMAT
     it('should return an array of Contacts from the Prisoner Contact Registry API', async () => {
       const offenderNo = 'A1234BC'
       const contact = [TestData.contact()]
@@ -40,26 +39,6 @@ describe('prisonerContactRegistryApiClient', () => {
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual(contact)
-    })
-
-    // SUPPORT OLD API FORMAT - remove once VB-6422 done
-    it('should return an array of Contacts from the Prisoner Contact Registry API with addresses mapped to address', async () => {
-      const offenderNo = 'A1234BC'
-      const contactDtos = [TestData.contactDto()]
-      const expectedContacts = [TestData.contact()]
-
-      fakePrisonerContactRegistryApi
-        .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
-        .query({
-          hasDateOfBirth: 'false',
-          withAddress: 'true',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, contactDtos)
-
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
-
-      expect(output).toStrictEqual(expectedContacts)
     })
 
     it('should return an empty array if prisoner not found', async () => {
