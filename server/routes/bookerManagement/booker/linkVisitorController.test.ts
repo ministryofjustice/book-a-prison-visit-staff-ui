@@ -7,6 +7,7 @@ import { createMockAuditService, createMockBookerService } from '../../../servic
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
 import { MoJAlert } from '../../../@types/bapv'
+import { SocialContactsDto } from '../../../data/orchestrationApiTypes'
 
 let app: Express
 let flashData: FlashData
@@ -97,7 +98,7 @@ describe('Booker management - link visitor with optional notification', () => {
     })
 
     it('should redirect to link approved visitor list page if visitorID in URL does not match a value in session', () => {
-      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, visitorId: 0 }]
+      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, visitorId: 0 } as SocialContactsDto]
       return request(app)
         .get(url)
         .expect(302)
@@ -172,7 +173,7 @@ describe('Booker management - link visitor with optional notification', () => {
     })
 
     it('should redirect to link approved visitor list page if visitorID in URL does not match a value in session', () => {
-      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, visitorId: 0 }]
+      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, visitorId: 0 } as SocialContactsDto]
       return request(app)
         .post(url)
         .send({ notifyBooker: 'yes' })
@@ -181,7 +182,7 @@ describe('Booker management - link visitor with optional notification', () => {
     })
 
     it('should redirect to link approved visitor list page if specified visitor has no DoB', () => {
-      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, dateOfBirth: null }]
+      sessionData.bookerLinkVisitor.nonLinkedContacts = [{ ...visitor, dateOfBirth: null } as SocialContactsDto]
       return request(app)
         .post(url)
         .send({ notifyBooker: 'yes' })

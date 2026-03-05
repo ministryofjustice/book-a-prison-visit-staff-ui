@@ -2915,6 +2915,8 @@ export interface components {
        * @example 2000-01-31
        */
       dateOfBirth?: string
+      /** @description Approved Visitor Flag */
+      approvedVisitor: boolean
       /**
        * Format: date
        * @description Date when visitor was last approved for a visit (approved / auto-approved)
