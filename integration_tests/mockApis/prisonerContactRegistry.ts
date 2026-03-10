@@ -13,7 +13,7 @@ export default {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/contactRegistry/v2/prisoners/${offenderNo}/contacts/social/approved?hasDateOfBirth=false&withAddress=true`,
+        url: `/contactRegistry/v2/prisoners/${offenderNo}/contacts/social/approved?hasDateOfBirth=false&withRestrictions=true`,
       },
       response: {
         status: 200,
