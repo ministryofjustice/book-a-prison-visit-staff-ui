@@ -31,7 +31,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
-          withAddress: 'true',
+          withRestrictions: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, contact)
@@ -48,7 +48,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
-          withAddress: 'true',
+          withRestrictions: 'true',
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)

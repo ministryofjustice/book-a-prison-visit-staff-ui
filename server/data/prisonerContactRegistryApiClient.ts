@@ -20,7 +20,7 @@ export default class PrisonerContactRegistryApiClient {
         path: `/v2/prisoners/${offenderNo}/contacts/social/approved`,
         query: new URLSearchParams({
           hasDateOfBirth: 'false',
-          withAddress: 'true',
+          withRestrictions: 'true',
         }).toString(),
       })
 
