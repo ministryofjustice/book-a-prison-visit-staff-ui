@@ -35,7 +35,7 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.1009.0",
+    "@aws-sdk/client-sqs": "^3.1013.0",
     "@axe-core/playwright": "4.11.1",
     "@ministryofjustice/frontend": "^8.0.1",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.3.2",
@@ -108,7 +108,7 @@
   },
   "overrides": {
     "@ministryofjustice/hmpps-npm-script-allowlist": {
-      "tar": "^7.5.11"
+      "tar": "^7.5.12"
     }
   }
 }
