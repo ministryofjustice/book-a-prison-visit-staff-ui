@@ -104,7 +104,7 @@
     "sass": "^1.98.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   },
   "overrides": {
     "@ministryofjustice/hmpps-npm-script-allowlist": {
