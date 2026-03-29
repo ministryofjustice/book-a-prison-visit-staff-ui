@@ -35,12 +35,12 @@
     "npm": "^11"
   },
   "dependencies": {
-    "@aws-sdk/client-sqs": "^3.1013.0",
+    "@aws-sdk/client-sqs": "^3.1018.0",
     "@axe-core/playwright": "4.11.1",
     "@ministryofjustice/frontend": "^8.0.1",
-    "@ministryofjustice/hmpps-connect-dps-components": "^5.3.2",
+    "@ministryofjustice/hmpps-connect-dps-components": "^5.3.4",
     "@ministryofjustice/hmpps-monitoring": "^1.0.2",
-    "@ministryofjustice/hmpps-rest-client": "^1.1.0",
+    "@ministryofjustice/hmpps-rest-client": "^1.2.0",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.8",
     "bunyan": "^1.8.15",
@@ -108,7 +108,7 @@
   },
   "overrides": {
     "@ministryofjustice/hmpps-npm-script-allowlist": {
-      "tar": "^7.5.12"
+      "tar": "^7.5.13"
     }
   }
 }
