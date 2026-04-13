@@ -233,53 +233,58 @@
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
         {% for visitor in visitDetails.visitors %}
-          <h3 class="govuk-heading-m">
-            <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
-            <span>
-              (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
-            </span>
-          </h3>
-          <dl class="govuk-list bapv-visit-details__person-details">
-            <dt>Date of birth</dt>
-            <dd data-test="visitor-dob-{{ loop.index }}">
-              {{- visitorDateOfBirth(visitor) -}}
-            </dd>
-
-            <dt>Address</dt>
-            <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
-          </dl>
-
-          {# Visitor restrictions #}
-          {% if visitor.restrictions | length %}
-            {% set visitorIndex = loop.index %}
-            <div class="bapv-visit-details__restrictions">
-              {% for restriction in visitor.restrictions %}
-
-                {% if restriction.restrictionId in flaggedVisitorRestrictionIds %}
-                  <p class="bapv-visit-details__restriction--flagged" id="visitor-restriction-{{ restriction.restrictionId }}">This restriction has been added or updated</p>
-                {% endif %}
-
-                <p>
-                  <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
-                    data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
-                    {{- restriction.restrictionTypeDescription -}}
-                  </span>
-                </p>
-
-                <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-comment">
-                  {{- restriction.comment -}}
-                </p>
-
-                <p class="bapv-visit-details__restriction-dates">
-                  Start: <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate('d/M/yyyy') }}</span>
-                  <br>
-                  <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
-                    {%- if restriction.expiryDate %}Ends: {{ restriction.expiryDate | formatDate('d/M/yyyy') -}}{% else %}No end date{% endif -%}
-                  </span>
-                </p>
-              {% endfor %}
-            </div>
+          <div id ="visitor-wrapper">
+          {% if visitor.personId in unapprovedVisitorIds %}
+            <p class="bapv-visit-details__unapproved--flagged">Visitor has been unapproved</p>
           {% endif %}
+            <h3 class="govuk-heading-m">
+              <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
+              <span>
+                (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
+              </span>
+            </h3>
+            <dl class="govuk-list bapv-visit-details__person-details">
+              <dt>Date of birth</dt>
+              <dd data-test="visitor-dob-{{ loop.index }}">
+                {{- visitorDateOfBirth(visitor) -}}
+              </dd>
+
+              <dt>Address</dt>
+              <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
+            </dl>
+
+            {# Visitor restrictions #}
+            {% if visitor.restrictions | length %}
+              {% set visitorIndex = loop.index %}
+              <div class="bapv-visit-details__restrictions">
+                {% for restriction in visitor.restrictions %}
+
+                  {% if restriction.restrictionId in flaggedVisitorRestrictionIds %}
+                    <p class="bapv-visit-details__restriction--flagged" id="visitor-restriction-{{ restriction.restrictionId }}">This restriction has been added or updated</p>
+                  {% endif %}
+
+                  <p>
+                    <span class="govuk-tag restriction-tag restriction-tag--{{ restriction.restrictionType }}"
+                      data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}">
+                      {{- restriction.restrictionTypeDescription -}}
+                    </span>
+                  </p>
+
+                  <p class="bapv-force-overflow" data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-comment">
+                    {{- restriction.comment -}}
+                  </p>
+
+                  <p class="bapv-visit-details__restriction-dates">
+                    Start: <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-start">{{ restriction.startDate | formatDate('d/M/yyyy') }}</span>
+                    <br>
+                    <span data-test="visitor-{{ visitorIndex }}-restriction-{{ loop.index }}-end">
+                      {%- if restriction.expiryDate %}Ends: {{ restriction.expiryDate | formatDate('d/M/yyyy') -}}{% else %}No end date{% endif -%}
+                    </span>
+                  </p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
         {% endfor %}
 
         {# Booking history #}

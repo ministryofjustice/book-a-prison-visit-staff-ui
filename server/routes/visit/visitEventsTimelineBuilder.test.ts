@@ -402,4 +402,29 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
+
+  it('should return a timeline with an event for "Needs review" - Reason: Unapproved visitor', () => {
+    params.events = [
+      {
+        type: 'VISITOR_UNAPPROVED_EVENT',
+        applicationMethodType: 'NOT_APPLICABLE',
+        actionedByFullName: null,
+        userType: 'SYSTEM',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ]
+
+    const expectedTimeline: MojTimelineItem[] = [
+      {
+        label: { text: 'Needs review' },
+        text: `Reason: Unapproved visitor`,
+        datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+        attributes: { 'data-test': 'timeline-entry-0' },
+      },
+    ]
+
+    const timeline = visitEventsTimelineBuilder(params)
+
+    expect(timeline).toStrictEqual(expectedTimeline)
+  })
 })

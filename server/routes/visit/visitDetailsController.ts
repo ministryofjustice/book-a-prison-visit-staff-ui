@@ -5,6 +5,7 @@ import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import {
   getAvailableVisitActions,
   getPrisonerLocation,
+  getUnapprovedVisitorsToFlag,
   getVisitAlerts,
   getVisitorRestrictionIdsToFlag,
 } from './visitUtils'
@@ -48,6 +49,7 @@ export default class VisitDetailsController {
       })
 
       const flaggedVisitorRestrictionIds = getVisitorRestrictionIdsToFlag(visitDetails.notifications)
+      const unapprovedVisitorIds = getUnapprovedVisitorsToFlag(visitDetails.notifications)
 
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,
@@ -71,6 +73,7 @@ export default class VisitDetailsController {
         prisonerLocation,
         visitDetails,
         flaggedVisitorRestrictionIds,
+        unapprovedVisitorIds,
         prisonerId: prisoner.prisonerNumber,
       })
     }

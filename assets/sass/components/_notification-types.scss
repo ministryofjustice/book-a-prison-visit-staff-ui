@@ -13,7 +13,7 @@
     @extend .govuk-tag--yellow;
   }
 
-  &--visitor_restriction {
+  &--visitor_restriction, &--visitor_unapproved_event {
     @extend .govuk-tag--orange;
   }
 }
