@@ -233,10 +233,11 @@
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
         {% for visitor in visitDetails.visitors %}
-          <div id ="visitor-wrapper">
-          {% if visitor.personId in unapprovedVisitorIds %}
-            <p class="bapv-visit-details__unapproved--flagged">Visitor has been unapproved</p>
-          {% endif %}
+          {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
+          <div class="visitor-wrapper {{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
+            {% if flagVisitor %}
+              <p>Visitor has been unapproved</p>
+            {% endif %}
             <h3 class="govuk-heading-m">
               <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
               <span>

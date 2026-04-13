@@ -217,15 +217,16 @@ export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetail
   return Array.from(restrictionIds)
 }
 
+// dual function^^^
 export const getUnapprovedVisitorsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {
-  const restrictionIds = new Set<number>() // only want unique IDs
+  const visitorIds = new Set<number>() // only want unique IDs
   notifications
     .filter(notification => notification.type === 'VISITOR_UNAPPROVED_EVENT')
     .forEach(notification => {
       const restrictionData = notification.additionalData.find(data => data.attributeName === 'VISITOR_ID')
-      restrictionIds.add(parseInt(restrictionData?.attributeValue, 10))
+      visitorIds.add(parseInt(restrictionData?.attributeValue, 10))
     })
-  return Array.from(restrictionIds)
+  return Array.from(visitorIds)
 }
 
 export const isPublicBooking = (events: EventAudit[]): boolean => {

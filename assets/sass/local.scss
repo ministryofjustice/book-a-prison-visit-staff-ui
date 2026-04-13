@@ -280,17 +280,17 @@ p.bapv-visit-details__restriction--flagged {
     padding-bottom: govuk-spacing(3);
 }
 
-div#visitor-wrapper:has(p.bapv-visit-details__unapproved--flagged) {
+.bapv-visit-details__visitor--flagged {
+  p {
+    color: $moj-warning-colour;
+    font-weight: $govuk-font-weight-bold;
+    grid-column-start: span 3;
+    margin-bottom: govuk-spacing(-4);
+  }
   border-left: $govuk-border-width solid $moj-warning-colour;
   padding-left: govuk-spacing(3);
   margin-bottom: govuk-spacing(2);
   padding-bottom: govuk-spacing(0);
-}
-p.bapv-visit-details__unapproved--flagged {
-  color: $moj-warning-colour;
-  font-weight: $govuk-font-weight-bold;
-  grid-column-start: span 3;
-  margin-bottom: govuk-spacing(-4);
 }
 
 .bapv-visit-details__alert-dates, .bapv-visit-details__restriction-dates {
