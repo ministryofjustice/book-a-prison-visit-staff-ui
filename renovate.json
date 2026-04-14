@@ -15,7 +15,7 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non major NPM dependencies",
       "groupSlug": "all-npm-minor-patch",
-      "minimumReleaseAge": "3 days"
+      "stabilityDays": 7
     },
     {
       "matchDepTypes": ["engines"],
@@ -24,7 +24,7 @@
     {
       "matchPackageNames": ["typescript", "govuk-frontend"],
       "rangeStrategy": "bump",
-      "minimumReleaseAge": null
+      "stabilityDays": 0
     },
     {
       "matchManagers": ["npm"],
@@ -34,12 +34,21 @@
     },
     {
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["node"],
+      "matchPackageNames": ["node", "hmpps-node"],
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchFileNames": ["**/.github/workflows/**/*.ya?ml"],
+      "separateMinorPatch": true
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "groupName": "all pre-commit dependencies"
     }
   ],
   "vulnerabilityAlerts": {
-    "minimumReleaseAge": null
+    "stabilityDays": 0
   }
 }
