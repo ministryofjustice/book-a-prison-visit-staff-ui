@@ -2,7 +2,12 @@ import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import {
+  EventAudit,
+  NotificationType,
+  VisitBookingDetails,
+  VisitNotificationEventAttributeNames,
+} from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_MS = config.visit.cancellationLimitDays * A_DAY_IN_MS
@@ -166,7 +171,7 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
   })
 
   if (groupedNotifications.length) {
-    const visitorRestrictionIds = getVisitorRestrictionIdsToFlag(groupedNotifications)
+    const visitorRestrictionIds = getIdsToFlag('VISITOR_RESTRICTION', 'VISITOR_RESTRICTION_ID', groupedNotifications)
 
     const restrictionListItems = visitorRestrictionIds
       .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
@@ -206,27 +211,19 @@ export const getVisitAlerts = (visitDetails: VisitBookingDetails): MoJAlert[] =>
   ]
 }
 
-export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {
-  const restrictionIds = new Set<number>() // only want unique IDs
+export const getIdsToFlag = (
+  notificationType: NotificationType,
+  returnedIdType: Extract<VisitNotificationEventAttributeNames, 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID'>,
+  notifications: VisitBookingDetails['notifications'],
+): number[] => {
+  const flaggedIds = new Set<number>() // only want unique IDs
   notifications
-    .filter(notification => notification.type === 'VISITOR_RESTRICTION')
+    .filter(notification => notification.type === notificationType)
     .forEach(notification => {
-      const restrictionData = notification.additionalData.find(data => data.attributeName === 'VISITOR_RESTRICTION_ID')
-      restrictionIds.add(parseInt(restrictionData?.attributeValue, 10))
+      const matchedNotifications = notification.additionalData.find(data => data.attributeName === returnedIdType)
+      flaggedIds.add(parseInt(matchedNotifications?.attributeValue, 10))
     })
-  return Array.from(restrictionIds)
-}
-
-// dual function^^^
-export const getUnapprovedVisitorsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {
-  const visitorIds = new Set<number>() // only want unique IDs
-  notifications
-    .filter(notification => notification.type === 'VISITOR_UNAPPROVED_EVENT')
-    .forEach(notification => {
-      const restrictionData = notification.additionalData.find(data => data.attributeName === 'VISITOR_ID')
-      visitorIds.add(parseInt(restrictionData?.attributeValue, 10))
-    })
-  return Array.from(visitorIds)
+  return Array.from(flaggedIds)
 }
 
 export const isPublicBooking = (events: EventAudit[]): boolean => {

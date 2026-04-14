@@ -2,13 +2,7 @@ import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import {
-  getAvailableVisitActions,
-  getPrisonerLocation,
-  getUnapprovedVisitorsToFlag,
-  getVisitAlerts,
-  getVisitorRestrictionIdsToFlag,
-} from './visitUtils'
+import { getAvailableVisitActions, getIdsToFlag, getPrisonerLocation, getVisitAlerts } from './visitUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
@@ -48,8 +42,12 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const flaggedVisitorRestrictionIds = getVisitorRestrictionIdsToFlag(visitDetails.notifications)
-      const unapprovedVisitorIds = getUnapprovedVisitorsToFlag(visitDetails.notifications)
+      const flaggedVisitorRestrictionIds = getIdsToFlag(
+        'VISITOR_RESTRICTION',
+        'VISITOR_RESTRICTION_ID',
+        visitDetails.notifications,
+      )
+      const unapprovedVisitorIds = getIdsToFlag('VISITOR_UNAPPROVED_EVENT', 'VISITOR_ID', visitDetails.notifications)
 
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,

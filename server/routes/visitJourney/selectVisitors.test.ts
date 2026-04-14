@@ -363,9 +363,10 @@ testJourneys.forEach(journey => {
           expect($('.govuk-error-summary__body').text()).toContain('No visitors selected')
           expect($('.govuk-error-summary__body a').attr('href')).toBe('#visitors-error')
           expect($('#visitors-error').text()).toContain('No visitors selected')
+          expect(flashProvider).toHaveBeenCalledWith('messages')
           expect(flashProvider).toHaveBeenCalledWith('errors')
           expect(flashProvider).toHaveBeenCalledWith('formValues')
-          expect(flashProvider).toHaveBeenCalledTimes(2)
+          expect(flashProvider).toHaveBeenCalledTimes(3)
         })
     })
 

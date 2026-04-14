@@ -1,4 +1,5 @@
 {% extends "layout.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "components/visitors.njk" import visitorDateOfBirth, visitorRestrictions %}
@@ -59,6 +60,12 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
+
       {% include "partials/errorSummary.njk" %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>

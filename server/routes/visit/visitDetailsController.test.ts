@@ -18,7 +18,7 @@ const visitService = createMockVisitService()
 let availableVisitActions: AvailableVisitActions
 let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
-let visitorRestrictionIdsToFlag: number[]
+let flaggedVisitorRestrictionIds: number[]
 
 jest.mock('./visitEventsTimelineBuilder', () => {
   return {
@@ -33,7 +33,7 @@ jest.mock('./visitUtils', () => {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
     getVisitAlerts: () => visitAlerts,
-    getVisitorRestrictionIdsToFlag: () => visitorRestrictionIdsToFlag,
+    getIdsToFlag: () => flaggedVisitorRestrictionIds,
   }
 })
 
@@ -58,7 +58,7 @@ describe('Visit details page', () => {
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
     visitAlerts = []
-    visitorRestrictionIdsToFlag = []
+    flaggedVisitorRestrictionIds = []
 
     visitDetails = TestData.visitBookingDetails()
 
@@ -385,7 +385,7 @@ describe('Visit details page', () => {
           TestData.restriction({ restrictionId: 2 }),
         ]
 
-        visitorRestrictionIdsToFlag = [2]
+        flaggedVisitorRestrictionIds = [2]
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
