@@ -73,7 +73,11 @@ export default class UpdateVisitController {
         publicBooker: isPublicBooking(visitDetails.events),
       }
 
-      const unapprovedVisitorIds = getIdsToFlag('VISITOR_UNAPPROVED_EVENT', 'VISITOR_ID', visitDetails.notifications)
+      const unapprovedVisitorIds = getIdsToFlag({
+        notificationType: 'VISITOR_UNAPPROVED_EVENT',
+        returnedIdType: 'VISITOR_ID',
+        notifications: visitDetails.notifications,
+      })
       const unapprovedVisitors = visitDetails.visitors.filter(visitor =>
         unapprovedVisitorIds.includes(visitor.personId),
       )

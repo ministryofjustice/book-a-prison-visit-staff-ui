@@ -234,7 +234,7 @@
         <h2 class="govuk-heading-l">Visitors</h2>
         {% for visitor in visitDetails.visitors %}
           {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
-          <div class="visitor-wrapper {{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
+          <div id="visitor-wrapper-{{ visitor.personId }}" class="{{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
             {% if flagVisitor %}
               <p>Visitor has been unapproved</p>
             {% endif %}

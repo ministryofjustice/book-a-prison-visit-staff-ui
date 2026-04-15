@@ -411,7 +411,9 @@ describe('Visit utils', () => {
         },
       ]
 
-      expect(getIdsToFlag(visitorRestriction, visitorRestrictionId, notifications)).toStrictEqual([1, 2])
+      expect(
+        getIdsToFlag({ notificationType: visitorRestriction, returnedIdType: visitorRestrictionId, notifications }),
+      ).toStrictEqual([1, 2])
     })
 
     it(`should return ${visitorId} if notification exists for ${visitorUnapprovedEvent}`, () => {
@@ -433,7 +435,9 @@ describe('Visit utils', () => {
         },
       ]
 
-      expect(getIdsToFlag(visitorUnapprovedEvent, visitorId, notifications)).toStrictEqual([100, 200])
+      expect(
+        getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
+      ).toStrictEqual([100, 200])
     })
   })
 
