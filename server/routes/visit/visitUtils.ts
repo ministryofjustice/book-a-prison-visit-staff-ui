@@ -182,33 +182,26 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
       notifications: linkedNotifications,
     })
 
+    let notificationItems = ''
     if (visitorRestrictionIds.length) {
-      const restrictionListItems = visitorRestrictionIds
+      notificationItems += visitorRestrictionIds
         .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
         .join('')
-
-      alerts.push({
-        variant: 'warning',
-        title: 'This visit needs review',
-        showTitleAsHeading: true,
-        html: `<ul class="govuk-list">${restrictionListItems}</ul>`,
-        classes: 'notifications-summary-alert',
-      } as MoJAlert)
     }
 
     if (unapprovedVisitorIds.length) {
-      const unapprovedListItems = unapprovedVisitorIds
+      notificationItems += unapprovedVisitorIds
         .map(id => `<li><a href="#visitor-wrapper-${id}">Visitor has been unapproved</a></li>`)
         .join('')
-
-      alerts.push({
-        variant: 'warning',
-        title: 'This visit needs review',
-        showTitleAsHeading: true,
-        html: `<ul class="govuk-list">${unapprovedListItems}</ul>`,
-        classes: 'notifications-summary-alert',
-      } as MoJAlert)
     }
+
+    alerts.push({
+      variant: 'warning',
+      title: 'This visit needs review',
+      showTitleAsHeading: true,
+      html: `<ul class="govuk-list">${notificationItems}</ul>`,
+      classes: 'notifications-summary-alert',
+    } as MoJAlert)
   }
 
   return alerts

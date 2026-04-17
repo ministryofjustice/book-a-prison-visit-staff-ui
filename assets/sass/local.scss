@@ -257,10 +257,6 @@
   display: grid;
   grid-template-columns: 17% auto 17%;
   gap: govuk-spacing(4) govuk-spacing(4);
-
-  & p {
-    margin-bottom: 0;
-  }
 }
 
 .bapv-visit-details__person-details + .bapv-visit-details__restrictions {
@@ -281,12 +277,13 @@ p.bapv-visit-details__restriction--flagged {
 }
 
 .bapv-visit-details__visitor--flagged {
-  p {
-    color: $moj-warning-colour;
+  p:first-child {
     font-weight: $govuk-font-weight-bold;
     grid-column-start: span 3;
+    color: $moj-warning-colour;
     margin-bottom: govuk-spacing(-4);
   }
+
   border-left: $govuk-border-width solid $moj-warning-colour;
   padding-left: govuk-spacing(3);
   margin-bottom: govuk-spacing(2);
@@ -296,7 +293,6 @@ p.bapv-visit-details__restriction--flagged {
 .bapv-visit-details__alert-dates, .bapv-visit-details__restriction-dates {
   color:  $govuk-secondary-text-colour;
 }
-
 
 .bapv-visit-details {
   & .moj-timeline__title {

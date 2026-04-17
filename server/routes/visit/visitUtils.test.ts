@@ -340,6 +340,32 @@ describe('Visit utils', () => {
               },
             ],
           ],
+          [
+            'visitor restriction and visitor unapproved notifications',
+            [
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+              },
+              {
+                type: 'VISITOR_UNAPPROVED_EVENT',
+                additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '3' }],
+              },
+            ],
+            [
+              {
+                variant: 'warning',
+                title: 'This visit needs review',
+                showTitleAsHeading: true,
+                html:
+                  '<ul class="govuk-list">' +
+                  '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+                  '<li><a href="#visitor-wrapper-3">Visitor has been unapproved</a></li>' +
+                  '</ul>',
+                classes: 'notifications-summary-alert',
+              },
+            ],
+          ],
         ])(
           'should handle %s',
           (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
