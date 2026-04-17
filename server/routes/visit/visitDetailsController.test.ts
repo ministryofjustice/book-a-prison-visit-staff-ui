@@ -420,7 +420,7 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('#visitor-wrapper-4321').hasClass('bapv-visit-details__visitor--flagged')).toBe(true)
+            expect($('.bapv-visit-details__visitor--flagged #visitor-4321').length).toBe(1)
             expect($('.bapv-visit-details__visitor--flagged').text()).toContain('Visitor has been unapproved')
           })
       })

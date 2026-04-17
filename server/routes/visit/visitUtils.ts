@@ -147,7 +147,8 @@ const getVisitRequestAlert = ({
 }
 
 const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
-  // split notifications into those that should be a single alert and those to be grouped into one alert
+  // simpleNotifications are simple descriptive notifications
+  // linkedNotifications are notifications with anchors to restrictions/visitors on the page
   const simpleNotifications: VisitBookingDetails['notifications'] = []
   const linkedNotifications: VisitBookingDetails['notifications'] = []
   notifications.forEach(notification => {
@@ -182,18 +183,13 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
       notifications: linkedNotifications,
     })
 
-    let notificationItems = ''
-    if (visitorRestrictionIds.length) {
-      notificationItems += visitorRestrictionIds
-        .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
-        .join('')
-    }
+    let notificationItems = visitorRestrictionIds
+      .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
+      .join('')
 
-    if (unapprovedVisitorIds.length) {
-      notificationItems += unapprovedVisitorIds
-        .map(id => `<li><a href="#visitor-wrapper-${id}">Visitor has been unapproved</a></li>`)
-        .join('')
-    }
+    notificationItems += unapprovedVisitorIds
+      .map(id => `<li><a href="#visitor-${id}">Visitor has been unapproved</a></li>`)
+      .join('')
 
     alerts.push({
       variant: 'warning',

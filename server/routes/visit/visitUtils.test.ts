@@ -360,7 +360,7 @@ describe('Visit utils', () => {
                 html:
                   '<ul class="govuk-list">' +
                   '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
-                  '<li><a href="#visitor-wrapper-3">Visitor has been unapproved</a></li>' +
+                  '<li><a href="#visitor-3">Visitor has been unapproved</a></li>' +
                   '</ul>',
                 classes: 'notifications-summary-alert',
               },
