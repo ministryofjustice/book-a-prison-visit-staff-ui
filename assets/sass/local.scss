@@ -257,6 +257,11 @@
   display: grid;
   grid-template-columns: 17% auto 17%;
   gap: govuk-spacing(4) govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+
+  & p {
+    margin-bottom: 0;
+  }
 }
 
 .bapv-visit-details__person-details + .bapv-visit-details__restrictions {
