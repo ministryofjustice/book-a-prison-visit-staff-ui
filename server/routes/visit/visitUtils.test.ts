@@ -285,7 +285,7 @@ describe('Visit utils', () => {
         )
       })
 
-      describe('Visitor restriction notification(s) => single alert with grouped restrictions', () => {
+      describe('Mixed notifications', () => {
         it.each([
           [
             'a single visitor restriction notification',
