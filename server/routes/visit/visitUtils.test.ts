@@ -149,6 +149,14 @@ describe('Visit utils', () => {
           ] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
         })
+
+        it('should set clearNotifications to false if visit notifications includes VISITOR_UNAPPROVED_EVENT', () => {
+          params.notifications = [
+            { type: 'NON_ASSOCIATION_EVENT' },
+            { type: 'VISITOR_UNAPPROVED_EVENT' },
+          ] as VisitBookingDetails['notifications']
+          expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
       })
     })
   })

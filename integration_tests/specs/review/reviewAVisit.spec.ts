@@ -62,6 +62,9 @@ test.describe('Review a visit', () => {
 
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.PRISONER_RECEIVED_EVENT)
 
+    await expect(visitDetailsPage.updateBooking).not.toBeInViewport()
+    await expect(visitDetailsPage.cancelBooking).toBeInViewport()
+    await expect(visitDetailsPage.clearNotifications).toBeInViewport()
     await visitDetailsPage.clearNotifications.click()
 
     // Stub ignore notifications
@@ -100,5 +103,57 @@ test.describe('Review a visit', () => {
     await expect(visitDetailsPage.actionedBy(0)).toContainText('User One')
     await expect(visitDetailsPage.eventTime(0)).toContainText('Thursday 11 April 2024 at 11am')
     await expect(visitDetailsPage.eventDescription(0)).toContainText('some reason')
+  })
+
+  test(`should not have ability to select 'do not change' option, when visit unapproved event causes visit needing review`, async ({
+    page,
+  }) => {
+    const visitDetails = TestData.visitBookingDetailsRaw({
+      startTimestamp: `${futureVisitDate}T12:00:00`,
+      endTimestamp: `${futureVisitDate}T14:00:00`,
+      events: [
+        {
+          type: 'BOOKED_VISIT',
+          applicationMethodType: 'PHONE',
+          actionedByFullName: 'User One',
+          userType: 'STAFF',
+          createTimestamp: '2024-04-11T09:00:00',
+        },
+        {
+          type: 'VISITOR_UNAPPROVED_EVENT',
+          applicationMethodType: 'NOT_APPLICABLE',
+          actionedByFullName: '',
+          userType: 'SYSTEM',
+          createTimestamp: '2024-04-11T10:00:00',
+        },
+      ],
+      notifications: [
+        {
+          type: 'VISITOR_UNAPPROVED_EVENT',
+          createdDateTime: '',
+          additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '4321' }],
+        },
+      ],
+    })
+
+    await orchestrationApi.stubGetVisitDetailed(visitDetails)
+
+    // Visit booking summary page
+    await page.goto('/visit/ab-cd-ef-gh')
+
+    const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'Visit booking details')
+
+    await expect(visitDetailsPage.messages.first()).toContainText(notificationTypeAlerts.VISITOR_UNAPPROVED_EVENT.title)
+
+    await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
+
+    await expect(visitDetailsPage.updateBooking).toBeInViewport()
+    await expect(visitDetailsPage.cancelBooking).toBeInViewport()
+    await expect(visitDetailsPage.clearNotifications).not.toBeInViewport()
+
+    await expect(visitDetailsPage.messages).toHaveCount(1)
+    await expect(visitDetailsPage.eventHeader(0)).toContainText(eventAuditTypes.VISITOR_UNAPPROVED_EVENT)
+    await expect(visitDetailsPage.eventTime(0)).toContainText('Thursday 11 April 2024 at 10am')
+    await expect(visitDetailsPage.eventDescription(0)).toContainText('Reason: Unapproved visitor')
   })
 })
