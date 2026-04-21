@@ -91,6 +91,7 @@ describe('Start a visit update journey', () => {
             visitReference: 'ab-cd-ef-gh',
             publicBooker: false,
           })
+          expect(flashProvider).not.toHaveBeenCalled()
         })
     })
 
