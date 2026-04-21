@@ -141,7 +141,7 @@ test.describe('Review a visit', () => {
 
     const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'Visit booking details')
 
-    await expect(visitDetailsPage.messages.first()).toContainText(notificationTypeAlerts.VISITOR_UNAPPROVED_EVENT.title)
+    await expect(visitDetailsPage.messages.first()).toContainText('This visit needs review')
 
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
 
@@ -152,6 +152,6 @@ test.describe('Review a visit', () => {
     await expect(visitDetailsPage.messages).toHaveCount(1)
     await expect(visitDetailsPage.eventHeader(0)).toContainText(eventAuditTypes.VISITOR_UNAPPROVED_EVENT)
     await expect(visitDetailsPage.eventTime(0)).toContainText('Thursday 11 April 2024 at 10am')
-    await expect(visitDetailsPage.eventDescription(0)).toContainText('Reason: Unapproved visitor')
+    await expect(visitDetailsPage.eventDescription(0)).toContainText('Reason: Visitor unapproved')
   })
 })
