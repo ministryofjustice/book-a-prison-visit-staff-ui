@@ -7,7 +7,7 @@ export const notificationTypes: Partial<Record<NotificationType, string>> = {
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
   PRISONER_RECEIVED_EVENT: 'Prisoner transferred',
   VISITOR_RESTRICTION: 'Visitor restriction',
-  VISITOR_UNAPPROVED_EVENT: 'Unapproved visitor',
+  VISITOR_UNAPPROVED_EVENT: 'Visitor unapproved',
 }
 
 // used on visits to review listing page
@@ -42,12 +42,6 @@ export const notificationTypeAlerts: Partial<Record<NotificationType, MoJAlert>>
     text: 'A new visit time should be selected.',
   },
 
-  VISITOR_UNAPPROVED_EVENT: {
-    variant: 'warning',
-    title: 'This visit needs review',
-    showTitleAsHeading: true,
-    text: 'Visitor has been unapproved.',
-  },
-
+  // VISITOR_UNAPPROVED_EVENT: handled in getVisitNotificationsAlerts()
   // VISITOR_RESTRICTION: handled in getVisitNotificationsAlerts()
 }

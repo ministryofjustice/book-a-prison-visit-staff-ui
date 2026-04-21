@@ -1,14 +1,15 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, user } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
-import { VisitSessionData } from '../../@types/bapv'
+import { MoJAlert, VisitSessionData } from '../../@types/bapv'
 import { clearSession } from '../visitorUtils'
 import TestData from '../testutils/testData'
 import { createMockVisitService } from '../../services/testutils/mocks'
 
 let app: Express
+let flashData: FlashData
 
 const visitService = createMockVisitService()
 
@@ -28,6 +29,9 @@ jest.mock('../visitorUtils', () => {
 beforeEach(() => {
   const fakeDate = new Date('2022-01-01T08:00:00')
   jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
+
+  flashData = {}
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitDetails = TestData.visitBookingDetails()
   visitSessionData = {} as VisitSessionData
@@ -86,6 +90,36 @@ describe('Start a visit update journey', () => {
             },
             visitReference: 'ab-cd-ef-gh',
             publicBooker: false,
+          })
+        })
+    })
+
+    it('should set flash message for "visitor unapproved event" to be rendered on select visitors page', () => {
+      visitDetails.notifications = [
+        {
+          type: 'VISITOR_UNAPPROVED_EVENT',
+          additionalData: [
+            {
+              attributeName: 'VISITOR_ID',
+              attributeValue: '4321',
+            },
+          ],
+          createdDateTime: '2023-01-14T10:00:00',
+        },
+      ]
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update')
+        .expect(302)
+        .expect('location', '/update-a-visit/select-visitors')
+        .expect(res => {
+          expect(clearSession).toHaveBeenCalledTimes(1)
+          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ username: 'user1', reference: 'ab-cd-ef-gh' })
+          expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
+            variant: 'information',
+            title: 'Jeanette Smith has been unapproved',
+            text: 'Complete the update to remove them from the visit.',
+            showTitleAsHeading: true,
           })
         })
     })

@@ -62,9 +62,9 @@ test.describe('Review a visit', () => {
 
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.PRISONER_RECEIVED_EVENT)
 
-    await expect(visitDetailsPage.updateBooking).not.toBeInViewport()
-    await expect(visitDetailsPage.cancelBooking).toBeInViewport()
-    await expect(visitDetailsPage.clearNotifications).toBeInViewport()
+    await expect(visitDetailsPage.updateBooking).toHaveCount(0)
+    await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
+    await expect(visitDetailsPage.clearNotifications).toHaveCount(1)
     await visitDetailsPage.clearNotifications.click()
 
     // Stub ignore notifications
@@ -105,9 +105,7 @@ test.describe('Review a visit', () => {
     await expect(visitDetailsPage.eventDescription(0)).toContainText('some reason')
   })
 
-  test(`should not have ability to select 'do not change' option, when visit unapproved event causes visit needing review`, async ({
-    page,
-  }) => {
+  test('should not render "Do not change" button if there is a visitor unapproved event', async ({ page }) => {
     const visitDetails = TestData.visitBookingDetailsRaw({
       startTimestamp: `${futureVisitDate}T12:00:00`,
       endTimestamp: `${futureVisitDate}T14:00:00`,
@@ -147,9 +145,9 @@ test.describe('Review a visit', () => {
 
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
 
-    await expect(visitDetailsPage.updateBooking).toBeInViewport()
-    await expect(visitDetailsPage.cancelBooking).toBeInViewport()
-    await expect(visitDetailsPage.clearNotifications).not.toBeInViewport()
+    await expect(visitDetailsPage.updateBooking).toHaveCount(1)
+    await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
+    await expect(visitDetailsPage.clearNotifications).toHaveCount(0)
 
     await expect(visitDetailsPage.messages).toHaveCount(1)
     await expect(visitDetailsPage.eventHeader(0)).toContainText(eventAuditTypes.VISITOR_UNAPPROVED_EVENT)
