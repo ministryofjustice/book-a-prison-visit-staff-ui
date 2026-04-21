@@ -95,13 +95,13 @@ test.describe('Bookings review listing page', () => {
     // Filter by user
     await listingPage.filterByUser('User One')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('User One')
 
     // Filter by reason
     await listingPage.filterByReason('Time slot removed')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('Time slot removed')
 
     // Filter by both

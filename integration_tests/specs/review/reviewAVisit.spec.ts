@@ -63,8 +63,8 @@ test.describe('Review a visit', () => {
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.PRISONER_RECEIVED_EVENT)
 
     await expect(visitDetailsPage.updateBooking).toHaveCount(0)
-    await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
-    await expect(visitDetailsPage.clearNotifications).toHaveCount(1)
+    await expect(visitDetailsPage.cancelBooking).toBeVisible()
+    await expect(visitDetailsPage.clearNotifications).toBeVisible()
     await visitDetailsPage.clearNotifications.click()
 
     // Stub ignore notifications
@@ -145,11 +145,11 @@ test.describe('Review a visit', () => {
 
     await expect(visitDetailsPage.eventDescription(0)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
 
-    await expect(visitDetailsPage.updateBooking).toHaveCount(1)
-    await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
+    await expect(visitDetailsPage.updateBooking).toBeVisible()
+    await expect(visitDetailsPage.cancelBooking).toBeVisible()
     await expect(visitDetailsPage.clearNotifications).toHaveCount(0)
 
-    await expect(visitDetailsPage.messages).toHaveCount(1)
+    await expect(visitDetailsPage.messages).toBeVisible()
     await expect(visitDetailsPage.eventHeader(0)).toContainText(eventAuditTypes.VISITOR_UNAPPROVED_EVENT)
     await expect(visitDetailsPage.eventTime(0)).toContainText('Thursday 11 April 2024 at 10am')
     await expect(visitDetailsPage.eventDescription(0)).toContainText('Reason: Visitor unapproved')
