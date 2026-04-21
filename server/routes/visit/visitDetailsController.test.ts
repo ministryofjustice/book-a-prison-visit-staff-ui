@@ -18,7 +18,7 @@ const visitService = createMockVisitService()
 let availableVisitActions: AvailableVisitActions
 let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
-let visitorRestrictionIdsToFlag: number[]
+let idsToFlag: jest.Mock
 
 jest.mock('./visitEventsTimelineBuilder', () => {
   return {
@@ -33,7 +33,7 @@ jest.mock('./visitUtils', () => {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
     getVisitAlerts: () => visitAlerts,
-    getVisitorRestrictionIdsToFlag: () => visitorRestrictionIdsToFlag,
+    getIdsToFlag: () => idsToFlag(),
   }
 })
 
@@ -58,7 +58,7 @@ describe('Visit details page', () => {
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
     visitAlerts = []
-    visitorRestrictionIdsToFlag = []
+    idsToFlag = jest.fn().mockReturnValue([])
 
     visitDetails = TestData.visitBookingDetails()
 
@@ -385,7 +385,10 @@ describe('Visit details page', () => {
           TestData.restriction({ restrictionId: 2 }),
         ]
 
-        visitorRestrictionIdsToFlag = [2]
+        idsToFlag = jest
+          .fn<number[], []>()
+          .mockReturnValueOnce([2]) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -400,6 +403,25 @@ describe('Visit details page', () => {
             expect($('.bapv-visit-details__restriction--flagged').text()).toBe(
               'This restriction has been added or updated',
             )
+          })
+      })
+    })
+
+    describe('Flag visitor unapproved', () => {
+      it('should flag a visitor', () => {
+        idsToFlag = jest
+          .fn<number[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce([4321]) //  unapproved returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__visitor--flagged #visitor-4321').length).toBe(1)
+            expect($('.bapv-visit-details__visitor--flagged').text()).toContain('Visitor has been unapproved')
           })
       })
     })

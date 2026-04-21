@@ -5,7 +5,7 @@ import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { clearSession } from '../visitorUtils'
 import { VisitSessionData } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
-import { getPrisonerLocation, isPublicBooking } from './visitUtils'
+import { getIdsToFlag, getPrisonerLocation, isPublicBooking } from './visitUtils'
 
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
@@ -72,6 +72,24 @@ export default class UpdateVisitController {
         visitReference: visitDetails.reference,
         publicBooker: isPublicBooking(visitDetails.events),
       }
+
+      const unapprovedVisitorIds = getIdsToFlag({
+        notificationType: 'VISITOR_UNAPPROVED_EVENT',
+        returnedIdType: 'VISITOR_ID',
+        notifications: visitDetails.notifications,
+      })
+      const unapprovedVisitors = visitDetails.visitors.filter(visitor =>
+        unapprovedVisitorIds.includes(visitor.personId),
+      )
+
+      unapprovedVisitors.forEach(visitor => {
+        req.flash('messages', {
+          variant: 'information',
+          title: `${visitor.firstName} ${visitor.lastName} has been unapproved`,
+          showTitleAsHeading: true,
+          text: 'Complete the update to remove them from the visit.',
+        })
+      })
 
       req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 

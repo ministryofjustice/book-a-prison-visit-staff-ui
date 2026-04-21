@@ -8,8 +8,8 @@ import {
   getAvailableVisitActions,
   AvailableVisitActions,
   isPublicBooking,
-  getVisitorRestrictionIdsToFlag,
   getVisitAlerts,
+  getIdsToFlag,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -149,6 +149,14 @@ describe('Visit utils', () => {
           ] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
         })
+
+        it('should set clearNotifications to false if visit notifications includes VISITOR_UNAPPROVED_EVENT', () => {
+          params.notifications = [
+            { type: 'NON_ASSOCIATION_EVENT' },
+            { type: 'VISITOR_UNAPPROVED_EVENT' },
+          ] as VisitBookingDetails['notifications']
+          expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
       })
     })
   })
@@ -285,7 +293,7 @@ describe('Visit utils', () => {
         )
       })
 
-      describe('Visitor restriction notification(s) => single alert with grouped restrictions', () => {
+      describe('Mixed notifications', () => {
         it.each([
           [
             'a single visitor restriction notification',
@@ -340,6 +348,32 @@ describe('Visit utils', () => {
               },
             ],
           ],
+          [
+            'visitor restriction and visitor unapproved notifications',
+            [
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+              },
+              {
+                type: 'VISITOR_UNAPPROVED_EVENT',
+                additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '3' }],
+              },
+            ],
+            [
+              {
+                variant: 'warning',
+                title: 'This visit needs review',
+                showTitleAsHeading: true,
+                html:
+                  '<ul class="govuk-list">' +
+                  '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+                  '<li><a href="#visitor-3">Visitor has been unapproved</a></li>' +
+                  '</ul>',
+                classes: 'notifications-summary-alert',
+              },
+            ],
+          ],
         ])(
           'should handle %s',
           (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
@@ -384,28 +418,60 @@ describe('Visit utils', () => {
       })
     })
   })
+  describe('getIdsToFlag', () => {
+    // flaggedVisitorRestrictionIds
+    const visitorRestrictionId = 'VISITOR_RESTRICTION_ID'
+    const visitorRestriction = 'VISITOR_RESTRICTION'
+    // unapprovedVisitorIds
+    const visitorId = 'VISITOR_ID'
+    const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
 
-  describe('getVisitorRestrictionIdsToFlag', () => {
-    it('should extract unique visitor restriction IDs if present from list of visit notifications', () => {
+    it(`should return ${visitorRestrictionId} if notification exists for ${visitorRestriction}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
         // should be ignored as not a VISITOR_RESTRICTION
         { type: 'PRISONER_RELEASED_EVENT' },
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '1' }],
         },
         // a duplicate VISITOR_RESTRICTION_ID - should be ignored
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '1' }],
         },
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '2' }],
         },
       ]
 
-      expect(getVisitorRestrictionIdsToFlag(notifications)).toStrictEqual([1, 2])
+      expect(
+        getIdsToFlag({ notificationType: visitorRestriction, returnedIdType: visitorRestrictionId, notifications }),
+      ).toStrictEqual([1, 2])
+    })
+
+    it(`should return ${visitorId} if notification exists for ${visitorUnapprovedEvent}`, () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a VISITOR_UNAPPROVED_EVENT
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '100' }],
+        },
+        // a duplicate VISITOR_ID - should be ignored
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '100' }],
+        },
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '200' }],
+        },
+      ]
+
+      expect(
+        getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
+      ).toStrictEqual([100, 200])
     })
   })
 

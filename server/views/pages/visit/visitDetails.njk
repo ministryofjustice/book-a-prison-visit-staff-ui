@@ -233,21 +233,27 @@
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
         {% for visitor in visitDetails.visitors %}
-          <h3 class="govuk-heading-m">
-            <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
-            <span>
-              (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
-            </span>
-          </h3>
-          <dl class="govuk-list bapv-visit-details__person-details">
-            <dt>Date of birth</dt>
-            <dd data-test="visitor-dob-{{ loop.index }}">
-              {{- visitorDateOfBirth(visitor) -}}
-            </dd>
+          {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
+          <div class="{{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
+            {% if flagVisitor %}
+              <p id="visitor-{{ visitor.personId }}">Visitor has been unapproved</p>
+            {% endif %}
+            <h3 class="govuk-heading-m">
+              <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
+              <span>
+                (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
+              </span>
+            </h3>
+            <dl class="govuk-list bapv-visit-details__person-details">
+              <dt>Date of birth</dt>
+              <dd data-test="visitor-dob-{{ loop.index }}">
+                {{- visitorDateOfBirth(visitor) -}}
+              </dd>
 
-            <dt>Address</dt>
-            <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
-          </dl>
+              <dt>Address</dt>
+              <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
+            </dl>
+          </div>
 
           {# Visitor restrictions #}
           {% if visitor.restrictions | length %}

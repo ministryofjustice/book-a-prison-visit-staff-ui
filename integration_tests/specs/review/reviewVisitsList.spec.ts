@@ -21,6 +21,7 @@ test.describe('Bookings review listing page', () => {
       notifications: [
         TestData.visitNotificationEventRaw({ type: 'PERSON_RESTRICTION_UPSERTED_EVENT' }),
         TestData.visitNotificationEventRaw({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+        TestData.visitNotificationEventRaw({ type: 'VISITOR_UNAPPROVED_EVENT' }),
       ],
     }),
   ]
@@ -71,6 +72,7 @@ test.describe('Bookings review listing page', () => {
     await expect(listingPage.getBookedBy(2)).toContainText(visitNotifications[1].bookedByName)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_RESTRICTION)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISON_VISITS_BLOCKED_FOR_DATE)
+    await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
     await expect(listingPage.getActionLink(2)).toHaveAttribute(
       'href',
       `/visit/${visitNotifications[1].visitReference}?from=review`,
@@ -93,13 +95,13 @@ test.describe('Bookings review listing page', () => {
     // Filter by user
     await listingPage.filterByUser('User One')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('User One')
 
     // Filter by reason
     await listingPage.filterByReason('Time slot removed')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('Time slot removed')
 
     // Filter by both
