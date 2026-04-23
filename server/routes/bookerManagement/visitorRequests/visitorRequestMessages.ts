@@ -8,7 +8,7 @@ const bookerNotifiedHtml = (bookerReference: string): string =>
 export const requestAlreadyReviewedMessage = (): MoJAlert => ({
   variant: 'information',
   title: 'Request already reviewed',
-  text: 'The selected request has already been reviewed by another staff member.',
+  text: 'The selected request has already been reviewed.',
 })
 
 export const requestApprovedMessage = (visitorRequest: PrisonVisitorRequestDto): MoJAlert => ({
