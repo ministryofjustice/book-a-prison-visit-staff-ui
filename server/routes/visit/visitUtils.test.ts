@@ -10,6 +10,7 @@ import {
   isPublicBooking,
   getVisitAlerts,
   getIdsToFlag,
+  hideAlertsInset,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -507,6 +508,62 @@ describe('Visit utils', () => {
 
       const publicBooker = isPublicBooking(events)
       expect(publicBooker).toStrictEqual(false)
+    })
+  })
+
+  describe('hideAlertsInset', () => {
+    it('should return "PAST" if startTimestamp is in the past (2AM visit, 2PM current time)', () => {
+      const fakeDate = new Date('2026-01-01T14:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T02:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'HEI'
+
+      const reason = hideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      expect(reason).toStrictEqual(
+        '<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="https://contacts-dev.hmpps.service.justice.gov.uk">contacts service</a>.',
+      )
+      jest.useRealTimers()
+    })
+
+    it('should NOT return "PAST" if startTimestamp is in the future (10PM visit, 10am current time)', () => {
+      const fakeDate = new Date('2026-01-01T10:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T22:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'HEI'
+
+      const reason = hideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      expect(reason).toStrictEqual('')
+      jest.useRealTimers()
+    })
+
+    it('should return "RELEASED" if prisoner prisonID is "OUT"', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'OUT'
+
+      const reason = hideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      expect(reason).toStrictEqual('Alerts and restrictions are not shown for released prisoners.')
+      jest.useRealTimers()
+    })
+
+    it('should return "TRANSFER" if visit prison ID and prisoner prison ID do not match', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+
+      const reason = hideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      expect(reason).toStrictEqual('Alerts and restrictions are not shown for transferred prisoners.')
+      jest.useRealTimers()
     })
   })
 })

@@ -1,3 +1,4 @@
+import { isFuture, isPast } from 'date-fns'
 import { MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
@@ -53,7 +54,6 @@ export const getAvailableVisitActions = ({
     return availableVisitActions
   }
 
-  const now = new Date()
   const visitStartTime = new Date(startTimestamp)
 
   // update
@@ -61,14 +61,14 @@ export const getAvailableVisitActions = ({
     notification => notification.type === 'PRISONER_RECEIVED_EVENT' || notification.type === 'PRISONER_RELEASED_EVENT',
   )
 
-  if (!hasUpdateBlockingNotifications && now < visitStartTime) {
+  if (!hasUpdateBlockingNotifications && isFuture(new Date(startTimestamp))) {
     availableVisitActions.update = true
   }
 
   // cancel
   const latestCancellationTime = new Date(visitStartTime.getTime() + CANCELLATION_LIMIT_MS)
 
-  if (now < latestCancellationTime) {
+  if (isFuture(latestCancellationTime)) {
     availableVisitActions.cancel = true
   }
 
@@ -251,4 +251,23 @@ export const getIdsToFlag = ({
 export const isPublicBooking = (events: EventAudit[]): boolean => {
   const visitBookedEvent = events.find(event => event.type === 'BOOKED_VISIT')
   return visitBookedEvent?.userType === 'PUBLIC'
+}
+
+export const hideAlertsInset = ({
+  startTimestamp,
+  visitPrisonId,
+  prisonerPrisonId,
+}: {
+  startTimestamp: VisitBookingDetails['startTimestamp']
+  visitPrisonId: string
+  prisonerPrisonId: string
+}): string => {
+  const visitStartTime = new Date(startTimestamp)
+
+  if (isPast(visitStartTime))
+    return `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`
+  if (prisonerPrisonId === 'OUT') return 'Alerts and restrictions are not shown for released prisoners.'
+  if (prisonerPrisonId !== visitPrisonId) return 'Alerts and restrictions are not shown for transferred prisoners.'
+
+  return ''
 }

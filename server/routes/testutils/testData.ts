@@ -674,6 +674,7 @@ export default class TestData {
       },
     ],
     notifications = [],
+    skipAlertsAndRestrictions = false,
   }: Partial<VisitBookingDetails> = {}): VisitBookingDetails => ({
     reference,
     visitRoom,
@@ -692,6 +693,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
+    skipAlertsAndRestrictions,
   })
 
   // raw data as returned from API
@@ -713,6 +715,8 @@ export default class TestData {
     visitors = this.visitBookingDetails().visitors,
     events = this.visitBookingDetails().events as VisitBookingDetailsRaw['events'],
     notifications = this.visitBookingDetails().notifications as VisitBookingDetailsRaw['notifications'],
+    skipAlertsAndRestrictions = this.visitBookingDetails()
+      .skipAlertsAndRestrictions as VisitBookingDetailsRaw['skipAlertsAndRestrictions'],
   }: Partial<VisitBookingDetailsRaw> = {}): VisitBookingDetailsRaw => ({
     reference,
     visitRoom,
@@ -731,6 +735,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
+    skipAlertsAndRestrictions,
   })
 
   // data with notification types processed
