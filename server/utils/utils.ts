@@ -9,8 +9,7 @@ import {
   subWeeks,
   parse,
 } from 'date-fns'
-// eslint-disable-next-line import/no-named-as-default
-import parsePhoneNumber from 'libphonenumber-js/mobile'
+import { parsePhoneNumberFromString as parsePhoneNumber } from 'libphonenumber-js/mobile'
 import config from '../config'
 
 export const properCase = (word: string): string =>
