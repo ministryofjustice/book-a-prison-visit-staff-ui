@@ -1,4 +1,4 @@
-import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 import { ValidationError } from 'express-validator'
 import { PrisonUser } from '../../interfaces/hmppsUser'
 import { CancelledVisitInfo, FlashFormValues, MoJAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
@@ -66,7 +66,7 @@ export declare global {
     interface Locals {
       user: PrisonUser
       feComponents?: {
-        sharedData?: HeaderFooterSharedData
+        sharedData?: SharedData
       }
       appInsightsOperationId?: string
     }
