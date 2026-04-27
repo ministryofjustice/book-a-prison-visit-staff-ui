@@ -53,7 +53,7 @@ export default function createApp(services: Services): express.Application {
   app.use(authorisationMiddleware([bapvUserRoles.STAFF_USER]))
   app.use(setUpCsrf())
   app.get(
-    '*',
+    '*any',
     getFrontendComponents({
       logger,
       componentApiConfig: config.apis.componentApi,
