@@ -53,11 +53,11 @@ export default function createApp(services: Services): express.Application {
   app.use(authorisationMiddleware([bapvUserRoles.STAFF_USER]))
   app.use(setUpCsrf())
   app.get(
-    '*any',
+    '*',
     getFrontendComponents({
-      dpsUrl: config.dpsHome,
       logger,
       componentApiConfig: config.apis.componentApi,
+      dpsUrl: config.dpsHome,
       requestOptions: { includeSharedData: true },
     }),
   )

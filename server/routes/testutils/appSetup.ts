@@ -19,7 +19,7 @@ import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 import { Session, SessionData } from 'express-session'
 import { ValidationError } from 'express-validator'
-import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 
 import indexRoutes from '../index'
 import visitJourneyRoutes from '../visitJourney'
@@ -70,7 +70,7 @@ function appSetup(
   userSupplier: () => PrisonUser,
   sessionData: SessionData,
   feComponents: {
-    sharedData?: HeaderFooterSharedData
+    sharedData?: SharedData
   },
 ): Express {
   const app = express()
@@ -131,14 +131,14 @@ export function appWithAllRoutes({
   services = {},
   userSupplier = () => user,
   sessionData = {} as SessionData,
-  feComponents = undefined as { sharedData?: HeaderFooterSharedData },
+  feComponents = undefined as { sharedData?: SharedData },
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => PrisonUser
   sessionData?: SessionData
   feComponents?: {
-    sharedData?: HeaderFooterSharedData
+    sharedData?: SharedData
   }
 }): Express {
   auth.default.authenticationMiddleware = () => (req, res, next) => next()
