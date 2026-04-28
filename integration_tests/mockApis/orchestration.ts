@@ -372,10 +372,12 @@ export default {
     rejectionReason = 'REJECT',
     requestReference = TestData.visitorRequest().reference,
     visitorRequest = TestData.visitorRequest(),
+    username = 'USER1',
   }: {
     rejectionReason?: RejectVisitorRequestDto['rejectionReason']
     requestReference?: string
     visitorRequest?: PrisonVisitorRequestDto
+    username?: string
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -383,7 +385,7 @@ export default {
         url: `/orchestration/visitor-requests/${requestReference}/reject`,
         bodyPatterns: [
           {
-            equalToJson: { rejectionReason },
+            equalToJson: { rejectionReason, actionedBy: username },
           },
         ],
       },
@@ -399,10 +401,12 @@ export default {
     visitorId = 4321,
     requestReference = TestData.visitorRequest().reference,
     visitorRequest = TestData.visitorRequest(),
+    username = 'USER1',
   }: {
     visitorId?: number
     requestReference?: string
     visitorRequest?: PrisonVisitorRequestDto
+    username?: string
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -410,7 +414,7 @@ export default {
         url: `/orchestration/visitor-requests/${requestReference}/approve`,
         bodyPatterns: [
           {
-            equalToJson: { visitorId },
+            equalToJson: { visitorId, actionedBy: username },
           },
         ],
       },
@@ -532,11 +536,13 @@ export default {
     prisonerId,
     visitorId,
     sendNotification,
+    username = 'USER1',
   }: {
     reference: string
     prisonerId: string
     visitorId: number
     sendNotification: boolean
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -546,8 +552,8 @@ export default {
           {
             equalToJson: {
               visitorId,
-              active: true,
               sendNotificationFlag: sendNotification,
+              actionedBy: username,
             },
           },
         ],
