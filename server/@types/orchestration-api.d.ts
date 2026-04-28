@@ -1843,6 +1843,7 @@ export interface components {
        * @enum {string}
        */
       rejectionReason: 'ALREADY_LINKED' | 'REJECT'
+      actionedBy: string
     }
     PrisonVisitorRequestDto: {
       /**
@@ -1901,6 +1902,7 @@ export interface components {
        * @example 5871791
        */
       visitorId: number
+      actionedBy: string
     }
     RetryDlqResult: {
       /** Format: int32 */
@@ -2013,6 +2015,7 @@ export interface components {
        * @example true
        */
       sendNotificationFlag: boolean
+      actionedBy: string
     }
     /** @description Permitted visitor associated with the permitted prisoner. */
     PermittedVisitorsForPermittedPrisonerBookerDto: {
