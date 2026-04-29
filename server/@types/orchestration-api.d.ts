@@ -2717,9 +2717,9 @@ export interface components {
       first?: boolean
       last?: boolean
       sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
@@ -2727,16 +2727,16 @@ export interface components {
       offset?: number
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
+      pageSize?: number
+      /** Format: int32 */
       pageNumber?: number
       paged?: boolean
       unpaged?: boolean
-      /** Format: int32 */
-      pageSize?: number
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */

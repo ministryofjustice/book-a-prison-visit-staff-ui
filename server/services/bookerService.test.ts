@@ -137,6 +137,7 @@ describe('Booker service', () => {
         prisonerId,
         visitorId,
         sendNotification,
+        username,
       })
     })
   })
@@ -210,7 +211,11 @@ describe('Booker service', () => {
       })
 
       expect(result).toStrictEqual(visitorRequest)
-      expect(orchestrationApiClient.approveVisitorRequest).toHaveBeenCalledWith({ requestReference, visitorId })
+      expect(orchestrationApiClient.approveVisitorRequest).toHaveBeenCalledWith({
+        requestReference,
+        visitorId,
+        username,
+      })
     })
   })
 
@@ -228,7 +233,11 @@ describe('Booker service', () => {
       })
 
       expect(result).toStrictEqual(visitorRequest)
-      expect(orchestrationApiClient.rejectVisitorRequest).toHaveBeenCalledWith({ requestReference, rejectionReason })
+      expect(orchestrationApiClient.rejectVisitorRequest).toHaveBeenCalledWith({
+        requestReference,
+        rejectionReason,
+        username,
+      })
     })
   })
 })

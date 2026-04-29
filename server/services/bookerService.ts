@@ -111,7 +111,7 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification })
+    await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification, username })
   }
 
   async unlinkBookerVisitor({
@@ -176,7 +176,7 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
+    return orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId, username })
   }
 
   async rejectVisitorRequest({
@@ -191,6 +191,6 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason })
+    return orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason, username })
   }
 }

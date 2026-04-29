@@ -27,6 +27,7 @@ describe('Establishment not supported page', () => {
           caseLoads: [unsupportedCaseLoad],
           services: [],
           allocationJobResponsibilities: [],
+          cspDirectives: {},
         },
       },
     })
@@ -66,6 +67,7 @@ describe('Establishment not supported page', () => {
           caseLoads: [caseLoad],
           services: [],
           allocationJobResponsibilities: [],
+          cspDirectives: {},
         },
       },
     })

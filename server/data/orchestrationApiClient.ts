@@ -278,26 +278,30 @@ export default class OrchestrationApiClient {
   async rejectVisitorRequest({
     requestReference,
     rejectionReason,
+    username,
   }: {
     requestReference: string
     rejectionReason: RejectVisitorRequestDto['rejectionReason']
+    username: string
   }): Promise<PrisonVisitorRequestDto> {
     return this.restClient.put({
       path: `/visitor-requests/${requestReference}/reject`,
-      data: <RejectVisitorRequestDto>{ rejectionReason },
+      data: <RejectVisitorRequestDto>{ rejectionReason, actionedBy: username },
     })
   }
 
   async approveVisitorRequest({
     requestReference,
     visitorId,
+    username,
   }: {
     requestReference: string
     visitorId: number
+    username: string
   }): Promise<PrisonVisitorRequestDto> {
     return this.restClient.put({
       path: `/visitor-requests/${requestReference}/approve`,
-      data: <ApproveVisitorRequestDto>{ visitorId },
+      data: <ApproveVisitorRequestDto>{ visitorId, actionedBy: username },
     })
   }
 
@@ -350,18 +354,20 @@ export default class OrchestrationApiClient {
     prisonerId,
     visitorId,
     sendNotification,
+    username,
   }: {
     reference: string
     prisonerId: string
     visitorId: number
     sendNotification: boolean
+    username: string
   }): Promise<void> {
     await this.restClient.post({
       path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
       data: <RegisterVisitorForBookerPrisonerDto>{
         visitorId,
-        active: true,
         sendNotificationFlag: sendNotification,
+        actionedBy: username,
       },
     })
   }
