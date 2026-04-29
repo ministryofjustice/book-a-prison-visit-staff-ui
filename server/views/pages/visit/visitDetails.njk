@@ -155,12 +155,7 @@
         {# Prisoner #}
         <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
 
-        {% if hideAlerts %}
-          {{ govukInsetText({
-            html: hideAlertsInsetHtml,
-            classes: 'govuk-inset-text--prisoner'
-          }) }}
-        {% endif %}
+        {{ govukInsetText(hideAlertsInset.prisoner) if hideAlertsInset }}
 
         <h3 class="govuk-heading-m">
           <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
@@ -242,11 +237,7 @@
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
 
-        {% if hideAlerts %}
-          {{ govukInsetText({
-            html: hideAlertsInsetHtml
-          }) }}
-        {% endif %}
+        {{ govukInsetText(hideAlertsInset.visitor) if hideAlertsInset }}
 
         {% for visitor in visitDetails.visitors %}
           {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}

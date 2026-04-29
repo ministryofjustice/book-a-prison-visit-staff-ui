@@ -1,5 +1,5 @@
 import { isFuture, isPast } from 'date-fns'
-import { MoJAlert } from '../../@types/bapv'
+import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
@@ -253,7 +253,7 @@ export const isPublicBooking = (events: EventAudit[]): boolean => {
   return visitBookedEvent?.userType === 'PUBLIC'
 }
 
-export const hideAlertsInset = ({
+export const getHideAlertsInset = ({
   startTimestamp,
   visitPrisonId,
   prisonerPrisonId,
@@ -261,13 +261,49 @@ export const hideAlertsInset = ({
   startTimestamp: VisitBookingDetails['startTimestamp']
   visitPrisonId: string
   prisonerPrisonId: string
-}): string => {
+}): { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null => {
   const visitStartTime = new Date(startTimestamp)
 
-  if (isPast(visitStartTime))
-    return `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`
-  if (prisonerPrisonId === 'OUT') return 'Alerts and restrictions are not shown for released prisoners.'
-  if (prisonerPrisonId !== visitPrisonId) return 'Alerts and restrictions are not shown for transferred prisoners.'
+  if (isPast(visitStartTime)) {
+    return {
+      prisoner: {
+        html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'inset-text-prisoner',
+      },
+      visitor: {
+        html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
 
-  return ''
+  if (prisonerPrisonId === 'OUT') {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'inset-text-prisoner',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+
+  if (prisonerPrisonId !== visitPrisonId) {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'inset-text-prisoner',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+  return null
 }

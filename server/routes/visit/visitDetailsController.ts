@@ -7,7 +7,7 @@ import {
   getIdsToFlag,
   getPrisonerLocation,
   getVisitAlerts,
-  hideAlertsInset,
+  getHideAlertsInset,
 } from './visitUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
@@ -39,13 +39,11 @@ export default class VisitDetailsController {
         return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
       }
 
-      const hideAlertsInsetHtml = visitDetails.skipAlertsAndRestrictions
-        ? hideAlertsInset({
-            startTimestamp: visitDetails.startTimestamp,
-            visitPrisonId: visitDetails.prison.prisonId,
-            prisonerPrisonId: visitDetails.prisoner.prisonId,
-          })
-        : ''
+      const hideAlertsInset = getHideAlertsInset({
+        startTimestamp: visitDetails.startTimestamp,
+        visitPrisonId: visitDetails.prison.prisonId,
+        prisonerPrisonId: visitDetails.prisoner.prisonId,
+      })
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
@@ -80,8 +78,7 @@ export default class VisitDetailsController {
 
       return res.render('pages/visit/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
-        hideAlerts: visitDetails.skipAlertsAndRestrictions,
-        hideAlertsInsetHtml,
+        hideAlertsInset,
         availableVisitActions,
         eventsTimeline,
         fromPage,

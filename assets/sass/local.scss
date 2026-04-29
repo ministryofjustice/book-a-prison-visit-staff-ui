@@ -331,15 +331,15 @@ p.bapv-visit-details__restriction--flagged {
   vertical-align: middle;
 }
 
-.govuk-inset-text {
+.bapv-visit-details .govuk-inset-text {
   p {
     margin-bottom: 0;
   }
 
   margin-top: 0;
-  margin-bottom: 0;
+  margin-bottom: govuk-spacing(1);
 }
 
-.govuk-inset-text--prisoner {
-  margin-bottom: -25px;
+.bapv-visit-details .inset-text-prisoner {
+  margin-bottom: govuk-spacing(-4);
 }

@@ -715,8 +715,7 @@ export default class TestData {
     visitors = this.visitBookingDetails().visitors,
     events = this.visitBookingDetails().events as VisitBookingDetailsRaw['events'],
     notifications = this.visitBookingDetails().notifications as VisitBookingDetailsRaw['notifications'],
-    skipAlertsAndRestrictions = this.visitBookingDetails()
-      .skipAlertsAndRestrictions as VisitBookingDetailsRaw['skipAlertsAndRestrictions'],
+    skipAlertsAndRestrictions = this.visitBookingDetails().skipAlertsAndRestrictions,
   }: Partial<VisitBookingDetailsRaw> = {}): VisitBookingDetailsRaw => ({
     reference,
     visitRoom,
