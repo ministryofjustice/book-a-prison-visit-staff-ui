@@ -43,6 +43,7 @@ export default class VisitDetailsController {
         startTimestamp: visitDetails.startTimestamp,
         visitPrisonId: visitDetails.prison.prisonId,
         prisonerPrisonId: visitDetails.prisoner.prisonId,
+        inOutStatus: visitDetails.prisoner.inOutStatus,
       })
 
       const availableVisitActions = getAvailableVisitActions({

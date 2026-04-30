@@ -257,10 +257,12 @@ export const getHideAlertsInset = ({
   startTimestamp,
   visitPrisonId,
   prisonerPrisonId,
+  inOutStatus,
 }: {
   startTimestamp: VisitBookingDetails['startTimestamp']
   visitPrisonId: string
   prisonerPrisonId: string
+  inOutStatus: VisitBookingDetails['prisoner']['inOutStatus']
 }): { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null => {
   const visitStartTime = new Date(startTimestamp)
 
@@ -292,7 +294,7 @@ export const getHideAlertsInset = ({
     }
   }
 
-  if (prisonerPrisonId !== visitPrisonId) {
+  if (prisonerPrisonId !== visitPrisonId && inOutStatus !== 'TRN') {
     return {
       prisoner: {
         text: 'Alerts and restrictions are not shown for transferred prisoners.',

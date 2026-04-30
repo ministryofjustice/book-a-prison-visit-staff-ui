@@ -513,19 +513,6 @@ describe('Visit utils', () => {
   })
 
   describe('getHideAlertsInset', () => {
-    it('should return null if alerts not to be hidden', () => {
-      const fakeDate = new Date('2026-01-01T10:00:00') // 01-01-26 2PM
-      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
-      const startTimestamp = '2026-01-01T22:00:00' // 01-01-26 2AM
-
-      const visitPrisonId = 'HEI'
-      const prisonerPrisonId = 'HEI'
-
-      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
-      expect(results).toStrictEqual(null)
-      jest.useRealTimers()
-    })
-
     it('should return "PAST" if startTimestamp is in the past (2AM visit, 2PM current time)', () => {
       const fakeDate = new Date('2026-01-01T14:00:00') // 01-01-26 2PM
       jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
@@ -533,6 +520,7 @@ describe('Visit utils', () => {
 
       const visitPrisonId = 'HEI'
       const prisonerPrisonId = 'HEI'
+      const inOutStatus = 'IN'
 
       const expected = {
         prisoner: {
@@ -546,7 +534,7 @@ describe('Visit utils', () => {
         },
       }
 
-      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
       expect(results).toStrictEqual(expected)
       jest.useRealTimers()
     })
@@ -558,6 +546,7 @@ describe('Visit utils', () => {
 
       const visitPrisonId = 'HEI'
       const prisonerPrisonId = 'OUT'
+      const inOutStatus = 'IN'
 
       const expected = {
         prisoner: {
@@ -571,7 +560,7 @@ describe('Visit utils', () => {
         },
       }
 
-      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
       expect(results).toStrictEqual(expected)
       jest.useRealTimers()
     })
@@ -583,6 +572,7 @@ describe('Visit utils', () => {
 
       const visitPrisonId = 'HEI'
       const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'IN'
 
       const expected = {
         prisoner: {
@@ -596,8 +586,22 @@ describe('Visit utils', () => {
         },
       }
 
-      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId })
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
       expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return null if prisons do not match but currently in "Transfer"', () => {
+      const fakeDate = new Date('2026-01-01T10:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T22:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'TRN'
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(null)
       jest.useRealTimers()
     })
   })
