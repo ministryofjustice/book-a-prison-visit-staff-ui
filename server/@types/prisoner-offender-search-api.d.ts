@@ -15,9 +15,12 @@ export interface paths {
     put?: never
     /**
      * Match prisoners by criteria
-     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     * @description This endpoint sorts by prisonerNumber.  This means that calling this endpoint to retrieve
+     *            subsequent pages *should* return the next page of results, but this is not guaranteed.
+     *
+     *            Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
-    post: operations['findByCriteria']
+    post: operations['findRestrictedPatientsByCriteria']
     delete?: never
     options?: never
     head?: never
@@ -35,7 +38,15 @@ export interface paths {
     put?: never
     /**
      * Match prisoners who have a release date within a range, and optionally by prison
-     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     * @description This endpoint sorts by OpenSearch score and then by prisonerNumber. The score is an indication of
+     *           how close the query matches a prisoner record, thus closest matches to the query will be returned first.
+     *           Unfortunately sorting by score is problematic as different shards might provide different scores, thus breaking
+     *           the paged results. Also it gives inconsistent results the higher the page number.
+     *
+     *           It is thus recommended not to use paging and instead request a large page size, together with setting the
+     *           responseFields to limit the returned response byte size (otherwise you risk hitting memory / webclient limits).
+     *
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     post: operations['findByReleaseDateAndPrison']
     delete?: never
@@ -79,7 +90,6 @@ export interface paths {
      *            This will also search aliases for possible matches.
      *            Use when there is manual input, e.g. a user can select the correct match from search results.
      *            Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
     post: operations['findPossibleMatchesBySearchCriteria']
     delete?: never
@@ -102,7 +112,7 @@ export interface paths {
      * @deprecated
      * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
-    post: operations['findByCriteria_1']
+    post: operations['deprecatedFindByCriteria']
     delete?: never
     options?: never
     head?: never
@@ -123,9 +133,8 @@ export interface paths {
      * @description Search by prisoner identifier or name and returning results for the criteria matched first.
      *             Typically used when the matching data is of high quality where the first match is expected to be a near perfect match.
      *             Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
-    post: operations['findByCriteria_2']
+    post: operations['findByCriteria']
     delete?: never
     options?: never
     head?: never
@@ -168,7 +177,6 @@ export interface paths {
      *           The '*' symbol will match any number of characters e.g. firstName='J*' will match 'John', 'Jane', and 'James'.
      *           The '?' symbol will match any letter substituted at that position. e.g. firstName='t?ny' will match 'Tony' and 'Tiny'
      *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
     post: operations['prisonerDetailSearch']
     delete?: never
@@ -197,9 +205,8 @@ export interface paths {
      *           Results are ordered so that prisoners that match the most criteria are returned first, then secondary order is by
      *           prisoner number.
      *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
-    post: operations['prisonerDetailSearch_1']
+    post: operations['physicalDetailSearch']
     delete?: never
     options?: never
     head?: never
@@ -221,7 +228,6 @@ export interface paths {
      *            It will return the best group of matching prisoners based on the request
      *            Specify the request criteria to match against.
      *            Role required is ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH.
-     *
      */
     post: operations['matchPrisoners']
     delete?: never
@@ -244,7 +250,6 @@ export interface paths {
      * @description Words and identifiers can be provided in either or mixed case and will be matched against all indexed text and keyword fields.
      *           Identifiers within the [and, or, not, exact] terms are detected and converted to the appropriate case.
      *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
     post: operations['keywordSearch']
     delete?: never
@@ -264,7 +269,15 @@ export interface paths {
     put?: never
     /**
      * Match prisoners by criteria
-     * @description Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role or PRISONER_SEARCH__PRISONER__RO
+     * @description This endpoint sorts by OpenSearch score and then by prisonerNumber. The score is an indication of
+     *           how close the query matches a prisoner record, thus closest matches to the query will be returned first.
+     *           Unfortunately sorting by score is problematic as different shards might provide different scores, thus breaking
+     *           the paged results. Also it gives inconsistent results the higher the page number.
+     *
+     *           It is thus recommended not to use paging and instead request a large page size, together with setting the
+     *           responseFields to limit the returned response byte size (otherwise you risk hitting memory / webclient limits).
+     *
+     *           Requires ROLE_GLOBAL_SEARCH role or ROLE_PRISONER_SEARCH role or PRISONER_SEARCH__PRISONER__RO
      */
     post: operations['globalFindByCriteria']
     delete?: never
@@ -444,7 +457,12 @@ export interface paths {
      *               ]
      *             }
      *           </pre>
-     *
+     *           <p>There have been issues raised with OpenSearch sorting in that it sometimes doesn't produce stable sorting results,
+     *           especially with higher page numbers.
+     *           </p>
+     *           <p>It is thus recommended not to use paging and instead request a large page size, together with setting the
+     *           responseFields to limit the returned response byte size (otherwise you risk hitting memory / webclient limits).
+     *           </p>
      */
     post: operations['attributeSearch']
     delete?: never
@@ -486,7 +504,6 @@ export interface paths {
      *           rather than all the possible values.  Only to be used for searching existing data purposes.
      *           This method will also cache all reference data results for an hour and any new data will only appear after an hour.
      *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
     get: operations['referenceData']
     put?: never
@@ -510,7 +527,6 @@ export interface paths {
      *           rather than all the possible values.  Only to be used for searching existing data purposes.
      *           This method will also cache all reference data results for an hour and any new data will only appear after an hour.
      *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role.
-     *
      */
     get: operations['alertsReferenceData']
     put?: never
@@ -550,7 +566,15 @@ export interface paths {
     }
     /**
      * Get all prisoners in a prison, including restricted patients supported by a POM
-     * @description Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
+     * @description This endpoint sorts by OpenSearch score and then by prisonerNumber. The score is an indication of
+     *           how close the query matches a prisoner record, thus closest matches to the query will be returned first.
+     *           Unfortunately sorting by score is problematic as different shards might provide different scores, thus breaking
+     *           the paged results. Also it gives inconsistent results the higher the page number.
+     *
+     *           It is thus recommended not to use paging and instead request a large page size, together with setting the
+     *           responseFields to limit the returned response byte size (otherwise you risk hitting memory / webclient limits).
+     *
+     *           Requires ROLE_GLOBAL_SEARCH or ROLE_PRISONER_SEARCH role
      */
     get: operations['findByPrison']
     put?: never
@@ -660,7 +684,11 @@ export interface paths {
      *           "/prison/WWI/prisoners?alerts=TACT&alerts=PEEP"
      *           This will return all people in HMP Wandsworth. With the alerts TACT or PEEP.
      *
+     *           There have been issues raised with OpenSearch sorting in that it sometimes doesn't produce stable sorting results,
+     *           especially with higher page numbers.
      *
+     *           It is thus recommended not to use paging and instead request a large page size, together with setting the
+     *           responseFields to limit the returned response byte size (otherwise you risk hitting memory / webclient limits).
      */
     get: operations['search']
     put?: never
@@ -723,7 +751,7 @@ export interface components {
     Address: {
       /**
        * @description The full address on a single line.  No fixed address records will have the fullAddress set to 'No fixed address'. Will never be null.
-       * @example 1
+       * @example 1 Main Street, Crookes, Sheffield, South Yorkshire, S10 1BP, England
        */
       fullAddress?: string
       /**
@@ -916,13 +944,13 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
+      first?: boolean
+      last?: boolean
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
@@ -1012,8 +1040,8 @@ export interface components {
        */
       croNumber?: string
       /**
-       * @description Booking No.
-       * @example 0001200924
+       * @description Booking Id
+       * @example 2900924
        */
       bookingId?: string
       /**
@@ -1097,6 +1125,8 @@ export interface components {
        * @example 2122100
        */
       currentFacialImageId?: number
+      /** @description True if prisoner has been recorded as being in the military. */
+      militaryRecord?: boolean
       /**
        * @description Status of the prisoner
        * @example ACTIVE IN
@@ -1119,20 +1149,31 @@ export interface components {
        */
       inOutStatus?: 'IN' | 'OUT' | 'TRN'
       /**
-       * @description Prison ID
+       * @description Current Prison ID (or OUT)
        * @example MDI
        */
       prisonId?: string
       /**
-       * @description The last prison for the prisoner (which is the same as the prisonId if they are still inside prison)
+       * @description Current Prison Name
+       * @example HMP Leeds
+       */
+      prisonName?: string
+      /**
+       * @description The last i.e. final prison for the prisoner (which is the same as the prisonId if they are still inside prison)
        * @example MDI
        */
       lastPrisonId?: string
       /**
-       * @description Prison Name
-       * @example HMP Leeds
+       * @description The previous prison for the prisoner within the current term
+       * @example MDI
        */
-      prisonName?: string
+      previousPrisonId?: string
+      /**
+       * Format: date
+       * @description The date they left the previous prison
+       * @example 2025-09-15
+       */
+      previousPrisonLeavingDate?: string
       /**
        * @description In prison cell location
        * @example A-1-002
@@ -1318,6 +1359,12 @@ export interface components {
        * @example 2023-05-01
        */
       conditionalReleaseDate?: string
+      /**
+       * Format: date
+       * @description Non-parole date. If nonParoleOverrideDate date is available then it will be set as nonParoleDate
+       * @example 2023-05-01
+       */
+      nonParoleDate?: string
       /**
        * Format: date
        * @description Actual Parole Date
@@ -1750,13 +1797,13 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
+      first?: boolean
+      last?: boolean
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
@@ -1981,8 +2028,7 @@ export interface components {
       /** @description List of body parts that have scars */
       scars?: components['schemas']['BodyPart'][]
       /**
-       * @description
-       *             Whether all terms are required to match. If set to true then only matches on all fields will return a result.
+       * @description Whether all terms are required to match. If set to true then only matches on all fields will return a result.
        *             If set to false then matches will return a higher score than non matches, but all will be returned.
        *             Prison and cell location will always be required to match.
        * @example false
@@ -1996,13 +2042,13 @@ export interface components {
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
+      first?: boolean
+      last?: boolean
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
@@ -2090,13 +2136,13 @@ export interface components {
        */
       fuzzyMatch?: boolean
       /**
-       * @description List of prison codes to filter results
+       * @description List of prison codes to filter results, null means all
        * @example [
        *       "LEI",
        *       "MDI"
        *     ]
        */
-      prisonIds: string[]
+      prisonIds?: string[]
       /** @description Pagination options. Will default to the first page if omitted. */
       pagination: components['schemas']['PaginationRequest']
       /**
@@ -2104,19 +2150,36 @@ export interface components {
        * @enum {string}
        */
       type: 'DEFAULT' | 'ESTABLISHMENT'
+      /**
+       * @description Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate)
+       * @example M
+       * @enum {string}
+       */
+      gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL'
+      /**
+       * @description Location, Inside or Outside
+       * @example IN
+       */
+      location?: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1970-02-28
+       */
+      dateOfBirth?: string
     }
     KeywordResponse: {
       /** Format: int64 */
       totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      first?: boolean
-      last?: boolean
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
+      first?: boolean
+      last?: boolean
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       numberOfElements?: number
@@ -2177,10 +2240,11 @@ export interface components {
       queries: components['schemas']['Query'][]
       pagination: components['schemas']['PaginationRequest']
     }
-    /** @description A matcher for a boolean attribute from the Prisoner.
+    /**
+     * @description A matcher for a boolean attribute from the Prisoner.
      *
      *       The type must be set to Boolean for this matcher.
-     *      */
+     */
     BooleanMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match
@@ -2199,7 +2263,8 @@ export interface components {
        */
       type: 'Boolean'
     }
-    /** @description A matcher for a date attribute from the Prisoner record.
+    /**
+     * @description A matcher for a date attribute from the Prisoner record.
      *
      *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
      *
@@ -2210,7 +2275,7 @@ export interface components {
      *       For equals enter the same date in both the min value and max value and leave min/max inclusive as true.
      *
      *       The type must be set to Date for this matcher.
-     *        */
+     */
     DateMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match
@@ -2246,7 +2311,8 @@ export interface components {
        */
       type: 'Date'
     }
-    /** @description A matcher for a date time attribute from the Prisoner record.
+    /**
+     * @description A matcher for a date time attribute from the Prisoner record.
      *
      *       For a between clause use both the min and max values.
      *
@@ -2255,7 +2321,7 @@ export interface components {
      *       For > enter only the min value.
      *
      *       The type must be set to DateTime for this matcher.
-     *      */
+     */
     DateTimeMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to search on
@@ -2281,7 +2347,8 @@ export interface components {
        */
       type: 'DateTime'
     }
-    /** @description A matcher for an integer attribute from the Prisoner record.
+    /**
+     * @description A matcher for an integer attribute from the Prisoner record.
      *
      *       For a between clause use both min value and max value. By default the range is inclusive, but can be adjusted with minInclusive and maxInclusive.
      *
@@ -2292,7 +2359,7 @@ export interface components {
      *       For equals enter the same integer in both the min value and max value and leave min/max inclusive as true..
      *
      *       The type must be set to Int for this matcher.
-     *        */
+     */
     IntMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match on
@@ -2332,14 +2399,15 @@ export interface components {
     Matcher: {
       type: string
     }
-    /** @description A matcher for PNC numbers.
+    /**
+     * @description A matcher for PNC numbers.
      *
      *         This is required because PNC numbers come in various formats with 2/4 long years and with/without leading zeroes.
      *
      *         This matcher will find the matching PNC regardless of which format is used.
      *
      *       The type must be set to PNC for this matcher.
-     *        */
+     */
     PncMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The PNC number match
@@ -2372,12 +2440,13 @@ export interface components {
         | components['schemas']['StringMatcher']
       )[]
       /** @description A list of sub-queries of type Query that will be combined with the matchers in this query */
-      subQueries?: unknown[]
+      subQueries?: components['schemas']['Query'][]
     }
-    /** @description A matcher for a string attribute from the prisoner record.
+    /**
+     * @description A matcher for a string attribute from the prisoner record.
      *
      *       The type must be set to String for this matcher.
-     *      */
+     */
     StringMatcher: Omit<components['schemas']['Matcher'], 'type'> & {
       /**
        * @description The attribute to match on
@@ -2474,7 +2543,7 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
-  findByCriteria: {
+  findRestrictedPatientsByCriteria: {
     parameters: {
       query?: {
         /**
@@ -2482,12 +2551,16 @@ export interface operations {
          * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
          */
         responseFields?: string[]
-        /** @description Zero-based page index (0..N) */
+        /**
+         * @description The name of a default list of response fields. The list can be defined for a client and
+         *             then referenced here. This saves passing a big list of fields to prisoner search on each request.
+         * @example restricted-patients
+         */
+        responseFieldsClient?: string
+        /** @description Zero-based page index (0..N). Will default to 0 if not supplied or invalid. */
         page?: number
-        /** @description The size of the page to be returned */
+        /** @description The size of the page to be returned. Will default to 10 if not supplied or invalid. */
         size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
       }
       header?: never
       path?: never
@@ -2518,12 +2591,15 @@ export interface operations {
          * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
          */
         responseFields?: string[]
-        /** @description Zero-based page index (0..N) */
+        /** @description Zero-based page index (0..N). Will default to 0 if not supplied or invalid. */
         page?: number
-        /** @description The size of the page to be returned */
+        /** @description The size of the page to be returned. Will default to 10 if not supplied or invalid. */
         size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
+        /**
+         * @description Whether to include results from supporting prisons
+         * @example false
+         */
+        includeSupportedByPrisons?: boolean
       }
       header?: never
       path?: never
@@ -2606,7 +2682,7 @@ export interface operations {
       }
     }
   }
-  findByCriteria_1: {
+  deprecatedFindByCriteria: {
     parameters: {
       query?: never
       header?: never
@@ -2630,7 +2706,7 @@ export interface operations {
       }
     }
   }
-  findByCriteria_2: {
+  findByCriteria: {
     parameters: {
       query?: {
         /**
@@ -2638,6 +2714,12 @@ export interface operations {
          * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
          */
         responseFields?: string[]
+        /**
+         * @description The name of a default list of response fields. The list can be defined for a client and
+         *             then referenced here. This saves passing a big list of fields to prisoner search on each request.
+         * @example restricted-patients
+         */
+        responseFieldsClient?: string
       }
       header?: never
       path?: never
@@ -2747,7 +2829,7 @@ export interface operations {
       }
     }
   }
-  prisonerDetailSearch_1: {
+  physicalDetailSearch: {
     parameters: {
       query?: {
         /**
@@ -2915,12 +2997,10 @@ export interface operations {
   globalFindByCriteria: {
     parameters: {
       query?: {
-        /** @description Zero-based page index (0..N) */
+        /** @description Zero-based page index (0..N). Will default to 0 if not supplied or invalid. */
         page?: number
-        /** @description The size of the page to be returned */
+        /** @description The size of the page to be returned. Will default to 10 if not supplied or invalid. */
         size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
         /**
          * @description A list of fields to populate on the Prisoner record returned in the response. An empty list defaults to all fields.
          * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
@@ -3173,7 +3253,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          '*/*': components['schemas']['Prisoner']
+          'application/json': components['schemas']['Prisoner']
         }
       }
     }
@@ -3187,12 +3267,10 @@ export interface operations {
          * @example [prisonerNumber,firstName,aliases.firstName,currentIncentive.level.code]
          */
         responseFields?: string[]
-        /** @description Zero-based page index (0..N) */
+        /** @description Zero-based page index (0..N). Will default to 0 if not supplied or invalid. */
         page?: number
-        /** @description The size of the page to be returned */
+        /** @description The size of the page to be returned. Will default to 10 if not supplied or invalid. */
         size?: number
-        /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-        sort?: string[]
       }
       header?: never
       path: {

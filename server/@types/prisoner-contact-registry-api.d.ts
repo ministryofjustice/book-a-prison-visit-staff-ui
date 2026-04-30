@@ -24,6 +24,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/prisoners/{prisonerId}/contacts/{contactId}/relationships/{relationshipId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a single contact details via their prisoner / contact relationship
+     * @description Get a single contact details via their prisoner / contact relationship
+     */
+    get: operations['getPrisonerContactDetailsViaRelationship']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/prisoners/{prisonerId}/contacts/social': {
     parameters: {
       query?: never
@@ -96,6 +116,66 @@ export interface paths {
      * @description Returns an updated date range for visitors if one is found with an active ban restriction. If not, it returns the original date range
      */
     get: operations['getUpdatedDateRangeForPrisonerVisitorsIfFoundWithBanRestrictions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/contacts/{contactId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a contact via Contact ID
+     * @description Returns a contact's basic details
+     */
+    get: operations['getContact']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/contacts/{contactId}/restrictions/global': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a contact's global restrictions
+     * @description Returns a contact's global restrictions
+     */
+    get: operations['getContactGlobalRestrictions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/contacts/{contactId}/linked-social-prisoners': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get a contact's linked prisoners via Contact ID
+     * @description Returns a contact's linked prisoners (prisonerIds) as a list
+     */
+    get: operations['getContactLinkedPrisoners']
     put?: never
     post?: never
     delete?: never
@@ -199,7 +279,7 @@ export interface components {
       noFixedAddress: boolean
     }
     /** @description A contact for a prisoner */
-    ContactDto: {
+    PrisonerContactDto: {
       /**
        * Format: int64
        * @description Identifier for this contact (Person in NOMIS)
@@ -306,6 +386,51 @@ export interface components {
       /** @description Has closed restriction */
       value: boolean
     }
+    /** @description A contact (no prisoner relationship) */
+    ContactDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact
+       * @example 5871791
+       */
+      contactId?: number
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Middle name
+       * @example Mark
+       */
+      middleName?: string
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1980-01-28
+       */
+      dateOfBirth?: string
+    }
+    /** @description A linked prisoner of contact */
+    ContactLinkedPrisonerDto: {
+      /**
+       * @description Prisoner number (NOMS ID)
+       * @example A1234BC
+       */
+      prisonerNumber: string
+      /**
+       * @description Coded value indicating either a social or official contact (mandatory).
+       *         This is a coded value from the group code CONTACT_TYPE in reference data.
+       *         Known values are (S) Social or (O) official.
+       * @example S
+       */
+      relationshipTypeCode: string
+    }
   }
   responses: never
   parameters: never
@@ -375,6 +500,84 @@ export interface operations {
       }
     }
   }
+  getPrisonerContactDetailsViaRelationship: {
+    parameters: {
+      query?: {
+        /**
+         * @description Defaults to false. Returns contact restrictions if set to true, skips grabbing restrictions if false
+         * @example false
+         */
+        withRestrictions?: boolean
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Identifier (NOMIS Offender No)
+         * @example A1234AA
+         */
+        prisonerId: string
+        /**
+         * @description The ID of the contact which is associated with the prisoner
+         * @example 57392371
+         */
+        contactId: string
+        /**
+         * @description The ID of the prisoner / contact relationship
+         * @example 23621947
+         */
+        relationshipId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Prisoner Contact Information Returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PrisonerContactDto']
+        }
+      }
+      /** @description Incorrect request to retrieve prisoner's contact details */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve prisoner's contact details */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner or contact not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
   getPrisonerSocialContacts: {
     parameters: {
       query?: {
@@ -383,6 +586,11 @@ export interface operations {
          * @example false
          */
         hasDateOfBirth?: boolean
+        /**
+         * @description Defaults to false. Returns all contacts restrictions if set to true, skips grabbing restrictions if false
+         * @example false
+         */
+        withRestrictions?: boolean
       }
       header?: never
       path: {
@@ -402,7 +610,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ContactDto'][]
+          'application/json': components['schemas']['PrisonerContactDto'][]
         }
       }
       /** @description Incorrect request to retrieve prisoner's approved social contacts */
@@ -451,6 +659,11 @@ export interface operations {
          * @example false
          */
         hasDateOfBirth?: boolean
+        /**
+         * @description Defaults to false. Returns all contacts restrictions if set to true, skips grabbing restrictions if false
+         * @example false
+         */
+        withRestrictions?: boolean
       }
       header?: never
       path: {
@@ -470,7 +683,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['ContactDto'][]
+          'application/json': components['schemas']['PrisonerContactDto'][]
         }
       }
       /** @description Incorrect request to retrieve prisoner's approved social contacts */
@@ -647,6 +860,192 @@ export interface operations {
         }
       }
       /** @description Prisoner, Visitor or Date range not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getContact: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description The ID of the contact
+         * @example 57392371
+         */
+        contactId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Contact's basic details returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContactDto']
+        }
+      }
+      /** @description Incorrect request to retrieve a contact's details */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve a contact's details */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Contact not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getContactGlobalRestrictions: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description The ID of the contact whose global restrictions are sought.
+         * @example 57392371
+         */
+        contactId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Contact's global restrictions returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RestrictionDto'][]
+        }
+      }
+      /** @description Incorrect request to retrieve a contact's global restrictions */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve a contact's global restrictions */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Contact not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getContactLinkedPrisoners: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description The ID of the contact
+         * @example 57392371
+         */
+        contactId: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Contact's linked prisoners list returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContactLinkedPrisonerDto'][]
+        }
+      }
+      /** @description Incorrect request to retrieve a contact's linked prisoners */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to retrieve a contact's linked prisoners */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Contact not found */
       404: {
         headers: {
           [name: string]: unknown
