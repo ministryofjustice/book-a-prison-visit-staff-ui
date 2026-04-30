@@ -2,7 +2,13 @@ import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import { getAvailableVisitActions, getIdsToFlag, getPrisonerLocation, getVisitAlerts } from './visitUtils'
+import {
+  getAvailableVisitActions,
+  getIdsToFlag,
+  getPrisonerLocation,
+  getVisitAlerts,
+  getHideAlertsInset,
+} from './visitUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
@@ -32,6 +38,13 @@ export default class VisitDetailsController {
       if (selectedEstablishment.prisonId !== prison.prisonId) {
         return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
       }
+
+      const hideAlertsInset = getHideAlertsInset({
+        startTimestamp: visitDetails.startTimestamp,
+        visitPrisonId: visitDetails.prison.prisonId,
+        prisonerPrisonId: visitDetails.prisoner.prisonId,
+        inOutStatus: visitDetails.prisoner.inOutStatus,
+      })
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
@@ -66,6 +79,7 @@ export default class VisitDetailsController {
 
       return res.render('pages/visit/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
+        hideAlertsInset,
         availableVisitActions,
         eventsTimeline,
         fromPage,

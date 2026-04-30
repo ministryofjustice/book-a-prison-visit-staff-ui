@@ -60,6 +60,7 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
+  dpsContacts: get('DPS_CONTACTS_URL', 'https://contacts-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   dpsHome: get('DPS_URL', 'https://dps-dev.prison.service.justice.gov.uk/', requiredInProduction),
   dpsPrisoner: get(
     'DPS_PRISONER_URL',

@@ -1,4 +1,5 @@
-import { MoJAlert } from '../../@types/bapv'
+import { isFuture, isPast } from 'date-fns'
+import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
@@ -53,7 +54,6 @@ export const getAvailableVisitActions = ({
     return availableVisitActions
   }
 
-  const now = new Date()
   const visitStartTime = new Date(startTimestamp)
 
   // update
@@ -61,14 +61,14 @@ export const getAvailableVisitActions = ({
     notification => notification.type === 'PRISONER_RECEIVED_EVENT' || notification.type === 'PRISONER_RELEASED_EVENT',
   )
 
-  if (!hasUpdateBlockingNotifications && now < visitStartTime) {
+  if (!hasUpdateBlockingNotifications && isFuture(new Date(startTimestamp))) {
     availableVisitActions.update = true
   }
 
   // cancel
   const latestCancellationTime = new Date(visitStartTime.getTime() + CANCELLATION_LIMIT_MS)
 
-  if (now < latestCancellationTime) {
+  if (isFuture(latestCancellationTime)) {
     availableVisitActions.cancel = true
   }
 
@@ -251,4 +251,61 @@ export const getIdsToFlag = ({
 export const isPublicBooking = (events: EventAudit[]): boolean => {
   const visitBookedEvent = events.find(event => event.type === 'BOOKED_VISIT')
   return visitBookedEvent?.userType === 'PUBLIC'
+}
+
+export const getHideAlertsInset = ({
+  startTimestamp,
+  visitPrisonId,
+  prisonerPrisonId,
+  inOutStatus,
+}: {
+  startTimestamp: VisitBookingDetails['startTimestamp']
+  visitPrisonId: string
+  prisonerPrisonId: string
+  inOutStatus: VisitBookingDetails['prisoner']['inOutStatus']
+}): { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null => {
+  const visitStartTime = new Date(startTimestamp)
+
+  if (isPast(visitStartTime)) {
+    return {
+      prisoner: {
+        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+
+  if (prisonerPrisonId === 'OUT') {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+
+  if (prisonerPrisonId !== visitPrisonId && inOutStatus !== 'TRN') {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+  return null
 }

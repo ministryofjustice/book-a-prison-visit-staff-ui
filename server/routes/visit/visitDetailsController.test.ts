@@ -8,7 +8,8 @@ import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
 import { AvailableVisitActions } from './visitUtils'
-import { MoJAlert } from '../../@types/bapv'
+import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
+import config from '../../config'
 
 let app: Express
 
@@ -19,6 +20,7 @@ let availableVisitActions: AvailableVisitActions
 let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
 let idsToFlag: jest.Mock
+let hideAlertsInset: { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null
 
 jest.mock('./visitEventsTimelineBuilder', () => {
   return {
@@ -34,6 +36,7 @@ jest.mock('./visitUtils', () => {
     getAvailableVisitActions: () => availableVisitActions,
     getVisitAlerts: () => visitAlerts,
     getIdsToFlag: () => idsToFlag(),
+    getHideAlertsInset: () => hideAlertsInset,
   }
 })
 
@@ -59,6 +62,7 @@ describe('Visit details page', () => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
     visitAlerts = []
     idsToFlag = jest.fn().mockReturnValue([])
+    hideAlertsInset = null
 
     visitDetails = TestData.visitBookingDetails()
 
@@ -422,6 +426,36 @@ describe('Visit details page', () => {
             const $ = cheerio.load(res.text)
             expect($('.bapv-visit-details__visitor--flagged #visitor-4321').length).toBe(1)
             expect($('.bapv-visit-details__visitor--flagged').text()).toContain('Visitor has been unapproved')
+          })
+      })
+    })
+
+    describe('Restriction and alert hidden text', () => {
+      it('should display reason for restrictions/alerts hidden', () => {
+        hideAlertsInset = {
+          prisoner: {
+            html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            attributes: { 'data-test': 'prisoner-inset' },
+            classes: 'inset-text-prisoner',
+          },
+          visitor: {
+            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            attributes: { 'data-test': 'visitor-inset' },
+          },
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=prisoner-inset]').text()).toContain(
+              'Alerts and restrictions are not shown for past visits.You can view alerts and restrictions for past visits in the contacts service.',
+            )
+            expect($('[data-test=visitor-inset]').text()).toContain(
+              'Visitor restrictions are not shown for past visits.You can view alerts and restrictions for past visits in the contacts service.',
+            )
           })
       })
     })

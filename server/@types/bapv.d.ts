@@ -163,6 +163,11 @@ export type CancelledVisitInfo = {
   hasMobileNumber: boolean
 }
 
+export type GOVUKInsetText = TextOrHtml & {
+  classes?: string
+  attributes?: { 'data-test': string }
+}
+
 export type GOVUKTag = TextOrHtml & {
   classes?: string
 }

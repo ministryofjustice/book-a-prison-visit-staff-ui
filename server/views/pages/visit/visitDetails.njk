@@ -4,6 +4,7 @@
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 {% from "components/visitors.njk" import visitorDateOfBirth %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set fromPrisonerProfile = false %}
 
@@ -153,6 +154,9 @@
 
         {# Prisoner #}
         <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
+
+        {{ govukInsetText(hideAlertsInset.prisoner) if hideAlertsInset }}
+
         <h3 class="govuk-heading-m">
           <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
           (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
@@ -232,6 +236,9 @@
 
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
+
+        {{ govukInsetText(hideAlertsInset.visitor) if hideAlertsInset }}
+
         {% for visitor in visitDetails.visitors %}
           {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
           <div class="{{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">

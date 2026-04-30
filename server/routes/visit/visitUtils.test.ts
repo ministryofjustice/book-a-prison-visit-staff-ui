@@ -1,4 +1,5 @@
 import { MoJAlert } from '../../@types/bapv'
+import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
@@ -10,6 +11,7 @@ import {
   isPublicBooking,
   getVisitAlerts,
   getIdsToFlag,
+  getHideAlertsInset,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -507,6 +509,100 @@ describe('Visit utils', () => {
 
       const publicBooker = isPublicBooking(events)
       expect(publicBooker).toStrictEqual(false)
+    })
+  })
+
+  describe('getHideAlertsInset', () => {
+    it('should return "PAST" if startTimestamp is in the past (2AM visit, 2PM current time)', () => {
+      const fakeDate = new Date('2026-01-01T14:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T02:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'HEI'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return "RELEASED" if prisoner prisonID is "OUT"', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'OUT'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          text: 'Alerts and restrictions are not shown for released prisoners.',
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: 'Visitor restrictions are not shown for released prisoners.',
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return "TRANSFER" if visit prison ID and prisoner prison ID do not match', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          text: 'Alerts and restrictions are not shown for transferred prisoners.',
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: 'Visitor restrictions are not shown for transferred prisoners.',
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return null if prisons do not match but currently in "Transfer"', () => {
+      const fakeDate = new Date('2026-01-01T10:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T22:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'TRN'
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(null)
+      jest.useRealTimers()
     })
   })
 })
