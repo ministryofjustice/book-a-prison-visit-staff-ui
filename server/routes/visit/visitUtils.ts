@@ -267,12 +267,12 @@ export const getHideAlertsInset = ({
   if (isPast(visitStartTime)) {
     return {
       prisoner: {
-        html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
         attributes: { 'data-test': 'prisoner-inset' },
-        classes: 'inset-text-prisoner',
+        classes: 'govuk-!-margin-bottom-1',
       },
       visitor: {
-        html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
         attributes: { 'data-test': 'visitor-inset' },
       },
     }
@@ -283,7 +283,7 @@ export const getHideAlertsInset = ({
       prisoner: {
         text: 'Alerts and restrictions are not shown for released prisoners.',
         attributes: { 'data-test': 'prisoner-inset' },
-        classes: 'inset-text-prisoner',
+        classes: 'govuk-!-margin-bottom-1',
       },
       visitor: {
         html: 'Visitor restrictions are not shown for released prisoners.',
@@ -297,7 +297,7 @@ export const getHideAlertsInset = ({
       prisoner: {
         text: 'Alerts and restrictions are not shown for transferred prisoners.',
         attributes: { 'data-test': 'prisoner-inset' },
-        classes: 'inset-text-prisoner',
+        classes: 'govuk-!-margin-bottom-1',
       },
       visitor: {
         html: 'Visitor restrictions are not shown for transferred prisoners.',
