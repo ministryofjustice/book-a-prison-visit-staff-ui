@@ -53,8 +53,6 @@ export default class TestData {
     country = 'England',
     primary = true,
     noFixedAddress = false,
-    phones = [],
-    addressUsages = [],
   }: Partial<Address> = {}): Address =>
     ({
       flat,
@@ -67,8 +65,6 @@ export default class TestData {
       country,
       primary,
       noFixedAddress,
-      phones,
-      addressUsages,
     }) as Address
 
   static alert = ({
@@ -228,7 +224,7 @@ export default class TestData {
     emergencyContact = false,
     nextOfKin = false,
     restrictions = [],
-    addresses = [this.address()],
+    address = this.address(),
   }: Partial<Contact> = {}): Contact =>
     ({
       personId,
@@ -242,7 +238,7 @@ export default class TestData {
       emergencyContact,
       nextOfKin,
       restrictions,
-      addresses,
+      address,
     }) as Contact
 
   static currentIncentive = ({
@@ -463,12 +459,14 @@ export default class TestData {
     firstName = 'Jeanette',
     lastName = 'Smith',
     dateOfBirth = '1986-07-28',
+    approvedVisitor = true,
     lastApprovedForVisitDate = '2025-10-11',
   }: Partial<SocialContactsDto> = {}): SocialContactsDto => ({
     visitorId,
     firstName,
     lastName,
     dateOfBirth,
+    approvedVisitor,
     lastApprovedForVisitDate,
   })
 
@@ -663,8 +661,6 @@ export default class TestData {
           town: 'Coventry',
           primary: true,
           noFixedAddress: false,
-          phones: [],
-          addressUsages: [],
         },
       },
     ],
@@ -678,6 +674,7 @@ export default class TestData {
       },
     ],
     notifications = [],
+    skipAlertsAndRestrictions = false,
   }: Partial<VisitBookingDetails> = {}): VisitBookingDetails => ({
     reference,
     visitRoom,
@@ -696,6 +693,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
+    skipAlertsAndRestrictions,
   })
 
   // raw data as returned from API
@@ -717,6 +715,7 @@ export default class TestData {
     visitors = this.visitBookingDetails().visitors,
     events = this.visitBookingDetails().events as VisitBookingDetailsRaw['events'],
     notifications = this.visitBookingDetails().notifications as VisitBookingDetailsRaw['notifications'],
+    skipAlertsAndRestrictions = this.visitBookingDetails().skipAlertsAndRestrictions,
   }: Partial<VisitBookingDetailsRaw> = {}): VisitBookingDetailsRaw => ({
     reference,
     visitRoom,
@@ -735,6 +734,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
+    skipAlertsAndRestrictions,
   })
 
   // data with notification types processed
@@ -874,12 +874,14 @@ export default class TestData {
     lastName = 'Smith',
     dateOfBirth = '1986-07-28',
     visitorRestrictions = [],
+    approved = true,
   }: Partial<VisitorInfoDto> = {}): VisitorInfoDto => ({
     visitorId,
     firstName,
     lastName,
     dateOfBirth,
     visitorRestrictions,
+    approved,
   })
 
   static visitorRequest = ({

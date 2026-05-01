@@ -72,29 +72,18 @@ describe('Prisoner visitor service', () => {
               globalRestriction: false,
             },
           ],
-          addresses: [
-            {
-              street: 'non primary addr',
-              primary: false,
-              noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
-            },
-            {
-              flat: '23B',
-              premise: 'Premises',
-              street: '123 The Street',
-              locality: 'Springfield',
-              town: 'Coventry',
-              postalCode: 'C1 2AB',
-              county: 'West Midlands',
-              country: 'England',
-              primary: true,
-              noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
-            },
-          ],
+          address: {
+            flat: '23B',
+            premise: 'Premises',
+            street: '123 The Street',
+            locality: 'Springfield',
+            town: 'Coventry',
+            postalCode: 'C1 2AB',
+            county: 'West Midlands',
+            country: 'England',
+            primary: true,
+            noFixedAddress: false,
+          },
         },
         {
           personId: 4322,
@@ -107,22 +96,11 @@ describe('Prisoner visitor service', () => {
           emergencyContact: false,
           nextOfKin: false,
           restrictions: [],
-          addresses: [
-            {
-              street: '1st listed address', // no primary; should show first
-              primary: false,
-              noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
-            },
-            {
-              street: '2nd listed address',
-              primary: false,
-              noFixedAddress: false,
-              phones: [],
-              addressUsages: [],
-            },
-          ],
+          address: {
+            street: '123 The Street',
+            primary: false,
+            noFixedAddress: false,
+          },
         },
         {
           personId: 4324,
@@ -136,7 +114,7 @@ describe('Prisoner visitor service', () => {
           emergencyContact: false,
           nextOfKin: false,
           restrictions: [],
-          addresses: [],
+          address: { primary: false, noFixedAddress: false },
         },
       ]
 
@@ -193,7 +171,7 @@ describe('Prisoner visitor service', () => {
           dateOfBirth: undefined,
           adult: true,
           relationshipDescription: 'Brother',
-          address: '1st listed address',
+          address: '123 The Street',
           restrictions: [],
           banned: false,
         },

@@ -4,7 +4,6 @@ import * as cheerio from 'cheerio'
 import { appWithAllRoutes } from '../../testutils/appSetup'
 import { createMockVisitOrdersService } from '../../../services/testutils/mocks'
 import TestData from '../../testutils/testData'
-import { setFeature } from '../../../data/testutils/mockFeature'
 
 let app: Express
 
@@ -16,8 +15,6 @@ const { prisonerId } = visitOrderHistoryPage
 const url = `/prisoner/${prisonerId}/visiting-orders-history`
 
 beforeEach(() => {
-  setFeature('voHistory', { enabled: true })
-
   visitOrdersService.getVoHistory.mockResolvedValue(visitOrderHistoryPage)
 
   app = appWithAllRoutes({ services: { visitOrdersService } })
@@ -29,14 +26,6 @@ afterEach(() => {
 
 describe('Visit orders history', () => {
   describe(`GET ${url}`, () => {
-    it('should return a 404 if FEATURE_VO_HISTORY not enabled', () => {
-      setFeature('voHistory', { enabled: false })
-
-      app = appWithAllRoutes({ services: { visitOrdersService } })
-
-      return request(app).get(url).expect(404)
-    })
-
     it('should render visiting orders history page', () => {
       return request(app)
         .get(url)

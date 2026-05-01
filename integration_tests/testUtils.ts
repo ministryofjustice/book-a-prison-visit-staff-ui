@@ -34,7 +34,7 @@ export const login = async (
     hmppsAuth.stubSignOutPage(),
     hmppsAuth.token({ name, roles, authSource }),
     tokenVerification.stubVerifyToken(active),
-    stubComponents({ username: name, caseLoad }),
+    stubComponents({ name, caseLoad }),
   ])
   await attemptHmppsAuthLogin(page)
 }

@@ -1,11 +1,13 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../services'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import {
   getAvailableVisitActions,
+  getIdsToFlag,
   getPrisonerLocation,
   getVisitAlerts,
-  getVisitorRestrictionIdsToFlag,
+  getHideAlertsInset,
 } from './visitUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
@@ -16,7 +18,7 @@ export default class VisitDetailsController {
     private readonly visitService: VisitService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
       const { selectedEstablishment } = req.session
@@ -37,7 +39,12 @@ export default class VisitDetailsController {
         return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
       }
 
-      const messages = getVisitAlerts(visitDetails)
+      const hideAlertsInset = getHideAlertsInset({
+        startTimestamp: visitDetails.startTimestamp,
+        visitPrisonId: visitDetails.prison.prisonId,
+        prisonerPrisonId: visitDetails.prisoner.prisonId,
+        inOutStatus: visitDetails.prisoner.inOutStatus,
+      })
 
       const availableVisitActions = getAvailableVisitActions({
         visitStatus: visitDetails.visitStatus,
@@ -46,7 +53,18 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const flaggedVisitorRestrictionIds = getVisitorRestrictionIdsToFlag(visitDetails.notifications)
+      const messages = getVisitAlerts(visitDetails)
+
+      const flaggedVisitorRestrictionIds = getIdsToFlag({
+        notificationType: 'VISITOR_RESTRICTION',
+        returnedIdType: 'VISITOR_RESTRICTION_ID',
+        notifications: visitDetails.notifications,
+      })
+      const unapprovedVisitorIds = getIdsToFlag({
+        notificationType: 'VISITOR_UNAPPROVED_EVENT',
+        returnedIdType: 'VISITOR_ID',
+        notifications: visitDetails.notifications,
+      })
 
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,
@@ -61,6 +79,7 @@ export default class VisitDetailsController {
 
       return res.render('pages/visit/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
+        hideAlertsInset,
         availableVisitActions,
         eventsTimeline,
         fromPage,
@@ -70,6 +89,7 @@ export default class VisitDetailsController {
         prisonerLocation,
         visitDetails,
         flaggedVisitorRestrictionIds,
+        unapprovedVisitorIds,
         prisonerId: prisoner.prisonerNumber,
       })
     }

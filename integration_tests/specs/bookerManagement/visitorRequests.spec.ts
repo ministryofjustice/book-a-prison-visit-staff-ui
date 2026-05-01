@@ -2,12 +2,12 @@ import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../mockApis/orchestration'
 
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
+import HomePage from '../../pages/homePage'
 import bapvUserRoles from '../../../server/constants/bapvUserRoles'
-import BookerManagementPage from '../../pages-playwright/bookerManagement/bookerManagementPage'
+import BookerManagementPage from '../../pages/bookerManagement/bookerManagementPage'
 import TestData from '../../../server/routes/testutils/testData'
-import LinkVisitorRequestPage from '../../pages-playwright/bookerManagement/visitorRequests/linkVisitorRequestPage'
-import CheckLinkedVisitorsPage from '../../pages-playwright/bookerManagement/visitorRequests/checkLinkedVisitorsPage'
+import LinkVisitorRequestPage from '../../pages/bookerManagement/visitorRequests/linkVisitorRequestPage'
+import CheckLinkedVisitorsPage from '../../pages/bookerManagement/visitorRequests/checkLinkedVisitorsPage'
 
 test.describe('Booker management - visitor requests', () => {
   test.beforeEach(async ({ page }) => {

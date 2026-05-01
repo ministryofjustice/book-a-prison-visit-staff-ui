@@ -461,13 +461,21 @@ describe('orchestrationApiClient', () => {
       const visitorRequest = TestData.visitorRequest()
       const requestReference = visitorRequest.reference
       const rejectionReason: RejectVisitorRequestDto['rejectionReason'] = 'REJECT'
+      const username = 'user1'
 
       fakeOrchestrationApi
-        .put(`/visitor-requests/${requestReference}/reject`, <RejectVisitorRequestDto>{ rejectionReason })
+        .put(`/visitor-requests/${requestReference}/reject`, <RejectVisitorRequestDto>{
+          rejectionReason,
+          actionedBy: username,
+        })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequest)
 
-      const output = await orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason })
+      const output = await orchestrationApiClient.rejectVisitorRequest({
+        requestReference,
+        rejectionReason,
+        username,
+      })
 
       expect(output).toStrictEqual(visitorRequest)
     })
@@ -478,13 +486,17 @@ describe('orchestrationApiClient', () => {
       const visitorRequest = TestData.visitorRequest()
       const requestReference = visitorRequest.reference
       const visitorId = 123
+      const username = 'user1'
 
       fakeOrchestrationApi
-        .put(`/visitor-requests/${requestReference}/approve`, <ApproveVisitorRequestDto>{ visitorId })
+        .put(`/visitor-requests/${requestReference}/approve`, <ApproveVisitorRequestDto>{
+          visitorId,
+          actionedBy: username,
+        })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequest)
 
-      const output = await orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId })
+      const output = await orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId, username })
 
       expect(output).toStrictEqual(visitorRequest)
     })
@@ -595,15 +607,16 @@ describe('orchestrationApiClient', () => {
       const reference = 'aaa-bbb-ccc'
       const visitorId = 123
       const sendNotification = true
+      const username = 'user1'
 
       fakeOrchestrationApi
         .post(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`, <
           RegisterVisitorForBookerPrisonerDto
-        >{ visitorId, active: true, sendNotificationFlag: sendNotification })
+        >{ visitorId, sendNotificationFlag: sendNotification, actionedBy: username })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200)
 
-      await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification })
+      await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification, username })
 
       expect(fakeOrchestrationApi.isDone()).toBe(true)
     })

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import orchestrationApi from '../mockApis/orchestration'
 
 import { login, resetStubs } from '../testUtils'
-import HomePage from '../pages-playwright/homePage'
+import HomePage from '../pages/homePage'
 import TestData from '../../server/routes/testutils/testData'
 import bapvUserRoles from '../../server/constants/bapvUserRoles'
 

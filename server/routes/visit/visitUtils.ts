@@ -1,8 +1,14 @@
-import { MoJAlert } from '../../@types/bapv'
+import { isFuture, isPast } from 'date-fns'
+import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
-import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import {
+  EventAudit,
+  NotificationType,
+  VisitBookingDetails,
+  VisitNotificationEventAttributeNames,
+} from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000
 const CANCELLATION_LIMIT_MS = config.visit.cancellationLimitDays * A_DAY_IN_MS
@@ -48,7 +54,6 @@ export const getAvailableVisitActions = ({
     return availableVisitActions
   }
 
-  const now = new Date()
   const visitStartTime = new Date(startTimestamp)
 
   // update
@@ -56,14 +61,14 @@ export const getAvailableVisitActions = ({
     notification => notification.type === 'PRISONER_RECEIVED_EVENT' || notification.type === 'PRISONER_RELEASED_EVENT',
   )
 
-  if (!hasUpdateBlockingNotifications && now < visitStartTime) {
+  if (!hasUpdateBlockingNotifications && isFuture(new Date(startTimestamp))) {
     availableVisitActions.update = true
   }
 
   // cancel
   const latestCancellationTime = new Date(visitStartTime.getTime() + CANCELLATION_LIMIT_MS)
 
-  if (now < latestCancellationTime) {
+  if (isFuture(latestCancellationTime)) {
     availableVisitActions.cancel = true
   }
 
@@ -72,7 +77,11 @@ export const getAvailableVisitActions = ({
     notification => notification.type === 'PRISON_VISITS_BLOCKED_FOR_DATE',
   )
 
-  if (!hasBlockedDateNotification && notifications.length > 0) {
+  const hasUnapprovedVisitorNotification = notifications.some(
+    notification => notification.type === 'VISITOR_UNAPPROVED_EVENT',
+  )
+
+  if (!hasBlockedDateNotification && !hasUnapprovedVisitorNotification && notifications.length > 0) {
     availableVisitActions.clearNotifications = true
   }
 
@@ -142,41 +151,55 @@ const getVisitRequestAlert = ({
 }
 
 const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notifications']): MoJAlert[] => {
-  // split notifications into those that should be a single alert and those to be grouped into one alert
-  const singleNotifications: VisitBookingDetails['notifications'] = []
-  const groupedNotifications: VisitBookingDetails['notifications'] = []
+  // simpleNotifications are simple descriptive notifications
+  // linkedNotifications are notifications with anchors to restrictions/visitors on the page
+  const simpleNotifications: VisitBookingDetails['notifications'] = []
+  const linkedNotifications: VisitBookingDetails['notifications'] = []
   notifications.forEach(notification => {
-    if (notification.type === 'VISITOR_RESTRICTION') {
-      groupedNotifications.push(notification)
+    if (notification.type === 'VISITOR_RESTRICTION' || notification.type === 'VISITOR_UNAPPROVED_EVENT') {
+      linkedNotifications.push(notification)
     } else {
-      singleNotifications.push(notification)
+      simpleNotifications.push(notification)
     }
   })
 
-  if (!singleNotifications.length && !groupedNotifications.length) {
+  if (!simpleNotifications.length && !linkedNotifications.length) {
     return []
   }
 
   const alerts = []
 
-  singleNotifications.forEach(notification => {
+  simpleNotifications.forEach(notification => {
     if (notificationTypeAlerts[notification.type]) {
       alerts.push(notificationTypeAlerts[notification.type])
     }
   })
 
-  if (groupedNotifications.length) {
-    const visitorRestrictionIds = getVisitorRestrictionIdsToFlag(groupedNotifications)
+  if (linkedNotifications.length) {
+    const visitorRestrictionIds = getIdsToFlag({
+      notificationType: 'VISITOR_RESTRICTION',
+      returnedIdType: 'VISITOR_RESTRICTION_ID',
+      notifications: linkedNotifications,
+    })
+    const unapprovedVisitorIds = getIdsToFlag({
+      notificationType: 'VISITOR_UNAPPROVED_EVENT',
+      returnedIdType: 'VISITOR_ID',
+      notifications: linkedNotifications,
+    })
 
-    const restrictionListItems = visitorRestrictionIds
+    let notificationItems = visitorRestrictionIds
       .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
+      .join('')
+
+    notificationItems += unapprovedVisitorIds
+      .map(id => `<li><a href="#visitor-${id}">Visitor has been unapproved</a></li>`)
       .join('')
 
     alerts.push({
       variant: 'warning',
       title: 'This visit needs review',
       showTitleAsHeading: true,
-      html: `<ul class="govuk-list">${restrictionListItems}</ul>`,
+      html: `<ul class="govuk-list">${notificationItems}</ul>`,
       classes: 'notifications-summary-alert',
     } as MoJAlert)
   }
@@ -206,18 +229,83 @@ export const getVisitAlerts = (visitDetails: VisitBookingDetails): MoJAlert[] =>
   ]
 }
 
-export const getVisitorRestrictionIdsToFlag = (notifications: VisitBookingDetails['notifications']): number[] => {
-  const restrictionIds = new Set<number>() // only want unique IDs
+export const getIdsToFlag = ({
+  notificationType,
+  returnedIdType,
+  notifications,
+}: {
+  notificationType: NotificationType
+  returnedIdType: Extract<VisitNotificationEventAttributeNames, 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID'>
+  notifications: VisitBookingDetails['notifications']
+}): number[] => {
+  const flaggedIds = new Set<number>() // only want unique IDs
   notifications
-    .filter(notification => notification.type === 'VISITOR_RESTRICTION')
+    .filter(notification => notification.type === notificationType)
     .forEach(notification => {
-      const restrictionData = notification.additionalData.find(data => data.attributeName === 'VISITOR_RESTRICTION_ID')
-      restrictionIds.add(parseInt(restrictionData?.attributeValue, 10))
+      const matchedNotifications = notification.additionalData.find(data => data.attributeName === returnedIdType)
+      flaggedIds.add(parseInt(matchedNotifications?.attributeValue, 10))
     })
-  return Array.from(restrictionIds)
+  return Array.from(flaggedIds)
 }
 
 export const isPublicBooking = (events: EventAudit[]): boolean => {
   const visitBookedEvent = events.find(event => event.type === 'BOOKED_VISIT')
   return visitBookedEvent?.userType === 'PUBLIC'
+}
+
+export const getHideAlertsInset = ({
+  startTimestamp,
+  visitPrisonId,
+  prisonerPrisonId,
+  inOutStatus,
+}: {
+  startTimestamp: VisitBookingDetails['startTimestamp']
+  visitPrisonId: string
+  prisonerPrisonId: string
+  inOutStatus: VisitBookingDetails['prisoner']['inOutStatus']
+}): { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null => {
+  const visitStartTime = new Date(startTimestamp)
+
+  if (isPast(visitStartTime)) {
+    return {
+      prisoner: {
+        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+
+  if (prisonerPrisonId === 'OUT') {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for released prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+
+  if (prisonerPrisonId !== visitPrisonId && inOutStatus !== 'TRN') {
+    return {
+      prisoner: {
+        text: 'Alerts and restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'prisoner-inset' },
+        classes: 'govuk-!-margin-bottom-1',
+      },
+      visitor: {
+        html: 'Visitor restrictions are not shown for transferred prisoners.',
+        attributes: { 'data-test': 'visitor-inset' },
+      },
+    }
+  }
+  return null
 }

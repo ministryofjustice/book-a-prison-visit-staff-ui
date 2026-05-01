@@ -12,7 +12,9 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types"]
+    "typeRoots": ["./server/@types", "./node_modules/@types"],
+    "types": ["node", "jest"],
+    "rootDir": "."
   },
   "exclude": [
     "node_modules",
@@ -21,7 +23,6 @@
     "dist",
     "coverage",
     "test_results",
-    "cypress.config.ts",
     "esbuild",
     "eslint.config.mjs"
   ],

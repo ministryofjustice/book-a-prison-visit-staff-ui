@@ -4,14 +4,14 @@ import { Services } from '../../../services'
 import BookerDetailsController from './bookerDetailsController'
 import { isValidBookerReference } from '../../validationChecks'
 import UnlinkVisitorController from './unlinkVisitorController'
-import ApprovedVisitorListController from './approvedVisitorListController'
+import VisitorListController from './visitorListController'
 import LinkVisitorController from './linkVisitorController'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
-  const approvedVisitorListController = new ApprovedVisitorListController(services.bookerService)
+  const visitorListController = new VisitorListController(services.bookerService)
   const linkVisitorController = new LinkVisitorController(services.auditService, services.bookerService)
   const unlinkVisitorController = new UnlinkVisitorController(services.auditService, services.bookerService)
 
@@ -27,12 +27,12 @@ export default function routes(services: Services): Router {
   // Booker details
   router.get('/:reference/booker-details', bookerDetailsController.view())
 
-  // Link visitor - approved visitor list
-  router.get('/:reference/prisoner/:prisonerId/link-visitor', approvedVisitorListController.view())
+  // Link visitor - visitor list
+  router.get('/:reference/prisoner/:prisonerId/link-visitor', visitorListController.view())
   router.post(
     '/:reference/prisoner/:prisonerId/link-visitor',
-    approvedVisitorListController.validate(),
-    approvedVisitorListController.submit(),
+    visitorListController.validate(),
+    visitorListController.submit(),
   )
 
   // Link visitor - confirm and notify

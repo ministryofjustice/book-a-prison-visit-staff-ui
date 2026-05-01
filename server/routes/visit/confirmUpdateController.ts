@@ -1,11 +1,12 @@
 import { RequestHandler, Request } from 'express'
 import { BadRequest } from 'http-errors'
 import { isValidVisitReference } from '../validationChecks'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 
 export default class ConfirmUpdateController {
   public constructor() {}
 
-  public viewConfirmUpdate(): RequestHandler {
+  public viewConfirmUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const reference = getVisitReference(req)
       const { policyNoticeDaysMin } = req.session.selectedEstablishment
@@ -19,7 +20,7 @@ export default class ConfirmUpdateController {
     }
   }
 
-  public submitConfirmUpdate(): RequestHandler {
+  public submitConfirmUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const reference = getVisitReference(req)
       const { confirmUpdate } = req.body
@@ -46,7 +47,7 @@ export default class ConfirmUpdateController {
   }
 }
 
-function getVisitReference(req: Request): string {
+function getVisitReference(req: Request<VisitReferenceParams>): string {
   const { reference } = req.params
 
   if (!isValidVisitReference(reference)) {

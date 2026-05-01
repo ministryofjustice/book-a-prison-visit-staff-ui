@@ -4,6 +4,7 @@
 {%- from "moj/components/timeline/macro.njk" import mojTimeline -%}
 {%- from "components/expandableComment/macro.njk" import bapvExpandableComment -%}
 {% from "components/visitors.njk" import visitorDateOfBirth %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set fromPrisonerProfile = false %}
 
@@ -153,6 +154,9 @@
 
         {# Prisoner #}
         <h2 class="govuk-heading-l govuk-!-padding-top-3">Prisoner</h2>
+
+        {{ govukInsetText(hideAlertsInset.prisoner) if hideAlertsInset }}
+
         <h3 class="govuk-heading-m">
           <span data-test="prisoner-name">{{ (visitDetails.prisoner.firstName + " " + visitDetails.prisoner.lastName) | properCaseFullName }}</span>
           (<span data-test="prisoner-number">{{ visitDetails.prisoner.prisonerNumber }}</span>)
@@ -232,22 +236,31 @@
 
         {# Visitors #}
         <h2 class="govuk-heading-l">Visitors</h2>
-        {% for visitor in visitDetails.visitors %}
-          <h3 class="govuk-heading-m">
-            <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
-            <span>
-              (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
-            </span>
-          </h3>
-          <dl class="govuk-list bapv-visit-details__person-details">
-            <dt>Date of birth</dt>
-            <dd data-test="visitor-dob-{{ loop.index }}">
-              {{- visitorDateOfBirth(visitor) -}}
-            </dd>
 
-            <dt>Address</dt>
-            <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
-          </dl>
+        {{ govukInsetText(hideAlertsInset.visitor) if hideAlertsInset }}
+
+        {% for visitor in visitDetails.visitors %}
+          {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
+          <div class="{{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
+            {% if flagVisitor %}
+              <p id="visitor-{{ visitor.personId }}">Visitor has been unapproved</p>
+            {% endif %}
+            <h3 class="govuk-heading-m">
+              <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
+              <span>
+                (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
+              </span>
+            </h3>
+            <dl class="govuk-list bapv-visit-details__person-details">
+              <dt>Date of birth</dt>
+              <dd data-test="visitor-dob-{{ loop.index }}">
+                {{- visitorDateOfBirth(visitor) -}}
+              </dd>
+
+              <dt>Address</dt>
+              <dd data-test="visitor-address-{{ loop.index }}">{{ visitor.primaryAddress | formatAddress }}</dd>
+            </dl>
+          </div>
 
           {# Visitor restrictions #}
           {% if visitor.restrictions | length %}

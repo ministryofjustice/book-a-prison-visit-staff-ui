@@ -1,7 +1,7 @@
 import { addDays, format } from 'date-fns'
-import { Restriction } from '../data/prisonerContactRegistryApiTypes'
+import { Address, Restriction } from '../data/prisonerContactRegistryApiTypes'
 import TestData from '../routes/testutils/testData'
-import { buildVisitorListItem, getBanStatus } from './visitorUtils'
+import { buildVisitorListItem, getBanStatus, getFormattedAddress } from './visitorUtils'
 
 describe('visitorUtils', () => {
   describe('buildVisitorListItem', () => {
@@ -21,6 +21,31 @@ describe('visitorUtils', () => {
         relationshipDescription: 'Wife',
         restrictions,
       })
+    })
+  })
+
+  describe('getFormattedAddress', () => {
+    it.each([
+      [
+        'Full address',
+        TestData.address(),
+        'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
+      ],
+      [
+        'Partial address',
+        {
+          street: '123 The Street',
+          town: 'Coventry',
+          postalCode: 'C1 2AB',
+        },
+        '123 The Street,\nCoventry,\nC1 2AB',
+      ],
+      ['Empty address', {}, 'Not entered'],
+      ['null address', null, 'Not entered'],
+      ['undefined address', undefined, 'Not entered'],
+    ])('%s', (_: string, address: Address, expected: string) => {
+      const formattedAddress = getFormattedAddress(address)
+      expect(formattedAddress).toStrictEqual(expected)
     })
   })
 

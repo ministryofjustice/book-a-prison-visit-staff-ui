@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitNotificationsService } from '../../services'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { IgnoreVisitNotificationsDto } from '../../data/orchestrationApiTypes'
 import { getFlashFormValues } from '../visitorUtils'
 
@@ -10,7 +11,7 @@ export default class ClearNotificationsController {
     private readonly visitNotificationsService: VisitNotificationsService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
 
@@ -22,7 +23,7 @@ export default class ClearNotificationsController {
     }
   }
 
-  public clearNotifications(): RequestHandler {
+  public clearNotifications(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const errors = validationResult(req)
       const { reference } = req.params

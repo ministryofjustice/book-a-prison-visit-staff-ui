@@ -2,22 +2,22 @@ import { expect, test } from '@playwright/test'
 import { addDays, format, sub, eachDayOfInterval } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
-import SearchForAPrisonerPage from '../../pages-playwright/search/searchForAPrisonerPage'
-import SearchForAPrisonerResultsPage from '../../pages-playwright/search/searchForPrinsonerResultsPage'
-import PrisonerProfilePage from '../../pages-playwright/prisoner/prisonerProfilePage'
-import SelectVisitorsPage from '../../pages-playwright/visitJourney/selectVisitorsPage'
+import HomePage from '../../pages/homePage'
+import SearchForAPrisonerPage from '../../pages/search/searchForAPrisonerPage'
+import SearchForAPrisonerResultsPage from '../../pages/search/searchForAPrisonerResultsPage'
+import PrisonerProfilePage from '../../pages/prisoner/prisonerProfilePage'
+import SelectVisitorsPage from '../../pages/visitJourney/selectVisitorsPage'
 import TestData from '../../../server/routes/testutils/testData'
 import prisonerContactRegistry from '../../mockApis/prisonerContactRegistry'
-import SelectVisitDateAndTimePage from '../../pages-playwright/visitJourney/selectVisitDateAndTimePage'
+import SelectVisitDateAndTimePage from '../../pages/visitJourney/selectVisitDateAndTimePage'
 import { SessionsAndScheduleDto } from '../../../server/data/orchestrationApiTypes'
-import AdditionalSupportPage from '../../pages-playwright/visitJourney/additionalSupportPage'
-import MainContactPage from '../../pages-playwright/visitJourney/mainContactPage'
-import RequestMethodPage from '../../pages-playwright/visitJourney/requestMethodPage'
-import CheckYourBookingPage from '../../pages-playwright/visitJourney/checkYourBookingPage'
-import ConfirmationPage from '../../pages-playwright/visitJourney/confirmationPage'
+import AdditionalSupportPage from '../../pages/visitJourney/additionalSupportPage'
+import MainContactPage from '../../pages/visitJourney/mainContactPage'
+import RequestMethodPage from '../../pages/visitJourney/requestMethodPage'
+import CheckYourBookingPage from '../../pages/visitJourney/checkYourBookingPage'
+import ConfirmationPage from '../../pages/visitJourney/confirmationPage'
 import prisonerSearch from '../../mockApis/prisonerSearch'
-import SelectVisitTypePage from '../../pages-playwright/visitJourney/selectVisitTypePage'
+import SelectVisitTypePage from '../../pages/visitJourney/selectVisitTypePage'
 
 test.describe('Book a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -88,7 +88,7 @@ test.describe('Book a visit', () => {
         content: [prisoner],
       },
     })
-    // generate array of dates over next month and add some visit sessions and events as defined in Cypress tests
+    // generate array of dates over next month and add some visit sessions and events
     const dateIn7Days = format(addDays(today, 7), shortDateFormat)
     const eachDateUntilNextMonth = eachDayOfInterval({ start: today, end: addDays(today, 32) })
 
@@ -176,7 +176,7 @@ test.describe('Book a visit', () => {
     await selectVisitDateAndTime.selectSession(dateIn7Days, 0).click()
 
     // Additional support
-    await selectVisitDateAndTime.continueButton.click()
+    await selectVisitDateAndTime.clickContinue()
     const additionalSupportPage = await AdditionalSupportPage.verifyOnPage(page)
     await additionalSupportPage.additionalSupportRequired.check()
     await additionalSupportPage.additionalSupportInput.fill('Wheelchair ramp, Some extra help!')
@@ -206,7 +206,7 @@ test.describe('Book a visit', () => {
       }),
     )
     // Request method
-    mainContactPage.continueButton.click()
+    await mainContactPage.continueButton.click()
     const requestMethodPage = await RequestMethodPage.verifyOnPage(page)
     await expect(requestMethodPage.getRequestLabelByValue('PHONE')).toContainText('Phone call')
     await requestMethodPage.getRequestMethodByValue('PHONE').check()
@@ -253,7 +253,7 @@ test.describe('Book a visit', () => {
       ],
     })
 
-    await checkYourBookingPage.submitButton.click()
+    await checkYourBookingPage.clickSubmit()
     const confirmationPage = await ConfirmationPage.verifyOnPage(page)
     await expect(confirmationPage.bookingReference).toContainText(TestData.visit().reference)
     await expect(confirmationPage.prisonerName).toContainText('John Smith')

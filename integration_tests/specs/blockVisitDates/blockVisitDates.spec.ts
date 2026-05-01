@@ -2,10 +2,10 @@ import { expect, test } from '@playwright/test'
 import { format } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
+import HomePage from '../../pages/homePage'
 
-import BlockVisitDatesPage from '../../pages-playwright/blockVisitDates/blockVisitDatesPage'
-import BlockVisitDateConfirmationPage from '../../pages-playwright/blockVisitDates/blockVisitDateConfirmationPage'
+import BlockVisitDatesPage from '../../pages/blockVisitDates/blockVisitDatesPage'
+import BlockVisitDateConfirmationPage from '../../pages/blockVisitDates/blockVisitDateConfirmationPage'
 import TestData from '../../../server/routes/testutils/testData'
 
 test.describe('Block visit dates', () => {

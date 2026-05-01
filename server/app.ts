@@ -35,7 +35,6 @@ import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
 import bapvUserRoles from './constants/bapvUserRoles'
-import setUpAnalytics from './middleware/setUpAnalytics'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -56,14 +55,13 @@ export default function createApp(services: Services): express.Application {
   app.get(
     '*any',
     getFrontendComponents({
-      dpsUrl: config.dpsHome,
       logger,
       componentApiConfig: config.apis.componentApi,
+      dpsUrl: config.dpsHome,
       requestOptions: { includeSharedData: true },
     }),
   )
   app.use(setUpCurrentUser())
-  app.use(setUpAnalytics(config.analytics))
 
   app.use(maintenancePageRoute())
 

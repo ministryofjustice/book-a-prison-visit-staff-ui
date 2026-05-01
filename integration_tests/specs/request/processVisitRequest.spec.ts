@@ -1,9 +1,8 @@
 import { test, expect } from '@playwright/test'
 import TestData from '../../../server/routes/testutils/testData'
-import HomePage from '../../pages-playwright/homePage'
-import VisitRequestsListingPage from '../../pages-playwright/request/visitRequestsListingPage'
-import VisitDetailsPage from '../../pages-playwright/visit/visitDetailsPage'
-import auth from '../../mockApis/auth'
+import HomePage from '../../pages/homePage'
+import VisitRequestsListingPage from '../../pages/request/visitRequestsListingPage'
+import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import { resetStubs, login } from '../../testUtils'
 
@@ -20,7 +19,6 @@ test.describe('Process a visit Request', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison(prisonStaffAndPublic)
     await orchestrationApi.stubGetVisitRequestCount({ visitRequestCount: 1 })

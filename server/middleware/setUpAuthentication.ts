@@ -20,9 +20,9 @@ export default function setUpAuth(): Router {
   router.get(
     '/autherror',
     getFrontendComponents({
-      dpsUrl: config.dpsHome,
       logger,
       componentApiConfig: config.apis.componentApi,
+      dpsUrl: config.dpsHome,
       requestOptions: { includeSharedData: true },
     }),
     (req, res) => {

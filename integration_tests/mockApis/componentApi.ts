@@ -1,5 +1,5 @@
 import Component from '@ministryofjustice/hmpps-connect-dps-components/dist/types/Component'
-import HeaderFooterSharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/HeaderFooterSharedData'
+import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dist/types/SharedData'
 import CaseLoad from '@ministryofjustice/hmpps-connect-dps-components/dist/types/CaseLoad'
 import { stubFor } from './wiremock'
 import { convertToTitleCase, initialiseName } from '../../server/utils/utils'
@@ -9,18 +9,19 @@ const headerHtml = `<header class="fallback-dps-header" role="banner"> <div clas
 
 const footerHtml = '<footer class="govuk-footer"></footer>'
 
-const stubComponents = ({ username, caseLoad }: { username: string; caseLoad: CaseLoad }) => {
-  const formattedUserName = initialiseName(convertToTitleCase(username))
-  const customHeaderHtml = headerHtml.replace('USER-NAME', formattedUserName)
+const stubComponents = ({ name = 'john smith', caseLoad }: { name?: string; caseLoad: CaseLoad }) => {
+  const formattedName = initialiseName(convertToTitleCase(name))
+  const customHeaderHtml = headerHtml.replace('USER-NAME', formattedName)
 
-  const meta: HeaderFooterSharedData = {
+  const meta: SharedData = {
     activeCaseLoad: caseLoad,
     caseLoads: [caseLoad],
     services: [],
     allocationJobResponsibilities: [],
+    cspDirectives: {},
   }
 
-  const componentsResponse: { header: Component; footer: Component; meta: HeaderFooterSharedData } = {
+  const componentsResponse: { header: Component; footer: Component; meta: SharedData } = {
     header: {
       html: customHeaderHtml,
       css: [],

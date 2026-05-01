@@ -1,4 +1,5 @@
 import { MoJAlert } from '../../@types/bapv'
+import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
 import { visitCancellationAlerts } from '../../constants/visitCancellation'
 import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
@@ -8,8 +9,9 @@ import {
   getAvailableVisitActions,
   AvailableVisitActions,
   isPublicBooking,
-  getVisitorRestrictionIdsToFlag,
   getVisitAlerts,
+  getIdsToFlag,
+  getHideAlertsInset,
 } from './visitUtils'
 
 beforeEach(() => {
@@ -149,6 +151,14 @@ describe('Visit utils', () => {
           ] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
         })
+
+        it('should set clearNotifications to false if visit notifications includes VISITOR_UNAPPROVED_EVENT', () => {
+          params.notifications = [
+            { type: 'NON_ASSOCIATION_EVENT' },
+            { type: 'VISITOR_UNAPPROVED_EVENT' },
+          ] as VisitBookingDetails['notifications']
+          expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
       })
     })
   })
@@ -285,7 +295,7 @@ describe('Visit utils', () => {
         )
       })
 
-      describe('Visitor restriction notification(s) => single alert with grouped restrictions', () => {
+      describe('Mixed notifications', () => {
         it.each([
           [
             'a single visitor restriction notification',
@@ -340,6 +350,32 @@ describe('Visit utils', () => {
               },
             ],
           ],
+          [
+            'visitor restriction and visitor unapproved notifications',
+            [
+              {
+                type: 'VISITOR_RESTRICTION',
+                additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+              },
+              {
+                type: 'VISITOR_UNAPPROVED_EVENT',
+                additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '3' }],
+              },
+            ],
+            [
+              {
+                variant: 'warning',
+                title: 'This visit needs review',
+                showTitleAsHeading: true,
+                html:
+                  '<ul class="govuk-list">' +
+                  '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
+                  '<li><a href="#visitor-3">Visitor has been unapproved</a></li>' +
+                  '</ul>',
+                classes: 'notifications-summary-alert',
+              },
+            ],
+          ],
         ])(
           'should handle %s',
           (_: string, notifications: VisitBookingDetails['notifications'], expected: MoJAlert[]) => {
@@ -384,28 +420,60 @@ describe('Visit utils', () => {
       })
     })
   })
+  describe('getIdsToFlag', () => {
+    // flaggedVisitorRestrictionIds
+    const visitorRestrictionId = 'VISITOR_RESTRICTION_ID'
+    const visitorRestriction = 'VISITOR_RESTRICTION'
+    // unapprovedVisitorIds
+    const visitorId = 'VISITOR_ID'
+    const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
 
-  describe('getVisitorRestrictionIdsToFlag', () => {
-    it('should extract unique visitor restriction IDs if present from list of visit notifications', () => {
+    it(`should return ${visitorRestrictionId} if notification exists for ${visitorRestriction}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
         // should be ignored as not a VISITOR_RESTRICTION
         { type: 'PRISONER_RELEASED_EVENT' },
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '1' }],
         },
         // a duplicate VISITOR_RESTRICTION_ID - should be ignored
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '1' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '1' }],
         },
         {
-          type: 'VISITOR_RESTRICTION',
-          additionalData: [{ attributeName: 'VISITOR_RESTRICTION_ID', attributeValue: '2' }],
+          type: visitorRestriction,
+          additionalData: [{ attributeName: visitorRestrictionId, attributeValue: '2' }],
         },
       ]
 
-      expect(getVisitorRestrictionIdsToFlag(notifications)).toStrictEqual([1, 2])
+      expect(
+        getIdsToFlag({ notificationType: visitorRestriction, returnedIdType: visitorRestrictionId, notifications }),
+      ).toStrictEqual([1, 2])
+    })
+
+    it(`should return ${visitorId} if notification exists for ${visitorUnapprovedEvent}`, () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a VISITOR_UNAPPROVED_EVENT
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '100' }],
+        },
+        // a duplicate VISITOR_ID - should be ignored
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '100' }],
+        },
+        {
+          type: visitorUnapprovedEvent,
+          additionalData: [{ attributeName: visitorId, attributeValue: '200' }],
+        },
+      ]
+
+      expect(
+        getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
+      ).toStrictEqual([100, 200])
     })
   })
 
@@ -441,6 +509,100 @@ describe('Visit utils', () => {
 
       const publicBooker = isPublicBooking(events)
       expect(publicBooker).toStrictEqual(false)
+    })
+  })
+
+  describe('getHideAlertsInset', () => {
+    it('should return "PAST" if startTimestamp is in the past (2AM visit, 2PM current time)', () => {
+      const fakeDate = new Date('2026-01-01T14:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T02:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'HEI'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return "RELEASED" if prisoner prisonID is "OUT"', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'OUT'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          text: 'Alerts and restrictions are not shown for released prisoners.',
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: 'Visitor restrictions are not shown for released prisoners.',
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return "TRANSFER" if visit prison ID and prisoner prison ID do not match', () => {
+      const fakeDate = new Date('2026-01-01T12:00:00') // 01-01-26 12PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-02T22:00:00' // 02-01-26 12PM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'IN'
+
+      const expected = {
+        prisoner: {
+          text: 'Alerts and restrictions are not shown for transferred prisoners.',
+          attributes: { 'data-test': 'prisoner-inset' },
+          classes: 'govuk-!-margin-bottom-1',
+        },
+        visitor: {
+          html: 'Visitor restrictions are not shown for transferred prisoners.',
+          attributes: { 'data-test': 'visitor-inset' },
+        },
+      }
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(expected)
+      jest.useRealTimers()
+    })
+
+    it('should return null if prisons do not match but currently in "Transfer"', () => {
+      const fakeDate = new Date('2026-01-01T10:00:00') // 01-01-26 2PM
+      jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
+      const startTimestamp = '2026-01-01T22:00:00' // 01-01-26 2AM
+
+      const visitPrisonId = 'HEI'
+      const prisonerPrisonId = 'EYI'
+      const inOutStatus = 'TRN'
+
+      const results = getHideAlertsInset({ startTimestamp, visitPrisonId, prisonerPrisonId, inOutStatus })
+      expect(results).toStrictEqual(null)
+      jest.useRealTimers()
     })
   })
 })

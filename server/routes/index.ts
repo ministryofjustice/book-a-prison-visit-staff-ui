@@ -3,7 +3,6 @@ import { Router } from 'express'
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
 import bapvUserRoles from '../constants/bapvUserRoles'
-import config from '../config'
 
 export default function routes({ bookerService, visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
@@ -24,7 +23,7 @@ export default function routes({ bookerService, visitNotificationsService, visit
     // Manage online bookers tile (users with ADMIN role) and visitor requests count (pubic-enabled prisons only)
     const showBookerManagementTile = userRoles.includes(bapvUserRoles.BOOKER_ADMIN)
     const visitorRequestCount =
-      config.features.visitorRequests.enabled && showBookerManagementTile && prison.isEnabledForPublic
+      showBookerManagementTile && prison.isEnabledForPublic
         ? await bookerService.getVisitorRequestCount({ username, prisonId: prison.prisonId })
         : 0
 

@@ -2,14 +2,14 @@ import { expect, test } from '@playwright/test'
 import orchestrationApi from '../../mockApis/orchestration'
 
 import { login, resetStubs } from '../../testUtils'
-import HomePage from '../../pages-playwright/homePage'
+import HomePage from '../../pages/homePage'
 import TestData from '../../../server/routes/testutils/testData'
 import bapvUserRoles from '../../../server/constants/bapvUserRoles'
-import BookerManagementPage from '../../pages-playwright/bookerManagement/bookerManagementPage'
-import BookerDetailsPage from '../../pages-playwright/bookerManagement/booker/bookerDetailsPage'
-import SelectBookerAccountPage from '../../pages-playwright/bookerManagement/selectBookerAccountPage'
-import ApprovedVisitorListPage from '../../pages-playwright/bookerManagement/booker/approvedVisitorListPage'
-import LinkVisitorPage from '../../pages-playwright/bookerManagement/booker/linkVisitorPage'
+import BookerManagementPage from '../../pages/bookerManagement/bookerManagementPage'
+import BookerDetailsPage from '../../pages/bookerManagement/booker/bookerDetailsPage'
+import SelectBookerAccountPage from '../../pages/bookerManagement/selectBookerAccountPage'
+import ApprovedVisitorListPage from '../../pages/bookerManagement/booker/approvedVisitorListPage'
+import LinkVisitorPage from '../../pages/bookerManagement/booker/linkVisitorPage'
 
 test.describe('Booker management - search, manual link/unlink visitors', () => {
   test.beforeEach(async () => {

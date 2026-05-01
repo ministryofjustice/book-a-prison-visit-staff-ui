@@ -60,18 +60,13 @@ export default {
     secret: get('SESSION_SECRET', 'app-insecure-default-session', requiredInProduction),
     expiryMinutes: Number(get('WEB_SESSION_TIMEOUT_IN_MINUTES', 120)),
   },
+  dpsContacts: get('DPS_CONTACTS_URL', 'https://contacts-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   dpsHome: get('DPS_URL', 'https://dps-dev.prison.service.justice.gov.uk/', requiredInProduction),
   dpsPrisoner: get(
     'DPS_PRISONER_URL',
     'https://prisoner-dev.digital.prison.service.justice.gov.uk/',
     requiredInProduction,
   ),
-  analytics: {
-    enabled: get('MATOMO_ENABLED', 'false', requiredInProduction) === 'true',
-    matomoContainerId: get('MATOMO_CONTAINER_ID', ''),
-    matomoSiteId: get('MATOMO_SITE_ID', ''),
-    matomoUrl: get('MATOMO_URL', ''),
-  },
   apis: {
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
@@ -152,18 +147,9 @@ export default {
       enabledRawNotifications: <NotificationTypeRaw[]>(
         get(
           'FEATURE_ENABLED_RAW_NOTIFICATION_TYPES',
-          'PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PERSON_RESTRICTION_UPSERTED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE,VISITOR_RESTRICTION_UPSERTED_EVENT',
+          'PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PERSON_RESTRICTION_UPSERTED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE,VISITOR_RESTRICTION_UPSERTED_EVENT,VISITOR_UNAPPROVED_EVENT',
         ).split(',')
       ),
-    },
-    visitorRequests: {
-      enabled: get('FEATURE_VISITOR_REQUESTS', 'false') === 'true',
-    },
-    voAdjustment: {
-      enabled: get('FEATURE_VO_ADJUSTMENT', 'false') === 'true',
-    },
-    voHistory: {
-      enabled: get('FEATURE_VO_HISTORY', 'false') === 'true',
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),

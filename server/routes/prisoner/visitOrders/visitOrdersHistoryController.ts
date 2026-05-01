@@ -1,10 +1,11 @@
 import { RequestHandler } from 'express'
 import { VisitOrdersService } from '../../../services'
+import { PrisonerParams } from '../../../@types/requestParameterTypes'
 
 export default class VisitOrdersHistoryController {
   public constructor(private readonly visitOrdersService: VisitOrdersService) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<PrisonerParams> {
     return async (req, res) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment

@@ -12,36 +12,28 @@ export const buildVisitorListItem = (visitor: Contact, policyNoticeDaysMax: numb
     dateOfBirth: visitor.dateOfBirth,
     adult: visitor.dateOfBirth ? isAdult(visitor.dateOfBirth) : true,
     relationshipDescription: visitor.relationshipDescription,
-    address: getAddressToDisplay(visitor.addresses),
+    address: getFormattedAddress(visitor.address),
     restrictions: visitor.restrictions,
     banned: getBanStatus(visitor.restrictions, policyNoticeDaysMax).isBanned,
   }
 }
 
-const getAddressToDisplay = (addresses: Address[]): string => {
-  if (addresses.length === 0) return 'Not entered'
-
-  const primaryAddress = addresses.find(address => address.primary)
-  return getFormattedAddress(primaryAddress || addresses[0])
-}
-
-// TODO add test for this?
 export const getFormattedAddress = (address: Address): string => {
-  const flat = address.flat && `Flat ${address.flat}`
+  const flat = address?.flat && `Flat ${address.flat}`
   const formattedAddress = [
-    address.premise,
+    address?.premise,
     flat,
-    address.street,
-    address.locality,
-    address.town,
-    address.county,
-    address.postalCode,
-    address.country,
+    address?.street,
+    address?.locality,
+    address?.town,
+    address?.county,
+    address?.postalCode,
+    address?.country,
   ]
     .filter(value => value)
     .join(',\n')
 
-  return formattedAddress
+  return formattedAddress || 'Not entered'
 }
 
 export const getBanStatus = (restrictions: Restriction[], policyNoticeDaysMax: number): BanStatus => {

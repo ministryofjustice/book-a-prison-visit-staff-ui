@@ -19,13 +19,10 @@ generic-service:
     COMPONENT_API_URL: https://frontend-components-dev.hmpps.service.justice.gov.uk
     DPS_URL: "https://dps-dev.prison.service.justice.gov.uk/"
     DPS_PRISONER_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk/"
+    DPS_CONTACTS_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
     REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: staging
-
-    FEATURE_VISITOR_REQUESTS: "true"
-    FEATURE_VO_ADJUSTMENT: "true"
-    FEATURE_VO_HISTORY: "true"
 
   allowlist:
     groups:

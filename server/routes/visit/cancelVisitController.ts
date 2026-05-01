@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitService } from '../../services'
+import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
@@ -25,7 +26,7 @@ export default class CancelVisitController {
     }
   }
 
-  public showCancellationReasons(): RequestHandler {
+  public showCancellationReasons(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
 
@@ -39,7 +40,7 @@ export default class CancelVisitController {
     }
   }
 
-  public cancelVisit(): RequestHandler {
+  public cancelVisit(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
 

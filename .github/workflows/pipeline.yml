@@ -41,16 +41,6 @@ jobs:
     secrets: inherit
     with:
       redis_tag: '7'
-  # TODO remove when Cypress tests all migrated to Playwright
-  node_integration_tests_cypress:
-    name: node integration tests (Cypress)
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/node_integration_tests.yml@v2 # WORKFLOW_VERSION
-    needs: [node_build]
-    secrets: inherit
-    with:
-      npm_script: 'int-test-cypress'
-      test_results_artifact_name: 'npm_integration_test_artifacts_cypress'
-      redis_tag: '7'
   helm_lint:
     strategy:
       matrix:
@@ -65,7 +55,6 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
     needs:
       - node_integration_tests
-      - node_integration_tests_cypress
       - node_unit_tests
     with:
       docker_registry: 'ghcr.io'

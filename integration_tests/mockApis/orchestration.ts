@@ -12,6 +12,7 @@ import {
   IgnoreVisitNotificationsDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
+  PrisonerBalanceAdjustmentValidationError,
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonVisitorRequestDto,
@@ -371,10 +372,12 @@ export default {
     rejectionReason = 'REJECT',
     requestReference = TestData.visitorRequest().reference,
     visitorRequest = TestData.visitorRequest(),
+    username = 'USER1',
   }: {
     rejectionReason?: RejectVisitorRequestDto['rejectionReason']
     requestReference?: string
     visitorRequest?: PrisonVisitorRequestDto
+    username?: string
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -382,7 +385,7 @@ export default {
         url: `/orchestration/visitor-requests/${requestReference}/reject`,
         bodyPatterns: [
           {
-            equalToJson: { rejectionReason },
+            equalToJson: { rejectionReason, actionedBy: username },
           },
         ],
       },
@@ -398,10 +401,12 @@ export default {
     visitorId = 4321,
     requestReference = TestData.visitorRequest().reference,
     visitorRequest = TestData.visitorRequest(),
+    username = 'USER1',
   }: {
     visitorId?: number
     requestReference?: string
     visitorRequest?: PrisonVisitorRequestDto
+    username?: string
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -409,7 +414,7 @@ export default {
         url: `/orchestration/visitor-requests/${requestReference}/approve`,
         bodyPatterns: [
           {
-            equalToJson: { visitorId },
+            equalToJson: { visitorId, actionedBy: username },
           },
         ],
       },
@@ -531,11 +536,13 @@ export default {
     prisonerId,
     visitorId,
     sendNotification,
+    username = 'USER1',
   }: {
     reference: string
     prisonerId: string
     visitorId: number
     sendNotification: boolean
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -545,8 +552,8 @@ export default {
           {
             equalToJson: {
               visitorId,
-              active: true,
               sendNotificationFlag: sendNotification,
+              actionedBy: username,
             },
           },
         ],
@@ -1012,13 +1019,41 @@ export default {
         url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
         bodyPatterns: [
           {
-            equalToJson: { prisonerBalanceAdjustmentDto },
+            equalToJson: prisonerBalanceAdjustmentDto,
           },
         ],
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      },
+    })
+  },
+
+  stubChangeVoBalanceFail: ({
+    prisonId = 'HEI',
+    prisonerId = TestData.prisoner().prisonerNumber,
+    validationErrors,
+  }: {
+    prisonId?: string
+    prisonerId?: string
+    validationErrors: PrisonerBalanceAdjustmentValidationError[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      },
+      response: {
+        status: 422,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {
+          status: 422,
+          errorCode: null,
+          userMessage: 'Manually adjust prisoner balance request failed',
+          developerMessage: null,
+          validationErrors,
+        },
       },
     })
   },
@@ -1096,7 +1131,7 @@ export default {
       },
     })
   },
-  stubOrchestrationPing: () => {
+  stubPing: () => {
     return stubFor({
       request: {
         method: 'GET',

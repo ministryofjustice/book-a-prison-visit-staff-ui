@@ -4,6 +4,7 @@ import { SessionData } from 'express-session'
 import { AuditService, BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
 import { SocialContactsDto } from '../../../data/orchestrationApiTypes'
+import { BookerPrisonerVisitorParams } from '../../../@types/requestParameterTypes'
 
 export default class LinkVisitorController {
   public constructor(
@@ -11,7 +12,7 @@ export default class LinkVisitorController {
     private readonly bookerService: BookerService,
   ) {}
 
-  public view(): RequestHandler {
+  public view(): RequestHandler<BookerPrisonerVisitorParams> {
     return async (req, res) => {
       const { reference, prisonerId, visitorId } = req.params
       const { bookerLinkVisitor } = req.session
@@ -34,7 +35,7 @@ export default class LinkVisitorController {
     }
   }
 
-  public submit(): RequestHandler {
+  public submit(): RequestHandler<BookerPrisonerVisitorParams> {
     return async (req, res) => {
       const { reference, prisonerId, visitorId } = req.params
       const { bookerLinkVisitor } = req.session

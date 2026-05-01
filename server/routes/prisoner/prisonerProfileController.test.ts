@@ -11,7 +11,6 @@ import {
   createMockPrisonerProfileService,
   createMockVisitService,
 } from '../../services/testutils/mocks'
-import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
@@ -25,9 +24,6 @@ const prisonId = 'HEI'
 let sessionData: SessionData
 
 beforeEach(() => {
-  setFeature('voAdjustment', { enabled: false })
-  setFeature('voHistory', { enabled: false })
-
   flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
@@ -120,8 +116,10 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('[data-test="tab-pvo-remaining"]').text()).toBe('0')
           expect($('[data-test="tab-pvo-last-date"]').text()).toBe('1 December 2021')
           expect($('[data-test="tab-pvo-next-date"]').text()).toBe('1 January 2022')
-          expect($('[data-test="view-edit-vo-balances"]').attr('href')).toBeUndefined()
-          expect($('[data-test="view-vo-history"]').attr('href')).toBeUndefined()
+          expect($('[data-test="edit-vo-balances"]').attr('href')).toBe(
+            '/prisoner/A1234BC/edit-visiting-orders-balances',
+          )
+          expect($('[data-test="view-vo-history"]').attr('href')).toBe('/prisoner/A1234BC/visiting-orders-history')
           expect($('.govuk-back-link').attr('href')).toBe('/search/prisoner')
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
@@ -141,9 +139,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         })
     })
 
-    it('should link to edit visiting orders balances page if feature enabled', () => {
-      setFeature('voAdjustment', { enabled: true })
-
+    it('should link to visiting order history and edit visitor orders pages', () => {
       app = appWithAllRoutes({
         services: { auditService, prisonerProfileService, visitService },
         sessionData,
@@ -158,25 +154,6 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('[data-test="edit-vo-balances"]').attr('href')).toBe(
             '/prisoner/A1234BC/edit-visiting-orders-balances',
           )
-          expect($('[data-test="view-vo-history"]').attr('href')).toBeUndefined()
-        })
-    })
-
-    it('should link to visiting order history page if feature enabled', () => {
-      setFeature('voHistory', { enabled: true })
-
-      app = appWithAllRoutes({
-        services: { auditService, prisonerProfileService, visitService },
-        sessionData,
-      })
-
-      return request(app)
-        .get('/prisoner/A1234BC')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('[data-test="edit-vo-balances"]').attr('href')).toBeUndefined()
           expect($('[data-test="view-vo-history"]').attr('href')).toBe('/prisoner/A1234BC/visiting-orders-history')
         })
     })

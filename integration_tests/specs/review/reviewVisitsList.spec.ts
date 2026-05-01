@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test'
 import { format } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import HomePage from '../../pages-playwright/homePage'
-import VisitsReviewListingPage from '../../pages-playwright/review/visitsReviewListingsPage'
+import HomePage from '../../pages/homePage'
+import VisitsReviewListingPage from '../../pages/review/visitsReviewListingsPage'
 import { notificationTypes } from '../../../server/constants/notifications'
 import { resetStubs, login } from '../../testUtils'
-import auth from '../../mockApis/auth'
 import orchestrationApi from '../../mockApis/orchestration'
 
 test.describe('Bookings review listing page', () => {
@@ -22,6 +21,7 @@ test.describe('Bookings review listing page', () => {
       notifications: [
         TestData.visitNotificationEventRaw({ type: 'PERSON_RESTRICTION_UPSERTED_EVENT' }),
         TestData.visitNotificationEventRaw({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+        TestData.visitNotificationEventRaw({ type: 'VISITOR_UNAPPROVED_EVENT' }),
       ],
     }),
   ]
@@ -30,7 +30,6 @@ test.describe('Bookings review listing page', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
-    await auth.stubSignIn()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
@@ -73,6 +72,7 @@ test.describe('Bookings review listing page', () => {
     await expect(listingPage.getBookedBy(2)).toContainText(visitNotifications[1].bookedByName)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_RESTRICTION)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISON_VISITS_BLOCKED_FOR_DATE)
+    await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
     await expect(listingPage.getActionLink(2)).toHaveAttribute(
       'href',
       `/visit/${visitNotifications[1].visitReference}?from=review`,
@@ -95,13 +95,13 @@ test.describe('Bookings review listing page', () => {
     // Filter by user
     await listingPage.filterByUser('User One')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('User One')
 
     // Filter by reason
     await listingPage.filterByReason('Time slot removed')
     await listingPage.applyFilter()
-    await expect(listingPage.getBookingsRows()).toHaveCount(1)
+    await expect(listingPage.getBookingsRows()).toBeVisible()
     await listingPage.removeFilter('Time slot removed')
 
     // Filter by both

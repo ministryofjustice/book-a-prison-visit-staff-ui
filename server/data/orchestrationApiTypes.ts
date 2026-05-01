@@ -76,6 +76,8 @@ export type VisitNotificationsRaw = components['schemas']['OrchestrationVisitNot
 export type VisitNotifications = Omit<VisitNotificationsRaw, 'notifications'> & {
   notifications: (Omit<VisitNotificationEventRaw, 'type'> & { type: NotificationType })[]
 }
+export type VisitNotificationEventAttributeNames =
+  components['schemas']['VisitNotificationEventAttributeDto']['attributeName']
 
 // Visit sessions and scheduled events (calendar)
 export type VisitSessionsAndScheduleDto = components['schemas']['VisitSessionsAndScheduleDto']

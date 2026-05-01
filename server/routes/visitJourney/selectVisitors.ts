@@ -43,6 +43,7 @@ export default class SelectVisitors {
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
+      messages: req.flash('messages'),
       offenderNo: visitSessionData.prisoner.offenderNo,
       prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
       visitorList,

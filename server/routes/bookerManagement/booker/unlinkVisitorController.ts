@@ -2,6 +2,7 @@ import { RequestHandler } from 'express'
 import { param, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
+import { BookerPrisonerVisitorParams } from '../../../@types/requestParameterTypes'
 
 export default class UnlinkVisitorController {
   public constructor(
@@ -9,7 +10,7 @@ export default class UnlinkVisitorController {
     private readonly bookerService: BookerService,
   ) {}
 
-  public unlink(): RequestHandler {
+  public unlink(): RequestHandler<BookerPrisonerVisitorParams> {
     return async (req, res) => {
       const { reference, prisonerId, visitorId: visitorIdString } = req.params
       const visitorId = parseInt(visitorIdString, 10)
