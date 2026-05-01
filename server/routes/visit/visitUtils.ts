@@ -254,11 +254,13 @@ export const isPublicBooking = (events: EventAudit[]): boolean => {
 }
 
 export const getHideAlertsInset = ({
+  prisonerNumber,
   startTimestamp,
   visitPrisonId,
   prisonerPrisonId,
   inOutStatus,
 }: {
+  prisonerNumber: string
   startTimestamp: VisitBookingDetails['startTimestamp']
   visitPrisonId: string
   prisonerPrisonId: string
@@ -269,12 +271,12 @@ export const getHideAlertsInset = ({
   if (isPast(visitStartTime)) {
     return {
       prisoner: {
-        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/alerts-restrictions">contacts service</a>.`,
         attributes: { 'data-test': 'prisoner-inset' },
         classes: 'govuk-!-margin-bottom-1',
       },
       visitor: {
-        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.`,
+        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`,
         attributes: { 'data-test': 'visitor-inset' },
       },
     }

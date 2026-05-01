@@ -40,6 +40,7 @@ export default class VisitDetailsController {
       }
 
       const hideAlertsInset = getHideAlertsInset({
+        prisonerNumber: visitDetails.prisoner.prisonerNumber,
         startTimestamp: visitDetails.startTimestamp,
         visitPrisonId: visitDetails.prison.prisonId,
         prisonerPrisonId: visitDetails.prisoner.prisonId,
