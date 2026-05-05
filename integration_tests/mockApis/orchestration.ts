@@ -5,6 +5,7 @@ import {
   ApplicationMethodType,
   ApplicationValidationErrorResponse,
   BookerDetailedInfoDto,
+  BookerPrisonerVisitorRequestDto,
   BookerSearchResultsDto,
   BookingRequestVisitorDetailsDto,
   CancelVisitOrchestrationDto,
@@ -591,6 +592,26 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: {},
+      },
+    })
+  },
+
+  stubGetBookerVisitorRequests: ({
+    bookerReference = TestData.bookerDetailedInfo().reference,
+    bookerVisitorRequests = [TestData.bookerPrisonerVisitorRequest()],
+  }: {
+    bookerReference?: string
+    bookerVisitorRequests?: BookerPrisonerVisitorRequestDto[]
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/public/booker/${bookerReference}/permitted/visitors/requests`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: bookerVisitorRequests,
       },
     })
   },

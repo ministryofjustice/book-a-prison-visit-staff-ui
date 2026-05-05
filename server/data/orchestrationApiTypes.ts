@@ -103,6 +103,7 @@ export type ApplicationValidationErrorResponse = components['schemas']['Applicat
 export type ApproveVisitorRequestDto = components['schemas']['ApproveVisitorRequestDto']
 export type BookerDetailedInfoDto = components['schemas']['BookerDetailedInfoDto']
 export type BookerSearchResultsDto = components['schemas']['BookerSearchResultsDto']
+export type BookerPrisonerVisitorRequestDto = components['schemas']['BookerPrisonerVisitorRequestDto']
 export type PrisonVisitorRequestDto = components['schemas']['PrisonVisitorRequestDto']
 export type PrisonVisitorRequestListEntryDto = components['schemas']['PrisonVisitorRequestListEntryDto']
 export type RegisterVisitorForBookerPrisonerDto = components['schemas']['RegisterVisitorForBookerPrisonerDto']
