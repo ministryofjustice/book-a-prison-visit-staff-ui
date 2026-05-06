@@ -396,6 +396,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors/{visitorId}/unlink': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * unlink booker prisoner visitor
+     * @description unlink booker prisoner visitor
+     */
+    post: operations['unlinkBookerPrisonerVisitor']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors/request': {
     parameters: {
       query?: never
@@ -1289,26 +1309,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors/{visitorId}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    post?: never
-    /**
-     * unlink booker prisoner visitor
-     * @description unlink booker prisoner visitor
-     */
-    delete: operations['unlinkBookerPrisonerVisitor']
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1835,6 +1835,11 @@ export interface components {
        * @enum {string}
        */
       rejectionReason: 'ALREADY_LINKED' | 'REJECT'
+      /**
+       * @description STAFF username who rejected the visitor
+       * @example ABC123D
+       */
+      actionedBy: string
     }
     PrisonVisitorRequestDto: {
       /**
@@ -1893,6 +1898,11 @@ export interface components {
        * @example 5871791
        */
       visitorId: number
+      /**
+       * @description STAFF username who approved the visitor
+       * @example ABC123D
+       */
+      actionedBy: string
     }
     RetryDlqResult: {
       /** Format: int32 */
@@ -2005,6 +2015,11 @@ export interface components {
        * @example true
        */
       sendNotificationFlag: boolean | null
+      /**
+       * @description STAFF username who registered the visitor
+       * @example ABC123D
+       */
+      actionedBy: string
     }
     /** @description Permitted visitor associated with the permitted prisoner. */
     PermittedVisitorsForPermittedPrisonerBookerDto: {
@@ -2014,6 +2029,14 @@ export interface components {
        * @example 5871791
        */
       visitorId: number
+    }
+    /** @description STAFF user details */
+    StaffUsernameDto: {
+      /**
+       * @description User Name for STAFF
+       * @example ALED
+       */
+      username: string
     }
     AddVisitorToBookerPrisonerRequestDto: {
       /** @description First name of the visitor in request */
@@ -2728,10 +2751,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       paged?: boolean
       unpaged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
     }
     SortObject: {
       empty?: boolean
@@ -3496,6 +3519,12 @@ export interface components {
        * @example 2000-01-01
        */
       dateOfBirth: string
+      /**
+       * Format: date
+       * @description Date when the visitor request was added
+       * @example 2000-01-01
+       */
+      requestedOn: string
     }
     BookerPrisonerInfoDto: {
       /** @description Prisoner Details */
@@ -5610,6 +5639,59 @@ export interface operations {
       }
       /** @description Incorrect permissions for this action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  unlinkBookerPrisonerVisitor: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        bookerReference: string
+        prisonerId: string
+        visitorId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StaffUsernameDto']
+      }
+    }
+    responses: {
+      /** @description Successfully unlinked booker prisoner visitor */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions for this action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description visitor not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8096,55 +8178,6 @@ export interface operations {
         }
       }
       /** @description Prison not found on visit-scheduler */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  unlinkBookerPrisonerVisitor: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        bookerReference: string
-        prisonerId: string
-        visitorId: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Successfully unlinked booker prisoner visitor */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions for this action */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description visitor not found */
       404: {
         headers: {
           [name: string]: unknown
