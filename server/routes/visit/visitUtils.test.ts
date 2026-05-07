@@ -361,6 +361,14 @@ describe('Visit utils', () => {
                 type: 'VISITOR_UNAPPROVED_EVENT',
                 additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '3' }],
               },
+              {
+                type: 'PRISONER_ALERTS_UPDATED_EVENT',
+                additionalData: [{ attributeName: 'ALERT_ID', attributeValue: '4' }],
+              },
+              // {
+              //   type: 'PRISONER_ALERTS_ADDED_EVENT',
+              //   additionalData: [{ attributeName: 'ALERT_ID', attributeValue: '5' }],
+              // }, TODO
             ],
             [
               {
@@ -371,6 +379,8 @@ describe('Visit utils', () => {
                   '<ul class="govuk-list">' +
                   '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
                   '<li><a href="#visitor-3">Visitor has been unapproved</a></li>' +
+                  '<li><a href="#prisoner-alert-4">An alert has been updated</a></li>' +
+                  // '<li><a href="#prisoner-alert-5">An alert has been added</a></li>' + TODO
                   '</ul>',
                 classes: 'notifications-summary-alert',
               },
@@ -427,6 +437,10 @@ describe('Visit utils', () => {
     // unapprovedVisitorIds
     const visitorId = 'VISITOR_ID'
     const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
+    // alertsUpdatedIds / alertsAddedIds
+    const alertId = 'ALERT_ID'
+    const alertsUpdatedEvent = 'PRISONER_ALERTS_UPDATED_EVENT'
+    // const alertsAddedEvent = 'PRISONER_ALERTS_ADDED_EVENT' TODO
 
     it(`should return ${visitorRestrictionId} if notification exists for ${visitorRestriction}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
@@ -475,6 +489,54 @@ describe('Visit utils', () => {
         getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
       ).toStrictEqual([100, 200])
     })
+
+    it(`should return ${alertId} if notification exists for ${alertsUpdatedEvent}`, () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a PRISONER_ALERTS_UPDATED_EVENT
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: alertsUpdatedEvent,
+          additionalData: [{ attributeName: alertId, attributeValue: '100' }],
+        },
+        // a duplicate ALERT_ID - should be ignored
+        {
+          type: alertsUpdatedEvent,
+          additionalData: [{ attributeName: alertId, attributeValue: '100' }],
+        },
+        {
+          type: alertsUpdatedEvent,
+          additionalData: [{ attributeName: alertId, attributeValue: '200' }],
+        },
+      ]
+
+      expect(
+        getIdsToFlag({ notificationType: alertsUpdatedEvent, returnedIdType: alertId, notifications }),
+      ).toStrictEqual([100, 200])
+    })
+
+    // it(`should return ${alertId} if notification exists for ${alertsAddedEvent}`, () => {
+    //   const notifications = <VisitBookingDetails['notifications']>[
+    //     // should be ignored as not a PRISONER_ALERTS_UPDATED_EVENT
+    //     { type: 'PRISONER_RELEASED_EVENT' },
+    //     {
+    //       type: alertsAddedEvent,
+    //       additionalData: [{ attributeName: alertId, attributeValue: '100' }],
+    //     },
+    //     // a duplicate ALERT_ID - should be ignored
+    //     {
+    //       type: alertsAddedEvent,
+    //       additionalData: [{ attributeName: alertId, attributeValue: '100' }],
+    //     },
+    //     {
+    //       type: alertsAddedEvent,
+    //       additionalData: [{ attributeName: alertId, attributeValue: '200' }],
+    //     },
+    //   ]
+
+    //   expect(
+    //     getIdsToFlag({ notificationType: alertsUpdatedEvent, returnedIdType: alertId, notifications }),
+    //   ).toStrictEqual([100, 200])
+    // }) TODO
   })
 
   describe('isPublicBooking', () => {
