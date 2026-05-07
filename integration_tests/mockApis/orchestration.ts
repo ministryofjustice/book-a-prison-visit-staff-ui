@@ -570,15 +570,22 @@ export default {
     reference,
     prisonerId,
     visitorId,
+    username = 'USER1',
   }: {
     reference: string
     prisonerId: string
     visitorId: number
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
-        method: 'DELETE',
-        url: `/orchestration/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
+        method: 'POST',
+        url: `/orchestration/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`,
+        bodyPatterns: [
+          {
+            equalToJson: { username },
+          },
+        ],
       },
       response: {
         status: 200,
