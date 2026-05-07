@@ -35,6 +35,7 @@ import {
   SessionCapacity,
   SessionSchedule,
   SocialContactsDto,
+  StaffUsernameDto,
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
@@ -376,14 +377,17 @@ export default class OrchestrationApiClient {
     reference,
     prisonerId,
     visitorId,
+    username,
   }: {
     reference: string
     prisonerId: string
     visitorId: number
+    username: string
   }): Promise<void> {
     try {
-      await this.restClient.delete({
-        path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`,
+      await this.restClient.post({
+        path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`,
+        data: <StaffUsernameDto>{ username },
       })
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.

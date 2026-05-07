@@ -20,6 +20,7 @@ import {
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionSchedule,
+  StaffUsernameDto,
   Visit,
   VisitBookingDetails,
   VisitBookingDetailsRaw,
@@ -624,39 +625,46 @@ describe('orchestrationApiClient', () => {
 
   describe('unlinkBookerVisitor', () => {
     const reference = 'aaa-bbb-ccc'
+    const username = 'user1'
     const visitorId = 123
 
     it('should unlink a visitor from a booker account', async () => {
       fakeOrchestrationApi
-        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .post(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`, <
+          StaffUsernameDto
+        >{ username })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200)
 
-      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId, username })
 
       expect(fakeOrchestrationApi.isDone()).toBe(true)
     })
 
     it('should catch 404 API error and handle as success', async () => {
       fakeOrchestrationApi
-        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .post(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`, <
+          StaffUsernameDto
+        >{ username })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+      await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId, username })
 
       expect(fakeOrchestrationApi.isDone()).toBe(true)
     })
 
     it('should throw other API errors', async () => {
       fakeOrchestrationApi
-        .delete(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}`)
+        .post(`/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`, <
+          StaffUsernameDto
+        >{ username })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(400)
 
-      await expect(orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })).rejects.toThrow(
-        'Bad Request',
-      )
+      await expect(
+        orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId, username }),
+      ).rejects.toThrow('Bad Request')
     })
   })
 

@@ -128,7 +128,7 @@ export default class BookerService {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId })
+    await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId, username })
   }
 
   async getVisitorRequests({

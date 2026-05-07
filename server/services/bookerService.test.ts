@@ -152,7 +152,12 @@ describe('Booker service', () => {
 
       await bookerService.unlinkBookerVisitor({ username: 'user1', reference, prisonerId, visitorId })
 
-      expect(orchestrationApiClient.unlinkBookerVisitor).toHaveBeenCalledWith({ reference, prisonerId, visitorId })
+      expect(orchestrationApiClient.unlinkBookerVisitor).toHaveBeenCalledWith({
+        reference,
+        prisonerId,
+        visitorId,
+        username: 'user1',
+      })
     })
   })
 
