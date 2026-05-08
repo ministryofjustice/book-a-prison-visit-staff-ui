@@ -22,6 +22,7 @@ const visitorRequestForReview = TestData.visitorRequestForReview()
 const linkedVisitors = [TestData.visitorInfo()]
 const url = `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/check-linked-visitors`
 const fakeDateTime = new Date('2025-10-01T09:00')
+const returnTo = 'manage-bookers'
 
 beforeEach(() => {
   jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDateTime) })
@@ -33,6 +34,7 @@ beforeEach(() => {
     visitorRequestJourney: {
       visitorRequest: visitorRequestForReview,
       linkedVisitors,
+      returnTo,
     },
   } as SessionData
 
@@ -84,7 +86,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect($('title').text()).toMatch(/^Check if the visitor is already linked -/)
           expect($('.govuk-breadcrumbs li').length).toBe(0)
           expect($('.govuk-back-link').attr('href')).toBe(
-            `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor`,
+            `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/link-visitor?from=manage-bookers`,
           )
           expect($('h1').text().trim()).toBe('Check if the visitor is already linked')
 
@@ -232,6 +234,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
           expect(sessionData.visitorRequestJourney).toStrictEqual({
             visitorRequest: visitorRequestForReview,
             linkedVisitors,
+            returnTo,
           })
         })
     })

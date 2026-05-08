@@ -36,6 +36,7 @@ export declare module 'express-session' {
     visitorRequestJourney?: {
       visitorRequest: VisitorRequestForReviewDto
       linkedVisitors: VisitorInfoDto[]
+      returnTo: 'booker-details' | 'manage-bookers'
     }
   }
 }

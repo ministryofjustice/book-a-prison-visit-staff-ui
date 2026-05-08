@@ -22,12 +22,13 @@ export default class CheckLinkedVisitorsController {
         delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
-      const { visitorRequest, linkedVisitors } = visitorRequestJourney
+      const { visitorRequest, linkedVisitors, returnTo } = visitorRequestJourney
 
       return res.render('pages/bookerManagement/visitorRequests/checkLinkedVisitors', {
         errors: req.flash('errors'),
         visitorRequest,
         linkedVisitors,
+        returnTo,
       })
     }
   }

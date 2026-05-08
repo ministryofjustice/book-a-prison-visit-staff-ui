@@ -163,7 +163,7 @@ describe('Booker service', () => {
 
   describe('getBookerVisitorRequestsByPrisoner', () => {
     it('should return visitor requests for given booker reference grouped by prisoner ID', async () => {
-      const bookerReference = 'aaaa-bbbb-cccc'
+      const reference = 'aaaa-bbbb-cccc'
       const visitorRequests = [
         TestData.bookerPrisonerVisitorRequest({ prisonerId: 'P1' }),
         TestData.bookerPrisonerVisitorRequest({ prisonerId: 'P2' }),
@@ -171,13 +171,13 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getBookerVisitorRequests.mockResolvedValue(visitorRequests)
 
-      const result = await bookerService.getBookerVisitorRequestsByPrisoner({ username, bookerReference })
+      const result = await bookerService.getBookerVisitorRequestsByPrisoner({ username, reference })
 
       expect(result).toStrictEqual({
         P1: [visitorRequests[0]],
         P2: [visitorRequests[1]],
       })
-      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(bookerReference)
+      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(reference)
     })
   })
 

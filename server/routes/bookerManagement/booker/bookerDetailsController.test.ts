@@ -49,9 +49,11 @@ describe('Booker management - booker details', () => {
       return request(app).get('/manage-bookers/INVALID-BOOKER-REFERENCE/booker-details').expect(400)
     })
 
-    it('should render booker details page - booker with single prisoner and visitors', () => {
+    it('should render booker details page - booker with single prisoner, visitors and visitor request', () => {
       const booker = TestData.bookerDetailedInfo()
+      const visitorRequest = TestData.bookerPrisonerVisitorRequest()
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({ A1234BC: [visitorRequest] })
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -71,7 +73,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
 
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text()).toBe('Visitors linked to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -86,7 +88,22 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
 
+          // Visitor requests
+          expect($('[data-test=prisoner-1-visitor-request-1-name]').text()).toBe('Mike Jones')
+          expect($('[data-test=prisoner-1-visitor-request-1-requested-date]').text()).toBe('10/12/2025')
+          expect($('[data-test=prisoner-1-visitor-request-1-action]').text()).toBe(
+            'View request to add Mike Jones as a visitor',
+          )
+          expect($('[data-test=prisoner-1-visitor-request-1-action] a').attr('href')).toBe(
+            `/manage-bookers/visitor-request/${visitorRequest.reference}/link-visitor?from=booker-details`,
+          )
+          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(0)
+
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
+            username: 'user1',
+            reference: booker.reference,
+          })
+          expect(bookerService.getBookerVisitorRequestsByPrisoner).toHaveBeenCalledWith({
             username: 'user1',
             reference: booker.reference,
           })
@@ -107,6 +124,7 @@ describe('Booker management - booker details', () => {
     it('should render any alert messages set in flash', () => {
       const booker = TestData.bookerDetailedInfo()
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       flashData.messages = [TestData.mojAlert({ title: 'test alert message' })]
@@ -142,6 +160,7 @@ describe('Booker management - booker details', () => {
         ],
       })
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -152,7 +171,7 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #1
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text()).toBe('Visitors linked to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -165,9 +184,12 @@ describe('Booker management - booker details', () => {
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
           )
 
+          // Visitor requests
+          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(1)
+
           // Prisoner #2
           // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text()).toBe('Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)')
+          expect($('[data-test=prisoner-2]').text().trim()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
@@ -179,8 +201,14 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-2-link-visitor]').attr('href')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/link-visitor',
           )
+          // Visitor requests
+          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(1)
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
+            username: 'user1',
+            reference: booker.reference,
+          })
+          expect(bookerService.getBookerVisitorRequestsByPrisoner).toHaveBeenCalledWith({
             username: 'user1',
             reference: booker.reference,
           })
@@ -213,6 +241,7 @@ describe('Booker management - booker details', () => {
         ],
       })
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -223,7 +252,7 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #1
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text()).toBe('Visitors linked to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -238,7 +267,7 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #2
           // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text()).toBe('Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)')
+          expect($('[data-test=prisoner-2]').text().trim()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
@@ -256,6 +285,7 @@ describe('Booker management - booker details', () => {
     it('should render booker details page - booker with no prisoners', () => {
       const booker = TestData.bookerDetailedInfo({ permittedPrisoners: [] })
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -278,6 +308,7 @@ describe('Booker management - booker details', () => {
         ],
       })
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -286,7 +317,7 @@ describe('Booker management - booker details', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Prisoner and no visitors message
-          expect($('[data-test=prisoner-1]').text()).toBe('Visitors linked to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-no-visitors]').text()).toContain('no linked visitors')
 
           expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
@@ -299,6 +330,7 @@ describe('Booker management - booker details', () => {
     it('should render booker details page - active booker when multiple accounts for email', () => {
       const booker = TestData.bookerDetailedInfo()
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: true })
       sessionData.matchedBookers = [TestData.bookerSearchResult(), TestData.bookerSearchResult()]
 
@@ -317,6 +349,7 @@ describe('Booker management - booker details', () => {
     it('should render booker details page - inactive booker when multiple accounts for email', () => {
       const booker = TestData.bookerDetailedInfo()
       bookerService.getBookerDetails.mockResolvedValue(booker)
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({})
       bookerService.getBookerStatus.mockResolvedValue({ active: false, emailHasMultipleAccounts: true })
 
       return request(app)
@@ -328,7 +361,7 @@ describe('Booker management - booker details', () => {
           expect($('.moj-alert').text()).toContain('This account is inactive')
 
           // Prisoner and visitors (with no 'Unlink' action)
-          expect($('[data-test=prisoner-1]').text()).toBe('Visitors linked to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')

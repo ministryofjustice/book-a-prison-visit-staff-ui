@@ -14,6 +14,7 @@ export default class VisitorRequestDetailsController {
     return async (req, res) => {
       const { requestReference } = req.params
       const { username } = res.locals.user
+      const returnTo = req.query?.from === 'booker-details' ? 'booker-details' : 'manage-bookers'
 
       const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
 
@@ -31,9 +32,15 @@ export default class VisitorRequestDetailsController {
       const showNoDobWarning = visitorRequest.socialContacts.some(contact => contact.dateOfBirth === null)
       const atLeastOneSelectableContact = visitorRequest.socialContacts.some(contact => contact.dateOfBirth?.length)
 
-      req.session.visitorRequestJourney = { visitorRequest, linkedVisitors }
+      req.session.visitorRequestJourney = { visitorRequest, linkedVisitors, returnTo }
+
+      const backLinkHref =
+        returnTo === 'booker-details'
+          ? `/manage-bookers/${visitorRequest.bookerReference}/booker-details`
+          : '/manage-bookers'
 
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
+        backLinkHref,
         errors: req.flash('errors'),
         atLeastOneSelectableContact,
         showNoDobWarning,

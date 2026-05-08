@@ -597,16 +597,16 @@ export default {
   },
 
   stubGetBookerVisitorRequests: ({
-    bookerReference = TestData.bookerDetailedInfo().reference,
+    reference = TestData.bookerDetailedInfo().reference,
     bookerVisitorRequests = [TestData.bookerPrisonerVisitorRequest()],
   }: {
-    bookerReference?: string
+    reference?: string
     bookerVisitorRequests?: BookerPrisonerVisitorRequestDto[]
   } = {}): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/public/booker/${bookerReference}/permitted/visitors/requests`,
+        url: `/orchestration/public/booker/${reference}/permitted/visitors/requests`,
       },
       response: {
         status: 200,

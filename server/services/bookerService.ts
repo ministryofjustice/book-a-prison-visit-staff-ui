@@ -134,15 +134,15 @@ export default class BookerService {
 
   async getBookerVisitorRequestsByPrisoner({
     username,
-    bookerReference,
+    reference,
   }: {
     username: string
-    bookerReference: string
+    reference: string
   }): Promise<Record<string, BookerPrisonerVisitorRequestDto[]>> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    const requests = await orchestrationApiClient.getBookerVisitorRequests(bookerReference)
+    const requests = await orchestrationApiClient.getBookerVisitorRequests(reference)
     return { ...Object.groupBy(requests, request => request.prisonerId) }
   }
 

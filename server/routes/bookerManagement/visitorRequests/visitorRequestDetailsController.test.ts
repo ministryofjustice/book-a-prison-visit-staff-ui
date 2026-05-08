@@ -107,6 +107,25 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(sessionData.visitorRequestJourney).toStrictEqual({
             visitorRequest: visitorRequestForReview,
             linkedVisitors,
+            returnTo: 'manage-bookers',
+          })
+        })
+    })
+
+    it('should correctly set back link and returnTo (in session data) if coming from booker details page', () => {
+      return request(app)
+        .get(`${url}?from=booker-details`)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('.govuk-back-link').attr('href')).toBe(
+            `/manage-bookers/${visitorRequestForReview.bookerReference}/booker-details`,
+          )
+
+          expect(sessionData.visitorRequestJourney).toStrictEqual({
+            visitorRequest: visitorRequestForReview,
+            linkedVisitors,
+            returnTo: 'booker-details',
           })
         })
     })
@@ -211,7 +230,11 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
   describe(`POST ${url}`, () => {
     beforeEach(() => {
-      sessionData.visitorRequestJourney = { visitorRequest: visitorRequestForReview, linkedVisitors }
+      sessionData.visitorRequestJourney = {
+        visitorRequest: visitorRequestForReview,
+        linkedVisitors,
+        returnTo: 'manage-bookers',
+      }
     })
 
     it('should require booker admin role', () => {
@@ -341,6 +364,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect(sessionData.visitorRequestJourney).toStrictEqual({
             visitorRequest: visitorRequestForReview,
             linkedVisitors,
+            returnTo: 'manage-bookers',
           })
         })
     })
