@@ -73,7 +73,9 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
 
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe(
+            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          )
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -171,7 +173,9 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #1
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe(
+            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          )
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -189,7 +193,9 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #2
           // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text().trim()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
+          expect($('[data-test=prisoner-2]').text().trim()).toBe(
+            'Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)',
+          )
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
@@ -252,7 +258,9 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #1
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe(
+            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          )
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
@@ -267,7 +275,9 @@ describe('Booker management - booker details', () => {
 
           // Prisoner #2
           // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text().trim()).toBe('Visits to Fred Smith (B4567DE) at Bristol (HMP)')
+          expect($('[data-test=prisoner-2]').text().trim()).toBe(
+            'Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)',
+          )
           expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
           expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
@@ -317,7 +327,9 @@ describe('Booker management - booker details', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Prisoner and no visitors message
-          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe(
+            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          )
           expect($('[data-test=prisoner-1-no-visitors]').text()).toContain('no linked visitors')
 
           expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
@@ -361,7 +373,9 @@ describe('Booker management - booker details', () => {
           expect($('.moj-alert').text()).toContain('This account is inactive')
 
           // Prisoner and visitors (with no 'Unlink' action)
-          expect($('[data-test=prisoner-1]').text().trim()).toBe('Visits to John Smith (A1234BC) at Hewell (HMP)')
+          expect($('[data-test=prisoner-1]').text().trim()).toBe(
+            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          )
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
