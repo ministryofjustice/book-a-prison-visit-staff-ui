@@ -22,6 +22,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
+  # Determines whether the pipeline should publish the docker image.
+  # Referenced by build and deploy jobs to avoid repeating the condition.
+  check_publish:
+    name: Check publish flag
+    runs-on: ubuntu-latest
+    outputs:      enabled: ${{ github.ref == 'refs/heads/main' && (inputs.push || inputs.push == null) }}
+    steps:
+      - name: Set publish flag
+        run: echo "Publishing enabled ${{ github.ref == 'refs/heads/main' && (inputs.push || inputs.push == null) }}"
   node_build:
     name: node build
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/node_build.yml@v2 # WORKFLOW_VERSION
@@ -56,14 +65,16 @@ jobs:
     needs:
       - node_integration_tests
       - node_unit_tests
+      - check_publish
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
       additional_docker_tag: ${{ inputs.additional_docker_tag }}
-      push: ${{ inputs.push || true }}
+      push: ${{ needs.check_publish.outputs.enabled == 'true' }}
       docker_multiplatform: false
   deploy_dev:
     name: Deploy to the dev environment
+    if: needs.check_publish.outputs.enabled == 'true'
     needs:
     - build
     - helm_lint
