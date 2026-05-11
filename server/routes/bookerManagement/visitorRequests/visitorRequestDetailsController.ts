@@ -14,6 +14,7 @@ export default class VisitorRequestDetailsController {
     return async (req, res) => {
       const { requestReference } = req.params
       const { username } = res.locals.user
+      const returnTo = req.query?.from === 'booker-details' ? 'booker-details' : 'manage-bookers'
 
       const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
 
@@ -31,9 +32,15 @@ export default class VisitorRequestDetailsController {
       const showNoDobWarning = visitorRequest.socialContacts.some(contact => contact.dateOfBirth === null)
       const atLeastOneSelectableContact = visitorRequest.socialContacts.some(contact => contact.dateOfBirth?.length)
 
-      req.session.visitorRequestJourney = { visitorRequest, linkedVisitors }
+      req.session.visitorRequestJourney = { visitorRequest, linkedVisitors, returnTo }
+
+      const backLinkHref =
+        returnTo === 'booker-details'
+          ? `/manage-bookers/${visitorRequest.bookerReference}/booker-details`
+          : '/manage-bookers'
 
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
+        backLinkHref,
         errors: req.flash('errors'),
         atLeastOneSelectableContact,
         showNoDobWarning,
@@ -66,6 +73,9 @@ export default class VisitorRequestDetailsController {
         return res.redirect(`/manage-bookers/visitor-request/${requestReference}/check-linked-visitors`)
       }
 
+      const { returnTo } = visitorRequestJourney
+      const includeBookerDetailsLink = returnTo === 'manage-bookers'
+
       try {
         const { username } = res.locals.user
 
@@ -79,7 +89,14 @@ export default class VisitorRequestDetailsController {
             rejectionReason,
           })
 
-          req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+          req.flash(
+            'messages',
+            requestRejectedMessage({
+              visitorRequest: rejectedVisitorRequest,
+              rejectionReason,
+              includeBookerDetailsLink,
+            }),
+          )
 
           this.auditService.rejectedVisitorRequest({
             requestReference,
@@ -95,7 +112,10 @@ export default class VisitorRequestDetailsController {
             visitorId,
           })
 
-          req.flash('messages', requestApprovedMessage(approvedVisitorRequest))
+          req.flash(
+            'messages',
+            requestApprovedMessage({ visitorRequest: approvedVisitorRequest, includeBookerDetailsLink }),
+          )
 
           this.auditService.approvedVisitorRequest({
             requestReference,
@@ -112,8 +132,12 @@ export default class VisitorRequestDetailsController {
         req.flash('messages', requestAlreadyReviewedMessage())
       }
 
+      const { bookerReference } = visitorRequestJourney.visitorRequest
       delete req.session.visitorRequestJourney
-      return res.redirect(`/manage-bookers`)
+
+      return returnTo === 'manage-bookers'
+        ? res.redirect(`/manage-bookers`)
+        : res.redirect(`/manage-bookers/${bookerReference}/booker-details`)
     }
   }
 

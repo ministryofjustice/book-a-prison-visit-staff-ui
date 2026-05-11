@@ -668,6 +668,21 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getBookerVisitorRequests', () => {
+    it('should return all visitor requests for given booker', async () => {
+      const bookerReference = 'aaaa-bbbb-cccc'
+      const bookerVisitorRequests = [TestData.bookerPrisonerVisitorRequest()]
+
+      fakeOrchestrationApi
+        .get(`/public/booker/${bookerReference}/permitted/visitors/requests`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, bookerVisitorRequests)
+
+      const result = await orchestrationApiClient.getBookerVisitorRequests(bookerReference)
+      expect(result).toStrictEqual(bookerVisitorRequests)
+    })
+  })
+
   describe('getVisitorRequests', () => {
     it('should return all visitor requests for given prison', async () => {
       const visitorRequestListEntries = [TestData.visitorRequestListEntry()]

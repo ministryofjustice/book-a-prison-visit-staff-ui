@@ -14,7 +14,11 @@ export default class BookerDetailsController {
       const { reference } = req.params
       const { username } = res.locals.user
 
-      const booker = await this.bookerService.getBookerDetails({ username, reference })
+      const [booker, visitorRequests] = await Promise.all([
+        this.bookerService.getBookerDetails({ username, reference }),
+        this.bookerService.getBookerVisitorRequestsByPrisoner({ username, reference }),
+      ])
+
       const { active, emailHasMultipleAccounts } = await this.bookerService.getBookerStatus({
         username,
         email: booker.email,
@@ -33,7 +37,13 @@ export default class BookerDetailsController {
 
       const messages = [...req.flash('messages'), ...this.getBookerDetailsMessages(active, emailHasMultipleAccounts)]
 
-      res.render('pages/bookerManagement/booker/bookerDetails', { backLinkHref, messages, active, booker })
+      res.render('pages/bookerManagement/booker/bookerDetails', {
+        backLinkHref,
+        messages,
+        active,
+        booker,
+        visitorRequests,
+      })
     }
   }
 

@@ -23,4 +23,16 @@ export default class BookerDetailsPage extends AbstractPage {
 
   unlinkPrisonerVisitor = (prisonerIndex: number, visitorIndex: number): Locator =>
     this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-unlink`)
+
+  // Visitor requests
+  visitorName = (prisonerIndex: number, visitorIndex: number): Locator =>
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-request-${visitorIndex}-name`)
+
+  requestedDate = (prisonerIndex: number, visitorIndex: number): Locator =>
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-request-${visitorIndex}-requested-date`)
+
+  viewRequestLink = (prisonerIndex: number, visitorIndex: number, visitorName: string): Locator =>
+    this.page
+      .getByTestId(`prisoner-${prisonerIndex}-visitor-request-${visitorIndex}-action`)
+      .getByRole('link', { name: `View request to add ${visitorName} as a visitor` })
 }

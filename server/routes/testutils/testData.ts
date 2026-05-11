@@ -3,6 +3,7 @@ import {
   Alert,
   ApplicationDto,
   BookerDetailedInfoDto,
+  BookerPrisonerVisitorRequestDto,
   BookerSearchResultsDto,
   ExcludeDateDto,
   OffenderRestriction,
@@ -196,6 +197,22 @@ export default class TestData {
     lastName,
     dateOfBirth,
     relationshipDescription,
+  })
+
+  static bookerPrisonerVisitorRequest = ({
+    reference = 'dddd-eeee-ffff',
+    prisonerId = 'A1234BC',
+    firstName = 'Mike',
+    lastName = 'Jones',
+    dateOfBirth = '1999-11-10',
+    requestedOn = '2025-12-10',
+  }: Partial<BookerPrisonerVisitorRequestDto> = {}): BookerPrisonerVisitorRequestDto => ({
+    reference,
+    prisonerId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    requestedOn,
   })
 
   static bookerSearchResult = ({
