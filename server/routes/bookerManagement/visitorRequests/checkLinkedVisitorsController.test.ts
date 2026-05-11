@@ -131,7 +131,7 @@ describe('Booker management - visitor requests - check linked visitors', () => {
       return request(app).post('/manage-bookers/visitor-request/INVALID-REQUEST-REFERENCE/link-visitor').expect(400)
     })
 
-    it('should reject request, send audit, set message, clear session and redirect to manage bookers page - REJECT', () => {
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page - REJECT (returnTo = manage-bookers)', () => {
       const rejectedVisitorRequest = TestData.visitorRequest()
       bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
 
@@ -149,7 +149,11 @@ describe('Booker management - visitor requests - check linked visitors', () => {
 
           expect(flashProvider).toHaveBeenCalledWith(
             'messages',
-            requestRejectedMessage(visitorRequestForReview, 'REJECT'),
+            requestRejectedMessage({
+              visitorRequest: visitorRequestForReview,
+              rejectionReason: 'REJECT',
+              includeBookerDetailsLink: true,
+            }),
           )
 
           expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
@@ -181,12 +185,53 @@ describe('Booker management - visitor requests - check linked visitors', () => {
 
           expect(flashProvider).toHaveBeenCalledWith(
             'messages',
-            requestRejectedMessage(visitorRequestForReview, 'ALREADY_LINKED'),
+            requestRejectedMessage({
+              visitorRequest: visitorRequestForReview,
+              rejectionReason: 'ALREADY_LINKED',
+              includeBookerDetailsLink: true,
+            }),
           )
 
           expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
             requestReference: visitorRequestForReview.reference,
             rejectionReason: 'ALREADY_LINKED',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
+        })
+    })
+
+    it('should reject request, send audit, set message, clear session and redirect to manage bookers page - REJECT (returnTo = booker-details)', () => {
+      const rejectedVisitorRequest = TestData.visitorRequest()
+      bookerService.rejectVisitorRequest.mockResolvedValue(rejectedVisitorRequest)
+      sessionData.visitorRequestJourney.returnTo = 'booker-details'
+
+      return request(app)
+        .post(url)
+        .send({ rejectionReason: 'REJECT' })
+        .expect(302)
+        .expect('location', `/manage-bookers/${visitorRequestForReview.bookerReference}/booker-details`)
+        .expect(() => {
+          expect(bookerService.rejectVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestRejectedMessage({
+              visitorRequest: visitorRequestForReview,
+              rejectionReason: 'REJECT',
+              includeBookerDetailsLink: false,
+            }),
+          )
+
+          expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            rejectionReason: 'REJECT',
             username: 'user1',
             operationId: undefined,
           })

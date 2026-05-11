@@ -1,9 +1,12 @@
 import { MoJAlert } from '../../../@types/bapv'
 import { PrisonVisitorRequestDto, RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
 
-const bookerNotifiedHtml = (bookerReference: string): string =>
-  'The booker has been notified by email. ' +
-  `You can <a href="/manage-bookers/${bookerReference}/booker-details">view the booker’s account</a>.`
+const bookerNotifiedHtml = (bookerReference: string, includeBookerDetailsLink: boolean): string =>
+  `The booker has been notified by email. ${
+    includeBookerDetailsLink
+      ? `You can <a href="/manage-bookers/${bookerReference}/booker-details">view the booker’s account</a>.`
+      : ''
+  }`
 
 export const requestAlreadyReviewedMessage = (): MoJAlert => ({
   variant: 'information',
@@ -11,18 +14,29 @@ export const requestAlreadyReviewedMessage = (): MoJAlert => ({
   text: 'The selected request has already been reviewed.',
 })
 
-export const requestApprovedMessage = (visitorRequest: PrisonVisitorRequestDto): MoJAlert => ({
+export const requestApprovedMessage = ({
+  visitorRequest,
+  includeBookerDetailsLink,
+}: {
+  visitorRequest: PrisonVisitorRequestDto
+  includeBookerDetailsLink: boolean
+}): MoJAlert => ({
   variant: 'success',
   title: `You approved the request and linked ${visitorRequest.firstName} ${visitorRequest.lastName}`,
   showTitleAsHeading: true,
-  html: bookerNotifiedHtml(visitorRequest.bookerReference),
+  html: bookerNotifiedHtml(visitorRequest.bookerReference, includeBookerDetailsLink),
   dismissible: true,
 })
 
-export const requestRejectedMessage = (
-  visitorRequest: PrisonVisitorRequestDto,
-  rejectionReason: RejectVisitorRequestDto['rejectionReason'],
-): MoJAlert => {
+export const requestRejectedMessage = ({
+  visitorRequest,
+  rejectionReason,
+  includeBookerDetailsLink,
+}: {
+  visitorRequest: PrisonVisitorRequestDto
+  rejectionReason: RejectVisitorRequestDto['rejectionReason']
+  includeBookerDetailsLink: boolean
+}): MoJAlert => {
   const title =
     rejectionReason === 'ALREADY_LINKED'
       ? `You confirmed that ${visitorRequest.firstName} ${visitorRequest.lastName} is already a linked visitor`
@@ -32,7 +46,7 @@ export const requestRejectedMessage = (
     variant: 'success',
     title,
     showTitleAsHeading: true,
-    html: bookerNotifiedHtml(visitorRequest.bookerReference),
+    html: bookerNotifiedHtml(visitorRequest.bookerReference, includeBookerDetailsLink),
     dismissible: true,
   }
 }

@@ -246,7 +246,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
       return request(app).post('/manage-bookers/visitor-request/INVALID-REQUEST-REFERENCE/link-visitor').expect(400)
     })
 
-    it('should approve request, send audit, set message, clear session and redirect to manage bookers page if visitor selected', () => {
+    it('should approve request, send audit, set message, clear session and redirect to manage bookers page if visitor selected (returnTo = manage-bookers)', () => {
       const approvedVisitorRequest = TestData.visitorRequest()
       bookerService.approveVisitorRequest.mockResolvedValue(approvedVisitorRequest)
 
@@ -262,7 +262,43 @@ describe('Booker management - visitor requests - link a visitor', () => {
             visitorId: 4321,
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', requestApprovedMessage(visitorRequestForReview))
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestApprovedMessage({ visitorRequest: visitorRequestForReview, includeBookerDetailsLink: true }),
+          )
+
+          expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
+            requestReference: visitorRequestForReview.reference,
+            visitorId: '4321',
+            username: 'user1',
+            operationId: undefined,
+          })
+
+          expect(sessionData.visitorRequestJourney).toBeUndefined()
+        })
+    })
+
+    it('should approve request, send audit, set message, clear session and redirect to booker details page if visitor selected (returnTo = booker-details)', () => {
+      const approvedVisitorRequest = TestData.visitorRequest()
+      bookerService.approveVisitorRequest.mockResolvedValue(approvedVisitorRequest)
+      sessionData.visitorRequestJourney.returnTo = 'booker-details'
+
+      return request(app)
+        .post(url)
+        .send({ visitorId: '4321' })
+        .expect(302)
+        .expect('location', `/manage-bookers/${visitorRequestForReview.bookerReference}/booker-details`)
+        .expect(() => {
+          expect(bookerService.approveVisitorRequest).toHaveBeenCalledWith({
+            username: 'user1',
+            requestReference: visitorRequestForReview.reference,
+            visitorId: 4321,
+          })
+
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestApprovedMessage({ visitorRequest: visitorRequestForReview, includeBookerDetailsLink: false }),
+          )
 
           expect(auditService.approvedVisitorRequest).toHaveBeenCalledWith({
             requestReference: visitorRequestForReview.reference,
@@ -311,7 +347,11 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
           expect(flashProvider).toHaveBeenCalledWith(
             'messages',
-            requestRejectedMessage(visitorRequestForReview, rejectionReason),
+            requestRejectedMessage({
+              visitorRequest: visitorRequestForReview,
+              rejectionReason,
+              includeBookerDetailsLink: true,
+            }),
           )
 
           expect(auditService.rejectedVisitorRequest).toHaveBeenCalledWith({
