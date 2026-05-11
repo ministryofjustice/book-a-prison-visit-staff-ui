@@ -34,9 +34,12 @@
           {% set prisonerName = (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName %}
           {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
 
-          <h2 class="govuk-heading-m" data-test="{{ prisonerIndex }}">Visitors linked to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}</h2>
+          <h2 class="govuk-heading-m" data-test="{{ prisonerIndex }}">
+            Visits to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}
+          </h2>
 
           {# Visitors #}
+          <h3 class="govuk-heading-s">Linked visitors</h3>
           {% if prisoner.permittedVisitors | length %}
 
             {# Build visitor table row items #}
@@ -105,6 +108,52 @@
             }) }}
           {% endif %}
 
+          {# Visitor requests #}
+          <h3 class="govuk-heading-s">Requests to link visitors</h3>
+
+          {% if visitorRequests[prisonerNumber] | length %}
+            {# Build visitor request table row items #}
+            {% set visitorRequestRowItems = [] %}
+            {%- for request in visitorRequests[prisonerNumber] %}
+              {% set requestIndex = prisonerIndex + "-visitor-request-" + loop.index %}
+              {% set visitorName = request.firstName + " " + request.lastName %}
+
+              {%- set visitorRequestRowItems = (visitorRequestRowItems.push([
+                {
+                  text: visitorName,
+                  attributes: { "data-test": requestIndex + "-name" }
+                },
+                {
+                  text: request.requestedOn | formatDate("d/M/yyyy"),
+                  attributes: { "data-test": requestIndex + "-requested-date" }
+                },
+                {
+                  html: '<a class="govuk-link--no-visited-state" 
+                        href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
+                        'View<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
+                  classes: "govuk-!-text-align-right",
+                  attributes: { "data-test": requestIndex + "-action" }
+                }
+                ]), visitorRequestRowItems) %}
+            {% endfor -%}
+
+            {{ govukTable({
+              classes: "govuk-!-margin-top-6",
+              firstCellIsHeader: true,
+              head: [
+                { text: "Name"},
+                { text: "Requested on"},
+                { text: "Action", classes: "govuk-!-text-align-right"}
+              ],
+              rows: visitorRequestRowItems
+            }) }}
+
+
+            {% else %}
+              <p data-test="{{ prisonerIndex }}-no-visitor-requests">
+                There are no requests to link visitors.
+              </p>
+          {% endif %}
         {% endfor %}
       {% else %}
         <p data-test="booker-no-prisoners">This booker has no prisoners.</p>
