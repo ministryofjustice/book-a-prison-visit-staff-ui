@@ -116,11 +116,11 @@
             {% set visitorRequestRowItems = [] %}
             {%- for request in visitorRequests[prisonerNumber] %}
               {% set requestIndex = prisonerIndex + "-visitor-request-" + loop.index %}
-              {% set visitorName %}{{ request.firstName }} {{ request.lastName }}{% endset %}
+              {% set visitorName = request.firstName + " " + request.lastName %}
 
               {%- set visitorRequestRowItems = (visitorRequestRowItems.push([
                 {
-                  text: visitorName | safe,
+                  text: visitorName,
                   attributes: { "data-test": requestIndex + "-name" }
                 },
                 {
