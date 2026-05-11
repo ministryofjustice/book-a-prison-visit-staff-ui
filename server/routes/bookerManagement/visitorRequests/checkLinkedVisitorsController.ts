@@ -22,12 +22,13 @@ export default class CheckLinkedVisitorsController {
         delete req.session.visitorRequestJourney
         return res.redirect('/manage-bookers')
       }
-      const { visitorRequest, linkedVisitors } = visitorRequestJourney
+      const { visitorRequest, linkedVisitors, returnTo } = visitorRequestJourney
 
       return res.render('pages/bookerManagement/visitorRequests/checkLinkedVisitors', {
         errors: req.flash('errors'),
         visitorRequest,
         linkedVisitors,
+        returnTo,
       })
     }
   }
@@ -50,6 +51,8 @@ export default class CheckLinkedVisitorsController {
 
       const { rejectionReason } = matchedData<{ rejectionReason: RejectVisitorRequestDto['rejectionReason'] }>(req)
       const { username } = res.locals.user
+      const { returnTo } = visitorRequestJourney
+      const includeBookerDetailsLink = returnTo === 'manage-bookers'
 
       try {
         const rejectedVisitorRequest = await this.bookerService.rejectVisitorRequest({
@@ -58,7 +61,10 @@ export default class CheckLinkedVisitorsController {
           rejectionReason,
         })
 
-        req.flash('messages', requestRejectedMessage(rejectedVisitorRequest, rejectionReason))
+        req.flash(
+          'messages',
+          requestRejectedMessage({ visitorRequest: rejectedVisitorRequest, rejectionReason, includeBookerDetailsLink }),
+        )
 
         this.auditService.rejectedVisitorRequest({
           requestReference,
@@ -74,8 +80,12 @@ export default class CheckLinkedVisitorsController {
         req.flash('messages', requestAlreadyReviewedMessage())
       }
 
+      const { bookerReference } = visitorRequestJourney.visitorRequest
       delete req.session.visitorRequestJourney
-      return res.redirect(`/manage-bookers`)
+
+      return returnTo === 'manage-bookers'
+        ? res.redirect(`/manage-bookers`)
+        : res.redirect(`/manage-bookers/${bookerReference}/booker-details`)
     }
   }
 

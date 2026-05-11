@@ -7,6 +7,7 @@ import {
   ApproveVisitorRequestDto,
   ApproveVisitRequestBodyDto,
   BookerDetailedInfoDto,
+  BookerPrisonerVisitorRequestDto,
   BookerSearchResultsDto,
   BookingOrchestrationRequestDto,
   BookingRequestVisitorDetailsDto,
@@ -395,6 +396,10 @@ export default class OrchestrationApiClient {
         throw error
       }
     }
+  }
+
+  async getBookerVisitorRequests(bookerReference: string): Promise<BookerPrisonerVisitorRequestDto[]> {
+    return this.restClient.get({ path: `/public/booker/${bookerReference}/permitted/visitors/requests` })
   }
 
   async getVisitorRequests(prisonId: string): Promise<PrisonVisitorRequestListEntryDto[]> {

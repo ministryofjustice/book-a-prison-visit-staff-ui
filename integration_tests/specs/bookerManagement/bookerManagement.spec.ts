@@ -33,17 +33,18 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
 
   test.describe('User has the booker admin role', () => {
     const email = 'booker@example.com'
+    const bookerSearchResult = TestData.bookerSearchResult({ email })
+    const bookerDetails = TestData.bookerDetailedInfo({ email })
 
     test.beforeEach(async ({ page }) => {
       await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
+
+      await orchestrationApi.stubGetBookersByEmail({ email, bookers: [bookerSearchResult] })
+      await orchestrationApi.stubGetBookerDetails({ reference: bookerDetails.reference, booker: bookerDetails })
+      await orchestrationApi.stubGetBookerVisitorRequests()
     })
 
     test('should search for a booker and navigate to booker details page (single booker record)', async ({ page }) => {
-      const bookerSearchResult = TestData.bookerSearchResult({ email })
-      const bookerDetails = TestData.bookerDetailedInfo({ email })
-      await orchestrationApi.stubGetBookersByEmail({ email, bookers: [bookerSearchResult] })
-      await orchestrationApi.stubGetBookerDetails({ reference: bookerDetails.reference, booker: bookerDetails })
-
       // Home page - select booker management tile
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.bookerManagementTile.click()
@@ -57,10 +58,11 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.bookerEmail).toContainText(email)
       await expect(bookerDetailsPage.bookerReference).toContainText(bookerDetails.reference)
-      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText(
-        'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-      )
+      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText('Visits to John Smith (A1234BC) at Hewell (HMP)')
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
+      await expect(bookerDetailsPage.visitorName(1, 1)).toContainText('Mike Jones')
+      await expect(bookerDetailsPage.requestedDate(1, 1)).toContainText('10/12/2025')
+      await expect(bookerDetailsPage.viewRequestLink(1, 1, 'Mike Jones')).toBeVisible()
     })
 
     test('should search for a booker and navigate to booker details page (multiple booker records)', async ({
@@ -102,18 +104,14 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.bookerEmail).toContainText(email)
       await expect(bookerDetailsPage.bookerReference).toContainText(activeBookerDetails.reference)
-      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText(
-        'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-      )
+      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText('Visits to John Smith (A1234BC) at Hewell (HMP)')
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
+      await expect(bookerDetailsPage.visitorName(1, 1)).toContainText('Mike Jones')
+      await expect(bookerDetailsPage.requestedDate(1, 1)).toContainText('10/12/2025')
+      await expect(bookerDetailsPage.viewRequestLink(1, 1, 'Mike Jones')).toBeVisible()
     })
 
     test('should link a visitor to a booker account', async ({ page }) => {
-      const bookerSearchResult = TestData.bookerSearchResult({ email })
-      const bookerDetails = TestData.bookerDetailedInfo({ email })
-      await orchestrationApi.stubGetBookersByEmail({ email, bookers: [bookerSearchResult] })
-      await orchestrationApi.stubGetBookerDetails({ reference: bookerDetails.reference, booker: bookerDetails })
-
       // Home page - select booker management tile
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.bookerManagementTile.click()
@@ -127,9 +125,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.bookerEmail).toContainText(email)
       await expect(bookerDetailsPage.bookerReference).toContainText(bookerDetails.reference)
-      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText(
-        'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-      )
+      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText('Visits to John Smith (A1234BC) at Hewell (HMP)')
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
 
       const unlinkedContact = TestData.socialContact({
@@ -171,11 +167,6 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
     })
 
     test('should unlink a visitor from a booker account', async ({ page }) => {
-      const bookerSearchResult = TestData.bookerSearchResult({ email })
-      const bookerDetails = TestData.bookerDetailedInfo({ email })
-      await orchestrationApi.stubGetBookersByEmail({ email, bookers: [bookerSearchResult] })
-      await orchestrationApi.stubGetBookerDetails({ reference: bookerDetails.reference, booker: bookerDetails })
-
       // Home page - select booker management tile
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.bookerManagementTile.click()
@@ -189,9 +180,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       const bookerDetailsPage = await BookerDetailsPage.verifyOnPage(page)
       await expect(bookerDetailsPage.bookerEmail).toContainText(email)
       await expect(bookerDetailsPage.bookerReference).toContainText(bookerDetails.reference)
-      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText(
-        'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-      )
+      await expect(bookerDetailsPage.prisonerHeading(1)).toContainText('Visits to John Smith (A1234BC) at Hewell (HMP)')
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
 
       // Unlink visitor
