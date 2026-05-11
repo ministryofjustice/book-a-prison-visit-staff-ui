@@ -79,6 +79,7 @@ jobs:
     needs:
     - build
     - helm_lint
+    - check_publish
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
@@ -86,9 +87,11 @@ jobs:
       app_version: '${{ needs.build.outputs.app_version }}'
   deploy_staging:
     name: Deploy to the staging environment
+    if: needs.check_publish.outputs.enabled == 'true'
     needs:
     - build
     - helm_lint
+    - check_publish
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
     with:
