@@ -27,7 +27,8 @@ jobs:
   check_publish:
     name: Check publish flag
     runs-on: ubuntu-latest
-    outputs:      enabled: ${{ github.ref == 'refs/heads/main' && (inputs.push || inputs.push == null) }}
+    outputs:      
+      enabled: ${{ github.ref == 'refs/heads/main' && (inputs.push || inputs.push == null) }}
     steps:
       - name: Set publish flag
         run: echo "Publishing enabled ${{ github.ref == 'refs/heads/main' && (inputs.push || inputs.push == null) }}"
