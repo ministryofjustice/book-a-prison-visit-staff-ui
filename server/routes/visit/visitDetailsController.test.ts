@@ -145,6 +145,20 @@ describe('Visit details page', () => {
         })
     })
 
+    it('should handle a deleted visitor relationship', () => {
+      visitDetails.visitors[0].relationshipDescription = null
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
+          expect($('[data-test="visitor-relation-1"]').text()).toBe('Relationship deleted')
+        })
+    })
+
     it('should render visit request title for a visit request', () => {
       visitDetails.visitSubStatus = 'REQUESTED'
 

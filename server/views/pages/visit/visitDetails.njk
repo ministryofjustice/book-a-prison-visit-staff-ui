@@ -248,7 +248,9 @@
             <h3 class="govuk-heading-m">
               <span data-test="visitor-name-{{ loop.index }}">{{ visitor.firstName }} {{ visitor.lastName }}</span>
               <span>
-                (<span data-test="visitor-relation-{{ loop.index }}">{{ visitor.relationshipDescription | lower }}</span>)
+                (<span data-test="visitor-relation-{{ loop.index }}">
+                  {{- (visitor.relationshipDescription | lower) | default("Relationship deleted", true) -}}
+                </span>)
               </span>
             </h3>
             <dl class="govuk-list bapv-visit-details__person-details">
