@@ -393,6 +393,8 @@ describe('Visit details page', () => {
           .fn<number[], []>()
           .mockReturnValueOnce([2]) // restrictions returned results
           .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -417,6 +419,8 @@ describe('Visit details page', () => {
           .fn<number[], []>()
           .mockReturnValueOnce([]) // restrictions returned results
           .mockReturnValueOnce([4321]) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')

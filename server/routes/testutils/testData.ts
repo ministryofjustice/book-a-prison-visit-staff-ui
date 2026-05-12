@@ -69,6 +69,7 @@ export default class TestData {
     }) as Address
 
   static alert = ({
+    alertUuid = 'abcd-efgh-ijkl',
     alertType = 'U',
     alertTypeDescription = 'COVID unit management',
     alertCode = 'UPIU',
@@ -80,6 +81,7 @@ export default class TestData {
     active = true,
   }: Partial<Alert> = {}): Alert =>
     ({
+      alertUuid,
       alertType,
       alertTypeDescription,
       alertCode,

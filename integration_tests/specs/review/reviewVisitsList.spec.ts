@@ -22,8 +22,8 @@ test.describe('Bookings review listing page', () => {
         TestData.visitNotificationEventRaw({ type: 'PERSON_RESTRICTION_UPSERTED_EVENT' }),
         TestData.visitNotificationEventRaw({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
         TestData.visitNotificationEventRaw({ type: 'VISITOR_UNAPPROVED_EVENT' }),
-        TestData.visitNotificationEventRaw({ type: 'PRISONER_ALERTS_UPDATED_EVENT' }),
-        // TestData.visitNotificationEventRaw({ type: 'PRISONER_ALERTS_ADDED_EVENT' })
+        TestData.visitNotificationEventRaw({ type: 'PRISONER_ALERT_UPDATED_EVENT' }),
+        TestData.visitNotificationEventRaw({ type: 'PRISONER_ALERT_CREATED_EVENT' }),
       ],
     }),
   ]
@@ -75,8 +75,8 @@ test.describe('Bookings review listing page', () => {
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_RESTRICTION)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISON_VISITS_BLOCKED_FOR_DATE)
     await expect(listingPage.getTypes(2)).toContainText(notificationTypes.VISITOR_UNAPPROVED_EVENT)
-    await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISONER_ALERTS_UPDATED_EVENT)
-    // await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISONER_ALERTS_ADDED_EVENT)
+    await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISONER_ALERT_UPDATED_EVENT)
+    await expect(listingPage.getTypes(2)).toContainText(notificationTypes.PRISONER_ALERT_CREATED_EVENT)
     await expect(listingPage.getActionLink(2)).toHaveAttribute(
       'href',
       `/visit/${visitNotifications[1].visitReference}?from=review`,

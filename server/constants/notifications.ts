@@ -3,8 +3,8 @@ import { NotificationType } from '../data/orchestrationApiTypes'
 
 // used on visits to review listing page and visit details timeline
 export const notificationTypes: Partial<Record<NotificationType, string>> = {
-  // PRISONER_ALERTS_ADDED_EVENT: 'Prisoner alert', TODO
-  PRISONER_ALERTS_UPDATED_EVENT: 'Prisoner alert',
+  PRISONER_ALERT_CREATED_EVENT: 'Prisoner alert',
+  PRISONER_ALERT_UPDATED_EVENT: 'Prisoner alert',
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
   PRISONER_RECEIVED_EVENT: 'Prisoner transferred',
@@ -14,8 +14,8 @@ export const notificationTypes: Partial<Record<NotificationType, string>> = {
 
 // used on visits to review listing page
 export const notificationTypeReasons: Partial<Record<NotificationType, string>> = {
-  // PRISONER_ALERTS_ADDED_EVENT: 'the prisoner has a new or updated alert that may impact visits', TODO
-  PRISONER_ALERTS_UPDATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
+  PRISONER_ALERT_CREATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
+  PRISONER_ALERT_UPDATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
   PRISONER_RELEASED_EVENT: 'the prisoner is released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'the date is no longer available for social visits',
   PRISONER_RECEIVED_EVENT: 'the prisoner has been transferred',
@@ -46,8 +46,8 @@ export const notificationTypeAlerts: Partial<Record<NotificationType, MoJAlert>>
     text: 'A new visit time should be selected.',
   },
 
-  // PRISONER_ALERTS_ADDED_EVENT: handled in getVisitNotificationsAlerts()
-  // PRISONER_ALERTS_UPDATED_EVENT: handled in getVisitNotificationsAlerts()
+  // PRISONER_ALERT_CREATED_EVENT: handled in getVisitNotificationsAlerts()
+  // PRISONER_ALERT_UPDATED_EVENT: handled in getVisitNotificationsAlerts()
   // VISITOR_UNAPPROVED_EVENT: handled in getVisitNotificationsAlerts()
   // VISITOR_RESTRICTION: handled in getVisitNotificationsAlerts()
 }

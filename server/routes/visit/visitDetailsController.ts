@@ -66,17 +66,19 @@ export default class VisitDetailsController {
         returnedIdType: 'VISITOR_ID',
         notifications: visitDetails.notifications,
       })
-      // TODO (let)
-      const flaggedAlertsIds = getIdsToFlag({
-        notificationType: 'PRISONER_ALERTS_UPDATED_EVENT',
-        returnedIdType: 'ALERT_ID',
+
+      const flaggedAlertUpdatedIds = getIdsToFlag({
+        notificationType: 'PRISONER_ALERT_UPDATED_EVENT',
+        returnedIdType: 'ALERT_UUID',
         notifications: visitDetails.notifications,
       })
-      // flaggedAlertsIds += getIdsToFlag({
-      //   notificationType: 'PRISONER_ALERTS_ADDED_EVENT',
-      //   returnedIdType: 'ALERT_ID',
-      //   notifications: visitDetails.notifications,
-      // }) TODO
+      const flaggedAlertCreatedIds = getIdsToFlag({
+        notificationType: 'PRISONER_ALERT_CREATED_EVENT',
+        returnedIdType: 'ALERT_UUID',
+        notifications: visitDetails.notifications,
+      })
+
+      const flaggedAlertsIds = [...flaggedAlertUpdatedIds, ...flaggedAlertCreatedIds]
 
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,

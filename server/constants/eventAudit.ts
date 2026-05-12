@@ -16,7 +16,8 @@ const eventAuditTypes: Partial<Record<EventAuditType, string>> = {
   PRISONER_RESTRICTION_CHANGE_EVENT: 'Needs review',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Needs review',
   IGNORE_VISIT_NOTIFICATIONS_EVENT: 'No change required',
-  PRISONER_ALERTS_UPDATED_EVENT: 'Needs review',
+  PRISONER_ALERT_CREATED_EVENT: 'Needs review',
+  PRISONER_ALERT_UPDATED_EVENT: 'Needs review',
   VISITOR_RESTRICTION: 'Needs review',
   VISITOR_UNAPPROVED_EVENT: 'Needs review',
 }

@@ -7,6 +7,7 @@ import {
   EventAudit,
   NotificationType,
   VisitBookingDetails,
+  VisitNotificationEventAttributeNames,
   // VisitNotificationEventAttributeNames, TODO
 } from '../../data/orchestrationApiTypes'
 
@@ -159,7 +160,8 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
     if (
       notification.type === 'VISITOR_RESTRICTION' ||
       notification.type === 'VISITOR_UNAPPROVED_EVENT' ||
-      notification.type === 'PRISONER_ALERTS_UPDATED_EVENT'
+      notification.type === 'PRISONER_ALERT_UPDATED_EVENT' ||
+      notification.type === 'PRISONER_ALERT_CREATED_EVENT'
     ) {
       linkedNotifications.push(notification)
     } else {
@@ -190,16 +192,16 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
       returnedIdType: 'VISITOR_ID',
       notifications: linkedNotifications,
     })
-    const alertsUpdatedIds = getIdsToFlag({
-      notificationType: 'PRISONER_ALERTS_UPDATED_EVENT',
-      returnedIdType: 'ALERT_ID',
+    const alertUpdatedIds = getIdsToFlag({
+      notificationType: 'PRISONER_ALERT_UPDATED_EVENT',
+      returnedIdType: 'ALERT_UUID',
       notifications: linkedNotifications,
     })
-    // const alertsAddedIds = getIdsToFlag({
-    //   notificationType: 'PRISONER_ALERTS_ADDED_EVENT',
-    //   returnedIdType: 'ALERT_ID',
-    //   notifications: linkedNotifications,
-    // }) TODO
+    const alertCreatedIds = getIdsToFlag({
+      notificationType: 'PRISONER_ALERT_CREATED_EVENT',
+      returnedIdType: 'ALERT_UUID',
+      notifications: linkedNotifications,
+    })
 
     let notificationItems = visitorRestrictionIds
       .map(id => `<li><a href="#visitor-restriction-${id}">A restriction has been added or updated</a></li>`)
@@ -209,13 +211,13 @@ const getVisitNotificationsAlerts = (notifications: VisitBookingDetails['notific
       .map(id => `<li><a href="#visitor-${id}">Visitor has been unapproved</a></li>`)
       .join('')
 
-    notificationItems += alertsUpdatedIds
+    notificationItems += alertUpdatedIds
       .map(id => `<li><a href="#prisoner-alert-${id}">An alert has been updated</a></li>`)
       .join('')
 
-    // notificationItems += alertsAddedIds
-    //   .map(id => `<li><a href="#prisoner-alert-${id}">An alert has been added</a></li>`)
-    //   .join('') TODO
+    notificationItems += alertCreatedIds
+      .map(id => `<li><a href="#prisoner-alert-${id}">An alert has been added</a></li>`)
+      .join('')
 
     alerts.push({
       variant: 'warning',
@@ -257,8 +259,7 @@ export const getIdsToFlag = ({
   notifications,
 }: {
   notificationType: NotificationType
-  //  returnedIdType: Extract<VisitNotificationEventAttributeNames, 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'ALERT_ID'> TODO
-  returnedIdType: 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'ALERT_ID'
+  returnedIdType: Extract<VisitNotificationEventAttributeNames, 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'ALERT_UUID'>
   notifications: VisitBookingDetails['notifications']
 }): number[] => {
   const flaggedIds = new Set<number>() // only want unique IDs
