@@ -21,7 +21,7 @@ export default class HomePage extends AbstractPage {
   readonly bookerManagementTile: Locator
 
   constructor(page: Page) {
-    super(page, 'Manage prison visits')
+    super(page, 'Social visits')
 
     this.bookOrChangeVisitTile = page.getByTestId('book-or-change-visit')
     this.visitRequestsTile = page.getByTestId('visit-requests')
