@@ -78,8 +78,8 @@ export default class VisitDetailsPage extends AbstractPage {
     return this.page.getByTestId(`prisoner-restriction-${index}`)
   }
 
-  prisonerAlert(index: number): Locator {
-    return this.page.getByTestId(`prisoner-alert-${index}`)
+  prisonerAlert(uuid: string): Locator {
+    return this.page.getByTestId(`prisoner-alert-${uuid}`)
   }
 
   visitorName(index: number): Locator {

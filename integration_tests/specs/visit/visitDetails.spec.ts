@@ -65,7 +65,9 @@ test.describe('Visit details page', () => {
     await expect(visitDetailsPage.prisonerLocation).toContainText('1-1-C-028, Hewell (HMP)')
     await expect(visitDetailsPage.prisonerDob).toContainText('2 April 1975')
     await expect(visitDetailsPage.prisonerRestriction(1)).toContainText('Restricted')
-    await expect(visitDetailsPage.prisonerAlert(1)).toContainText('Protective Isolation Unit')
+    await expect(visitDetailsPage.prisonerAlert(visitDetails.prisoner.prisonerAlerts[0].alertUuid)).toContainText(
+      'Protective Isolation Unit',
+    )
 
     // Visitor details
     await expect(visitDetailsPage.visitorName(1)).toContainText('Jeanette Smith')
