@@ -437,7 +437,7 @@ describe('Visit utils', () => {
     // unapprovedVisitorIds
     const visitorId = 'VISITOR_ID'
     const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
-    // alertsUpdatedIds / alertsCreatedIds
+    // flaggedAlertUpdatedIds / flaggedAlertCreatedIds
     const alertUuid = 'ALERT_UUID'
     const alertUpdatedEvent = 'PRISONER_ALERT_UPDATED_EVENT'
     const alertCreatedEvent = 'PRISONER_ALERT_CREATED_EVENT'
@@ -511,7 +511,7 @@ describe('Visit utils', () => {
 
       expect(
         getIdsToFlag({ notificationType: alertUpdatedEvent, returnedIdType: alertUuid, notifications }),
-      ).toStrictEqual([100, 200])
+      ).toStrictEqual(['100', '200'])
     })
 
     it(`should return ${alertUuid} if notification exists for ${alertCreatedEvent}`, () => {
@@ -535,7 +535,7 @@ describe('Visit utils', () => {
 
       expect(
         getIdsToFlag({ notificationType: alertCreatedEvent, returnedIdType: alertUuid, notifications }),
-      ).toStrictEqual([100, 200])
+      ).toStrictEqual(['100', '200'])
     })
   })
 

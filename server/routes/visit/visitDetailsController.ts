@@ -66,19 +66,16 @@ export default class VisitDetailsController {
         returnedIdType: 'VISITOR_ID',
         notifications: visitDetails.notifications,
       })
-
-      const flaggedAlertUpdatedIds = getIdsToFlag({
-        notificationType: 'PRISONER_ALERT_UPDATED_EVENT',
-        returnedIdType: 'ALERT_UUID',
-        notifications: visitDetails.notifications,
-      })
       const flaggedAlertCreatedIds = getIdsToFlag({
         notificationType: 'PRISONER_ALERT_CREATED_EVENT',
         returnedIdType: 'ALERT_UUID',
         notifications: visitDetails.notifications,
       })
-
-      const flaggedAlertsIds = [...flaggedAlertUpdatedIds, ...flaggedAlertCreatedIds]
+      const flaggedAlertUpdatedIds = getIdsToFlag({
+        notificationType: 'PRISONER_ALERT_UPDATED_EVENT',
+        returnedIdType: 'ALERT_UUID',
+        notifications: visitDetails.notifications,
+      })
 
       const eventsTimeline = visitEventsTimelineBuilder({
         events: visitDetails.events,
@@ -104,7 +101,8 @@ export default class VisitDetailsController {
         visitDetails,
         flaggedVisitorRestrictionIds,
         unapprovedVisitorIds,
-        flaggedAlertsIds,
+        flaggedAlertUpdatedIds,
+        flaggedAlertCreatedIds,
         prisonerId: prisoner.prisonerNumber,
       })
     }

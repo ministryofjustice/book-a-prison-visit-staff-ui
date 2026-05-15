@@ -76,6 +76,7 @@ describe('Visit details page', () => {
 
   describe('GET /visit/:reference', () => {
     it('should render full visit booking summary page', () => {
+      const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
       return request(app)
         .get('/visit/ab-cd-ef-gh')
         .expect(200)
@@ -112,11 +113,11 @@ describe('Visit details page', () => {
           expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
             'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
           )
-          expect($('[data-test="prisoner-alert-1"]').text()).toContain('Protective Isolation Unit')
-          expect($('[data-test="prisoner-alert-1-updated"]').text()).toContain('1/3/2023')
-          expect($('[data-test="prisoner-alert-1-start"]').text()).toContain('2/1/2023')
-          expect($('[data-test="prisoner-alert-1-end"]').text()).toContain('No end date')
-          expect($('[data-test="prisoner-alert-1-comment"]').text()).toContain('Alert comment')
+          expect($(`[data-test="prisoner-alert-${alertUuid}"]`).text()).toContain('Protective Isolation Unit')
+          expect($(`[data-test="prisoner-alert-${alertUuid}-updated"]`).text()).toContain('1/3/2023')
+          expect($(`[data-test="prisoner-alert-${alertUuid}-start"]`).text()).toContain('2/1/2023')
+          expect($(`[data-test="prisoner-alert-${alertUuid}-end"]`).text()).toContain('No end date')
+          expect($(`[data-test="prisoner-alert-${alertUuid}-comment"]`).text()).toContain('Alert comment')
           // visitor details
           expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
           expect($('[data-test="visitor-relation-1"]').text()).toBe('wife')
@@ -444,6 +445,45 @@ describe('Visit details page', () => {
             const $ = cheerio.load(res.text)
             expect($('.bapv-visit-details__visitor--flagged #visitor-4321').length).toBe(1)
             expect($('.bapv-visit-details__visitor--flagged').text()).toContain('Visitor has been unapproved')
+          })
+      })
+    })
+
+    describe('Flag restriction added / changed', () => {
+      it('should flag a new restriction', () => {
+        const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([alertUuid]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__alert--flagged').text()).toContain('This new alert has been added')
+          })
+      })
+      it('should flag an updated restriction', () => {
+        const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([alertUuid]) //  alert updated returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__alert--flagged').text()).toContain('This alert has been updated')
           })
       })
     })

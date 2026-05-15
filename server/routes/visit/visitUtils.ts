@@ -253,15 +253,41 @@ export const getVisitAlerts = (visitDetails: VisitBookingDetails): MoJAlert[] =>
   ]
 }
 
-export const getIdsToFlag = ({
+type FlaggedIdType = Extract<
+  VisitNotificationEventAttributeNames,
+  'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'ALERT_UUID'
+>
+type NumericFlaggedIdType = Exclude<FlaggedIdType, 'ALERT_UUID'>
+
+export function getIdsToFlag(args: {
+  notificationType: NotificationType
+  returnedIdType: 'ALERT_UUID' // if alertUuid - string array return
+  notifications: VisitBookingDetails['notifications']
+}): string[]
+export function getIdsToFlag(args: {
+  notificationType: NotificationType
+  returnedIdType: NumericFlaggedIdType // if not alertUuid - number array return
+  notifications: VisitBookingDetails['notifications']
+}): number[]
+export function getIdsToFlag({
   notificationType,
   returnedIdType,
   notifications,
 }: {
   notificationType: NotificationType
-  returnedIdType: Extract<VisitNotificationEventAttributeNames, 'VISITOR_RESTRICTION_ID' | 'VISITOR_ID' | 'ALERT_UUID'>
+  returnedIdType: FlaggedIdType // all types of accepted flagged Ids
   notifications: VisitBookingDetails['notifications']
-}): number[] => {
+}): string[] | number[] {
+  if (returnedIdType === 'ALERT_UUID') {
+    const flaggedIds = new Set<string>() // only want unique IDs
+    notifications
+      .filter(notification => notification.type === notificationType)
+      .forEach(notification => {
+        const matchedNotifications = notification.additionalData.find(data => data.attributeName === returnedIdType)
+        flaggedIds.add(matchedNotifications?.attributeValue)
+      })
+    return Array.from(flaggedIds)
+  }
   const flaggedIds = new Set<number>() // only want unique IDs
   notifications
     .filter(notification => notification.type === notificationType)
