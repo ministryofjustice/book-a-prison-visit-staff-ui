@@ -3,7 +3,7 @@
 [![pipeline](https://github.com/ministryofjustice/book-a-prison-visit-staff-ui/actions/workflows/pipeline.yml/badge.svg)](https://github.com/ministryofjustice/book-a-prison-visit-staff-ui)
 [![Docker Repository on ghcr](https://img.shields.io/badge/ghcr.io-repository-2496ED.svg?logo=docker)](https://ghcr.io/ministryofjustice/book-a-prison-visit-staff-ui)
 
-Staff UI for new Manage a Prison Visit project.
+Staff UI for Social visits.
 
 ## Running the app
 The easiest way to run the app is to use docker compose to create the service and all dependencies. 

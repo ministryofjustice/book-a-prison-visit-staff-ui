@@ -26,7 +26,7 @@ describe('Breadcrumbs', () => {
     expect($('.govuk-breadcrumbs li:first a').text()).toBe('Digital Prison Services')
     expect($('.govuk-breadcrumbs li:first a').attr('href')).toBe(config.dpsHome)
 
-    expect($('.govuk-breadcrumbs li:nth-child(2) a').text()).toBe('Manage prison visits')
+    expect($('.govuk-breadcrumbs li:nth-child(2) a').text()).toBe('Social visits')
     expect($('.govuk-breadcrumbs li:nth-child(2) a').attr('href')).toBe('/')
   })
 
@@ -53,7 +53,7 @@ describe('Breadcrumbs', () => {
     expect($('.govuk-breadcrumbs li:first a').text()).toBe('Digital Prison Services')
     expect($('.govuk-breadcrumbs li:first a').attr('href')).toBe(config.dpsHome)
 
-    expect($('.govuk-breadcrumbs li:nth-child(2) a').text()).toBe('Manage prison visits')
+    expect($('.govuk-breadcrumbs li:nth-child(2) a').text()).toBe('Social visits')
     expect($('.govuk-breadcrumbs li:nth-child(2) a').attr('href')).toBe('/')
 
     expect($('.govuk-breadcrumbs li:nth-child(3) a').text()).toBe('Test')
