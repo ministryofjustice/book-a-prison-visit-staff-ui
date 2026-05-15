@@ -10,7 +10,8 @@ import {
   AvailableVisitActions,
   isPublicBooking,
   getVisitAlerts,
-  getIdsToFlag,
+  getStringIdsToFlag,
+  getNumberIdsToFlag,
   getHideAlertsInset,
 } from './visitUtils'
 
@@ -430,17 +431,13 @@ describe('Visit utils', () => {
       })
     })
   })
-  describe('getIdsToFlag', () => {
+  describe('getNumberIdsToFlag', () => {
     // flaggedVisitorRestrictionIds
     const visitorRestrictionId = 'VISITOR_RESTRICTION_ID'
     const visitorRestriction = 'VISITOR_RESTRICTION'
     // unapprovedVisitorIds
     const visitorId = 'VISITOR_ID'
     const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
-    // flaggedAlertUpdatedIds / flaggedAlertCreatedIds
-    const alertUuid = 'ALERT_UUID'
-    const alertUpdatedEvent = 'PRISONER_ALERT_UPDATED_EVENT'
-    const alertCreatedEvent = 'PRISONER_ALERT_CREATED_EVENT'
 
     it(`should return ${visitorRestrictionId} if notification exists for ${visitorRestriction}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
@@ -462,7 +459,11 @@ describe('Visit utils', () => {
       ]
 
       expect(
-        getIdsToFlag({ notificationType: visitorRestriction, returnedIdType: visitorRestrictionId, notifications }),
+        getNumberIdsToFlag({
+          notificationType: visitorRestriction,
+          returnedIdType: visitorRestrictionId,
+          notifications,
+        }),
       ).toStrictEqual([1, 2])
     })
 
@@ -486,9 +487,16 @@ describe('Visit utils', () => {
       ]
 
       expect(
-        getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
+        getNumberIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
       ).toStrictEqual([100, 200])
     })
+  })
+
+  describe('getStringIdsToFlag', () => {
+    // flaggedAlertUpdatedIds / flaggedAlertCreatedIds
+    const alertUuid = 'ALERT_UUID'
+    const alertUpdatedEvent = 'PRISONER_ALERT_UPDATED_EVENT'
+    const alertCreatedEvent = 'PRISONER_ALERT_CREATED_EVENT'
 
     it(`should return ${alertUuid} if notification exists for ${alertUpdatedEvent}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
@@ -510,7 +518,7 @@ describe('Visit utils', () => {
       ]
 
       expect(
-        getIdsToFlag({ notificationType: alertUpdatedEvent, returnedIdType: alertUuid, notifications }),
+        getStringIdsToFlag({ notificationType: alertUpdatedEvent, returnedIdType: alertUuid, notifications }),
       ).toStrictEqual(['100', '200'])
     })
 
@@ -534,7 +542,7 @@ describe('Visit utils', () => {
       ]
 
       expect(
-        getIdsToFlag({ notificationType: alertCreatedEvent, returnedIdType: alertUuid, notifications }),
+        getStringIdsToFlag({ notificationType: alertCreatedEvent, returnedIdType: alertUuid, notifications }),
       ).toStrictEqual(['100', '200'])
     })
   })

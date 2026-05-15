@@ -5,7 +5,7 @@ import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { clearSession } from '../visitorUtils'
 import { VisitSessionData } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
-import { getIdsToFlag, getPrisonerLocation, isPublicBooking } from './visitUtils'
+import { getNumberIdsToFlag, getPrisonerLocation, isPublicBooking } from './visitUtils'
 
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
@@ -73,7 +73,7 @@ export default class UpdateVisitController {
         publicBooker: isPublicBooking(visitDetails.events),
       }
 
-      const unapprovedVisitorIds = getIdsToFlag({
+      const unapprovedVisitorIds = getNumberIdsToFlag({
         notificationType: 'VISITOR_UNAPPROVED_EVENT',
         returnedIdType: 'VISITOR_ID',
         notifications: visitDetails.notifications,
