@@ -8,7 +8,6 @@ import {
   NotificationType,
   VisitBookingDetails,
   VisitNotificationEventAttributeNames,
-  // VisitNotificationEventAttributeNames, TODO
 } from '../../data/orchestrationApiTypes'
 
 const A_DAY_IN_MS = 24 * 60 * 60 * 1000

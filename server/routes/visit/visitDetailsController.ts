@@ -102,8 +102,8 @@ export default class VisitDetailsController {
         visitDetails,
         flaggedVisitorRestrictionIds,
         unapprovedVisitorIds,
-        flaggedAlertUpdatedIds,
         flaggedAlertCreatedIds,
+        flaggedAlertUpdatedIds,
         prisonerId: prisoner.prisonerNumber,
       })
     }
