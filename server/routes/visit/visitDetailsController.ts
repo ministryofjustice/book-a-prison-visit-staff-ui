@@ -4,8 +4,7 @@ import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import {
   getAvailableVisitActions,
-  getNumberIdsToFlag,
-  getStringIdsToFlag,
+  getIdsToFlag,
   getPrisonerLocation,
   getVisitAlerts,
   getHideAlertsInset,
@@ -57,22 +56,22 @@ export default class VisitDetailsController {
 
       const messages = getVisitAlerts(visitDetails)
 
-      const flaggedVisitorRestrictionIds = getNumberIdsToFlag({
+      const flaggedVisitorRestrictionIds = getIdsToFlag({
         notificationType: 'VISITOR_RESTRICTION',
         returnedIdType: 'VISITOR_RESTRICTION_ID',
         notifications: visitDetails.notifications,
       })
-      const unapprovedVisitorIds = getNumberIdsToFlag({
+      const unapprovedVisitorIds = getIdsToFlag({
         notificationType: 'VISITOR_UNAPPROVED_EVENT',
         returnedIdType: 'VISITOR_ID',
         notifications: visitDetails.notifications,
       })
-      const flaggedAlertCreatedIds = getStringIdsToFlag({
+      const flaggedAlertCreatedIds = getIdsToFlag({
         notificationType: 'PRISONER_ALERT_CREATED_EVENT',
         returnedIdType: 'ALERT_UUID',
         notifications: visitDetails.notifications,
       })
-      const flaggedAlertUpdatedIds = getStringIdsToFlag({
+      const flaggedAlertUpdatedIds = getIdsToFlag({
         notificationType: 'PRISONER_ALERT_UPDATED_EVENT',
         returnedIdType: 'ALERT_UUID',
         notifications: visitDetails.notifications,

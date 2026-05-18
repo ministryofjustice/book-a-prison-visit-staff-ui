@@ -245,7 +245,7 @@
         {{ govukInsetText(hideAlertsInset.visitor) if hideAlertsInset }}
 
         {% for visitor in visitDetails.visitors %}
-          {% set flagVisitor = visitor.personId in unapprovedVisitorIds %}
+          {% set flagVisitor = (visitor.personId | string) in unapprovedVisitorIds %}
           <div class="{{ 'bapv-visit-details__visitor--flagged' if flagVisitor }}">
             {% if flagVisitor %}
               <p id="visitor-{{ visitor.personId }}">Visitor has been unapproved</p>
@@ -275,7 +275,7 @@
             <div class="bapv-visit-details__restrictions">
               {% for restriction in visitor.restrictions %}
 
-                {% if restriction.restrictionId in flaggedVisitorRestrictionIds %}
+                {% if (restriction.restrictionId | string) in flaggedVisitorRestrictionIds %}
                   <p class="bapv-visit-details__restriction--flagged" id="visitor-restriction-{{ restriction.restrictionId }}">This restriction has been added or updated</p>
                 {% endif %}
 

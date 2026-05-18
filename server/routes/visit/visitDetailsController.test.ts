@@ -19,8 +19,7 @@ const visitService = createMockVisitService()
 let availableVisitActions: AvailableVisitActions
 let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
-let stringIdsToFlag: jest.Mock
-let numberIdsToFlag: jest.Mock
+let idsToFlag: jest.Mock
 let hideAlertsInset: { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null
 
 jest.mock('./visitEventsTimelineBuilder', () => {
@@ -36,8 +35,7 @@ jest.mock('./visitUtils', () => {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,
     getVisitAlerts: () => visitAlerts,
-    getStringIdsToFlag: () => stringIdsToFlag(),
-    getNumberIdsToFlag: () => numberIdsToFlag(),
+    getIdsToFlag: () => idsToFlag(),
     getHideAlertsInset: () => hideAlertsInset,
   }
 })
@@ -63,8 +61,7 @@ describe('Visit details page', () => {
   beforeEach(() => {
     availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
     visitAlerts = []
-    stringIdsToFlag = jest.fn().mockReturnValue([])
-    numberIdsToFlag = jest.fn().mockReturnValue([])
+    idsToFlag = jest.fn().mockReturnValue([])
     hideAlertsInset = null
 
     visitDetails = TestData.visitBookingDetails()
@@ -407,12 +404,10 @@ describe('Visit details page', () => {
           TestData.restriction({ restrictionId: 2 }),
         ]
 
-        numberIdsToFlag = jest
-          .fn<number[], []>()
-          .mockReturnValueOnce([2]) // restrictions returned results
-          .mockReturnValueOnce([]) //  unapproved returned results
-        stringIdsToFlag = jest
+        idsToFlag = jest
           .fn<string[], []>()
+          .mockReturnValueOnce(['2']) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
           .mockReturnValueOnce([]) //  alert added returned results
           .mockReturnValueOnce([]) //  alert updated returned results
 
@@ -435,12 +430,10 @@ describe('Visit details page', () => {
 
     describe('Flag visitor unapproved', () => {
       it('should flag a visitor', () => {
-        numberIdsToFlag = jest
-          .fn<number[], []>()
-          .mockReturnValueOnce([]) // restrictions returned results
-          .mockReturnValueOnce([4321]) //  unapproved returned results
-        stringIdsToFlag = jest
+        idsToFlag = jest
           .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce(['4321']) //  unapproved returned results
           .mockReturnValueOnce([]) //  alert added returned results
           .mockReturnValueOnce([]) //  alert updated returned results
 
@@ -459,12 +452,10 @@ describe('Visit details page', () => {
     describe('Flag restriction added / changed', () => {
       it('should flag a new restriction', () => {
         const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
-        numberIdsToFlag = jest
-          .fn<number[], []>()
+        idsToFlag = jest
+          .fn<string[], []>()
           .mockReturnValueOnce([]) // restrictions returned results
           .mockReturnValueOnce([]) //  unapproved returned results
-        stringIdsToFlag = jest
-          .fn<string[], []>()
           .mockReturnValueOnce([alertUuid]) //  alert added returned results
           .mockReturnValueOnce([]) //  alert updated returned results
         return request(app)
@@ -478,12 +469,10 @@ describe('Visit details page', () => {
       })
       it('should flag an updated restriction', () => {
         const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
-        numberIdsToFlag = jest
-          .fn<number[], []>()
+        idsToFlag = jest
+          .fn<string[], []>()
           .mockReturnValueOnce([]) // restrictions returned results
           .mockReturnValueOnce([]) //  unapproved returned results
-        stringIdsToFlag = jest
-          .fn<string[], []>()
           .mockReturnValueOnce([]) //  alert added returned results
           .mockReturnValueOnce([alertUuid]) //  alert updated returned results
 
