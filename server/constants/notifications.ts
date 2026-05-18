@@ -15,7 +15,7 @@ export const notificationTypes: Partial<Record<NotificationType, string>> = {
 // used on visits to review listing page
 export const notificationTypeReasons: Partial<Record<NotificationType, string>> = {
   PRISONER_ALERT_CREATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
-  PRISONER_ALERT_UPDATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
+  // PRISONER_ALERT_UPDATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
   PRISONER_RELEASED_EVENT: 'the prisoner is released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'the date is no longer available for social visits',
   PRISONER_RECEIVED_EVENT: 'the prisoner has been transferred',
