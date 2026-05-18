@@ -449,8 +449,8 @@ describe('Visit details page', () => {
       })
     })
 
-    describe('Flag restriction added / changed', () => {
-      it('should flag a new restriction', () => {
+    describe('Flag alert added / changed', () => {
+      it('should flag a new alert', () => {
         const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
         idsToFlag = jest
           .fn<string[], []>()
@@ -467,7 +467,7 @@ describe('Visit details page', () => {
             expect($('.bapv-visit-details__alert--flagged').text()).toContain('This new alert has been added')
           })
       })
-      it('should flag an updated restriction', () => {
+      it('should flag an updated alert', () => {
         const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
         idsToFlag = jest
           .fn<string[], []>()
