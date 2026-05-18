@@ -209,7 +209,7 @@
           <div class="bapv-visit-details__alerts">
             {% for alert in visitDetails.prisoner.prisonerAlerts %}
               {% if alert.alertUuid in flaggedAlertCreatedIds %}
-                <p class="bapv-visit-details__alert--flagged">This new alert has been added</p>
+                <p class="bapv-visit-details__alert--flagged" id="prisoner-alert={{ alert.alertUuid }}">This new alert has been added</p>
               {% elseif alert.alertUuid in flaggedAlertUpdatedIds %}
                 <p class="bapv-visit-details__alert--flagged">This alert has been updated</p>
               {% endif %}

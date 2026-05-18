@@ -9,7 +9,7 @@
     @extend .govuk-tag--turquoise;
   }
 
-  &--prisoner_alert_updated_event, &--prisoner_alert_added_event {
+  &--prisoner_alert_updated_event, &--prisoner_alert_created_event {
     @extend .govuk-tag--yellow;
   }
 
