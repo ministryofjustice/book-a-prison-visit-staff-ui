@@ -2137,7 +2137,7 @@ export interface components {
       /** @description Visitor Details */
       visitors: components['schemas']['VisitPassVisitorDto'][]
     }
-    /** @description Visit Pass Details */
+    /** @description Visit Pass - Visitor Details */
     VisitPassVisitorDto: {
       /**
        * Format: int64
@@ -2160,7 +2160,7 @@ export interface components {
        * @description Visitor's date of birth
        * @example 2000-01-01
        */
-      dob?: string | null
+      dateOfBirth?: string | null
       address?: components['schemas']['AddressDto'] | null
     }
     /** @description Details to register a visitor to a booker's prisoner. */
@@ -2844,10 +2844,10 @@ export interface components {
         | 'CANCELLED'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2867,10 +2867,10 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
-      paged?: boolean
-      unpaged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      paged?: boolean
+      unpaged?: boolean
     }
     SortObject: {
       empty?: boolean

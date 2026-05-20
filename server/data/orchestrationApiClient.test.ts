@@ -26,6 +26,7 @@ import {
   VisitBookingDetailsRaw,
   VisitNotificationEvent,
   VisitNotificationEventRaw,
+  VisitPassRequestDto,
   VisitRestriction,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
@@ -854,6 +855,22 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
+    })
+  })
+
+  describe('getVisitPasses', () => {
+    it('should return visit passes for given prison and date', async () => {
+      const date = '2024-01-31'
+      const results = [TestData.visitPass()]
+
+      fakeOrchestrationApi
+        .post(`/visit-passes/prison/${prisonId}`, <VisitPassRequestDto>{ visitDate: date, actionedBy: 'user1' })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getVisitPasses({ prisonId, date, username: 'user1' })
+
+      expect(output).toStrictEqual(results)
     })
   })
 

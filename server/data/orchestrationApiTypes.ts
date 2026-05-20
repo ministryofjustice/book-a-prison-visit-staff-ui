@@ -22,6 +22,7 @@ export type VisitPreview = components['schemas']['VisitPreviewDto']
 export type Visitor = components['schemas']['VisitorDto']
 
 export type VisitPassDto = components['schemas']['VisitPassDto']
+export type VisitPassRequestDto = components['schemas']['VisitPassRequestDto']
 export type VisitPassVisitorDto = components['schemas']['VisitPassVisitorDto']
 
 export type ApplicationDto = components['schemas']['ApplicationDto']

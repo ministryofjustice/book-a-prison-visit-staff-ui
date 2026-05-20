@@ -28,6 +28,7 @@ import {
   VisitOrderHistoryDetailsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
+  VisitPassDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -821,6 +822,38 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: excludeDates,
+      },
+    })
+  },
+
+  stubGetVisitPasses: ({
+    prisonId = 'HEI',
+    date,
+    username,
+    visitPasses = [TestData.visitPass()],
+  }: {
+    prisonId: string
+    date: string
+    username: string
+    visitPasses: VisitPassDto[]
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: `/orchestration/visit-passes/${prisonId}`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              visitDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitPasses,
       },
     })
   },
