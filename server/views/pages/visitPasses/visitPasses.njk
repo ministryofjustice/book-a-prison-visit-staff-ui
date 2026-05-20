@@ -1,0 +1,30 @@
+{% extends "layout.njk" %}
+{% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
+
+{% set pageHeaderTitle = "Print visit passes" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {{ mojPageHeaderActions({
+        heading: {
+          text: pageHeaderTitle
+        },
+        items: [{
+          id: "print-all",
+          text: "Print all"
+        }]
+      }) }}
+
+    </div>
+  </div>
+{% endblock %}
+
+{% block pageScripts %}
+  <script nonce="{{ cspNonce }}">
+    document.getElementById('print-all').addEventListener('click', () => {
+      window.print()
+    })
+  </script>
+{% endblock %}
