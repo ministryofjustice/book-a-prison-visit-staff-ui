@@ -20,9 +20,9 @@
   {% set capacity = sessionSchedule.capacity[type] %}
 
   {% if capacity or (visitsSection.visits | length) %}
-    <h3 class="govuk-heading-s govuk-!-margin-top-7" data-test="visit-section-heading-{{ type }}">
+    <h4 class="govuk-heading-s govuk-!-margin-top-7" data-test="visit-section-heading-{{ type }}">
       {{- ("all" if type == "unknown" else type) | capitalize }} visits
-    </h3>
+    </h4>
 
     <p data-test="visit-tables-booked-{{ type}}">
       {{ visitsSection.visits | length }}{{ (" of " + capacity) if capacity }} {{ "table" | pluralise(capacity or visitsSection.visits | length)}} reserved
@@ -119,6 +119,7 @@
       {% include "partials/errorSummary.njk" %}
     </div>
   </div>
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <nav class="moj-sub-navigation bapv-sub-navigation" aria-label="Sub navigation">
@@ -166,12 +167,28 @@
       </nav>
     </div>
   </div>
+
+  {% if features.printVisitPasses %}
+  <h2 class="govuk-heading-m govuk-!-padding-top-0">
+    {{- selectedDateString | formatDate("EEEE d MMMM yyyy") -}}
+  </h2>
+
+  {# Print visit passes #}
+  {{ govukButton({
+    text: "Print visit passes",
+    classes: "govuk-button--secondary",
+    href: "/visit-passes?date=" + selectedDateString,
+    preventDoubleClick: true,
+    attributes: { "data-test": "print-visit-passes" }
+  }) }}
+  {% endif %}
+
   <div class="govuk-grid-row">
 
     {% set selectedTimeSlotLabel = "" %}
     {% if sessionsSideNav | length %}
       <div class="govuk-grid-column-one-quarter">
-        {# build side nav time slot nav for each visit room #}
+        {# build side nav time slot nav for each visit room #} 
         {% set sessionSideNavSections = [] %}
         {% for heading, items in sessionsSideNav %}
           {% set sectionItems = [] %}
@@ -205,7 +222,7 @@
         {% if sessionSchedule %}
           <span class="govuk-caption-m" data-test="visit-room-caption">{{ sessionSchedule.visitRoom }}</span>
         {% endif %}
-        <h2 class="govuk-heading-m" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h2>
+        <h3 class="govuk-heading-m govuk-!-padding-top-1" data-test="visit-session-heading">Visits from {{ selectedTimeSlotLabel }}</h3>
 
         {{ renderVisitsSection('closed') }}
         {{ renderVisitsSection('open') }}
