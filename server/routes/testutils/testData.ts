@@ -29,6 +29,8 @@ import {
   VisitOrderHistoryDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
+  VisitPassDto,
+  VisitPassVisitorDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -975,6 +977,40 @@ export default class TestData {
     lastName,
     dateOfBirth,
     requestedOn,
+  })
+
+  static visitPass = ({
+    reference = 'ab-cd-ef-gh',
+    startTime = '10:00',
+    endTime = '11:00',
+    prisonerId = 'A1234BC',
+    prisonerFirstName = 'JOHN',
+    prisonerLastName = 'SMITH',
+    visitRestriction = 'OPEN',
+    visitors = [this.visitPassVisitor()],
+  }: Partial<VisitPassDto> = {}): VisitPassDto => ({
+    reference,
+    startTime,
+    endTime,
+    prisonerId,
+    prisonerFirstName,
+    prisonerLastName,
+    visitRestriction,
+    visitors,
+  })
+
+  static visitPassVisitor = ({
+    nomisPersonId = 4321,
+    firstName = 'Jeanette',
+    lastName = 'Smith',
+    dateOfBirth = '1986-07-28',
+    address = this.address(),
+  }: Partial<VisitPassVisitorDto> = {}): VisitPassVisitorDto => ({
+    nomisPersonId,
+    firstName,
+    lastName,
+    dateOfBirth,
+    address,
   })
 
   static visitPreview = ({

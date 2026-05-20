@@ -372,6 +372,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visit-passes/prison/{prisonId}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get visit passes for a prison on a given date.
+     * @description Get visit passes for a prison on a given date.
+     */
+    post: operations['getVisitPassesForPrisonOnDate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors': {
     parameters: {
       query?: never
@@ -2002,6 +2022,147 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
+    /** @description Visit Pass request details. */
+    VisitPassRequestDto: {
+      /**
+       * Format: date
+       * @description Date for which visit passes are being sought.
+       * @example 2025-01-01
+       */
+      visitDate: string
+      /**
+       * @description STAFF username who triggered the visit passes endpoint.
+       * @example ABC123D
+       */
+      actionedBy: string
+    }
+    /** @description An address */
+    AddressDto: {
+      /**
+       * @description Flat
+       * @example 3B
+       */
+      flat?: string | null
+      /**
+       * @description Premise
+       * @example Liverpool Prison
+       */
+      premise?: string | null
+      /**
+       * @description Street
+       * @example Slinn Street
+       */
+      street?: string | null
+      /**
+       * @description Locality
+       * @example Brincliffe
+       */
+      locality?: string | null
+      /**
+       * @description Town/City
+       * @example Liverpool
+       */
+      town?: string | null
+      /**
+       * @description Postal Code
+       * @example LI1 5TH
+       */
+      postalCode?: string | null
+      /**
+       * @description County
+       * @example HEREFORD
+       */
+      county?: string | null
+      /**
+       * @description Country
+       * @example ENG
+       */
+      country?: string | null
+      /**
+       * @description Additional Information
+       * @example This is a comment text
+       */
+      comment?: string | null
+      /**
+       * @description Primary Address
+       * @example false
+       */
+      primary: boolean
+      /**
+       * @description No Fixed Address
+       * @example false
+       */
+      noFixedAddress: boolean
+    }
+    /** @description Visit Pass Details */
+    VisitPassDto: {
+      /**
+       * @description Visit Reference
+       * @example v9-d7-ed-7u
+       */
+      reference: string
+      /**
+       * Format: HH:mm
+       * @description Visit Start time
+       * @example 11:00
+       */
+      startTime: string
+      /**
+       * Format: HH:mm
+       * @description Visit End time
+       * @example 13:00
+       */
+      endTime: string
+      /**
+       * @description Prisoner Id
+       * @example AF34567G
+       */
+      prisonerId: string
+      /**
+       * @description Prisoner First Name
+       * @example John
+       */
+      prisonerFirstName: string
+      /**
+       * @description Prisoner Last Name
+       * @example Smith
+       */
+      prisonerLastName: string
+      /**
+       * @description Visit Restriction
+       * @example OPEN
+       * @enum {string}
+       */
+      visitRestriction: 'OPEN' | 'CLOSED' | 'UNKNOWN'
+      /** @description Visitor Details */
+      visitors: components['schemas']['VisitPassVisitorDto'][]
+    }
+    /** @description Visit Pass - Visitor Details */
+    VisitPassVisitorDto: {
+      /**
+       * Format: int64
+       * @description Person ID (nomis) of the visitor
+       * @example 1234
+       */
+      nomisPersonId: number
+      /**
+       * @description Visitor's first name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Visitor's last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Visitor's date of birth
+       * @example 2000-01-01
+       */
+      dateOfBirth?: string | null
+      address?: components['schemas']['AddressDto'] | null
+    }
     /** @description Details to register a visitor to a booker's prisoner. */
     RegisterVisitorForBookerPrisonerDto: {
       /**
@@ -2131,64 +2292,6 @@ export interface components {
        * @description The time the booker account was created
        */
       createdTimestamp: string
-    }
-    /** @description An address */
-    AddressDto: {
-      /**
-       * @description Flat
-       * @example 3B
-       */
-      flat?: string | null
-      /**
-       * @description Premise
-       * @example Liverpool Prison
-       */
-      premise?: string | null
-      /**
-       * @description Street
-       * @example Slinn Street
-       */
-      street?: string | null
-      /**
-       * @description Locality
-       * @example Brincliffe
-       */
-      locality?: string | null
-      /**
-       * @description Town/City
-       * @example Liverpool
-       */
-      town?: string | null
-      /**
-       * @description Postal Code
-       * @example LI1 5TH
-       */
-      postalCode?: string | null
-      /**
-       * @description County
-       * @example HEREFORD
-       */
-      county?: string | null
-      /**
-       * @description Country
-       * @example ENG
-       */
-      country?: string | null
-      /**
-       * @description Additional Information
-       * @example This is a comment text
-       */
-      comment?: string | null
-      /**
-       * @description Primary Address
-       * @example false
-       */
-      primary: boolean
-      /**
-       * @description No Fixed Address
-       * @example false
-       */
-      noFixedAddress: boolean
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
@@ -2541,11 +2644,13 @@ export interface components {
       prison: components['schemas']['PrisonRegisterPrisonDto']
       /** @description Prisoner details */
       prisoner: components['schemas']['PrisonerDetailsDto']
-      /** @description Prisoner details */
+      /** @description Visitor details */
       visitors: components['schemas']['VisitorDetailsDto'][]
+      /** @description Events tied to visit booking */
       events: components['schemas']['EventAuditOrchestrationDto'][]
+      /** @description Notifications tied to visit booking */
       notifications: components['schemas']['VisitNotificationDto'][]
-      /** @description Prisoner details */
+      /** @description Boolean to signify if alerts and restrictions retrieval was intentionally skipped */
       skipAlertsAndRestrictions: boolean
     }
     /** @description Visit notification details */
@@ -2739,10 +2844,10 @@ export interface components {
         | 'CANCELLED'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -5553,6 +5658,81 @@ export interface operations {
       }
       /** @description Incorrect permissions to reserve a slot */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitPassesForPrisonOnDate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Prison code.
+         * @example ABC
+         */
+        prisonId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VisitPassRequestDto']
+      }
+    }
+    responses: {
+      /** @description Return visit passes given a prison and visit date. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitPassDto'][]
+        }
+      }
+      /** @description Incorrect request to get visit passes for a prison on a given date. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get visit passes for a prison on a given date. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit passes could not be found for the supplied prison and visit date. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Internal server error while retrieving visit passes. */
+      500: {
         headers: {
           [name: string]: unknown
         }

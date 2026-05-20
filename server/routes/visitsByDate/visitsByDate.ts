@@ -119,6 +119,7 @@ export default function routes({
       messages: req.flash('messages'),
       formValues: getFlashFormValues(req),
       dateTabs: getDateTabs(selectedDateString, firstTabDateString, 3),
+      selectedDateString,
       sessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,

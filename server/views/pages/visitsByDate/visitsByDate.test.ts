@@ -92,6 +92,7 @@ describe('Views - Visits by date', () => {
       ],
     ])
 
+    const selectedDateString = '2024-02-02'
     const sessionSchedule = TestData.sessionSchedule({
       sessionTemplateReference: 'ref-1',
       sessionTimeSlot: { startTime: '10:00', endTime: '11:00' },
@@ -105,10 +106,13 @@ describe('Views - Visits by date', () => {
     }
 
     viewContext = {
+      selectedDateString,
       sessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,
       visits,
+
+      features: { printVisitPasses: true },
     }
 
     const $ = cheerio.load(compiledTemplate.render(viewContext))
@@ -123,7 +127,9 @@ describe('Views - Visits by date', () => {
     expect($('.moj-side-navigation ul').eq(1).find('a').first().attr('href')).toBe('/visits?query-2')
 
     expect($('[data-test=visit-room-caption]').text()).toBe('Visits hall')
-    expect($('h2').text()).toBe('Visits from 10am to 11am')
+    expect($('h2').text()).toBe('Friday 2 February 2024')
+    expect($('[data-test="print-visit-passes"]').attr('href')).toBe('/visit-passes?date=2024-02-02')
+    expect($('h3').text()).toBe('Visits from 10am to 11am')
     expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
     expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')
     expect($('[data-test=visit-visitors-total-closed]').length).toBe(0)
@@ -132,6 +138,34 @@ describe('Views - Visits by date', () => {
     expect($('[data-test=visit-visitors-total-open]').length).toBe(0)
 
     expect($('[data-test="no-visits-message"]').length).toBe(0)
+  })
+
+  it('should not show the print visit passes button when feature is disabled', () => {
+    const sessionsSideNav: VisitsPageSideNav = new Map()
+
+    const selectedDateString = '2024-02-02'
+    const sessionSchedule = TestData.sessionSchedule()
+    const queryParamsForBackLink = 'back-link-query'
+    const visits: Record<VisitRestriction, { numVisitors: number; visits: VisitPreview[] }> = {
+      CLOSED: { numVisitors: 0, visits: [] },
+      OPEN: { numVisitors: 0, visits: [] },
+      UNKNOWN: { numVisitors: 0, visits: [] },
+    }
+
+    viewContext = {
+      selectedDateString,
+      sessionSchedule,
+      sessionsSideNav,
+      queryParamsForBackLink,
+      visits,
+
+      features: { printVisitPasses: false },
+    }
+
+    const $ = cheerio.load(compiledTemplate.render(viewContext))
+
+    expect($('h2').length).toBe(0)
+    expect($('[data-test="print-visit-passes"]').length).toBe(0)
   })
 
   it('should display appropriate message for an exclude date with no visits', () => {

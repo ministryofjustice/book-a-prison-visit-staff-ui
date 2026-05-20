@@ -46,6 +46,8 @@ import {
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitorRequestsCountByPrisonCodeDto,
+  VisitPassDto,
+  VisitPassRequestDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestsCountDto,
@@ -472,6 +474,23 @@ export default class OrchestrationApiClient {
       path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
     })
     return isExcluded
+  }
+
+  // visit passes controller
+
+  async getVisitPasses({
+    prisonId,
+    date,
+    username,
+  }: {
+    prisonId: string
+    date: string
+    username: string
+  }): Promise<VisitPassDto[]> {
+    return this.restClient.post({
+      path: `/visit-passes/prison/${prisonId}`,
+      data: <VisitPassRequestDto>{ visitDate: date, actionedBy: username },
+    })
   }
 
   // visit requests controller

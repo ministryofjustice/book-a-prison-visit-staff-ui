@@ -343,5 +343,23 @@ describe('Visit service', () => {
         expect(result).toBe(2)
       })
     })
+
+    describe('getVisitPasses', () => {
+      it('should return visit passes for given date', async () => {
+        const date = '2024-01-31'
+        const visitPasses = [TestData.visitPass()]
+
+        orchestrationApiClient.getVisitPasses.mockResolvedValue(visitPasses)
+
+        const result = await visitService.getVisitPasses({
+          username: 'user',
+          prisonId,
+          date,
+        })
+
+        expect(orchestrationApiClient.getVisitPasses).toHaveBeenCalledWith({ prisonId, date, username: 'user' })
+        expect(result).toStrictEqual(visitPasses)
+      })
+    })
   })
 })

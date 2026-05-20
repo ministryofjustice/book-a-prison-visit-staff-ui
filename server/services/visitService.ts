@@ -8,6 +8,7 @@ import {
   CancelVisitOrchestrationDto,
   Visit,
   VisitBookingDetails,
+  VisitPassDto,
   VisitPreview,
 } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
@@ -211,6 +212,21 @@ export default class VisitService {
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
     return orchestrationApiClient.getBookedVisitCountByDate(prisonId, date)
+  }
+
+  async getVisitPasses({
+    prisonId,
+    date,
+    username,
+  }: {
+    prisonId: string
+    date: string
+    username: string
+  }): Promise<VisitPassDto[]> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitPasses({ prisonId, date, username })
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {
