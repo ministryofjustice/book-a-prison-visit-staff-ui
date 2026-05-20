@@ -1,7 +1,7 @@
 .notification-tag {
   white-space: nowrap;
 
-  &--prisoner_released_event {
+  &--prisoner_released_event, &--prisoner_received_event {
     @extend .govuk-tag--pink;
   }
 
@@ -9,7 +9,7 @@
     @extend .govuk-tag--turquoise;
   }
 
-  &--prisoner_received_event {
+  &--prisoner_alert_updated_event, &--prisoner_alert_created_event {
     @extend .govuk-tag--yellow;
   }
 

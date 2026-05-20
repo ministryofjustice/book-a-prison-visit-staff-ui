@@ -79,7 +79,7 @@ export default class UpdateVisitController {
         notifications: visitDetails.notifications,
       })
       const unapprovedVisitors = visitDetails.visitors.filter(visitor =>
-        unapprovedVisitorIds.includes(visitor.personId),
+        unapprovedVisitorIds.includes(visitor.personId.toString()),
       )
 
       unapprovedVisitors.forEach(visitor => {

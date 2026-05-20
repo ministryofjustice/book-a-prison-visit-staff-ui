@@ -2193,6 +2193,11 @@ export interface components {
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
       /**
+       * @description The unique identifier assigned to the alert
+       * @example 8cdadcf3-b003-4116-9956-c99bd8df6a00
+       */
+      alertUuid: string
+      /**
        * @description Alert Type
        * @example X
        */
@@ -2264,6 +2269,8 @@ export interface components {
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_RESTRICTION_CHANGE_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PRISONER_ALERT_CREATED_EVENT'
+        | 'PRISONER_ALERT_UPDATED_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
         | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
@@ -2579,6 +2586,8 @@ export interface components {
         | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PRISONER_ALERT_CREATED_EVENT'
+        | 'PRISONER_ALERT_UPDATED_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_UNAPPROVED_EVENT'
@@ -2603,6 +2612,8 @@ export interface components {
         | 'VISITOR_ID'
         | 'PAIRED_VISIT'
         | 'APPOINTMENT_INSTANCE_ID'
+        | 'ALERT_CODE'
+        | 'ALERT_UUID'
       /**
        * @description Value of the attribute associated with the notification event
        * @example BAN
@@ -2758,8 +2769,8 @@ export interface components {
     }
     SortObject: {
       empty?: boolean
-      sorted?: boolean
       unsorted?: boolean
+      sorted?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -2831,6 +2842,8 @@ export interface components {
         | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'PRISONER_RECEIVED_EVENT'
         | 'PRISONER_ALERTS_UPDATED_EVENT'
+        | 'PRISONER_ALERT_CREATED_EVENT'
+        | 'PRISONER_ALERT_UPDATED_EVENT'
         | 'PERSON_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
         | 'VISITOR_UNAPPROVED_EVENT'
@@ -6278,6 +6291,8 @@ export interface operations {
           | 'SESSION_VISITS_BLOCKED_FOR_DATE'
           | 'PRISONER_RECEIVED_EVENT'
           | 'PRISONER_ALERTS_UPDATED_EVENT'
+          | 'PRISONER_ALERT_CREATED_EVENT'
+          | 'PRISONER_ALERT_UPDATED_EVENT'
           | 'PERSON_RESTRICTION_UPSERTED_EVENT'
           | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
           | 'VISITOR_UNAPPROVED_EVENT'
@@ -6336,6 +6351,8 @@ export interface operations {
           | 'SESSION_VISITS_BLOCKED_FOR_DATE'
           | 'PRISONER_RECEIVED_EVENT'
           | 'PRISONER_ALERTS_UPDATED_EVENT'
+          | 'PRISONER_ALERT_CREATED_EVENT'
+          | 'PRISONER_ALERT_UPDATED_EVENT'
           | 'PERSON_RESTRICTION_UPSERTED_EVENT'
           | 'VISITOR_RESTRICTION_UPSERTED_EVENT'
           | 'VISITOR_UNAPPROVED_EVENT'

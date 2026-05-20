@@ -67,6 +67,7 @@ test.describe('Book a visit', () => {
         lastName: 'Smith',
         alerts: [
           {
+            alertUuid: 'abcd-efgh-ijkl',
             alertType: 'U',
             alertTypeDescription: 'COVID unit management',
             alertCode: 'UPIU',

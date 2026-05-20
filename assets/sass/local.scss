@@ -268,7 +268,7 @@
   margin-top: govuk-spacing(6);
 }
 
-p.bapv-visit-details__restriction--flagged {
+p.bapv-visit-details__restriction--flagged, p.bapv-visit-details__alert--flagged {
     &, & + p {
       border-left: $govuk-border-width solid $moj-warning-colour;
       padding-left: govuk-spacing(3);

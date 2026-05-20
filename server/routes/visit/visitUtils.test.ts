@@ -361,6 +361,14 @@ describe('Visit utils', () => {
                 type: 'VISITOR_UNAPPROVED_EVENT',
                 additionalData: [{ attributeName: 'VISITOR_ID', attributeValue: '3' }],
               },
+              {
+                type: 'PRISONER_ALERT_UPDATED_EVENT',
+                additionalData: [{ attributeName: 'ALERT_UUID', attributeValue: '4' }],
+              },
+              {
+                type: 'PRISONER_ALERT_CREATED_EVENT',
+                additionalData: [{ attributeName: 'ALERT_UUID', attributeValue: '5' }],
+              },
             ],
             [
               {
@@ -371,6 +379,8 @@ describe('Visit utils', () => {
                   '<ul class="govuk-list">' +
                   '<li><a href="#visitor-restriction-2">A restriction has been added or updated</a></li>' +
                   '<li><a href="#visitor-3">Visitor has been unapproved</a></li>' +
+                  '<li><a href="#prisoner-alert-4">An alert has been updated</a></li>' +
+                  '<li><a href="#prisoner-alert-5">An alert has been added</a></li>' +
                   '</ul>',
                 classes: 'notifications-summary-alert',
               },
@@ -428,6 +438,11 @@ describe('Visit utils', () => {
     const visitorId = 'VISITOR_ID'
     const visitorUnapprovedEvent = 'VISITOR_UNAPPROVED_EVENT'
 
+    // flaggedAlertCreatedIds and flaggedAlertUpdatedIds
+    const alertUuid = 'ALERT_UUID'
+    const alertUpdatedEvent = 'PRISONER_ALERT_UPDATED_EVENT'
+    const alertCreatedEvent = 'PRISONER_ALERT_CREATED_EVENT'
+
     it(`should return ${visitorRestrictionId} if notification exists for ${visitorRestriction}`, () => {
       const notifications = <VisitBookingDetails['notifications']>[
         // should be ignored as not a VISITOR_RESTRICTION
@@ -448,8 +463,12 @@ describe('Visit utils', () => {
       ]
 
       expect(
-        getIdsToFlag({ notificationType: visitorRestriction, returnedIdType: visitorRestrictionId, notifications }),
-      ).toStrictEqual([1, 2])
+        getIdsToFlag({
+          notificationType: visitorRestriction,
+          returnedIdType: visitorRestrictionId,
+          notifications,
+        }),
+      ).toStrictEqual(['1', '2'])
     })
 
     it(`should return ${visitorId} if notification exists for ${visitorUnapprovedEvent}`, () => {
@@ -473,7 +492,55 @@ describe('Visit utils', () => {
 
       expect(
         getIdsToFlag({ notificationType: visitorUnapprovedEvent, returnedIdType: visitorId, notifications }),
-      ).toStrictEqual([100, 200])
+      ).toStrictEqual(['100', '200'])
+    })
+
+    it(`should return ${alertUuid} if notification exists for ${alertUpdatedEvent}`, () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a PRISONER_ALERT_UPDATED_EVENT
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: alertUpdatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '100' }],
+        },
+        // a duplicate ALERT_UUID - should be ignored
+        {
+          type: alertUpdatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '100' }],
+        },
+        {
+          type: alertUpdatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '200' }],
+        },
+      ]
+
+      expect(
+        getIdsToFlag({ notificationType: alertUpdatedEvent, returnedIdType: alertUuid, notifications }),
+      ).toStrictEqual(['100', '200'])
+    })
+
+    it(`should return ${alertUuid} if notification exists for ${alertCreatedEvent}`, () => {
+      const notifications = <VisitBookingDetails['notifications']>[
+        // should be ignored as not a PRISONER_ALERT_CREATED_EVENT
+        { type: 'PRISONER_RELEASED_EVENT' },
+        {
+          type: alertCreatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '100' }],
+        },
+        // a duplicate ALERT_UUID - should be ignored
+        {
+          type: alertCreatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '100' }],
+        },
+        {
+          type: alertCreatedEvent,
+          additionalData: [{ attributeName: alertUuid, attributeValue: '200' }],
+        },
+      ]
+
+      expect(
+        getIdsToFlag({ notificationType: alertCreatedEvent, returnedIdType: alertUuid, notifications }),
+      ).toStrictEqual(['100', '200'])
     })
   })
 
