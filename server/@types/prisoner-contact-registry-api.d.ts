@@ -184,6 +184,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/contacts/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Search for contacts with a potential relationship to a prisoner
+     * @description Returns contact details (including relationship details of prisoner if prisonerId provided).
+     */
+    get: operations['searchContacts']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -192,9 +212,9 @@ export interface components {
       /** Format: int32 */
       status: number
       /** Format: int32 */
-      errorCode?: number
-      userMessage?: string
-      developerMessage?: string
+      errorCode?: number | null
+      userMessage?: string | null
+      developerMessage?: string | null
     }
     /** @description A date range */
     DateRangeDto: {
@@ -226,47 +246,47 @@ export interface components {
        * @description Flat
        * @example 3B
        */
-      flat?: string
+      flat?: string | null
       /**
        * @description Premise
        * @example Liverpool Prison
        */
-      premise?: string
+      premise?: string | null
       /**
        * @description Street
        * @example Slinn Street
        */
-      street?: string
+      street?: string | null
       /**
        * @description Locality
        * @example Brincliffe
        */
-      locality?: string
+      locality?: string | null
       /**
        * @description Town/City
        * @example Liverpool
        */
-      town?: string
+      town?: string | null
       /**
        * @description Postal Code
        * @example LI1 5TH
        */
-      postalCode?: string
+      postalCode?: string | null
       /**
        * @description County
        * @example HEREFORD
        */
-      county?: string
+      county?: string | null
       /**
        * @description Country
        * @example ENG
        */
-      country?: string
+      country?: string | null
       /**
        * @description Additional Information
        * @example This is a comment text
        */
-      comment?: string
+      comment?: string | null
       /**
        * @description Primary Address
        * @example false
@@ -285,7 +305,7 @@ export interface components {
        * @description Identifier for this contact (Person in NOMIS)
        * @example 5871791
        */
-      personId?: number
+      personId?: number | null
       /**
        * @description First name
        * @example John
@@ -295,7 +315,7 @@ export interface components {
        * @description Middle name
        * @example Mark
        */
-      middleName?: string
+      middleName?: string | null
       /**
        * @description Last name
        * @example Smith
@@ -306,7 +326,7 @@ export interface components {
        * @description Date of birth
        * @example 1980-01-28
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Code for relationship to Prisoner
        * @example RO
@@ -316,7 +336,7 @@ export interface components {
        * @description Description of relationship to Prisoner
        * @example Responsible Officer
        */
-      relationshipDescription?: string
+      relationshipDescription?: string | null
       /**
        * @description Type of Contact
        * @example O
@@ -326,7 +346,7 @@ export interface components {
        * @description Description of Contact Type
        * @example Official
        */
-      contactTypeDescription?: string
+      contactTypeDescription?: string | null
       /** @description Approved Visitor Flag */
       approvedVisitor: boolean
       /** @description Emergency Contact Flag */
@@ -335,13 +355,12 @@ export interface components {
       nextOfKin: boolean
       /** @description List of restrictions associated with the contact */
       restrictions: components['schemas']['RestrictionDto'][]
-      /** @description Address associated with the contact */
-      address?: components['schemas']['AddressDto']
+      address?: components['schemas']['AddressDto'] | null
       /**
        * @description Additional Information
        * @example This is a comment text
        */
-      commentText?: string
+      commentText?: string | null
     }
     /** @description A contact for a prisoner */
     RestrictionDto: {
@@ -372,14 +391,14 @@ export interface components {
        * @description Restriction Expiry
        * @example 2000-10-31
        */
-      expiryDate?: string
+      expiryDate?: string | null
       /** @description True if applied globally to the contact or False if applied in the context of a visit */
       globalRestriction: boolean
       /**
        * @description Additional Information
        * @example This is a comment text
        */
-      comment?: string
+      comment?: string | null
     }
     /** @description Boolean flag signifying if any visitors have closed restrictions */
     HasClosedRestrictionDto: {
@@ -393,7 +412,7 @@ export interface components {
        * @description Identifier for this contact
        * @example 5871791
        */
-      contactId?: number
+      contactId?: number | null
       /**
        * @description First name
        * @example John
@@ -403,7 +422,7 @@ export interface components {
        * @description Middle name
        * @example Mark
        */
-      middleName?: string
+      middleName?: string | null
       /**
        * @description Last name
        * @example Smith
@@ -414,7 +433,7 @@ export interface components {
        * @description Date of birth
        * @example 1980-01-28
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
     }
     /** @description A linked prisoner of contact */
     ContactLinkedPrisonerDto: {
@@ -430,6 +449,82 @@ export interface components {
        * @example S
        */
       relationshipTypeCode: string
+    }
+    /** @description A contact with an optional prisoner relationship */
+    ContactWithOptionalPrisonerRelationshipDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      contactId: number
+      /**
+       * Format: int64
+       * @description The unique identifier for the prisoner-contact relationship
+       * @example 123456
+       */
+      prisonerContactId?: number | null
+      /**
+       * @description First name
+       * @example John
+       */
+      firstName: string
+      /**
+       * @description Middle name
+       * @example Mark
+       */
+      middleName?: string | null
+      /**
+       * @description Last name
+       * @example Smith
+       */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth
+       * @example 1980-01-28
+       */
+      dateOfBirth?: string | null
+      /**
+       * @description Code for relationship to Prisoner
+       * @example RO
+       */
+      relationshipCode?: string | null
+      /**
+       * @description Description of relationship to Prisoner
+       * @example Responsible Officer
+       */
+      relationshipDescription?: string | null
+      /**
+       * @description Type of Contact
+       * @example O
+       */
+      contactType?: string | null
+      /**
+       * @description Description of Contact Type
+       * @example Official
+       */
+      contactTypeDescription?: string | null
+      /** @description List of restrictions associated with the contact */
+      restrictions: components['schemas']['RestrictionDto'][]
+      address?: components['schemas']['AddressDto'] | null
+      /**
+       * @description Is this prisoner's contact relationship approved?
+       * @example true
+       */
+      approvedVisitor?: boolean | null
+      /**
+       * @description Is this prisoner's contact relationship the emergency contact?
+       * @example true
+       */
+      emergencyContact?: boolean | null
+      /**
+       * @description Is this prisoner's contact relationship the next of kin?
+       * @example true
+       */
+      nextOfKin?: boolean | null
+      /** @description comments of the relationship */
+      comments?: string | null
     }
   }
   responses: never
@@ -1047,6 +1142,69 @@ export interface operations {
       }
       /** @description Contact not found */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  searchContacts: {
+    parameters: {
+      query: {
+        /**
+         * @description Contact IDs. Comma-separated list of contact IDs, e.g. contactIds=123,456,789
+         * @example 123,456,789
+         */
+        contactIds: number[]
+        /**
+         * @description The unique identifier of the prisoner (e.g. prisonNumber, prisonerNumber, prisonId). If provided, relationship information will be included between contacts and prisoner
+         * @example AA123456
+         */
+        prisonerId?: string
+        /**
+         * @description Defaults to false. Returns all contacts restrictions if set to true, skips grabbing restrictions if false
+         * @example false
+         */
+        withRestrictions?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Contact information returned, including relationship details of prisoner if prisonerId provided */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContactWithOptionalPrisonerRelationshipDto'][]
+        }
+      }
+      /** @description Incorrect request to search for contacts with a potential relationship to a prisoner */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to search for contacts with a potential relationship to a prisoner */
+      403: {
         headers: {
           [name: string]: unknown
         }
