@@ -829,18 +829,18 @@ export default {
   stubGetVisitPasses: ({
     prisonId = 'HEI',
     date,
-    username,
+    username = 'USER1',
     visitPasses = [TestData.visitPass()],
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
-    visitPasses: VisitPassDto[]
+    username?: string
+    visitPasses?: VisitPassDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'POST',
-        url: `/orchestration/visit-passes/${prisonId}`,
+        url: `/orchestration/visit-passes/prison/${prisonId}`,
         bodyPatterns: [
           {
             equalToJson: {
