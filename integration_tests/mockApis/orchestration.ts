@@ -29,6 +29,7 @@ import {
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPassDto,
+  VisitPassRequestDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -840,11 +841,11 @@ export default {
     return stubFor({
       request: {
         method: 'POST',
-        url: `/orchestration/visit-passes/prison/${prisonId}`,
+        url: `/orchestration/prison/${prisonId}/visit-passes`,
         bodyPatterns: [
           {
-            equalToJson: {
-              visitDate: date,
+            equalToJson: <VisitPassRequestDto>{
+              date,
               actionedBy: username,
             },
           },

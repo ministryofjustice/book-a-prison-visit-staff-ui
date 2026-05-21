@@ -488,7 +488,7 @@ export default class OrchestrationApiClient {
     username: string
   }): Promise<VisitPassDto[]> {
     return this.restClient.post({
-      path: `/visit-passes/prison/${prisonId}`,
+      path: `/prison/${prisonId}/visit-passes`,
       data: <VisitPassRequestDto>{ date, actionedBy: username },
     })
   }

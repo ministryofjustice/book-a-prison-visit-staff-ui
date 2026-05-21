@@ -864,7 +864,7 @@ describe('orchestrationApiClient', () => {
       const results = [TestData.visitPass()]
 
       fakeOrchestrationApi
-        .post(`/visit-passes/prison/${prisonId}`, <VisitPassRequestDto>{ date, actionedBy: 'user1' })
+        .post(`/prison/${prisonId}/visit-passes`, <VisitPassRequestDto>{ date, actionedBy: 'user1' })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
