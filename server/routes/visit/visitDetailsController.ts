@@ -40,11 +40,8 @@ export default class VisitDetailsController {
       }
 
       const hideAlertsInset = getHideAlertsInset({
+        skipAlertsAndRestrictionReason: visitDetails.skipAlertsAndRestrictionReason,
         prisonerNumber: visitDetails.prisoner.prisonerNumber,
-        startTimestamp: visitDetails.startTimestamp,
-        visitPrisonId: visitDetails.prison.prisonId,
-        prisonerPrisonId: visitDetails.prisoner.prisonId,
-        inOutStatus: visitDetails.prisoner.inOutStatus,
       })
 
       const availableVisitActions = getAvailableVisitActions({
