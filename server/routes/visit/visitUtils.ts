@@ -318,10 +318,8 @@ export const getHideAlertsInset = ({
       }
       break
 
-    default: {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const unhandledCase: never = skipAlertsAndRestrictionReason
-    }
+    default:
+      return null
   }
 
   return {
