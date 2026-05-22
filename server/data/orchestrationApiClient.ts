@@ -493,6 +493,21 @@ export default class OrchestrationApiClient {
     })
   }
 
+  async getVisitPass({
+    prisonId,
+    reference,
+    username,
+  }: {
+    prisonId: string
+    reference: string
+    username: string
+  }): Promise<VisitPassDto> {
+    return this.restClient.post({
+      path: `/prison/${prisonId}/visit-passes/visit/${reference}`,
+      data: <StaffUsernameDto>{ username },
+    })
+  }
+
   // visit requests controller
 
   async rejectVisitRequest({

@@ -229,6 +229,21 @@ export default class VisitService {
     return orchestrationApiClient.getVisitPasses({ prisonId, date, username })
   }
 
+  async getVisitPass({
+    prisonId,
+    reference,
+    username,
+  }: {
+    prisonId: string
+    reference: string
+    username: string
+  }): Promise<VisitPassDto> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+
+    return orchestrationApiClient.getVisitPass({ prisonId, reference, username })
+  }
+
   private buildVisitInformation(visit: Visit): VisitInformation {
     const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
 

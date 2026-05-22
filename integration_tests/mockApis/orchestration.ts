@@ -22,6 +22,7 @@ import {
   SessionCapacity,
   SessionSchedule,
   SocialContactsDto,
+  StaffUsernameDto,
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
@@ -855,6 +856,37 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitPasses,
+      },
+    })
+  },
+
+  stubGetVisitPass: ({
+    prisonId = 'HEI',
+    reference = TestData.visitPass().reference,
+    username = 'USER1',
+    visitPass = TestData.visitPass(),
+  }: {
+    prisonId?: string
+    reference?: string
+    username?: string
+    visitPass?: VisitPassDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: `/orchestration/prison/${prisonId}/visit-passes/visit/${reference}`,
+        bodyPatterns: [
+          {
+            equalToJson: <StaffUsernameDto>{
+              username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitPass,
       },
     })
   },

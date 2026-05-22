@@ -361,5 +361,23 @@ describe('Visit service', () => {
         expect(result).toStrictEqual(visitPasses)
       })
     })
+
+    describe('getVisitPass', () => {
+      it('should return a visit pass for given visit reference', async () => {
+        const visitPass = TestData.visitPass()
+        const { reference } = visitPass
+
+        orchestrationApiClient.getVisitPass.mockResolvedValue(visitPass)
+
+        const result = await visitService.getVisitPass({
+          username: 'user',
+          prisonId,
+          reference,
+        })
+
+        expect(orchestrationApiClient.getVisitPass).toHaveBeenCalledWith({ prisonId, reference, username: 'user' })
+        expect(result).toStrictEqual(visitPass)
+      })
+    })
   })
 })
