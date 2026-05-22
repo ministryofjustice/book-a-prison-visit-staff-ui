@@ -165,6 +165,7 @@ export default class TestData {
     prisonName = 'Hewell (HMP)',
     cellLocation = '1-1-C-028',
     locationDescription = 'Hewell (HMP)',
+    status = 'ACTIVE IN',
     convictedStatus = 'Convicted',
   }: Partial<
     BookerDetailedInfoDto['permittedPrisoners'][0]['prisoner']
@@ -177,6 +178,7 @@ export default class TestData {
     prisonName,
     cellLocation,
     locationDescription,
+    status,
     convictedStatus,
   })
 
@@ -695,7 +697,7 @@ export default class TestData {
       },
     ],
     notifications = [],
-    skipAlertsAndRestrictions = false,
+    skipAlertsAndRestrictionReason = null,
   }: Partial<VisitBookingDetails> = {}): VisitBookingDetails => ({
     reference,
     visitRoom,
@@ -714,7 +716,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
-    skipAlertsAndRestrictions,
+    skipAlertsAndRestrictionReason,
   })
 
   // raw data as returned from API
@@ -736,7 +738,7 @@ export default class TestData {
     visitors = this.visitBookingDetails().visitors,
     events = this.visitBookingDetails().events as VisitBookingDetailsRaw['events'],
     notifications = this.visitBookingDetails().notifications as VisitBookingDetailsRaw['notifications'],
-    skipAlertsAndRestrictions = this.visitBookingDetails().skipAlertsAndRestrictions,
+    skipAlertsAndRestrictionReason = this.visitBookingDetails().skipAlertsAndRestrictionReason,
   }: Partial<VisitBookingDetailsRaw> = {}): VisitBookingDetailsRaw => ({
     reference,
     visitRoom,
@@ -755,7 +757,7 @@ export default class TestData {
     visitors,
     events,
     notifications,
-    skipAlertsAndRestrictions,
+    skipAlertsAndRestrictionReason,
   })
 
   // data with notification types processed

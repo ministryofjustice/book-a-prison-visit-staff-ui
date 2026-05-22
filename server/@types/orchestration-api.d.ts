@@ -372,26 +372,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/visit-passes/prison/{prisonId}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    get?: never
-    put?: never
-    /**
-     * Get visit passes for a prison on a given date.
-     * @description Get visit passes for a prison on a given date.
-     */
-    post: operations['getVisitPassesForPrisonOnDate']
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/public/booker/{bookerReference}/permitted/prisoners/{prisonerId}/permitted/visitors': {
     parameters: {
       query?: never
@@ -490,6 +470,46 @@ export interface paths {
      * @description Search for all booker accounts that are registered to email
      */
     post: operations['searchForBooker']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/prison/{prisonId}/visit-passes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get visit passes for a prison on a given date.
+     * @description Get visit passes for a prison on a given date.
+     */
+    post: operations['getVisitPassesForPrisonOnDate']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/prison/{prisonId}/visit-passes/visit/{visitReference}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Get visit pass for an individual visit.
+     * @description Get visit pass for an individual visit.
+     */
+    post: operations['getVisitPassForVisitReference']
     delete?: never
     options?: never
     head?: never
@@ -2022,6 +2042,136 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
+    /** @description Details to register a visitor to a booker's prisoner. */
+    RegisterVisitorForBookerPrisonerDto: {
+      /**
+       * Format: int64
+       * @description Visitor Id
+       * @example 12345
+       */
+      visitorId: number
+      /**
+       * @description Flag to determine if the booker should be notified of the registration
+       * @example true
+       */
+      sendNotificationFlag: boolean | null
+      /**
+       * @description STAFF username who registered the visitor
+       * @example ABC123D
+       */
+      actionedBy: string
+    }
+    /** @description Permitted visitor associated with the permitted prisoner. */
+    PermittedVisitorsForPermittedPrisonerBookerDto: {
+      /**
+       * Format: int64
+       * @description Identifier for this contact (Person in NOMIS)
+       * @example 5871791
+       */
+      visitorId: number
+    }
+    /** @description Visit Pass request details. */
+    StaffUsernameDto: {
+      /**
+       * @description User Name for STAFF
+       * @example ALED
+       */
+      username: string
+    }
+    AddVisitorToBookerPrisonerRequestDto: {
+      /** @description First name of the visitor in request */
+      firstName: string
+      /** @description Last name of the visitor in request */
+      lastName: string
+      /**
+       * Format: date
+       * @description Date of birth of the visitor in request
+       */
+      dateOfBirth: string
+    }
+    BookerVisitorRequestValidationErrorResponse: {
+      /** Format: int32 */
+      status: number
+      /** Format: int32 */
+      errorCode?: number | null
+      userMessage?: string | null
+      developerMessage?: string | null
+      /** @enum {string} */
+      validationError:
+        | 'PRISONER_NOT_FOUND_FOR_BOOKER'
+        | 'MAX_IN_PROGRESS_REQUESTS_REACHED'
+        | 'REQUEST_ALREADY_EXISTS'
+        | 'VISITOR_ALREADY_EXISTS'
+    }
+    CreateVisitorRequestResponseDto: {
+      /**
+       * @description Reference of newly created visitor request
+       * @example abc-def-ghi
+       */
+      reference: string
+      /**
+       * @description Status of newly created visitor request
+       * @example REQUESTED or AUTO_APPROVED
+       * @enum {string}
+       */
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
+      /**
+       * @description Reference of booker who submitted the request
+       * @example abc-def-ghi
+       */
+      bookerReference: string
+      /**
+       * @description The id of the booker's prisoner for the visitor request
+       * @example AA123456
+       */
+      prisonerId: string
+    }
+    /** @description Details to register a prisoner to a booker. */
+    RegisterPrisonerForBookerDto: {
+      /**
+       * @description Prisoner Id
+       * @example A1234AA
+       */
+      prisonerId: string
+      /**
+       * @description Prisoner first name
+       * @example James
+       */
+      prisonerFirstName: string
+      /**
+       * @description Prisoner last name
+       * @example Smith
+       */
+      prisonerLastName: string
+      /**
+       * Format: date
+       * @description Prisoner date of birth
+       * @example 1960-01-30
+       */
+      prisonerDateOfBirth: string
+      /**
+       * @description Prison Id
+       * @example MDI
+       */
+      prisonId: string
+    }
+    /** @description Find a booker via search criteria */
+    SearchBookerDto: {
+      /** @description auth email */
+      email: string
+    }
+    /** @description Details of a found booker via booker search */
+    BookerSearchResultsDto: {
+      /** @description This is the booker reference, unique per booker */
+      reference: string
+      /** @description email registered to booker */
+      email: string
+      /**
+       * Format: date-time
+       * @description The time the booker account was created
+       */
+      createdTimestamp: string
+    }
     /** @description Visit Pass request details. */
     VisitPassRequestDto: {
       /**
@@ -2029,7 +2179,7 @@ export interface components {
        * @description Date for which visit passes are being sought.
        * @example 2025-01-01
        */
-      visitDate: string
+      date: string
       /**
        * @description STAFF username who triggered the visit passes endpoint.
        * @example ABC123D
@@ -2162,136 +2312,6 @@ export interface components {
        */
       dateOfBirth?: string | null
       address?: components['schemas']['AddressDto'] | null
-    }
-    /** @description Details to register a visitor to a booker's prisoner. */
-    RegisterVisitorForBookerPrisonerDto: {
-      /**
-       * Format: int64
-       * @description Visitor Id
-       * @example 12345
-       */
-      visitorId: number
-      /**
-       * @description Flag to determine if the booker should be notified of the registration
-       * @example true
-       */
-      sendNotificationFlag: boolean | null
-      /**
-       * @description STAFF username who registered the visitor
-       * @example ABC123D
-       */
-      actionedBy: string
-    }
-    /** @description Permitted visitor associated with the permitted prisoner. */
-    PermittedVisitorsForPermittedPrisonerBookerDto: {
-      /**
-       * Format: int64
-       * @description Identifier for this contact (Person in NOMIS)
-       * @example 5871791
-       */
-      visitorId: number
-    }
-    /** @description STAFF user details */
-    StaffUsernameDto: {
-      /**
-       * @description User Name for STAFF
-       * @example ALED
-       */
-      username: string
-    }
-    AddVisitorToBookerPrisonerRequestDto: {
-      /** @description First name of the visitor in request */
-      firstName: string
-      /** @description Last name of the visitor in request */
-      lastName: string
-      /**
-       * Format: date
-       * @description Date of birth of the visitor in request
-       */
-      dateOfBirth: string
-    }
-    BookerVisitorRequestValidationErrorResponse: {
-      /** Format: int32 */
-      status: number
-      /** Format: int32 */
-      errorCode?: number | null
-      userMessage?: string | null
-      developerMessage?: string | null
-      /** @enum {string} */
-      validationError:
-        | 'PRISONER_NOT_FOUND_FOR_BOOKER'
-        | 'MAX_IN_PROGRESS_REQUESTS_REACHED'
-        | 'REQUEST_ALREADY_EXISTS'
-        | 'VISITOR_ALREADY_EXISTS'
-    }
-    CreateVisitorRequestResponseDto: {
-      /**
-       * @description Reference of newly created visitor request
-       * @example abc-def-ghi
-       */
-      reference: string
-      /**
-       * @description Status of newly created visitor request
-       * @example REQUESTED or AUTO_APPROVED
-       * @enum {string}
-       */
-      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
-      /**
-       * @description Reference of booker who submitted the request
-       * @example abc-def-ghi
-       */
-      bookerReference: string
-      /**
-       * @description The id of the booker's prisoner for the visitor request
-       * @example AA123456
-       */
-      prisonerId: string
-    }
-    /** @description Details to register a prisoner to a booker. */
-    RegisterPrisonerForBookerDto: {
-      /**
-       * @description Prisoner Id
-       * @example A1234AA
-       */
-      prisonerId: string
-      /**
-       * @description Prisoner first name
-       * @example James
-       */
-      prisonerFirstName: string
-      /**
-       * @description Prisoner last name
-       * @example Smith
-       */
-      prisonerLastName: string
-      /**
-       * Format: date
-       * @description Prisoner date of birth
-       * @example 1960-01-30
-       */
-      prisonerDateOfBirth: string
-      /**
-       * @description Prison Id
-       * @example MDI
-       */
-      prisonId: string
-    }
-    /** @description Find a booker via search criteria */
-    SearchBookerDto: {
-      /** @description auth email */
-      email: string
-    }
-    /** @description Details of a found booker via booker search */
-    BookerSearchResultsDto: {
-      /** @description This is the booker reference, unique per booker */
-      reference: string
-      /** @description email registered to booker */
-      email: string
-      /**
-       * Format: date-time
-       * @description The time the booker account was created
-       */
-      createdTimestamp: string
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
     AlertDto: {
@@ -2650,8 +2670,11 @@ export interface components {
       events: components['schemas']['EventAuditOrchestrationDto'][]
       /** @description Notifications tied to visit booking */
       notifications: components['schemas']['VisitNotificationDto'][]
-      /** @description Boolean to signify if alerts and restrictions retrieval was intentionally skipped */
-      skipAlertsAndRestrictions: boolean
+      /**
+       * @description Enum denoting why alerts and restrictions were skipped; absent if not skipped
+       * @enum {string|null}
+       */
+      skipAlertsAndRestrictionReason?: 'PRISONER_RELEASED' | 'PRISONER_TRANSFERRED' | 'VISIT_IN_PAST' | null
     }
     /** @description Visit notification details */
     VisitContactDto: {
@@ -2844,10 +2867,10 @@ export interface components {
         | 'CANCELLED'
     }
     PageVisitDto: {
-      /** Format: int32 */
-      totalPages?: number
       /** Format: int64 */
       totalElements?: number
+      /** Format: int32 */
+      totalPages?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
@@ -2874,8 +2897,8 @@ export interface components {
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -3469,6 +3492,11 @@ export interface components {
        * @example Outside - released from Leeds
        */
       locationDescription?: string | null
+      /**
+       * @description Status of the prisoner
+       * @example ACTIVE IN
+       */
+      status: string
       /**
        * @description Convicted Status
        * @example Convicted
@@ -5667,81 +5695,6 @@ export interface operations {
       }
     }
   }
-  getVisitPassesForPrisonOnDate: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description Prison code.
-         * @example ABC
-         */
-        prisonId: string
-      }
-      cookie?: never
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['VisitPassRequestDto']
-      }
-    }
-    responses: {
-      /** @description Return visit passes given a prison and visit date. */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          '*/*': components['schemas']['VisitPassDto'][]
-        }
-      }
-      /** @description Incorrect request to get visit passes for a prison on a given date. */
-      400: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to get visit passes for a prison on a given date. */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Visit passes could not be found for the supplied prison and visit date. */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Internal server error while retrieving visit passes. */
-      500: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
   getPermittedVisitorsForPrisoner: {
     parameters: {
       query?: never
@@ -6041,6 +5994,157 @@ export interface operations {
       }
       /** @description Incorrect permissions for this action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitPassesForPrisonOnDate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Prison code.
+         * @example ABC
+         */
+        prisonId: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VisitPassRequestDto']
+      }
+    }
+    responses: {
+      /** @description Return visit passes given a prison and visit date. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitPassDto'][]
+        }
+      }
+      /** @description Incorrect request to get visit passes for a prison on a given date. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get visit passes for a prison on a given date. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit passes could not be found for the supplied prison and visit date. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Internal server error while retrieving visit passes. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getVisitPassForVisitReference: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description Prison code.
+         * @example ABC
+         */
+        prisonId: string
+        visitReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['StaffUsernameDto']
+      }
+    }
+    responses: {
+      /** @description Return visit pass given a visit reference and prison. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitPassDto']
+        }
+      }
+      /** @description Incorrect request to get a visit pass given a visit reference and prison. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get a visit pass given a visit reference and prison. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Visit pass could not be found for the given visit reference. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Internal server error while retrieving visit pass for the given visit reference. */
+      500: {
         headers: {
           [name: string]: unknown
         }
