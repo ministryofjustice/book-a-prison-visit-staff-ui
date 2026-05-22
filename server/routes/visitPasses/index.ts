@@ -9,7 +9,7 @@ export default function routes(services: Services): Router {
   if (config.features.printVisitPasses) {
     const visitPassesController = new VisitPassesController(services.auditService, services.visitService)
 
-    router.get('/', visitPassesController.view())
+    router.get('/', visitPassesController.viewByDate())
   }
 
   return router
