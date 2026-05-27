@@ -152,7 +152,6 @@ export default {
       ),
     },
     printVisitPasses: get('FEATURE_PRINT_VISIT_PASSES', 'false') === 'true',
-    blockSessions: get('FEATURE_BLOCK_SESSIONS', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: translateEnvironment(get('ENVIRONMENT_NAME', '')),
