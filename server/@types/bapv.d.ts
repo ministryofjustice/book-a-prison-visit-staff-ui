@@ -12,7 +12,7 @@ import {
 import type { CalendarVisitSession } from '../services/visitSessionsService'
 import type { Restriction } from '../data/prisonerContactRegistryApiTypes'
 
-type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
+export type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
 export type FlashFormValues = Record<string, unknown>
 
