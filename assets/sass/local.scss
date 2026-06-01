@@ -191,16 +191,24 @@
   @include govuk-link-style-default;
 }
 
-.env--STAGING [data-qa=connect-dps-common-environment-tag] {
+.env--localhost [data-qa="cdps-header-environment-tag"],
+.env--staging [data-qa="cdps-header-environment-tag"] {
   padding-left: 0;
   visibility: hidden;
 
   &::before {
-    content: "STAGING";
+    float: left;
     visibility: visible;
     @extend .govuk-tag;
-    @extend .govuk-tag--orange;
   }
+}
+.env--localhost [data-qa="cdps-header-environment-tag"]::before {
+  content: "LOCALHOST";
+  @extend .govuk-tag--yellow;
+}
+.env--staging [data-qa="cdps-header-environment-tag"]::before {
+  content: "STAGING";
+  @extend .govuk-tag--orange;
 }
 
 // fix colour on MoJ sortable table for non-sortable headings
