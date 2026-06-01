@@ -40,7 +40,7 @@
     "@ministryofjustice/frontend": "^8.0.1",
     "@ministryofjustice/hmpps-connect-dps-components": "^5.5.0",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",
-    "@ministryofjustice/hmpps-rest-client": "^1.2.1",
+    "@ministryofjustice/hmpps-rest-client": "^2.1.0",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.8",
     "bunyan": "^1.8.15",
