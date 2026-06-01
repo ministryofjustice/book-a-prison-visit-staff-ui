@@ -38,7 +38,7 @@
     "@aws-sdk/client-sqs": "^3.1053.0",
     "@axe-core/playwright": "4.11.3",
     "@ministryofjustice/frontend": "^8.0.1",
-    "@ministryofjustice/hmpps-connect-dps-components": "^5.5.0",
+    "@ministryofjustice/hmpps-connect-dps-components": "^6.0.0",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",
     "@ministryofjustice/hmpps-rest-client": "^2.1.0",
     "agentkeepalive": "^4.6.0",
