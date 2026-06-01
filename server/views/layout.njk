@@ -1,6 +1,5 @@
 {% extends "govuk/template.njk" %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {% set bodyClasses = ("env--" + environmentName) if environmentName %}
 
@@ -26,16 +25,20 @@
   {{ feComponents.header | safe }}
 {% endblock %}
 
-{% block headerEnd %}
-  {{ govukPhaseBanner({
-    html: 'We want to hear from you - <a class="govuk-link" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2AYNZK8DJCZBgXxIreDRN5tUQTIwNlJCU1IzSFVMU1JPMUdUVklRUTdNMS4u">give your feedback to help us improve the service</a>.'
-  }) }}
-{% endblock %}
-
 {% block bodyStart %}
 {% endblock %}
 
 {% block beforeContent %}
+  <div class="govuk-grid-row technical-updates-banner" id="technical-updates-banner" data-banner-version="30 May 2025">
+    <div class="govuk-grid-column-full">
+      <div class="govuk-width-container govuk-body technical-updates-container">
+        <div class="technical-updates-content">
+          <strong class="technical-updates-whats-new">We want to hear from you</strong>
+          <span>
+              Give <a class="govuk-link" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2AYNZK8DJCZBgXxIreDRN5tUQTIwNlJCU1IzSFVMU1JPMUdUVklRUTdNMS4u">your feedback</a> to help us improve the service.
+          </span>
+    </div>
+  </div>
   {% if backLinkHref %}
     <div role="navigation">
       {{ govukBackLink({
