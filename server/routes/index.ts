@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { clearSession } from './visitorUtils'
 import { Services } from '../services'
 import bapvUserRoles from '../constants/bapvUserRoles'
+import config from '../config'
 
 export default function routes({ bookerService, visitNotificationsService, visitRequestsService }: Services): Router {
   const router = Router()
@@ -27,11 +28,14 @@ export default function routes({ bookerService, visitNotificationsService, visit
         ? await bookerService.getVisitorRequestCount({ username, prisonId: prison.prisonId })
         : 0
 
+    const showVisitAllowanceTile = config.features.remandLimits
+
     res.render('pages/index', {
       showRequestedVisitsTile,
       visitRequestCount,
       visitReviewCount,
       showBookerManagementTile,
+      showVisitAllowanceTile,
       visitorRequestCount,
     })
   })

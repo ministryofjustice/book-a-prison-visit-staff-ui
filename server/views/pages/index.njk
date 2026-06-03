@@ -112,6 +112,19 @@
             id: "block-dates"
           }) }}
         </li>
+
+        {% if showVisitAllowanceTile %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              href: "/visit-allowances",
+              clickable: "true",
+              heading: "Visit allowances",
+              description: "View and update the number of visits that prisoners are allowed",
+              id: "visit-allowances"
+            }) }}
+          </li>
+        {% endif %}
+        
       </ul>
     </div>
   </div>
