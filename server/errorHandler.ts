@@ -16,16 +16,19 @@ export default function createErrorHandler(production: boolean) {
     }
 
     if (req.method === 'POST') {
-      try {
-        await getFrontendComponents({
+      await new Promise<void>(resolve => {
+        getFrontendComponents({
           logger,
           componentApiConfig: config.apis.componentApi,
           dpsUrl: config.dpsHome,
           requestOptions: { includeSharedData: true },
-        })(req, res, next)
-      } catch (err) {
-        logger.error('Error fetching frontend components while handling failed POST request', err)
-      }
+        })(req, res, err => {
+          if (err) {
+            logger.error('Error fetching frontend components while handling failed POST request', err)
+          }
+          resolve()
+        })
+      })
     }
 
     const heading = errorHasStatus(error, 404) ? 'Page not found' : 'Error'
