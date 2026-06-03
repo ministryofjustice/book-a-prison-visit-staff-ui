@@ -23,6 +23,10 @@
 
 {% block header %}
   {{ feComponents.header | safe }}
+
+  {% if features.feedbackBanner.enabled %}
+    {% include "partials/feedbackBanner.njk" %}
+  {% endif %}
 {% endblock %}
 
 {% block bodyStart %}
