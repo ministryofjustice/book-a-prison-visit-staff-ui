@@ -1,0 +1,18 @@
+// Adapted from https://design-patterns.service.justice.gov.uk/components/new-features-banner/
+
+.feedback-banner {
+  background-color: #44247b;
+}
+
+.feedback-content {
+  color: govuk-colour('white');
+  padding: govuk-spacing(2) govuk-spacing(5);
+
+  & strong {
+    margin-right: govuk-spacing(4);
+  }
+
+  & a {
+    @include govuk-link-style-inverse;
+  }
+}
