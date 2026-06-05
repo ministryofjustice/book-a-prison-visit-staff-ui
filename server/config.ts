@@ -149,6 +149,10 @@ export default {
     cancellationLimitDays: Number(get('CANCELLATION_LIMIT_DAYS', 28)),
   },
   features: {
+    feedbackBanner: {
+      enabled: get('FEATURE_FEEDBACK_BANNER_ENABLED', 'false') === 'true',
+      url: get('FEATURE_FEEDBACK_BANNER_URL', '#feedback'),
+    },
     notificationTypes: {
       enabledRawNotifications: <NotificationTypeRaw[]>(
         get(
