@@ -1,5 +1,5 @@
 import { HmppsAuthClient, IncentivesApiClient, RestClientBuilder } from '../data'
-import { PrisonIncentivesLevels } from '../data/incentivesApiTypes'
+import { PrisonIncentiveLevel } from '../data/incentivesApiTypes'
 
 export type VisitAllowances = {
   basic: VisitAllowanceType
@@ -17,13 +17,13 @@ export default class VisitAllowanceService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getIncentivesLevels({
+  async getPrisonIncentiveLevels({
     username,
     prisonId,
   }: {
     username: string
     prisonId: string
-  }): Promise<PrisonIncentivesLevels> {
+  }): Promise<PrisonIncentiveLevel[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const incentivesApiClient = this.incentivesApiClientFactory(token)
 

@@ -1,3 +1,3 @@
 import { components } from '../@types/incentives-api'
 
-export type PrisonIncentivesLevels = components['schemas']['PrisonIncentiveLevel'][]
+export type PrisonIncentiveLevel = components['schemas']['PrisonIncentiveLevel']

@@ -16,7 +16,7 @@
 
   {% set displayRows = (displayRows.push([
     {
-      text: incentive.levelName,
+      html: '<span class="govuk-!-font-weight-bold">' + incentive.levelName + '</span>',
       attributes: { "data-test": "incentive-level-" + loop.index }
     },
     {
@@ -72,7 +72,9 @@
         rows: displayRows
       }) }}
 
-      <a class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">Go to the incentives service to change visit allowances for convicted prisoners.</a>
+      <p><a class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
+        Go to the incentives service to change visit allowances for convicted prisoners.
+      </a></p>
       
     </div>
   </div>

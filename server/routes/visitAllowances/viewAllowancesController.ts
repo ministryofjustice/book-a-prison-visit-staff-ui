@@ -7,12 +7,10 @@ export default class ViewAllowancesController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { prisonId } = req.session.selectedEstablishment
-      const incentiveLevels = await this.visitAllowanceService.getIncentivesLevels({
+      const incentiveLevels = await this.visitAllowanceService.getPrisonIncentiveLevels({
         username: res.locals.user.username,
         prisonId,
       })
-
-      // console.log(incentiveLevels)
 
       return res.render('pages/visitAllowances/view', {
         incentiveLevels,
