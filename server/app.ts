@@ -29,6 +29,7 @@ import requestRoutes from './routes/request'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search/search'
 import timetableRoutes from './routes/timetable'
+import visitAllowancesRoutes from './routes/visitAllowances'
 import visitRoutes from './routes/visit'
 import visitsByDateRoutes from './routes/visitsByDate/visitsByDate'
 import type { Services } from './services'
@@ -79,6 +80,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/timetable', timetableRoutes(services))
   app.use('/requested-visits', requestRoutes(services))
   app.use('/review', reviewRoutes(services))
+  app.use('/visit-allowances', visitAllowancesRoutes(services))
   app.use('/visit', visitRoutes(services))
   app.use('/visits', visitsByDateRoutes(services))
 

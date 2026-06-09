@@ -59,6 +59,11 @@ export default {
     'https://prisoner-dev.digital.prison.service.justice.gov.uk/',
     requiredInProduction,
   ),
+  dpsIncentives: get(
+    'DPS_INCENTIVES_URL',
+    'https://incentives-ui-dev.hmpps.service.justice.gov.uk/',
+    requiredInProduction,
+  ),
   apis: {
     hmppsAuth: {
       url: get('HMPPS_AUTH_URL', 'http://localhost:9090/auth', requiredInProduction),
@@ -129,6 +134,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('COMPONENT_TIMEOUT_DEADLINE', 10000))),
     },
+    incentives: {
+      url: get('INCENTIVES_API_URL', 'http://localhost:8080', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('INCENTIVES_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('INCENTIVES_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('INCENTIVES_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   visit: {
     // Max number of days AFTER a visit that it can be marked CANCELLED
@@ -148,6 +162,7 @@ export default {
       ),
     },
     printVisitPasses: get('FEATURE_PRINT_VISIT_PASSES', 'false') === 'true',
+    remandLimits: get('FEATURE_REMAND_LIMITS', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),

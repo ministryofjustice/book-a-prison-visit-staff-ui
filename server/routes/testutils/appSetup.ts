@@ -32,6 +32,7 @@ import requestRoutes from '../request'
 import reviewRoutes from '../review'
 import searchRoutes from '../search/search'
 import timetableRoutes from '../timetable'
+import visitAllowancesRoutes from '../visitAllowances'
 import visitRoutes from '../visit'
 import visitsRoutes from '../visitsByDate/visitsByDate'
 
@@ -116,6 +117,7 @@ function appSetup(
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
+  app.use('/visit-allowances', visitAllowancesRoutes(services))
   app.use('/visit', visitRoutes(services))
   app.use('/visits', visitsRoutes(services))
 

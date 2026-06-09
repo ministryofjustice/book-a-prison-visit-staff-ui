@@ -1,0 +1,82 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+
+{% set pageHeaderTitle = "Visit allowances" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% set displayRows = [] %}
+
+{% for incentive in incentiveLevels %}
+
+  {% set displayRows = (displayRows.push([
+    {
+      html: '<span class="govuk-!-font-weight-bold">' + incentive.levelName + '</span>',
+      attributes: { "data-test": "incentive-level-" + loop.index }
+    },
+    {
+      text: incentive.visitOrders + ' every 14 days',
+      attributes: { "data-test": "vo-count-" + loop.index }
+    },
+    {
+      text: incentive.privilegedVisitOrders + ' every 28 days',
+      attributes: { "data-test": "pvo-count-" + loop.index }
+    }
+  ]), displayRows) %}
+
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <h2 class="govuk-heading-m">Unconvicted prisoners</h2>
+
+      <p>
+        Unconvicted prisoners are remand prisoners, immigration detainees and civil prisoners.
+      </p>
+      <p>
+        They are allowed <span data-test="remand-limit">3 visits every 7 days</span>. This allowance renews on Monday.
+      </p>
+
+        <form action="/visit-allowances" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukButton({
+          text: "Change allowance",
+          attributes: { "data-test": "change-allowance" },
+          preventDoubleClick: true
+        }) }}
+      </form>
+
+      <h2 class="govuk-heading-m">Convicted prisoners</h2>
+
+      {{ govukTable({
+        head: [
+          {
+            text: "Incentive level"
+          },
+          {
+            text: "VOs"
+          },
+          {
+            text: "PVOs"
+          }
+        ],
+        rows: displayRows
+      }) }}
+
+      <p><a data-test="incentives-service-url" class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
+        Go to the incentives service to change visit allowances for convicted prisoners.
+      </a></p>
+      
+    </div>
+  </div>
+{% endblock %}

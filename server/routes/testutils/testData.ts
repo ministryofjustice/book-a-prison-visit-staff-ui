@@ -43,6 +43,7 @@ import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTyp
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
 import { MoJAlert, Prison } from '../../@types/bapv'
 import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
+import { PrisonIncentiveLevel } from '../../data/incentivesApiTypes'
 
 export default class TestData {
   static address = ({
@@ -407,6 +408,32 @@ export default class TestData {
     eventSourceDesc,
     startTime,
     endTime,
+  })
+
+  static prisonIncentiveLevel = ({
+    levelCode = 'STD',
+    levelName = 'Standard',
+    prisonId = 'HEI',
+    active = true,
+    defaultOnAdmission = true,
+    remandTransferLimitInPence = 6050,
+    remandSpendLimitInPence = 60500,
+    convictedTransferLimitInPence = 1980,
+    convictedSpendLimitInPence = 19800,
+    visitOrders = 1,
+    privilegedVisitOrders = 3,
+  }: Partial<PrisonIncentiveLevel> = {}): PrisonIncentiveLevel => ({
+    levelCode,
+    levelName,
+    prisonId,
+    active,
+    defaultOnAdmission,
+    remandTransferLimitInPence,
+    remandSpendLimitInPence,
+    convictedTransferLimitInPence,
+    convictedSpendLimitInPence,
+    visitOrders,
+    privilegedVisitOrders,
   })
 
   // Visitor restrictions

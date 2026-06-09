@@ -17,10 +17,12 @@ generic-service:
     ORCHESTRATION_API_URL: "https://hmpps-manage-prison-visits-orchestration-preprod.prison.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
     PRISONER_CONTACT_REGISTRY_API_URL: "https://prisoner-contact-registry-preprod.prison.service.justice.gov.uk"
-    COMPONENT_API_URL: https://frontend-components-preprod.hmpps.service.justice.gov.uk
+    COMPONENT_API_URL: "https://frontend-components-preprod.hmpps.service.justice.gov.uk"
+    INCENTIVES_API_URL: "https://incentives-api-preprod.hmpps.service.justice.gov.uk"
     DPS_URL: "https://dps-preprod.prison.service.justice.gov.uk/"
     DPS_PRISONER_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk/"
-    DPS_CONTACTS_URL: "https://contacts-preprod.hmpps.service.justice.gov.uk"
+    DPS_CONTACTS_URL: "https://contacts-preprod.hmpps.service.justice.gov.uk/"
+    DPS_INCENTIVES_URL: "https://incentives-ui-preprod.hmpps.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-preprod"
     ENVIRONMENT_NAME: preprod
 
