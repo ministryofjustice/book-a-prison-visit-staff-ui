@@ -20,7 +20,7 @@ export default class ViewAllowancesController {
 
   public change(): RequestHandler {
     return async (req, res) => {
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/visit-allowances/remand')
     }
   }
 }

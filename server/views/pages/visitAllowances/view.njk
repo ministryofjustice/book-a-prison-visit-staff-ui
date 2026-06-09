@@ -43,7 +43,7 @@
         Unconvicted prisoners are remand prisoners, immigration detainees and civil prisoners.
       </p>
       <p>
-        They are allowed 3 visits every 7 days. This allowance renews on Monday.
+        They are allowed <span data-test="remand-limit">3 visits every 7 days</span>. This allowance renews on Monday.
       </p>
 
         <form action="/visit-allowances" method="POST" novalidate>
@@ -72,7 +72,7 @@
         rows: displayRows
       }) }}
 
-      <p><a class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
+      <p><a data-test="incentives-service-url" class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
         Go to the incentives service to change visit allowances for convicted prisoners.
       </a></p>
       
