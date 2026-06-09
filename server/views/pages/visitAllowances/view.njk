@@ -50,12 +50,13 @@
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukButton({
-          text: "Change allowances",
+          text: "Change allowance",
           attributes: { "data-test": "change-allowance" },
           preventDoubleClick: true
         }) }}
       </form>
 
+      <h2 class="govuk-heading-m">Convicted prisoners</h2>
 
       {{ govukTable({
         head: [

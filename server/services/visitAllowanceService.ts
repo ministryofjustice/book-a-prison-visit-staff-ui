@@ -1,16 +1,6 @@
 import { HmppsAuthClient, IncentivesApiClient, RestClientBuilder } from '../data'
 import { PrisonIncentiveLevel } from '../data/incentivesApiTypes'
 
-export type VisitAllowances = {
-  basic: VisitAllowanceType
-  standard: VisitAllowanceType
-  enhanced: VisitAllowanceType
-}
-export type VisitAllowanceType = {
-  vo: number
-  pvo: number
-}
-
 export default class VisitAllowanceService {
   constructor(
     private readonly incentivesApiClientFactory: RestClientBuilder<IncentivesApiClient>,

@@ -43,7 +43,7 @@ describe('Visit allowances - View current visit allowances', () => {
 
           // Form
           expect($('form').attr('action')).toBe(url)
-          expect($('[data-test=change-allowance]').text().trim()).toBe('Change allowances')
+          expect($('[data-test=change-allowance]').text().trim()).toBe('Change allowance')
 
           // Table
           expect($('[data-test=incentive-level-1]').text().trim()).toBe('Standard')
