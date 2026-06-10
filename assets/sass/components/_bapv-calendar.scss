@@ -111,7 +111,7 @@
 
 .bapv-calendar__day--outline {
   border-radius: 50%;
-  outline: 2px solid govuk-colour("dark-grey");
+  outline: 2px solid govuk-colour("black", $variant: "tint-25");
 
 }
 

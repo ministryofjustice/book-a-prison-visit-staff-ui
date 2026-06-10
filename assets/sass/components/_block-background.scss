@@ -1,4 +1,4 @@
 .block-background {
-    background-color: govuk-colour("light-grey");
+    background-color: govuk-colour("black", $variant: "tint-95");
     padding: govuk-spacing(6) govuk-spacing(3);
 }
