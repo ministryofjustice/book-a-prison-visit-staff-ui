@@ -832,7 +832,7 @@ export default {
     prisonId = 'HEI',
     date,
     username = 'USER1',
-    visitPasses = [TestData.visitPass()],
+    visitPasses = [TestData.visitPassDto()],
   }: {
     prisonId?: string
     date: string
@@ -862,9 +862,9 @@ export default {
 
   stubGetVisitPass: ({
     prisonId = 'HEI',
-    reference = TestData.visitPass().reference,
+    reference = TestData.visitPassDto().reference,
     username = 'USER1',
-    visitPass = TestData.visitPass(),
+    visitPass = TestData.visitPassDto(),
   }: {
     prisonId?: string
     reference?: string

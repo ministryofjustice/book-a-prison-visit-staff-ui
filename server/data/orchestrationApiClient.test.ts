@@ -861,7 +861,7 @@ describe('orchestrationApiClient', () => {
   describe('getVisitPasses', () => {
     it('should return visit passes for given prison and date', async () => {
       const date = '2024-01-31'
-      const results = [TestData.visitPass()]
+      const results = [TestData.visitPassDto()]
 
       fakeOrchestrationApi
         .post(`/prison/${prisonId}/visit-passes`, <VisitPassRequestDto>{ date, actionedBy: 'user1' })
@@ -877,7 +877,7 @@ describe('orchestrationApiClient', () => {
   describe('getVisitPass', () => {
     it('should return visit pass for given prison and visit reference', async () => {
       const reference = 'ab-cd-ef-gh'
-      const results = TestData.visitPass()
+      const results = TestData.visitPassDto()
 
       fakeOrchestrationApi
         .post(`/prison/${prisonId}/visit-passes/visit/${reference}`, <StaffUsernameDto>{ username: 'user1' })

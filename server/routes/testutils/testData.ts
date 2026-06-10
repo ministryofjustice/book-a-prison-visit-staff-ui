@@ -1008,17 +1008,19 @@ export default class TestData {
     requestedOn,
   })
 
-  static visitPass = ({
+  static visitPassDto = ({
     reference = 'ab-cd-ef-gh',
+    visitDate = '2026-06-01',
     startTime = '10:00',
     endTime = '11:00',
     prisonerId = 'A1234BC',
     prisonerFirstName = 'JOHN',
     prisonerLastName = 'SMITH',
     visitRestriction = 'OPEN',
-    visitors = [this.visitPassVisitor()],
+    visitors = [this.visitPassDtoVisitor()],
   }: Partial<VisitPassDto> = {}): VisitPassDto => ({
     reference,
+    visitDate,
     startTime,
     endTime,
     prisonerId,
@@ -1028,7 +1030,7 @@ export default class TestData {
     visitors,
   })
 
-  static visitPassVisitor = ({
+  static visitPassDtoVisitor = ({
     nomisPersonId = 4321,
     firstName = 'Jeanette',
     lastName = 'Smith',

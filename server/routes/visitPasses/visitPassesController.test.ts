@@ -33,7 +33,7 @@ describe('Print visit passes by date', () => {
     })
 
     it('should render visit passes page for given date and selected establishment', () => {
-      const visitPasses = [TestData.visitPass()] // TODO add second test visit pass
+      const visitPasses = [TestData.visitPassDto()] // TODO add second test visit pass
       visitService.getVisitPasses.mockResolvedValue(visitPasses)
 
       return request(app)
@@ -44,7 +44,7 @@ describe('Print visit passes by date', () => {
           // Page header
           expect($('title').text()).toMatch(/^Print visit passes -/)
           expect($('.govuk-back-link').length).toBe(0)
-          expect($('h1').text().trim()).toBe('Print visit passes')
+          expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
 
           // TODO extend test assertions
         })
@@ -53,7 +53,7 @@ describe('Print visit passes by date', () => {
 })
 
 describe('Print visit pass by visit reference', () => {
-  const visitPass = TestData.visitPass()
+  const visitPass = TestData.visitPassDto()
   const { reference } = visitPass
   const url = `/visit/${reference}/visit-pass`
 
@@ -75,7 +75,7 @@ describe('Print visit pass by visit reference', () => {
           // Page header
           expect($('title').text()).toMatch(/^Print visit passes -/)
           expect($('.govuk-back-link').length).toBe(0)
-          expect($('h1').text().trim()).toBe('Print visit passes')
+          expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
 
           // TODO extend test assertions
         })

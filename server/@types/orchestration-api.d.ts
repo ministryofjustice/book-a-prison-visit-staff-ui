@@ -2340,6 +2340,12 @@ export interface components {
        */
       reference: string
       /**
+       * Format: date
+       * @description Visit Date
+       * @example 2026-09-21
+       */
+      visitDate: string
+      /**
        * Format: HH:mm
        * @description Visit Start time
        * @example 11:00
