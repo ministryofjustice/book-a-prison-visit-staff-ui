@@ -296,7 +296,7 @@ export const getHideAlertsInset = ({
         html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/alerts-restrictions">contacts service</a>.`,
       }
       visitorTextOrHtml = {
-        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`,
+        html: `Visitor restrictions are not shown for past visits.<br>You can view restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`,
       }
       break
 

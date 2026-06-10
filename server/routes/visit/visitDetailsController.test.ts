@@ -495,7 +495,7 @@ describe('Visit details page', () => {
             classes: 'inset-text-prisoner',
           },
           visitor: {
-            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
             attributes: { 'data-test': 'visitor-inset' },
           },
         }
@@ -510,7 +510,7 @@ describe('Visit details page', () => {
               'Alerts and restrictions are not shown for past visits.You can view alerts and restrictions in the contacts service.',
             )
             expect($('[data-test=visitor-inset]').text()).toContain(
-              'Visitor restrictions are not shown for past visits.You can view alerts and restrictions in the contacts service.',
+              'Visitor restrictions are not shown for past visits.You can view restrictions in the contacts service.',
             )
           })
       })

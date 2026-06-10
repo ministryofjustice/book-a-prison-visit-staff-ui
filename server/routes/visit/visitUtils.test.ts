@@ -597,7 +597,7 @@ describe('Visit utils', () => {
 
     it('should return past visit message if skipAlertsAndRestrictionReason is VISIT_IN_PAST', () => {
       expected.prisoner.html = `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/alerts-restrictions">contacts service</a>.`
-      expected.visitor.html = `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`
+      expected.visitor.html = `Visitor restrictions are not shown for past visits.<br>You can view restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`
 
       const results = getHideAlertsInset({ skipAlertsAndRestrictionReason: 'VISIT_IN_PAST', prisonerNumber })
       expect(results).toStrictEqual(expected)
