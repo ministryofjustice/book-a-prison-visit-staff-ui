@@ -293,10 +293,10 @@ export const getHideAlertsInset = ({
   switch (skipAlertsAndRestrictionReason) {
     case 'VISIT_IN_PAST':
       prisonerTextOrHtml = {
-        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/alerts-restrictions">contacts service</a>.`,
+        html: `Alerts and restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/alerts-restrictions">contacts service</a>.`,
       }
       visitorTextOrHtml = {
-        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`,
+        html: `Visitor restrictions are not shown for past visits.<br>You can view alerts and restrictions in the <a href="${config.dpsContacts}/prisoner/${prisonerNumber}/contacts/list">contacts service</a>.`,
       }
       break
 

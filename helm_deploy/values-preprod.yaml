@@ -21,7 +21,7 @@ generic-service:
     INCENTIVES_API_URL: "https://incentives-api-preprod.hmpps.service.justice.gov.uk"
     DPS_URL: "https://dps-preprod.prison.service.justice.gov.uk/"
     DPS_PRISONER_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk/"
-    DPS_CONTACTS_URL: "https://contacts-preprod.hmpps.service.justice.gov.uk/"
+    DPS_CONTACTS_URL: "https://contacts-preprod.hmpps.service.justice.gov.uk"
     DPS_INCENTIVES_URL: "https://incentives-ui-preprod.hmpps.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-preprod"
     ENVIRONMENT_NAME: preprod

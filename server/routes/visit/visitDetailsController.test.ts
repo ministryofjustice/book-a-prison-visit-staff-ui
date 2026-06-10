@@ -490,12 +490,12 @@ describe('Visit details page', () => {
       it('should display reason for restrictions/alerts hidden', () => {
         hideAlertsInset = {
           prisoner: {
-            html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
             attributes: { 'data-test': 'prisoner-inset' },
             classes: 'inset-text-prisoner',
           },
           visitor: {
-            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions for past visits in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view alerts and restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
             attributes: { 'data-test': 'visitor-inset' },
           },
         }
@@ -507,10 +507,10 @@ describe('Visit details page', () => {
           .expect(res => {
             const $ = cheerio.load(res.text)
             expect($('[data-test=prisoner-inset]').text()).toContain(
-              'Alerts and restrictions are not shown for past visits.You can view alerts and restrictions for past visits in the contacts service.',
+              'Alerts and restrictions are not shown for past visits.You can view alerts and restrictions in the contacts service.',
             )
             expect($('[data-test=visitor-inset]').text()).toContain(
-              'Visitor restrictions are not shown for past visits.You can view alerts and restrictions for past visits in the contacts service.',
+              'Visitor restrictions are not shown for past visits.You can view alerts and restrictions in the contacts service.',
             )
           })
       })
