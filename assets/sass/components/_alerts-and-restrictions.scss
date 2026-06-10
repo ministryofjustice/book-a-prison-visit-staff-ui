@@ -31,9 +31,7 @@
     @extend .govuk-tag--orange;
   }
 
-  &--DIHCON {
-    @extend .govuk-tag--blue !optional;
-  }
+  // DIHCON: this uses the standard tag blue colour
 
   &--ACC {
     @extend .govuk-tag--turquoise;
