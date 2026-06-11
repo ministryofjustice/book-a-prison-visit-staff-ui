@@ -4,8 +4,8 @@
 
 $card-border-width: 1px;
 $card-border-bottom-width: govuk-spacing(1);
-$card-border-hover-color: $govuk-border-colour;
-$card-border-color: lighten($card-border-hover-color, 15%);
+$card-border-hover-color: govuk-functional-colour(border);
+$card-border-color: govuk-colour("black", $variant: "tint-80");
 
 .card {
   margin-bottom: govuk-spacing(7);

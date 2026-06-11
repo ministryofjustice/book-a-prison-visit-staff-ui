@@ -1,7 +1,7 @@
 .bapv-filter-card {
   position: relative;
-  background-color: govuk-colour("light-grey");
-  border: 1px solid govuk-colour("mid-grey");
+  background-color: govuk-colour("black", $variant: "tint-95");
+  border: 1px solid govuk-colour("black", $variant: "tint-80");
   padding: govuk-spacing(3) govuk-spacing(3) govuk-spacing(6) govuk-spacing(3);
   @include govuk-clearfix();
   .govuk-heading-s {

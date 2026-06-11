@@ -33,11 +33,11 @@
   max-width: unset;
 
   &--UPIU {
-    background-color: govuk-colour("bright-purple");
+    background-color: govuk-colour("magenta", $variant: "shade-25");
   }
 
   &--RCDR {
-    background-color: govuk-colour("dark-blue");
+    background-color: govuk-colour("blue", $variant: "shade-50");
   }
   
   &--URCU {
