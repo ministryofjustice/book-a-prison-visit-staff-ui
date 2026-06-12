@@ -8,6 +8,8 @@ import ClearNotificationsController from './clearNotificationsController'
 import ConfirmUpdateController from './confirmUpdateController'
 import UpdateVisitController from './updateVisitController'
 import ProcessVisitRequestController from './processVisitRequestController'
+import config from '../../config'
+import VisitPassesController from '../visitPasses/visitPassesController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -38,6 +40,11 @@ export default function routes(services: Services): Router {
 
   router.get('/:reference/clear-notifications', clearNotifications.view())
   router.post('/:reference/clear-notifications', clearNotifications.validate(), clearNotifications.clearNotifications())
+
+  if (config.features.printVisitPasses) {
+    const visitPassesController = new VisitPassesController(services.auditService, services.visitService)
+    router.get('/:reference/visit-pass', visitPassesController.viewByVisit())
+  }
 
   router.get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
   router.post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())

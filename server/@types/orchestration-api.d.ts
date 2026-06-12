@@ -315,6 +315,30 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/config/prisons/prison/{prisonCode}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets prison by given prison id/code
+     * @description Gets prison by given prison id/code
+     */
+    get: operations['getPrison']
+    /**
+     * Update prison config by given prison id/code
+     * @description Update prison config by given prison id/code
+     */
+    put: operations['updatePrison']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/config/prisons/prison/{prisonCode}/exclude-date/remove': {
     parameters: {
       query?: never
@@ -1269,26 +1293,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/config/prisons/prison/{prisonCode}': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Gets prison by given prison id/code
-     * @description Gets prison by given prison id/code
-     */
-    get: operations['getPrison']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/config/prisons/prison/{prisonCode}/exclude-date/{excludeDate}/isExcluded': {
     parameters: {
       query?: never
@@ -2042,6 +2046,90 @@ export interface components {
       /** @description full name of user who added the exclude date or username if full name is not available. */
       actionedBy: string
     }
+    /** @description Prison update dto */
+    VisitSchedulerUpdatePrisonDto: {
+      /**
+       * @description The week day of which the prison week starts on. Enum value, any day of the week MONDAY - SUNDAY
+       * @enum {string|null}
+       */
+      weekStartDay?: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY' | null
+      /**
+       * Format: int32
+       * @description The limit per prison week, the number of remand visits that can be booked per week
+       */
+      remandVisitLimitPerWeek?: number | null
+    }
+    /** @description Prison user client dto */
+    PrisonUserClientDto: {
+      /**
+       * @description User type
+       * @example STAFF
+       * @enum {string}
+       */
+      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      /**
+       * @description is prison user client active
+       * @example true
+       */
+      active: boolean
+    }
+    /** @description Prison dto */
+    VisitSchedulerPrisonDto: {
+      /**
+       * @description prison code
+       * @example BHI
+       */
+      code: string
+      /**
+       * @description is prison active
+       * @example true
+       */
+      active: boolean
+      /**
+       * Format: int32
+       * @description minimum number of days notice from the current date to booked a visit
+       * @example 2
+       */
+      policyNoticeDaysMin: number
+      /**
+       * Format: int32
+       * @description maximum number of days notice from the current date to booked a visit
+       * @example 28
+       */
+      policyNoticeDaysMax: number
+      /**
+       * Format: int32
+       * @description Max number of total visitors
+       */
+      maxTotalVisitors: number
+      /**
+       * Format: int32
+       * @description Max number of adults
+       */
+      maxAdultVisitors: number
+      /**
+       * Format: int32
+       * @description Max number of children
+       */
+      maxChildVisitors: number
+      /**
+       * Format: int32
+       * @description Age of adults in years
+       */
+      adultAgeYears: number
+      /**
+       * @description The week day of which the prison week starts on. Enum value, any day of the week MONDAY - SUNDAY
+       * @enum {string}
+       */
+      weekStartDay: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+      /**
+       * Format: int32
+       * @description The limit per prison week, the number of remand visits that can be booked per week
+       */
+      remandVisitLimitPerWeek: number
+      /** @description prison user client */
+      clients: components['schemas']['PrisonUserClientDto'][]
+    }
     /** @description Details to register a visitor to a booker's prisoner. */
     RegisterVisitorForBookerPrisonerDto: {
       /**
@@ -2251,6 +2339,12 @@ export interface components {
        * @example v9-d7-ed-7u
        */
       reference: string
+      /**
+       * Format: date
+       * @description Visit Date
+       * @example 2026-09-21
+       */
+      visitDate: string
       /**
        * Format: HH:mm
        * @description Visit Start time
@@ -4211,6 +4305,16 @@ export interface components {
        */
       adultAgeYears: number
       /**
+       * @description The week day of which the prison week starts on. Enum value, any day of the week MONDAY - SUNDAY
+       * @enum {string}
+       */
+      weekStartDay: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'
+      /**
+       * Format: int32
+       * @description The limit per prison week, the number of remand visits that can be booked per week
+       */
+      remandVisitLimitPerWeek: number
+      /**
        * @description Contact email address of prison
        * @example example@example.com
        */
@@ -4221,20 +4325,6 @@ export interface components {
       webAddress?: string | null
       /** @description prison user client */
       clients: components['schemas']['PrisonUserClientDto'][]
-    }
-    /** @description Prison user client dto */
-    PrisonUserClientDto: {
-      /**
-       * @description User type
-       * @example STAFF
-       * @enum {string}
-       */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
-      /**
-       * @description is prison user client active
-       * @example true
-       */
-      active: boolean
     }
   }
   responses: never
@@ -5375,6 +5465,98 @@ export interface operations {
       }
       /** @description Session template not found on visit-scheduler */
       404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  getPrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison id
+         * @example BHI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description prison returned */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PrisonDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get prison */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  updatePrison: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /**
+         * @description prison id
+         * @example BHI
+         */
+        prisonCode: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VisitSchedulerUpdatePrisonDto']
+      }
+    }
+    responses: {
+      /** @description prison updated */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['VisitSchedulerPrisonDto']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to get prison */
+      403: {
         headers: {
           [name: string]: unknown
         }
@@ -8271,50 +8453,6 @@ export interface operations {
         }
       }
       /** @description Incorrect permissions to get supported prison details */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getPrison: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description prison id
-         * @example BHI
-         */
-        prisonCode: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description prison returned */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          '*/*': components['schemas']['PrisonDto']
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to get prison */
       403: {
         headers: {
           [name: string]: unknown

@@ -74,6 +74,7 @@ describe('Visit utils', () => {
           update: false,
           cancel: false,
           clearNotifications: false,
+          print: false,
           processRequest: true,
         })
       })
@@ -87,6 +88,7 @@ describe('Visit utils', () => {
           update: false,
           cancel: false,
           clearNotifications: false,
+          print: false,
           processRequest: false,
         })
       })
@@ -94,14 +96,16 @@ describe('Visit utils', () => {
 
     describe('BOOKED visit', () => {
       describe('update action', () => {
-        it('should set update to false if visit has started', () => {
+        it('should set update and print to false if visit has started', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T09:00:00') })
           expect(getAvailableVisitActions(params).update).toBe(false)
+          expect(getAvailableVisitActions(params).print).toBe(false)
         })
 
-        it('should set update to true before visit has started', () => {
+        it('should set update and print to true before visit has started', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T08:59:59') })
           expect(getAvailableVisitActions(params).update).toBe(true)
+          expect(getAvailableVisitActions(params).print).toBe(true)
         })
 
         it('should set update to false if before start time but prisoner has been released', () => {
@@ -118,19 +122,22 @@ describe('Visit utils', () => {
       })
 
       describe('cancel action', () => {
-        it('should set cancel to true before visit start time', () => {
+        it('should set cancel and print to true before visit start time', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T08:59:59') })
           expect(getAvailableVisitActions(params).cancel).toBe(true)
+          expect(getAvailableVisitActions(params).print).toBe(true)
         })
 
-        it('should set cancel to true after visit start time, up to CANCELLATION_LIMIT_DAYS (28)', () => {
+        it('should set cancel to true and print to false after visit start time, up to CANCELLATION_LIMIT_DAYS (28)', () => {
           jest.useFakeTimers({ now: new Date('2025-04-29T08:59:59') }) // startTimestamp + 28 days
           expect(getAvailableVisitActions(params).cancel).toBe(true)
+          expect(getAvailableVisitActions(params).print).toBe(false)
         })
 
-        it('should set cancel to false after CANCELLATION_LIMIT_DAYS (28)', () => {
+        it('should set cancel to false and print to false after CANCELLATION_LIMIT_DAYS (28)', () => {
           jest.useFakeTimers({ now: new Date('2025-04-29T09:00:00') }) // startTimestamp + 28 days + 1 second
           expect(getAvailableVisitActions(params).cancel).toBe(false)
+          expect(getAvailableVisitActions(params).print).toBe(false)
         })
       })
 

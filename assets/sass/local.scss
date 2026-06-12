@@ -2,6 +2,11 @@
   min-height: 600px;
 }
 
+// Hide element if JavaScript is not enabled
+body:not(.js-enabled) .no-js-hidden {
+  display: none;
+}
+
 .bapv-secondary-text {
   color: $govuk-secondary-text-colour;
 }

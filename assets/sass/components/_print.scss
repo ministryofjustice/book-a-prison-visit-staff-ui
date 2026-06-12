@@ -1,0 +1,19 @@
+@page {
+  size: A4;
+  margin: 15mm 10mm;
+}
+
+@media print {
+  .govuk-skip-link,
+  .govuk-footer {
+    display: none;
+  }
+
+  .govuk-width-container {
+    max-width: none;
+  }
+
+  .govuk-main-wrapper {
+    padding: 0;
+  }
+}

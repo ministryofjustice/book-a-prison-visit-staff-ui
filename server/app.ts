@@ -32,6 +32,7 @@ import timetableRoutes from './routes/timetable'
 import visitAllowancesRoutes from './routes/visitAllowances'
 import visitRoutes from './routes/visit'
 import visitsByDateRoutes from './routes/visitsByDate/visitsByDate'
+import visitPassesRoutes from './routes/visitPasses'
 import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
@@ -82,6 +83,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/review', reviewRoutes(services))
   app.use('/visit-allowances', visitAllowancesRoutes(services))
   app.use('/visit', visitRoutes(services))
+  app.use('/visit-passes', visitPassesRoutes(services))
   app.use('/visits', visitsByDateRoutes(services))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

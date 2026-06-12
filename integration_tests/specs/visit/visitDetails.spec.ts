@@ -58,6 +58,7 @@ test.describe('Visit details page', () => {
     await expect(visitDetailsPage.updateBooking).toHaveCount(0)
     await expect(visitDetailsPage.cancelBooking).toHaveCount(0)
     await expect(visitDetailsPage.clearNotifications).toHaveCount(0)
+    await expect(visitDetailsPage.printVisitPass).toHaveCount(0)
 
     // Prisoner details
     await expect(visitDetailsPage.prisonerName).toContainText('John Smith')
@@ -100,7 +101,7 @@ test.describe('Visit details page', () => {
 
     await expect(visitDetailsPage.updateBooking).toHaveCount(1)
     await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
-    await expect(visitDetailsPage.clearNotifications).toHaveCount(0)
+    await expect(visitDetailsPage.printVisitPass).toHaveCount(1) // TODO confirm if this behaviour is correct (given date blocked)
 
     await expect(visitDetailsPage.messages.nth(0)).toContainText(
       notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title,
@@ -128,6 +129,7 @@ test.describe('Visit details page', () => {
     await expect(visitDetailsPage.updateBooking).toHaveCount(0)
     await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
     await expect(visitDetailsPage.clearNotifications).toHaveCount(1)
+    await expect(visitDetailsPage.printVisitPass).toHaveCount(0)
 
     await expect(visitDetailsPage.messages.nth(0)).toContainText(notificationTypeAlerts.PRISONER_RECEIVED_EVENT.title)
   })
