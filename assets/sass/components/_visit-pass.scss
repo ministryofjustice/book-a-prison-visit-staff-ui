@@ -90,7 +90,7 @@
   &::after {
     content: "";
     display: inline-block;
-    border-bottom: 2px solid govuk-colour("black");
+    border-bottom: 1px solid govuk-colour("black");
     margin-bottom: -0.5rem;
     margin-left: 1.5rem;
     width: 40%;
@@ -107,7 +107,35 @@ p.visit-pass__created-date {
     border: none;
     break-after: page;
     margin: 0;
-    padding: 0;
+    padding: 2mm 3mm;
     width: unset;
+  }
+
+  .visit-pass__header {
+    margin-bottom: 5mm;
+  }
+
+  .visit-pass__info {
+    margin-bottom: -1mm !important;
+  }
+
+  .visit-pass .govuk-heading-l {
+    font-size: 22px;
+  }
+
+  .visit-pass .govuk-heading-m {
+    font-size: 18px;
+    margin-bottom: 2mm;
+    padding-top: 3mm !important;
+  }
+
+  .visit-pass .govuk-body,
+  .visit-pass .govuk-list {
+    font-size: 14px;
+    margin-bottom: 4mm;
+  }
+
+  .visit-pass .govuk-body-s {
+    font-size: 12px;
   }
 }
