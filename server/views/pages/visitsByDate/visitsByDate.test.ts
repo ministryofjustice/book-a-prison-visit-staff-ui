@@ -128,7 +128,7 @@ describe('Views - Visits by date', () => {
 
     expect($('[data-test=visit-room-caption]').text()).toBe('Visits hall')
     expect($('h2').text()).toBe('Friday 2 February 2024')
-    expect($('[data-test="print-visit-passes"]').attr('href')).toBe('/visit-passes?date=2024-02-02')
+    expect($('[data-test="print-visit-passes"]').attr('href')).toBe('/visit-passes?date=2024-02-02&back-link-query')
     expect($('h3').text()).toBe('Visits from 10am to 11am')
     expect($('[data-test=visit-section-heading-closed]').text().trim()).toBe('Closed visits')
     expect($('[data-test=visit-tables-booked-closed]').text().trim()).toBe('0 of 5 tables reserved')

@@ -177,7 +177,7 @@
   {{ govukButton({
     text: "Print visit passes",
     classes: "govuk-button--secondary",
-    href: "/visit-passes?date=" + selectedDateString,
+    href: "/visit-passes?date=" + selectedDateString + "&" + queryParamsForBackLink,
     preventDoubleClick: true,
     attributes: { "data-test": "print-visit-passes" }
   }) }}

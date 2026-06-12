@@ -34,7 +34,7 @@
 
 {% block beforeContent %}
   {% if backLinkHref %}
-    <div role="navigation">
+    <div role="navigation" class="govuk-!-display-none-print">
       {{ govukBackLink({
         text: "Back",
         href: backLinkHref

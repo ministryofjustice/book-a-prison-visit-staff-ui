@@ -398,7 +398,7 @@ describe('Visit details page', () => {
             expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
 
             expect($('[data-test=print-visit-pass]').text().trim()).toBe('Print visit pass')
-            expect($('[data-test=print-visit-pass]').attr('href')).toBe('/visit/ab-cd-ef-gh/visit-pass')
+            expect($('[data-test=print-visit-pass]').attr('href')).toBe('/visit/ab-cd-ef-gh/visit-pass?from=visit')
           })
       })
 

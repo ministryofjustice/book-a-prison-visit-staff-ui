@@ -103,7 +103,9 @@ describe('GET /visits - Visits by date page', () => {
 
           // Print visit passes
           expect($('h2').text()).toBe('Thursday 1 February 2024')
-          expect($('[data-test=print-visit-passes]').attr('href')).toBe('/visit-passes?date=2024-02-01')
+          expect($('[data-test=print-visit-passes]').attr('href')).toBe(
+            '/visit-passes?date=2024-02-01&query=sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
+          )
 
           // side-nav
           expect($('.moj-side-navigation h4').eq(0).text()).toBe('Visits hall')
