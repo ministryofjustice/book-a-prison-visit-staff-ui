@@ -25,9 +25,9 @@ describe('visitPassBuilder', () => {
         date: 'Monday 1 June 2026',
         time: '10am to 11am',
         prisonerName: 'John Smith',
-        prisonerNumber: 'A1234BC',
+        prisonNumber: 'A1234BC',
         reference: 'ab-cd-ef-gh',
-        visitRestriction: 'Open',
+        type: 'Open',
         adults: [
           {
             name: 'Jeanette Smith',

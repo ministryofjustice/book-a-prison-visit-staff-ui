@@ -73,9 +73,9 @@ describe('Print visit pass by visit reference', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Page header
-          expect($('title').text()).toMatch(/^Print visit passes -/)
+          expect($('title').text()).toMatch(/^Print visit pass -/)
           expect($('.govuk-back-link').length).toBe(0)
-          expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
+          expect($('h1').eq(0).text().trim()).toBe('Print visit pass')
 
           // TODO extend test assertions
         })

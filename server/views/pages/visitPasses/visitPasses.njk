@@ -1,25 +1,129 @@
 {% extends "layout.njk" %}
 {% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
 
-{% set pageHeaderTitle = "Print visit passes" %}
+{% set pageHeaderTitle = "Print visit " + ("pass" if singlePass else "passes") %}
 
 {% block content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+  {{ mojPageHeaderActions({
+    classes: "govuk-!-display-none-print govuk-!-margin-right-9",
+    heading: {
+      text: pageHeaderTitle
+    },
+    items: [{
+      id: "print-all",
+      classes: "no-js-hidden",
+      text: "Print all"
+    }]
+  }) }}
 
-      {{ mojPageHeaderActions({
-        heading: {
-          text: pageHeaderTitle
-        },
-        items: [{
-          id: "print-all",
-          classes: "no-js-hidden",
-          text: "Print all"
-        }]
-      }) }}
+  {# Visit passes #}
+  {% if visitPasses | length %}
+    <p class="govuk-!-display-none-print">Print visit passes to give to visitors when they arrive.</p>
 
-    </div>
-  </div>
+    {% for visitPass in visitPasses %}
+      {% set visitPassIndex = loop.index %}
+
+      {# Visit pass - header #}
+      <section class="visit-pass">
+        <header class="visit-pass__header">
+          <img src="/assets/images/hmpps_logo.svg" alt="HM Prison & Probation Service logo">
+          <h1 class="govuk-heading-l">{{ prisonName }}</h1>
+        </header>
+
+        {# Visit pass - visit info #}
+        <h2 class="govuk-heading-l">Visit information</h2>
+        <dl class="visit-pass__info">
+          <dt>Date</dt>
+          <dd data-test="visit-{{ loop.index }}-date">{{ visitPass.date }}</dd>
+
+          <dt>Time</dt>
+          <dd data-test="visit-{{ loop.index }}-time">{{ visitPass.time }}</dd>
+
+          <dt>Prisoner name</dt>
+          <dd data-test="visit-{{ loop.index }}-prisoner-name">{{ visitPass.prisonerName }}</dd>
+
+          <dt>Prison number</dt>
+          <dd data-test="visit-{{ loop.index }}-prison-number">{{ visitPass.prisonNumber }}</dd>
+
+          <dt>Visit reference</dt>
+          <dd data-test="visit-{{ loop.index }}-reference">{{ visitPass.reference }}</dd>
+
+          <dt>Visit type</dt>
+          <dd data-test="visit-{{ loop.index }}-visit-type">{{ visitPass.type }}</dd>
+        </dl>
+
+        <div class="visit-pass__visitors-container{{ "--with-children" if (visitPass.children | length) }}">
+          {# Visit pass - visitors (over 16s) #}
+          <div class="visit-pass__visitors">
+            <h2 class="govuk-heading-l">Visitors</h2>
+            <ul class="govuk-list govuk-list--bullet">
+              {% for visitor in visitPass.adults %}
+                <li data-test="visit-{{ visitPassIndex }}-visitor-{{ loop.index }}">
+                  {{- visitor.name -}}
+                  <br>
+                  {{- visitor.address -}}
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          {# Visit pass - visitors (under 16s) #}
+          {% if visitPass.children | length %}
+            <div class="visit-pass__child-visitors">
+              <h2 class="govuk-heading-l">Under 16s</h2>
+              <ul class="govuk-list govuk-list--bullet">
+                {% for visitor in visitPass.children %}
+                  <li data-test="visit-{{ visitPassIndex }}-child-visitor-{{ loop.index }}">
+                    {{- visitor.name -}}
+                    <br>
+                    Date of birth {{ visitor.dateOfBirth | formatDate("d/M/yyyy") }} ({{ visitor.dateOfBirth | displayAge -}})
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        {# Visit pass - declaration #}
+        <h2 class="govuk-heading-l">Visitor declaration</h2>
+        <p>
+          No unauthorised article may be taken into or from prison or
+          supplied to a prisoner from a visitor. Unauthorised articles
+          may be confiscated; the visitor may be prosecuted, and may on
+          conviction by imprisoned or fined. The prisoner may face a
+          disciplinary charge. Any article brought, with permission,
+          for a prisoner should be handed to the officer supervising
+          visits. Any person entering or leaving a prison may be
+          stopped, searched and photographed. They may also be required
+          to provide a personal biometric (i.e. electronic fingerprint)
+          or submit to another physical measurement.
+        </p>
+
+        <p>
+          The Governor may refuse entry to or direct the removal from a
+          prison of any person who does not leave on being required to do so.
+        </p>
+
+        <p class="visit-pass__visitor-signature">Visitor signature:</p>
+
+        {# Visit pass - staff checks #}
+        <h2 class="govuk-heading-l">Staff checks</h2>
+        <p class="visit-pass__staff-checks">
+          <span>Initials of staff member:</span>
+          <span>Time of checks:</span>
+        </p>
+
+        {# Visit pass - created date/time #}
+        <p class="visit-pass__created-date">
+          Visit pass created:
+          <span data-test="visit-pass-created-date"> {{ createdDate }}</span>
+        </p>
+      </section>
+    {% endfor %}
+
+  {% else %}
+    <p data-test="no-visit-passes">There are no visit passes to print for this date.</p>
+  {% endif %}
 {% endblock %}
 
 {% block pageScripts %}

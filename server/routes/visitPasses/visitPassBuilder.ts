@@ -6,9 +6,9 @@ export type VisitPass = {
   date: string
   time: string
   prisonerName: string
-  prisonerNumber: string
+  prisonNumber: string
   reference: string
-  visitRestriction: string
+  type: string
   adults: { name: string; address: string }[]
   children: { name: string; dateOfBirth: string }[]
 }
@@ -18,7 +18,7 @@ const CHILD_VISITOR_AGE_THRESHOLD = 16
 export const buildVisitPass = (visitPass: VisitPassDto): VisitPass => {
   const date = format(parseISO(visitPass.visitDate), 'EEEE d MMMM yyyy')
 
-  const visitRestriction = properCase(visitPass.visitRestriction)
+  const type = properCase(visitPass.visitRestriction)
 
   const { adultVisitors, childVisitors } = splitAdultAndChildVisitors(visitPass.visitors)
   const adults = adultVisitors.map(visitor => ({
@@ -34,9 +34,9 @@ export const buildVisitPass = (visitPass: VisitPassDto): VisitPass => {
     date,
     time: formatStartToEndTime(visitPass.startTime, visitPass.endTime),
     prisonerName: properCaseFullName(`${visitPass.prisonerFirstName} ${visitPass.prisonerLastName}`),
-    prisonerNumber: visitPass.prisonerId,
+    prisonNumber: visitPass.prisonerId,
     reference: visitPass.reference,
-    visitRestriction,
+    type,
     adults,
     children,
   }
