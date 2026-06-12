@@ -49,9 +49,9 @@ const splitAdultAndChildVisitors = (
 
   return visitors.reduce(
     (acc, visitor) => {
-      const dob = new Date(visitor.dateOfBirth)
+      const dob = visitor.dateOfBirth ? parseISO(visitor.dateOfBirth) : null
 
-      if (Number.isNaN(dob.getTime()) || differenceInYears(now, dob) >= CHILD_VISITOR_AGE_THRESHOLD) {
+      if (!dob || Number.isNaN(dob.getTime()) || differenceInYears(now, dob) >= CHILD_VISITOR_AGE_THRESHOLD) {
         acc.adultVisitors.push(visitor)
       } else {
         acc.childVisitors.push(visitor)
