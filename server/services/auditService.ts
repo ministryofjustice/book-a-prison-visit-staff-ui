@@ -212,28 +212,6 @@ export default class AuditService {
     })
   }
 
-  async printedVisitList({
-    viewDate,
-    prisonId,
-    username,
-    operationId,
-  }: {
-    viewDate: string
-    prisonId: string
-    username: string
-    operationId: string
-  }) {
-    return this.sendAuditMessage({
-      action: 'PRINTED_VISIT_LIST',
-      who: username,
-      operationId,
-      details: {
-        viewDate,
-        prisonId,
-      },
-    })
-  }
-
   async overrodeZeroVO({
     prisonerId,
     username,

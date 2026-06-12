@@ -219,30 +219,6 @@ describe('Audit service', () => {
     })
   })
 
-  it('sends a visit list printed audit message', async () => {
-    await auditService.printedVisitList({
-      viewDate: '2022-06-01T12:12:12',
-      prisonId,
-      username: 'username',
-      operationId: 'operation-id',
-    })
-
-    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
-    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
-      input: {
-        MessageBody: JSON.stringify({
-          what: 'PRINTED_VISIT_LIST',
-          when: fakeDate,
-          operationId: 'operation-id',
-          who: 'username',
-          service: 'book-a-prison-visit-staff-ui',
-          details: '{"viewDate":"2022-06-01T12:12:12","prisonId":"HEI"}',
-        }),
-        QueueUrl,
-      },
-    })
-  })
-
   it('sends a zero VO overridden audit message', async () => {
     await auditService.overrodeZeroVO({ prisonerId: 'A1234BC', username: 'username', operationId: 'operation-id' })
 
