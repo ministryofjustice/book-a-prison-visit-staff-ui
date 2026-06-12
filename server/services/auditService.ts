@@ -499,6 +499,46 @@ export default class AuditService {
     })
   }
 
+  async printedVisitPass({
+    visitReference,
+    prisonerId,
+    prisonId,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    prisonerId: string
+    prisonId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'PRINTED_VISIT_PASS',
+      who: username,
+      operationId,
+      details: { visitReference, prisonerId, prisonId },
+    })
+  }
+
+  async printedVisitPasses({
+    date,
+    prisonId,
+    username,
+    operationId,
+  }: {
+    date: string
+    prisonId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'PRINTED_VISIT_PASSES',
+      who: username,
+      operationId,
+      details: { date, prisonId },
+    })
+  }
+
   private async sendAuditMessage({
     action,
     who,

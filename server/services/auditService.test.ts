@@ -551,4 +551,53 @@ describe('Audit service', () => {
       },
     })
   })
+
+  it('sends a printed visit pass audit message', async () => {
+    await auditService.printedVisitPass({
+      visitReference: 'ab-cd-ef-gh',
+      prisonerId: 'A1234BC',
+      prisonId: 'HEI',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'PRINTED_VISIT_PASS',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh","prisonerId":"A1234BC","prisonId":"HEI"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a printed visit passes audit message', async () => {
+    await auditService.printedVisitPasses({
+      date: '2024-06-01',
+      prisonId: 'HEI',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'PRINTED_VISIT_PASSES',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"date":"2024-06-01","prisonId":"HEI"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
 })
