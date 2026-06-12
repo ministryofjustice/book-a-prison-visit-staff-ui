@@ -12,8 +12,9 @@
     items: [{
       id: "print-all",
       classes: "no-js-hidden",
-      text: "Print all"
-    }]
+      text: "Print all",
+      attributes: { "data-test": "print-all" }
+    }] if visitPasses | length else []
   }) }}
 
   {# Visit passes #}
@@ -128,7 +129,7 @@
 
 {% block pageScripts %}
   <script nonce="{{ cspNonce }}">
-    document.getElementById('print-all').addEventListener('click', () => {
+    document.getElementById('print-all')?.addEventListener('click', () => {
       window.print()
     })
   </script>

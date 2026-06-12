@@ -45,8 +45,25 @@ describe('Print visit passes by date', () => {
           expect($('title').text()).toMatch(/^Print visit passes -/)
           expect($('.govuk-back-link').attr('href')).toBe(`/visits?back-link-query`)
           expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
+          expect($('[data-test="print-all"]').length).toBe(1)
 
           // TODO extend test assertions
+
+          expect($('[data-test="no-visit-passes"]').length).toBe(0)
+        })
+    })
+
+    it('should show message and no print button if no passes to print', () => {
+      visitService.getVisitPasses.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
+          expect($('[data-test="print-all"]').length).toBe(0)
+          expect($('[data-test="no-visit-passes"]').length).toBe(1)
         })
     })
   })
@@ -76,8 +93,11 @@ describe('Print visit pass by visit reference', () => {
           expect($('title').text()).toMatch(/^Print visit pass -/)
           expect($('.govuk-back-link').attr('href')).toBe(`/visit/${reference}`)
           expect($('h1').eq(0).text().trim()).toBe('Print visit pass')
+          expect($('[data-test="print-all"]').length).toBe(1)
 
           // TODO extend test assertions
+
+          expect($('[data-test="no-visit-passes"]').length).toBe(0)
         })
     })
   })
