@@ -832,12 +832,12 @@ export default {
     prisonId = 'HEI',
     date,
     username = 'USER1',
-    visitPasses = [TestData.visitPassDto()],
+    visitPassDtos = [TestData.visitPassDto()],
   }: {
     prisonId?: string
     date: string
     username?: string
-    visitPasses?: VisitPassDto[]
+    visitPassDtos?: VisitPassDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -855,7 +855,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitPasses,
+        jsonBody: visitPassDtos,
       },
     })
   },
@@ -864,12 +864,12 @@ export default {
     prisonId = 'HEI',
     reference = TestData.visitPassDto().reference,
     username = 'USER1',
-    visitPass = TestData.visitPassDto(),
+    visitPassDto = TestData.visitPassDto(),
   }: {
     prisonId?: string
     reference?: string
     username?: string
-    visitPass?: VisitPassDto
+    visitPassDto?: VisitPassDto
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -886,7 +886,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: visitPass,
+        jsonBody: visitPassDto,
       },
     })
   },
