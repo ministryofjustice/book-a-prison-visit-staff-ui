@@ -5,7 +5,7 @@
 
 {% block content %}
   {{ mojPageHeaderActions({
-    classes: "govuk-!-display-none-print govuk-!-margin-right-9",
+    classes: "govuk-!-display-none-print govuk-!-width-three-quarters",
     heading: {
       text: pageHeaderTitle
     },
@@ -31,8 +31,8 @@
         </header>
 
         {# Visit pass - visit info #}
-        <h2 class="govuk-heading-l">Visit information</h2>
-        <dl class="visit-pass__info">
+        <h2 class="govuk-heading-m">Visit information</h2>
+        <dl class="govuk-body visit-pass__info">
           <dt>Date</dt>
           <dd data-test="visit-{{ loop.index }}-date">{{ visitPass.date }}</dd>
 
@@ -55,7 +55,7 @@
         <div class="visit-pass__visitors-container{{ "--with-children" if (visitPass.children | length) }}">
           {# Visit pass - visitors (over 16s) #}
           <div class="visit-pass__visitors">
-            <h2 class="govuk-heading-l">Visitors</h2>
+            <h2 class="govuk-heading-m">Visitors</h2>
             <ul class="govuk-list govuk-list--bullet">
               {% for visitor in visitPass.adults %}
                 <li data-test="visit-{{ visitPassIndex }}-visitor-{{ loop.index }}">
@@ -70,7 +70,7 @@
           {# Visit pass - visitors (under 16s) #}
           {% if visitPass.children | length %}
             <div class="visit-pass__child-visitors">
-              <h2 class="govuk-heading-l">Under 16s</h2>
+              <h2 class="govuk-heading-m">Under 16s</h2>
               <ul class="govuk-list govuk-list--bullet">
                 {% for visitor in visitPass.children %}
                   <li data-test="visit-{{ visitPassIndex }}-child-visitor-{{ loop.index }}">
@@ -85,7 +85,7 @@
         </div>
 
         {# Visit pass - declaration #}
-        <h2 class="govuk-heading-l">Visitor declaration</h2>
+        <h2 class="govuk-heading-m">Visitor declaration</h2>
         <p>
           No unauthorised article may be taken into or from prison or
           supplied to a prisoner from a visitor. Unauthorised articles
@@ -107,14 +107,14 @@
         <p class="visit-pass__visitor-signature">Visitor signature:</p>
 
         {# Visit pass - staff checks #}
-        <h2 class="govuk-heading-l">Staff checks</h2>
+        <h2 class="govuk-heading-m">Staff checks</h2>
         <p class="visit-pass__staff-checks">
           <span>Initials of staff member:</span>
           <span>Time of checks:</span>
         </p>
 
         {# Visit pass - created date/time #}
-        <p class="visit-pass__created-date">
+        <p class="govuk-body-s visit-pass__created-date">
           Visit pass created:
           <span data-test="visit-pass-created-date"> {{ createdDate }}</span>
         </p>

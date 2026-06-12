@@ -1,14 +1,12 @@
 .visit-pass {
   border: 1px solid govuk-functional-colour("border");
-  margin: 0 govuk-spacing(3) govuk-spacing(9);
-  padding: govuk-spacing(3) govuk-spacing(4);
+  margin: 0 govuk-spacing(6) govuk-spacing(9);
+  padding: govuk-spacing(3) govuk-spacing(6);
+  width: 66%;
 
-  &, .govuk-list, p {
-    @include govuk-font($size: 24);
-  }
-
-  .govuk-heading-l {
-    margin-bottom: govuk-spacing(4);
+  .govuk-heading-m {
+    margin-bottom: govuk-spacing(3);
+    padding-top: govuk-spacing(5);
   }
 }
 
@@ -26,7 +24,7 @@
 }
 
 .visit-pass__header {
-  margin-bottom: govuk-spacing(4);
+  margin-bottom: govuk-spacing(2);
   position: relative;
 
   // need to constrain height of SVG to that of the h1
@@ -41,13 +39,15 @@
 }
 
 .visit-pass__info {
+  margin-bottom: govuk-spacing(-3);
+
   dt {
     font-weight: $govuk-font-weight-bold;
   }
 
   dd {
     margin-left: 0;
-    margin-bottom: govuk-spacing(4);
+    margin-bottom: govuk-spacing(3);
   }
 
   // distribute dt/dd pairs to left/right columns on grid
@@ -70,13 +70,23 @@
 
 .visit-pass__visitors,
 .visit-pass__child-visitors {
+  ul {
+    margin-bottom: 0;
+  }
+
   li {
-    margin-bottom: govuk-spacing(4);
+    margin-bottom: govuk-spacing(3);
+  }
+
+  li:last-child {
+    margin-bottom: 0;
   }
 }
 
 .visit-pass__visitor-signature,
 .visit-pass__staff-checks span {
+  margin-bottom: govuk-spacing(2);
+
   &::after {
     content: "";
     display: inline-block;
@@ -88,8 +98,7 @@
 }
 
 p.visit-pass__created-date {
-  @include govuk-font($size: 19);
-  margin-top: govuk-spacing(9);
+  margin-top: govuk-spacing(6);
 }
 
 
@@ -99,5 +108,6 @@ p.visit-pass__created-date {
     break-after: page;
     margin: 0;
     padding: 0;
+    width: unset;
   }
 }
