@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express'
+import { RequestHandler, Request } from 'express'
 import { format } from 'date-fns'
 import { AuditService, VisitService } from '../../services'
 import { getParsedDateFromQueryString } from '../../utils/utils'
@@ -24,6 +24,7 @@ export default class VisitPassesController {
       // TODO send audit event
 
       res.render('pages/visitPasses/visitPasses', {
+        backLinkHref: this.getBacklinkHref(req.query),
         prisonName,
         singlePass: false,
         visitPasses,
@@ -45,6 +46,7 @@ export default class VisitPassesController {
       // TODO send audit event
 
       res.render('pages/visitPasses/visitPasses', {
+        backLinkHref: this.getBacklinkHref(req.query, reference),
         prisonName,
         singlePass: true,
         visitPasses: [visitPass],
@@ -55,5 +57,18 @@ export default class VisitPassesController {
 
   private getCreatedDate(): string {
     return format(new Date(), "EEEE d MMMM yyyy 'at' h:mmaaa")
+  }
+
+  private getBacklinkHref({ from, query }: Request['query'], reference?: string): string {
+    switch (from) {
+      case 'visit':
+        return `/visit/${reference}`
+
+      case 'visits':
+        return `/visits?${query}`
+
+      default:
+        return '/'
+    }
   }
 }

@@ -114,7 +114,7 @@
           {{ govukButton({
             text: "Print visit pass",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
-            href: "/visit/" + visitDetails.reference + "/visit-pass",
+            href: "/visit/" + visitDetails.reference + "/visit-pass?from=visit",
             attributes: { "data-test": "print-visit-pass" },
             preventDoubleClick: true
           }) if features.printVisitPasses and availableVisitActions.print }}
