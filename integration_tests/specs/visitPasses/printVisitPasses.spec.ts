@@ -23,12 +23,32 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('Print visit passes by date (via visits by date page)', () => {
+  const visitPasses = [
+    TestData.visitPassDto({
+      visitors: [
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'One' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Two' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Three' }),
+      ],
+    }),
+    TestData.visitPassDto({
+      visitors: [
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'One' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Two' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Three' }),
+
+        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'One', dateOfBirth: '2020-01-01' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'Two', dateOfBirth: '2026-02-01' }),
+        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'Three', dateOfBirth: '2026-06-01' }),
+      ],
+    }),
+  ]
+
   test('should navigate to print visit passes page and trigger print dialog', async ({ page }) => {
     await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({ prisonId, sessionDate: todayShortFormat, visits: [] })
     await orchestrationApi.stubIsBlockedDate({ prisonId, excludeDate: todayShortFormat, excludeDates: [] })
-
-    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat })
+    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPasses })
 
     // Navigate to Visits by date page
     const homePage = await HomePage.verifyOnPage(page)
@@ -37,7 +57,7 @@ test.describe('Print visit passes by date (via visits by date page)', () => {
 
     // Click 'Print visit passes' button
     await visitsByDatePage.printVisitPasses.click()
-    const visitPassesPage = await VisitPassesPage.verifyOnPage(page)
+    const visitPassesPage = await VisitPassesPage.verifyOnPage(page, 'Print visit passes')
 
     // Visit passes page
     // TODO extend to check pass contents
@@ -60,11 +80,11 @@ test.describe('Print single visit pass by reference (via visit booking details p
 
     // Navigate to Visit booking details by date page
     await page.goto(`/visit/${visitDetails.reference}`)
-    const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'booking')
+    const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'Visit booking details')
 
     // Click 'Print visit passes' button
     await visitDetailsPage.printVisitPass.click()
-    const visitPassesPage = await VisitPassesPage.verifyOnPage(page)
+    const visitPassesPage = await VisitPassesPage.verifyOnPage(page, 'Print visit pass')
 
     // Visit passes page
     // TODO extend to check pass contents

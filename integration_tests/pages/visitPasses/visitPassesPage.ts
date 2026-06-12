@@ -4,8 +4,8 @@ import AbstractPage from '../abstractPage'
 export default class VisitPassesPage extends AbstractPage {
   readonly printAll: Locator
 
-  constructor(page: Page) {
-    super(page, 'Print visit passes')
+  constructor(page: Page, title: string) {
+    super(page, title)
 
     this.printAll = page.getByRole('button', { name: 'Print all' })
   }
