@@ -110,6 +110,7 @@ describe('Views - Visits by date', () => {
       sessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,
+      showPrintPassesButton: true,
       visits,
 
       features: { printVisitPasses: true },
@@ -158,6 +159,7 @@ describe('Views - Visits by date', () => {
       sessionsSideNav,
       queryParamsForBackLink,
       visits,
+      showPrintPassesButton: true,
 
       features: { printVisitPasses: false },
     }

@@ -13,8 +13,7 @@ export default function setUpStaticResources(): Router {
   // Rewrite /favicon.ico requests to the GOV.UK asset path otherwise they get an auth redirect and end up as 404s
   // (Safari, for example, requests /favicon.ico even though a different path is specified in the HTML head)
   router.get('/favicon.ico', (req, _res, next) => {
-    // TODO remove 'rebrand' from path when upgrading to govuk-frontend v6
-    req.url = '/assets/rebrand/images/favicon.ico'
+    req.url = '/assets/images/favicon.ico'
     next()
   })
 

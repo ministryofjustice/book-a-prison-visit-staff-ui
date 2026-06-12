@@ -1,4 +1,4 @@
-import { isFuture } from 'date-fns'
+import { isFuture, isToday } from 'date-fns'
 import { GOVUKInsetText, MoJAlert, TextOrHtml } from '../../@types/bapv'
 import config from '../../config'
 import { notificationTypeAlerts } from '../../constants/notifications'
@@ -62,8 +62,12 @@ export const getAvailableVisitActions = ({
     notification => notification.type === 'PRISONER_RECEIVED_EVENT' || notification.type === 'PRISONER_RELEASED_EVENT',
   )
 
-  if (!hasUpdateBlockingNotifications && isFuture(new Date(startTimestamp))) {
+  if (!hasUpdateBlockingNotifications && isFuture(visitStartTime)) {
     availableVisitActions.update = true
+  }
+
+  // print
+  if (!notifications.length && (isToday(visitStartTime) || isFuture(visitStartTime))) {
     availableVisitActions.print = true
   }
 

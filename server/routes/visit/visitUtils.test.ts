@@ -16,6 +16,7 @@ import {
 
 beforeEach(() => {
   jest.restoreAllMocks()
+  jest.useRealTimers()
 })
 
 describe('Visit utils', () => {
@@ -62,10 +63,6 @@ describe('Visit utils', () => {
       params = { visitStatus: 'BOOKED', visitSubStatus: 'AUTO_APPROVED', startTimestamp, notifications: [] }
     })
 
-    afterAll(() => {
-      jest.useRealTimers()
-    })
-
     describe('REQUESTED visit', () => {
       it('should enable only "processRequest" action if visit REQUESTED', () => {
         params.visitSubStatus = 'REQUESTED'
@@ -96,10 +93,10 @@ describe('Visit utils', () => {
 
     describe('BOOKED visit', () => {
       describe('update action', () => {
-        it('should set update and print to false if visit has started', () => {
+        it('should set update to false and print to true if visit has started', () => {
           jest.useFakeTimers({ now: new Date('2025-04-01T09:00:00') })
           expect(getAvailableVisitActions(params).update).toBe(false)
-          expect(getAvailableVisitActions(params).print).toBe(false)
+          expect(getAvailableVisitActions(params).print).toBe(true)
         })
 
         it('should set update and print to true before visit has started', () => {
@@ -165,6 +162,11 @@ describe('Visit utils', () => {
             { type: 'VISITOR_UNAPPROVED_EVENT' },
           ] as VisitBookingDetails['notifications']
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
+
+        it('should set print to false if a visit notification is set', () => {
+          params.notifications = [{ type: 'NON_ASSOCIATION_EVENT' }] as VisitBookingDetails['notifications']
+          expect(getAvailableVisitActions(params).print).toBe(false)
         })
       })
     })
@@ -608,7 +610,6 @@ describe('Visit utils', () => {
 
       const results = getHideAlertsInset({ skipAlertsAndRestrictionReason: 'VISIT_IN_PAST', prisonerNumber })
       expect(results).toStrictEqual(expected)
-      jest.useRealTimers()
     })
 
     it('should return released prisoner message if skipAlertsAndRestrictionReason is PRISONER_RELEASED', () => {
@@ -631,7 +632,6 @@ describe('Visit utils', () => {
         skipAlertsAndRestrictionReason: 'PRISONER_TRANSFERRED',
       })
       expect(results).toStrictEqual(expected)
-      jest.useRealTimers()
     })
 
     it('should return null if skipAlertsAndRestrictionReason is null', () => {

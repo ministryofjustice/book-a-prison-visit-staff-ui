@@ -169,18 +169,18 @@
   </div>
 
   {% if features.printVisitPasses %}
-  <h2 class="govuk-heading-m govuk-!-padding-top-0">
+  <h2 class="govuk-heading-m govuk-!-padding-top-0 {{ "govuk-!-margin-bottom-6" if not showPrintPassesButton }}">
     {{- selectedDateString | formatDate("EEEE d MMMM yyyy") -}}
   </h2>
 
   {# Print visit passes #}
   {{ govukButton({
     text: "Print visit passes",
-    classes: "govuk-button--secondary",
+    classes: "govuk-button--secondary govuk-!-margin-top-2",
     href: "/visit-passes?date=" + selectedDateString + "&" + queryParamsForBackLink,
     preventDoubleClick: true,
     attributes: { "data-test": "print-visit-passes" }
-  }) }}
+  }) if showPrintPassesButton }}
   {% endif %}
 
   <div class="govuk-grid-row">
