@@ -80,7 +80,10 @@
     </div>
 
     {# Visit actions #}
-    {% if availableVisitActions.update or availableVisitActions.cancel or availableVisitActions.clearNotifications %}
+    {% if availableVisitActions.update
+      or availableVisitActions.cancel
+      or availableVisitActions.clearNotifications
+      or availableVisitActions.print %}
       <div class="govuk-button-group" data-test="visit-actions">
         <form action="/visit/{{ visitDetails.reference }}/update" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -107,6 +110,14 @@
             attributes: { "data-test": "clear-notifications" },
             preventDoubleClick: true
           }) if availableVisitActions.clearNotifications }}
+
+          {{ govukButton({
+            text: "Print visit pass",
+            classes: "govuk-!-margin-top-5 govuk-button--secondary",
+            href: "/visit/" + visitDetails.reference + "/visit-pass",
+            attributes: { "data-test": "print-visit-pass" },
+            preventDoubleClick: true
+          }) if features.printVisitPasses and availableVisitActions.print }}
 
         </form>
       </div>

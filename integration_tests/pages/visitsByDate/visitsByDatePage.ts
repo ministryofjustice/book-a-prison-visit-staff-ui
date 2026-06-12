@@ -17,6 +17,8 @@ export default class VisitsByDatePage extends AbstractPage {
 
   readonly activeSessionNavLink: Locator
 
+  readonly printVisitPasses: Locator
+
   readonly visitSessionHeading: Locator
 
   readonly noResultsMessage: Locator
@@ -32,6 +34,9 @@ export default class VisitsByDatePage extends AbstractPage {
     // tabs
     this.dateTabsToday = page.locator(':nth-child(1) > .moj-sub-navigation__link')
     this.dateTabsTomorrow = page.locator(':nth-child(2) > .moj-sub-navigation__link')
+
+    // Print visit passes
+    this.printVisitPasses = page.getByRole('button', { name: 'Print visit passes' })
 
     // session navigation
     this.activeSessionNavLink = page.locator('.moj-side-navigation__item--active > a')

@@ -22,6 +22,7 @@ import {
   SessionCapacity,
   SessionSchedule,
   SocialContactsDto,
+  StaffUsernameDto,
   Visit,
   VisitBookingDetailsRaw,
   VisitNotificationsRaw,
@@ -29,6 +30,7 @@ import {
   VisitorInfoDto,
   VisitorRequestForReviewDto,
   VisitPassDto,
+  VisitPassRequestDto,
   VisitPreview,
   VisitRequestResponse,
   VisitRequestSummary,
@@ -829,22 +831,22 @@ export default {
   stubGetVisitPasses: ({
     prisonId = 'HEI',
     date,
-    username,
-    visitPasses = [TestData.visitPass()],
+    username = 'USER1',
+    visitPasses = [TestData.visitPassDto()],
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
-    visitPasses: VisitPassDto[]
+    username?: string
+    visitPasses?: VisitPassDto[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'POST',
-        url: `/orchestration/visit-passes/${prisonId}`,
+        url: `/orchestration/prison/${prisonId}/visit-passes`,
         bodyPatterns: [
           {
-            equalToJson: {
-              visitDate: date,
+            equalToJson: <VisitPassRequestDto>{
+              date,
               actionedBy: username,
             },
           },
@@ -854,6 +856,37 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: visitPasses,
+      },
+    })
+  },
+
+  stubGetVisitPass: ({
+    prisonId = 'HEI',
+    reference = TestData.visitPassDto().reference,
+    username = 'USER1',
+    visitPass = TestData.visitPassDto(),
+  }: {
+    prisonId?: string
+    reference?: string
+    username?: string
+    visitPass?: VisitPassDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'POST',
+        url: `/orchestration/prison/${prisonId}/visit-passes/visit/${reference}`,
+        bodyPatterns: [
+          {
+            equalToJson: <StaffUsernameDto>{
+              username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: visitPass,
       },
     })
   },

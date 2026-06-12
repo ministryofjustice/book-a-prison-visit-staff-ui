@@ -10,6 +10,7 @@ import { MojTimelineItem } from './visitEventsTimelineBuilder'
 import { AvailableVisitActions } from './visitUtils'
 import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
 import config from '../../config'
+import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 
@@ -59,7 +60,15 @@ describe('Visit details page', () => {
   ]
 
   beforeEach(() => {
-    availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: false }
+    setFeature('printVisitPasses', true)
+
+    availableVisitActions = {
+      update: false,
+      cancel: false,
+      clearNotifications: false,
+      print: false,
+      processRequest: false,
+    }
     visitAlerts = []
     idsToFlag = jest.fn().mockReturnValue([])
     hideAlertsInset = null
@@ -173,7 +182,13 @@ describe('Visit details page', () => {
     })
 
     it('should render hidden redirect-to field for a visit request when coming from visits page', () => {
-      availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+      availableVisitActions = {
+        update: false,
+        cancel: false,
+        clearNotifications: false,
+        print: false,
+        processRequest: true,
+      }
       visitDetails.visitSubStatus = 'REQUESTED'
 
       return request(app)
@@ -187,7 +202,14 @@ describe('Visit details page', () => {
     })
 
     it('should render hidden redirect-to field and prisonerId for a visit request when coming from prisoner profile page', () => {
-      availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+      setFeature('printVisitPasses', true)
+      availableVisitActions = {
+        update: false,
+        cancel: false,
+        clearNotifications: false,
+        print: false,
+        processRequest: true,
+      }
       visitDetails.visitSubStatus = 'REQUESTED'
 
       return request(app)
@@ -346,11 +368,18 @@ describe('Visit details page', () => {
             expect($('[data-test=update-visit]').length).toBe(0)
             expect($('[data-test=cancel-visit]').length).toBe(0)
             expect($('[data-test=clear-notifications]').length).toBe(0)
+            expect($('[data-test=print-visit-pass]').length).toBe(0)
           })
       })
 
       it('should render all buttons if all visit actions available', () => {
-        availableVisitActions = { update: true, cancel: true, clearNotifications: true, processRequest: false }
+        availableVisitActions = {
+          update: true,
+          cancel: true,
+          clearNotifications: true,
+          print: true,
+          processRequest: false,
+        }
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -367,11 +396,45 @@ describe('Visit details page', () => {
 
             expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
             expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
+
+            expect($('[data-test=print-visit-pass]').text().trim()).toBe('Print visit pass')
+            expect($('[data-test=print-visit-pass]').attr('href')).toBe('/visit/ab-cd-ef-gh/visit-pass')
           })
       })
 
-      it('should render approve and reject buttons if all visit request actions enabled', () => {
-        availableVisitActions = { update: false, cancel: false, clearNotifications: false, processRequest: true }
+      it('should NOT render print visit pass button if the feature is disabled', () => {
+        availableVisitActions = {
+          update: true,
+          cancel: true,
+          clearNotifications: true,
+          print: true,
+          processRequest: false,
+        }
+
+        setFeature('printVisitPasses', false)
+        app = appWithAllRoutes({ services: { auditService, visitService } })
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=update-visit]').length).toBe(1)
+            expect($('[data-test=cancel-visit]').length).toBe(1)
+            expect($('[data-test=clear-notifications]').length).toBe(1)
+            expect($('[data-test=print-visit-pass]').length).toBe(0)
+          })
+      })
+
+      it('should render approve and reject buttons when all visit request actions disabled', () => {
+        availableVisitActions = {
+          update: false,
+          cancel: false,
+          clearNotifications: false,
+          print: false,
+          processRequest: true,
+        }
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -382,6 +445,7 @@ describe('Visit details page', () => {
             expect($('[data-test=update-visit]').length).toBe(0)
             expect($('[data-test=cancel-visit]').length).toBe(0)
             expect($('[data-test=clear-notifications]').length).toBe(0)
+            expect($('[data-test=print-visit-pass]').length).toBe(0)
 
             expect($('[data-test=approve-visit-request]').text().trim()).toBe('Approve request')
             expect($('[data-test=approve-visit-request]').parent('form').attr('action')).toBe(

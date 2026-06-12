@@ -37,11 +37,12 @@ export const getAvailableVisitActions = ({
   visitSubStatus: VisitBookingDetails['visitSubStatus']
   startTimestamp: VisitBookingDetails['startTimestamp']
   notifications: VisitBookingDetails['notifications']
-}): { update: boolean; cancel: boolean; clearNotifications: boolean; processRequest: boolean } => {
+}): { update: boolean; cancel: boolean; clearNotifications: boolean; print: boolean; processRequest: boolean } => {
   const availableVisitActions = {
     update: false,
     cancel: false,
     clearNotifications: false,
+    print: false,
     processRequest: false,
   }
 
@@ -63,6 +64,7 @@ export const getAvailableVisitActions = ({
 
   if (!hasUpdateBlockingNotifications && isFuture(new Date(startTimestamp))) {
     availableVisitActions.update = true
+    availableVisitActions.print = true
   }
 
   // cancel

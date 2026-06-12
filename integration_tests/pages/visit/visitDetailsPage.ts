@@ -39,6 +39,8 @@ export default class VisitDetailsPage extends AbstractPage {
 
   readonly clearNotifications: Locator
 
+  readonly printVisitPass: Locator
+
   readonly approveRequest: Locator
 
   readonly rejectRequest: Locator
@@ -68,6 +70,7 @@ export default class VisitDetailsPage extends AbstractPage {
     this.updateBooking = page.getByTestId('update-visit')
     this.cancelBooking = page.getByTestId('cancel-visit')
     this.clearNotifications = page.getByTestId('clear-notifications')
+    this.printVisitPass = page.getByTestId('print-visit-pass')
     this.approveRequest = page.getByTestId('approve-visit-request')
     this.rejectRequest = page.getByTestId('reject-visit-request')
   }

@@ -1,0 +1,141 @@
+.visit-pass {
+  border: 1px solid govuk-functional-colour("border");
+  margin: 0 govuk-spacing(6) govuk-spacing(9);
+  padding: govuk-spacing(3) govuk-spacing(6);
+  width: 66%;
+
+  .govuk-heading-m {
+    margin-bottom: govuk-spacing(3);
+    padding-top: govuk-spacing(5);
+  }
+}
+
+// set up 2-column grid
+.visit-pass__header,
+.visit-pass__info,
+// adults only: use both columns
+.visit-pass__visitors:not(:has(+ .visit-pass__child-visitors)) ul,
+// with children: use grid to split visitors into 2 columns
+.visit-pass__visitors-container--with-children,
+.visit-pass__staff-checks {
+  display: grid;
+  column-gap: govuk-spacing(7);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.visit-pass__header {
+  margin-bottom: govuk-spacing(2);
+  position: relative;
+
+  // need to constrain height of SVG to that of the h1
+  img {
+    position: absolute;
+    height: 100%;
+  }
+
+  h1 {
+    grid-column: 2;
+  }
+}
+
+.visit-pass__info {
+  margin-bottom: govuk-spacing(-3);
+
+  dt {
+    font-weight: $govuk-font-weight-bold;
+  }
+
+  dd {
+    margin-left: 0;
+    margin-bottom: govuk-spacing(3);
+  }
+
+  // distribute dt/dd pairs to left/right columns on grid
+  dt:nth-of-type(odd),
+  dd:nth-of-type(odd) {
+    grid-column: 1;
+  }
+  dt:nth-of-type(even),
+  dd:nth-of-type(even) {
+    grid-column: 2;
+  }
+
+  // ensure correct grid rows
+  @each $i in (2, 4, 6) {
+    dt:nth-of-type(#{$i}) {
+      grid-row: $i - 1;
+    }
+  }
+}
+
+.visit-pass__visitors,
+.visit-pass__child-visitors {
+  ul {
+    margin-bottom: 0;
+  }
+
+  li {
+    margin-bottom: govuk-spacing(3);
+  }
+
+  li:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.visit-pass__visitor-signature,
+.visit-pass__staff-checks span {
+  margin-bottom: govuk-spacing(2);
+
+  &::after {
+    content: "";
+    display: inline-block;
+    border-bottom: 1px solid govuk-colour("black");
+    margin-bottom: -0.5rem;
+    margin-left: 1.5rem;
+    width: 40%;
+  }
+}
+
+p.visit-pass__created-date {
+  margin-top: govuk-spacing(6);
+}
+
+
+@media print {
+  .visit-pass {
+    border: none;
+    break-after: page;
+    margin: 0;
+    padding: 2mm 3mm;
+    width: unset;
+  }
+
+  .visit-pass__header {
+    margin-bottom: 5mm;
+  }
+
+  .visit-pass__info {
+    margin-bottom: -1mm !important;
+  }
+
+  .visit-pass .govuk-heading-l {
+    font-size: 22px;
+  }
+
+  .visit-pass .govuk-heading-m {
+    font-size: 18px;
+    margin-bottom: 2mm;
+    padding-top: 3mm !important;
+  }
+
+  .visit-pass .govuk-body,
+  .visit-pass .govuk-list {
+    font-size: 14px;
+    margin-bottom: 4mm;
+  }
+
+  .visit-pass .govuk-body-s {
+    font-size: 12px;
+  }
+}

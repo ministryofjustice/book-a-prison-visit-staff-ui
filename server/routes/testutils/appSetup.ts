@@ -34,6 +34,7 @@ import searchRoutes from '../search/search'
 import timetableRoutes from '../timetable'
 import visitAllowancesRoutes from '../visitAllowances'
 import visitRoutes from '../visit'
+import visitPassesRoutes from '../visitPasses'
 import visitsRoutes from '../visitsByDate/visitsByDate'
 
 import nunjucksSetup from '../../utils/nunjucksSetup'
@@ -119,6 +120,7 @@ function appSetup(
   app.use('/timetable', timetableRoutes(services))
   app.use('/visit-allowances', visitAllowancesRoutes(services))
   app.use('/visit', visitRoutes(services))
+  app.use('/visit-passes', visitPassesRoutes(services))
   app.use('/visits', visitsRoutes(services))
 
   app.use((req, res, next) => next(new NotFound()))
