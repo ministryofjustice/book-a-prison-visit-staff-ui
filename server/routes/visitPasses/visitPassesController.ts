@@ -1,5 +1,5 @@
-import { RequestHandler } from 'express'
-import { format } from 'date-fns'
+import { RequestHandler, Request } from 'express'
+import { format, isBefore, startOfToday } from 'date-fns'
 import { AuditService, VisitService } from '../../services'
 import { getParsedDateFromQueryString } from '../../utils/utils'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
@@ -17,13 +17,18 @@ export default class VisitPassesController {
       const { prisonId, prisonName } = req.session.selectedEstablishment
       const { username } = res.locals.user
 
+      if (isBefore(date, startOfToday())) {
+        return res.redirect('/visits')
+      }
+
       const visitPassDtos = await this.visitService.getVisitPasses({ prisonId, date, username })
 
       const visitPasses = visitPassDtos.map(buildVisitPass)
 
       // TODO send audit event
 
-      res.render('pages/visitPasses/visitPasses', {
+      return res.render('pages/visitPasses/visitPasses', {
+        backLinkHref: this.getBacklinkHref(req.query),
         prisonName,
         singlePass: false,
         visitPasses,
@@ -40,11 +45,16 @@ export default class VisitPassesController {
 
       const visitPassDto = await this.visitService.getVisitPass({ prisonId, reference, username })
 
+      if (isBefore(visitPassDto.visitDate, startOfToday())) {
+        return res.redirect(`/visit/${reference}`)
+      }
+
       const visitPass = buildVisitPass(visitPassDto)
 
       // TODO send audit event
 
-      res.render('pages/visitPasses/visitPasses', {
+      return res.render('pages/visitPasses/visitPasses', {
+        backLinkHref: this.getBacklinkHref(req.query, reference),
         prisonName,
         singlePass: true,
         visitPasses: [visitPass],
@@ -55,5 +65,18 @@ export default class VisitPassesController {
 
   private getCreatedDate(): string {
     return format(new Date(), "EEEE d MMMM yyyy 'at' h:mmaaa")
+  }
+
+  private getBacklinkHref({ from, query }: Request['query'], reference?: string): string {
+    switch (from) {
+      case 'visit':
+        return `/visit/${reference}`
+
+      case 'visits':
+        return `/visits?${query}`
+
+      default:
+        return '/'
+    }
   }
 }

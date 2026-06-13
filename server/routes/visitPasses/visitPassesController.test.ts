@@ -11,21 +11,25 @@ let app: Express
 const auditService = createMockAuditService()
 const visitService = createMockVisitService()
 
+const fakeDate = new Date('2026-05-20T11:00:00')
+
 beforeEach(() => {
   setFeature('printVisitPasses', true)
 
+  jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
   app = appWithAllRoutes({ services: { auditService, visitService } })
 })
 
 afterEach(() => {
   jest.resetAllMocks()
+  jest.useRealTimers()
 })
 
 describe('Print visit passes by date', () => {
   const date = '2026-05-20'
-  const url = `/visit-passes?date=${date}`
+  const url = `/visit-passes?date=${date}&from=visits&query=back-link-query`
 
-  describe(`GET ${url}`, () => {
+  describe('GET /visit-passes', () => {
     it('should return a 404 if the feature is not enabled', () => {
       setFeature('printVisitPasses', false)
       app = appWithAllRoutes({ services: { auditService, visitService } })
@@ -43,10 +47,43 @@ describe('Print visit passes by date', () => {
           const $ = cheerio.load(res.text)
           // Page header
           expect($('title').text()).toMatch(/^Print visit passes -/)
-          expect($('.govuk-back-link').length).toBe(0)
+          expect($('.govuk-back-link').attr('href')).toBe(`/visits?back-link-query`)
           expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
+          expect($('[data-test="print-all"]').length).toBe(1)
 
           // TODO extend test assertions
+
+          expect($('[data-test="no-visit-passes"]').length).toBe(0)
+
+          expect(visitService.getVisitPasses).toHaveBeenCalledWith({ date, prisonId: 'HEI', username: 'user1' })
+        })
+    })
+
+    it('should show message and no print button if no passes to print', () => {
+      visitService.getVisitPasses.mockResolvedValue([])
+
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').eq(0).text().trim()).toBe('Print visit passes')
+          expect($('[data-test="print-all"]').length).toBe(0)
+          expect($('[data-test="no-visit-passes"]').length).toBe(1)
+
+          expect(visitService.getVisitPasses).toHaveBeenCalledWith({ date, prisonId: 'HEI', username: 'user1' })
+          // TODO assert no audit call
+        })
+    })
+
+    it('should redirect back to visits by date page if trying to print passes in the past', () => {
+      return request(app)
+        .get('/visit-passes?date=2025-05-19') // yesterday
+        .expect(302)
+        .expect('location', '/visits')
+        .expect(() => {
+          expect(visitService.getVisitPasses).not.toHaveBeenCalled()
+          // TODO assert no audit call
         })
     })
   })
@@ -55,7 +92,7 @@ describe('Print visit passes by date', () => {
 describe('Print visit pass by visit reference', () => {
   const visitPass = TestData.visitPassDto()
   const { reference } = visitPass
-  const url = `/visit/${reference}/visit-pass`
+  const url = `/visit/${reference}/visit-pass?from=visit`
 
   describe(`GET ${url}`, () => {
     it('should return a 404 if the feature is not enabled', () => {
@@ -74,10 +111,28 @@ describe('Print visit pass by visit reference', () => {
           const $ = cheerio.load(res.text)
           // Page header
           expect($('title').text()).toMatch(/^Print visit pass -/)
-          expect($('.govuk-back-link').length).toBe(0)
+          expect($('.govuk-back-link').attr('href')).toBe(`/visit/${reference}`)
           expect($('h1').eq(0).text().trim()).toBe('Print visit pass')
+          expect($('[data-test="print-all"]').length).toBe(1)
 
           // TODO extend test assertions
+
+          expect($('[data-test="no-visit-passes"]').length).toBe(0)
+
+          expect(visitService.getVisitPass).toHaveBeenCalledWith({ prisonId: 'HEI', reference, username: 'user1' })
+        })
+    })
+
+    it('should redirect back to visit booking details page if visit date is in the past', () => {
+      visitService.getVisitPass.mockResolvedValue({ ...visitPass, visitDate: '2025-05-19' })
+
+      return request(app)
+        .get(url)
+        .expect(302)
+        .expect('location', `/visit/${reference}`)
+        .expect(res => {
+          expect(visitService.getVisitPass).toHaveBeenCalledWith({ prisonId: 'HEI', reference, username: 'user1' })
+          // TODO assert no audit call
         })
     })
   })

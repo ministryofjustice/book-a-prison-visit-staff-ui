@@ -101,7 +101,7 @@ test.describe('Visit details page', () => {
 
     await expect(visitDetailsPage.updateBooking).toHaveCount(1)
     await expect(visitDetailsPage.cancelBooking).toHaveCount(1)
-    await expect(visitDetailsPage.printVisitPass).toHaveCount(1) // TODO confirm if this behaviour is correct (given date blocked)
+    await expect(visitDetailsPage.printVisitPass).toHaveCount(0)
 
     await expect(visitDetailsPage.messages.nth(0)).toContainText(
       notificationTypeAlerts.PRISON_VISITS_BLOCKED_FOR_DATE.title,

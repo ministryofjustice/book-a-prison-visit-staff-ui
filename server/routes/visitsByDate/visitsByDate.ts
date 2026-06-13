@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { body, validationResult, oneOf } from 'express-validator'
+import { isFuture, isToday } from 'date-fns'
 import { getParsedDateFromQueryString } from '../../utils/utils'
 import { getDateTabs, getSelectedOrDefaultSessionSchedule, getSessionsSideNav } from './visitsUtils'
 import type { Services } from '../../services'
@@ -107,6 +108,8 @@ export default function routes({
       from: 'visits',
     }).toString()
 
+    const showPrintPassesButton = isToday(selectedDateString) || isFuture(selectedDateString)
+
     await auditService.viewedVisits({
       viewDate: selectedDateString,
       prisonId,
@@ -123,6 +126,7 @@ export default function routes({
       sessionSchedule,
       sessionsSideNav,
       queryParamsForBackLink,
+      showPrintPassesButton,
       visits,
       isAnExcludeDate,
       isAnExcludeDateWithVisitNotifications,

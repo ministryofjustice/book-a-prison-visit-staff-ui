@@ -52,6 +52,7 @@ describe('GET /visits - Visits by date page', () => {
 
   const fakeDateTime = new Date('2024-02-01T09:00')
   const today = format(fakeDateTime, 'yyyy-MM-dd')
+  const yesterday = '2024-01-31'
 
   const sessionSchedule = [TestData.sessionSchedule({ capacity: { open: 20, closed: 5 } })]
   const visits = [TestData.visitPreview()]
@@ -103,7 +104,9 @@ describe('GET /visits - Visits by date page', () => {
 
           // Print visit passes
           expect($('h2').text()).toBe('Thursday 1 February 2024')
-          expect($('[data-test=print-visit-passes]').attr('href')).toBe('/visit-passes?date=2024-02-01')
+          expect($('[data-test=print-visit-passes]').attr('href')).toBe(
+            '/visit-passes?date=2024-02-01&query=sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
+          )
 
           // side-nav
           expect($('.moj-side-navigation h4').eq(0).text()).toBe('Visits hall')
@@ -185,6 +188,17 @@ describe('GET /visits - Visits by date page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('h2').length).toBe(0)
+          expect($('[data-test=print-visit-passes]').length).toBe(0)
+        })
+    })
+
+    it('should not show the print visit passes button for a date in the past', () => {
+      return request(app)
+        .get(`/visits?selectedDate=${yesterday}`)
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
           expect($('[data-test=print-visit-passes]').length).toBe(0)
         })
     })

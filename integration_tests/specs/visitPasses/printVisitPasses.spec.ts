@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('Print visit passes by date (via visits by date page)', () => {
-  const visitPasses = [
+  const visitPassDtos = [
     TestData.visitPassDto({
       visitors: [
         TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'One' }),
@@ -48,7 +48,7 @@ test.describe('Print visit passes by date (via visits by date page)', () => {
     await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({ prisonId, sessionDate: todayShortFormat, visits: [] })
     await orchestrationApi.stubIsBlockedDate({ prisonId, excludeDate: todayShortFormat, excludeDates: [] })
-    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPasses })
+    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPassDtos })
 
     // Navigate to Visits by date page
     const homePage = await HomePage.verifyOnPage(page)
@@ -74,9 +74,10 @@ test.describe('Print single visit pass by reference (via visit booking details p
       startTimestamp: `${futureVisitDate}T12:00:00`,
       endTimestamp: `${futureVisitDate}T14:00:00`,
     })
+    const visitPassDto = TestData.visitPassDto({ visitDate: futureVisitDate })
 
     await orchestrationApi.stubGetVisitDetailed(visitDetails)
-    await orchestrationApi.stubGetVisitPass({ reference: visitDetails.reference })
+    await orchestrationApi.stubGetVisitPass({ reference: visitDetails.reference, visitPassDto })
 
     // Navigate to Visit booking details by date page
     await page.goto(`/visit/${visitDetails.reference}`)
