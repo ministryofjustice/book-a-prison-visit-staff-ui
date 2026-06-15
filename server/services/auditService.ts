@@ -212,28 +212,6 @@ export default class AuditService {
     })
   }
 
-  async printedVisitList({
-    viewDate,
-    prisonId,
-    username,
-    operationId,
-  }: {
-    viewDate: string
-    prisonId: string
-    username: string
-    operationId: string
-  }) {
-    return this.sendAuditMessage({
-      action: 'PRINTED_VISIT_LIST',
-      who: username,
-      operationId,
-      details: {
-        viewDate,
-        prisonId,
-      },
-    })
-  }
-
   async overrodeZeroVO({
     prisonerId,
     username,
@@ -496,6 +474,46 @@ export default class AuditService {
       who: username,
       operationId,
       details: { prisonerId, voChange, pvoChange, reason, reasonDetails },
+    })
+  }
+
+  async printedVisitPass({
+    visitReference,
+    prisonerId,
+    prisonId,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    prisonerId: string
+    prisonId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'PRINTED_VISIT_PASS',
+      who: username,
+      operationId,
+      details: { visitReference, prisonerId, prisonId },
+    })
+  }
+
+  async printedVisitPasses({
+    date,
+    prisonId,
+    username,
+    operationId,
+  }: {
+    date: string
+    prisonId: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'PRINTED_VISIT_PASSES',
+      who: username,
+      operationId,
+      details: { date, prisonId },
     })
   }
 

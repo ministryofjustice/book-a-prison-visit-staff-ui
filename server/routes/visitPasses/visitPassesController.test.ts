@@ -56,6 +56,12 @@ describe('Print visit passes by date', () => {
           expect($('[data-test="no-visit-passes"]').length).toBe(0)
 
           expect(visitService.getVisitPasses).toHaveBeenCalledWith({ date, prisonId: 'HEI', username: 'user1' })
+          expect(auditService.printedVisitPasses).toHaveBeenCalledWith({
+            date,
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
         })
     })
 
@@ -72,7 +78,12 @@ describe('Print visit passes by date', () => {
           expect($('[data-test="no-visit-passes"]').length).toBe(1)
 
           expect(visitService.getVisitPasses).toHaveBeenCalledWith({ date, prisonId: 'HEI', username: 'user1' })
-          // TODO assert no audit call
+          expect(auditService.printedVisitPasses).toHaveBeenCalledWith({
+            date,
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
         })
     })
 
@@ -83,7 +94,7 @@ describe('Print visit passes by date', () => {
         .expect('location', '/visits')
         .expect(() => {
           expect(visitService.getVisitPasses).not.toHaveBeenCalled()
-          // TODO assert no audit call
+          expect(auditService.printedVisitPasses).not.toHaveBeenCalled()
         })
     })
   })
@@ -120,6 +131,13 @@ describe('Print visit pass by visit reference', () => {
           expect($('[data-test="no-visit-passes"]').length).toBe(0)
 
           expect(visitService.getVisitPass).toHaveBeenCalledWith({ prisonId: 'HEI', reference, username: 'user1' })
+          expect(auditService.printedVisitPass).toHaveBeenCalledWith({
+            visitReference: reference,
+            prisonerId: visitPass.prisonerId,
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
         })
     })
 
@@ -132,7 +150,7 @@ describe('Print visit pass by visit reference', () => {
         .expect('location', `/visit/${reference}`)
         .expect(res => {
           expect(visitService.getVisitPass).toHaveBeenCalledWith({ prisonId: 'HEI', reference, username: 'user1' })
-          // TODO assert no audit call
+          expect(auditService.printedVisitPass).not.toHaveBeenCalled()
         })
     })
   })

@@ -25,7 +25,12 @@ export default class VisitPassesController {
 
       const visitPasses = visitPassDtos.map(buildVisitPass)
 
-      // TODO send audit event
+      await this.auditService.printedVisitPasses({
+        date,
+        prisonId,
+        username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       return res.render('pages/visitPasses/visitPasses', {
         backLinkHref: this.getBacklinkHref(req.query),
@@ -51,7 +56,13 @@ export default class VisitPassesController {
 
       const visitPass = buildVisitPass(visitPassDto)
 
-      // TODO send audit event
+      await this.auditService.printedVisitPass({
+        visitReference: reference,
+        prisonerId: visitPassDto.prisonerId,
+        prisonId,
+        username,
+        operationId: res.locals.appInsightsOperationId,
+      })
 
       return res.render('pages/visitPasses/visitPasses', {
         backLinkHref: this.getBacklinkHref(req.query, reference),
