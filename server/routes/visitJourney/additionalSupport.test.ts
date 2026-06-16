@@ -85,7 +85,7 @@ testJourneys.forEach(journey => {
           expect($('[data-test="support-required-no"]').prop('checked')).toBe(false)
           expect($('[data-test-app-ref="aaa-bbb-ccc"]').length).toBe(1)
           expect($('[data-test="warning-text"]').text()).toBe(
-            'Comments appear on the operational reports that are printed from NOMIS.',
+            'Comments appear on the operational reports that are printed from DPS and NOMIS.',
           )
         })
     })
@@ -116,7 +116,7 @@ testJourneys.forEach(journey => {
           const $ = cheerio.load(res.text)
           expect($('h1').text().trim()).toBe('Is additional support needed for any of the visitors?')
           expect($('[data-test="warning-text"]').text()).toContain(
-            'The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from NOMIS.',
+            'The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from DPS and NOMIS.',
           )
         })
     })
