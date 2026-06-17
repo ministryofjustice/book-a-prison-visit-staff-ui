@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { add, format } from 'date-fns'
 import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
@@ -9,8 +9,11 @@ import TestData from '../../../server/routes/testutils/testData'
 import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
 
 const shortDateFormat = 'yyyy-MM-dd'
+const longDateFormat = 'EEEE d MMMM yyyy'
 const today = new Date()
 const todayShortFormat = format(today, shortDateFormat)
+const todayLongFormat = format(today, longDateFormat)
+
 const prisonId = 'HEI'
 
 test.beforeEach(async ({ page }) => {
@@ -23,32 +26,13 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.describe('Print visit passes by date (via visits by date page)', () => {
-  const visitPassDtos = [
-    TestData.visitPassDto({
-      visitors: [
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'One' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Two' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Three' }),
-      ],
-    }),
-    TestData.visitPassDto({
-      visitors: [
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'One' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Two' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Adult', lastName: 'Three' }),
-
-        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'One', dateOfBirth: '2020-01-01' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'Two', dateOfBirth: '2026-02-01' }),
-        TestData.visitPassDtoVisitor({ firstName: 'Child', lastName: 'Three', dateOfBirth: '2026-06-01' }),
-      ],
-    }),
-  ]
+  const visitPassDto = TestData.visitPassDto({ visitDate: todayShortFormat })
 
   test('should navigate to print visit passes page and trigger print dialog', async ({ page }) => {
     await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({ prisonId, sessionDate: todayShortFormat, visits: [] })
     await orchestrationApi.stubIsBlockedDate({ prisonId, excludeDate: todayShortFormat, excludeDates: [] })
-    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPassDtos })
+    await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPassDtos: [visitPassDto] })
 
     // Navigate to Visits by date page
     const homePage = await HomePage.verifyOnPage(page)
@@ -60,7 +44,14 @@ test.describe('Print visit passes by date (via visits by date page)', () => {
     const visitPassesPage = await VisitPassesPage.verifyOnPage(page, 'Print visit passes')
 
     // Visit passes page
-    // TODO extend to check pass contents
+    await expect(visitPassesPage.getPrisonName(1)).toContainText('Hewell (HMP)')
+    await expect(visitPassesPage.getVisitDate(1)).toContainText(todayLongFormat)
+    await expect(visitPassesPage.getVisitTime(1)).toContainText('10am to 11am')
+    await expect(visitPassesPage.getPrisonerName(1)).toContainText('John Smith')
+    await expect(visitPassesPage.getPrisonNumber(1)).toContainText(visitPassDto.prisonerId)
+    await expect(visitPassesPage.getReference(1)).toContainText(visitPassDto.reference)
+    await expect(visitPassesPage.getVisitType(1)).toContainText('Open')
+    await expect(visitPassesPage.getVisitor(1, 1)).toContainText('Jeanette Smith')
 
     // Print button should trigger print dialog
     await visitPassesPage.printAllAndCheckForPrintDialog()
@@ -88,7 +79,7 @@ test.describe('Print single visit pass by reference (via visit booking details p
     const visitPassesPage = await VisitPassesPage.verifyOnPage(page, 'Print visit pass')
 
     // Visit passes page
-    // TODO extend to check pass contents
+    await expect(visitPassesPage.getReference(1)).toContainText(visitPassDto.reference)
 
     // Print button should trigger print dialog
     await visitPassesPage.printAllAndCheckForPrintDialog()

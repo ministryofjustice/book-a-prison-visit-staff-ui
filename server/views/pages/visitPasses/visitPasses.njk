@@ -28,29 +28,29 @@
       <section class="visit-pass">
         <header class="visit-pass__header">
           <img src="/assets/images/hmpps_logo.svg" alt="HM Prison & Probation Service logo">
-          <h1 class="govuk-heading-l">{{ prisonName }}</h1>
+          <h1 class="govuk-heading-l" data-test="visit-{{ visitPassIndex }}-prison-name">{{ prisonName }}</h1>
         </header>
 
         {# Visit pass - visit info #}
         <h2 class="govuk-heading-m">Visit information</h2>
         <dl class="govuk-body visit-pass__info">
           <dt>Date</dt>
-          <dd data-test="visit-{{ loop.index }}-date">{{ visitPass.date }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-date">{{ visitPass.date }}</dd>
 
           <dt>Time</dt>
-          <dd data-test="visit-{{ loop.index }}-time">{{ visitPass.time }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-time">{{ visitPass.time }}</dd>
 
           <dt>Prisoner name</dt>
-          <dd data-test="visit-{{ loop.index }}-prisoner-name">{{ visitPass.prisonerName }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-prisoner-name">{{ visitPass.prisonerName }}</dd>
 
           <dt>Prison number</dt>
-          <dd data-test="visit-{{ loop.index }}-prison-number">{{ visitPass.prisonNumber }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-prison-number">{{ visitPass.prisonNumber }}</dd>
 
           <dt>Visit reference</dt>
-          <dd data-test="visit-{{ loop.index }}-reference">{{ visitPass.reference }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-reference">{{ visitPass.reference }}</dd>
 
           <dt>Visit type</dt>
-          <dd data-test="visit-{{ loop.index }}-visit-type">{{ visitPass.type }}</dd>
+          <dd data-test="visit-{{ visitPassIndex }}-visit-type">{{ visitPass.type }}</dd>
         </dl>
 
         <div class="visit-pass__visitors-container{{ "--with-children" if (visitPass.children | length) }}">
@@ -117,7 +117,7 @@
         {# Visit pass - created date/time #}
         <p class="govuk-body-s visit-pass__created-date">
           Visit pass created:
-          <span data-test="visit-pass-created-date"> {{ createdDate }}</span>
+          <span data-test="visit-{{ visitPassIndex }}-pass-created-date">{{ createdDate }}</span>
         </p>
       </section>
     {% endfor %}

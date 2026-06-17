@@ -21,13 +21,13 @@
 
       {% if publicBooker %}
         {{ govukWarningText({
-          text: "The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from NOMIS.",
+          text: "The booker can view this comment on GOV.UK. Comments also appear on the operational reports that are printed from DPS and NOMIS.",
           iconFallbackText: "Warning",
           classes: "govuk-!-width-two-thirds",
           attributes: { "data-test": "warning-text" }
         }) }}
       {% else %}
-        <p data-test="warning-text">Comments appear on the operational reports that are printed from NOMIS.</p>
+        <p data-test="warning-text">Comments appear on the operational reports that are printed from DPS and NOMIS.</p>
       {% endif %}
       
       <form action="{{ urlPrefix }}/additional-support" method="POST" novalidate>
