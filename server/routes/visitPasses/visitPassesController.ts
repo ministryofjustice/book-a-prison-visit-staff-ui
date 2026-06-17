@@ -12,7 +12,7 @@ export default class VisitPassesController {
   ) {}
 
   public viewByDate(): RequestHandler {
-    return async (req, res) => {
+    return async (req, res, next) => {
       const date = getParsedDateFromQueryString(req.query.date?.toString())
       const { prisonId, prisonName } = req.session.selectedEstablishment
       const { username } = res.locals.user
@@ -21,56 +21,70 @@ export default class VisitPassesController {
         return res.redirect('/visits')
       }
 
-      const visitPassDtos = await this.visitService.getVisitPasses({ prisonId, date, username })
+      try {
+        const visitPassDtos = await this.visitService.getVisitPasses({ prisonId, date, username })
 
-      const visitPasses = visitPassDtos.map(buildVisitPass)
+        const visitPasses = visitPassDtos.map(buildVisitPass)
 
-      await this.auditService.printedVisitPasses({
-        date,
-        prisonId,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
+        await this.auditService.printedVisitPasses({
+          date,
+          prisonId,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
 
-      return res.render('pages/visitPasses/visitPasses', {
-        backLinkHref: this.getBacklinkHref(req.query),
-        prisonName,
-        singlePass: false,
-        visitPasses,
-        createdDate: this.getCreatedDate(),
-      })
+        return res.render('pages/visitPasses/visitPasses', {
+          backLinkHref: this.getBacklinkHref(req.query),
+          prisonName,
+          singlePass: false,
+          visitPasses,
+          createdDate: this.getCreatedDate(),
+        })
+      } catch (error) {
+        if (error?.status === 400) {
+          return res.redirect('/visits')
+        }
+        return next(error)
+      }
     }
   }
 
   public viewByVisit(): RequestHandler<VisitReferenceParams> {
-    return async (req, res) => {
+    return async (req, res, next) => {
       const { reference } = req.params
       const { prisonId, prisonName } = req.session.selectedEstablishment
       const { username } = res.locals.user
 
-      const visitPassDto = await this.visitService.getVisitPass({ prisonId, reference, username })
+      try {
+        const visitPassDto = await this.visitService.getVisitPass({ prisonId, reference, username })
 
-      if (isBefore(visitPassDto.visitDate, startOfToday())) {
-        return res.redirect(`/visit/${reference}`)
+        if (isBefore(visitPassDto.visitDate, startOfToday())) {
+          return res.redirect(`/visit/${reference}`)
+        }
+
+        const visitPass = buildVisitPass(visitPassDto)
+
+        await this.auditService.printedVisitPass({
+          visitReference: reference,
+          prisonerId: visitPassDto.prisonerId,
+          prisonId,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
+
+        return res.render('pages/visitPasses/visitPasses', {
+          backLinkHref: this.getBacklinkHref(req.query, reference),
+          prisonName,
+          singlePass: true,
+          visitPasses: [visitPass],
+          createdDate: this.getCreatedDate(),
+        })
+      } catch (error) {
+        if (error?.status === 400) {
+          return res.redirect(`/visit/${reference}`)
+        }
+        return next(error)
       }
-
-      const visitPass = buildVisitPass(visitPassDto)
-
-      await this.auditService.printedVisitPass({
-        visitReference: reference,
-        prisonerId: visitPassDto.prisonerId,
-        prisonId,
-        username,
-        operationId: res.locals.appInsightsOperationId,
-      })
-
-      return res.render('pages/visitPasses/visitPasses', {
-        backLinkHref: this.getBacklinkHref(req.query, reference),
-        prisonName,
-        singlePass: true,
-        visitPasses: [visitPass],
-        createdDate: this.getCreatedDate(),
-      })
     }
   }
 

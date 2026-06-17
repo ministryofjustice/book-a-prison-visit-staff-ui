@@ -1,6 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
+import { BadRequest, InternalServerError } from 'http-errors'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
@@ -156,13 +157,38 @@ describe('Print visit passes by date', () => {
         })
     })
 
-    it('should redirect back to visits by date page if trying to print passes in the past', () => {
+    it('should redirect back to the visits by date page if trying to print passes in the past', () => {
       return request(app)
         .get('/visit-passes?date=2025-05-19') // yesterday
         .expect(302)
         .expect('location', '/visits')
         .expect(() => {
           expect(visitService.getVisitPasses).not.toHaveBeenCalled()
+          expect(auditService.printedVisitPasses).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should redirect back to visits by date page if API returns a 400 Bad Request', () => {
+      visitService.getVisitPasses.mockRejectedValue(new BadRequest())
+
+      return request(app)
+        .get(url)
+        .expect(302)
+        .expect('location', '/visits')
+        .expect(() => {
+          expect(visitService.getVisitPasses).toHaveBeenCalled()
+          expect(auditService.printedVisitPasses).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should handle other API errors with default error handler', () => {
+      visitService.getVisitPasses.mockRejectedValue(new InternalServerError())
+
+      return request(app)
+        .get(url)
+        .expect(500)
+        .expect(() => {
+          expect(visitService.getVisitPasses).toHaveBeenCalled()
           expect(auditService.printedVisitPasses).not.toHaveBeenCalled()
         })
     })
@@ -232,6 +258,31 @@ describe('Print visit pass by visit reference', () => {
         .expect('location', `/visit/${reference}`)
         .expect(res => {
           expect(visitService.getVisitPass).toHaveBeenCalledWith({ prisonId: 'HEI', reference, username: 'user1' })
+          expect(auditService.printedVisitPass).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should redirect back to visit booking details page if API returns a 400 Bad Request', () => {
+      visitService.getVisitPass.mockRejectedValue(new BadRequest())
+
+      return request(app)
+        .get(url)
+        .expect(302)
+        .expect('location', `/visit/${reference}`)
+        .expect(() => {
+          expect(visitService.getVisitPass).toHaveBeenCalled()
+          expect(auditService.printedVisitPass).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should handle other API errors with default error handler', () => {
+      visitService.getVisitPass.mockRejectedValue(new InternalServerError())
+
+      return request(app)
+        .get(url)
+        .expect(500)
+        .expect(() => {
+          expect(visitService.getVisitPass).toHaveBeenCalled()
           expect(auditService.printedVisitPass).not.toHaveBeenCalled()
         })
     })
