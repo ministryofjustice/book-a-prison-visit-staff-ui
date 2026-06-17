@@ -98,11 +98,16 @@
     "lint-staged": "^17.0.7",
     "nock": "^14.0.15",
     "nodemon": "^3.1.14",
-    "prettier": "^3.8.3",
+    "prettier": "^3.8.4",
     "prettier-plugin-jinja-template": "^2.2.0",
     "sass": "^1.100.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "@opentelemetry/core": "2.8.0",
+    "form-data": "4.0.6",
+    "js-yaml": "4.2.0"
   }
 }
