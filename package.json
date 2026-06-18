@@ -5,7 +5,7 @@
   "repository": "git@github.com:ministryofjustice/book-a-prison-visit-staff-ui.git",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky",
+    "prepare": "hmpps-precommit-hooks-prepare",
     "copy-views": "cp -R server/views dist/server/",
     "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.scss:./assets/stylesheets/application.css --style compressed",
     "watch-ts": "tsc -w",
@@ -62,13 +62,14 @@
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^5.12.1",
+    "redis": "^6.0.0",
     "superagent": "^10.3.0"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.973.11",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
+    "@ministryofjustice/hmpps-precommit-hooks": "3.0.1",
     "@playwright/test": "^1.60.0",
     "@tsconfig/node24": "^24.0.4",
     "@types/bunyan": "^1.8.11",
@@ -90,7 +91,6 @@
     "cheerio": "^1.2.0",
     "concurrently": "^10.0.3",
     "dotenv": "^17.4.2",
-    "husky": "^9.1.7",
     "jest": "^30.4.2",
     "jest-html-reporter": "^4.4.0",
     "jest-junit": "^17.0.0",
