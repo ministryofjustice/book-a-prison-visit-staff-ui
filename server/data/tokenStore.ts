@@ -31,6 +31,10 @@ export default class TokenStore {
       return result
     }
 
-    return result.toString()
+    if (Buffer.isBuffer(result)) {
+      return result.toString()
+    }
+
+    return ''
   }
 }
