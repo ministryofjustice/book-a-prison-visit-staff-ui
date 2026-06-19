@@ -88,7 +88,11 @@ describe('Clear visit notifications', () => {
         .expect(302)
         .expect('location', '/visit/ab-cd-ef-gh')
         .expect(() => {
-          expect(flashProvider).not.toHaveBeenCalled()
+          expect(flashProvider).toHaveBeenCalledWith('messages', {
+            variant: 'success',
+            title: 'The visit has not been changed',
+            text: 'You confirmed the visit does not need to change',
+          })
 
           expect(visitNotificationsService.ignoreNotifications).toHaveBeenCalledWith({
             username: 'user1',
