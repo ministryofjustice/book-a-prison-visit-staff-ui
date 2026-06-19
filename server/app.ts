@@ -37,6 +37,7 @@ import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
 import bapvUserRoles from './constants/bapvUserRoles'
+import addUsernameAndCaseloadToTelemetry from './utils/azureAppInsights'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -69,6 +70,7 @@ export default function createApp(services: Services): express.Application {
 
   app.use(populateSelectedEstablishment(services))
   app.use(appInsightsOperationId)
+  app.use(addUsernameAndCaseloadToTelemetry())
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))

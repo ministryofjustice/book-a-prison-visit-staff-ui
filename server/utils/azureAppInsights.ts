@@ -1,47 +1,35 @@
-import { setup, defaultClient, TelemetryClient, DistributedTracingModes, Contracts } from 'applicationinsights'
-import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
-import { ApplicationInfo } from '../applicationInfo'
+import { initialiseTelemetry, flushTelemetry, telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
+import type { RequestHandler } from 'express'
+import logger from '../../logger'
 
-export type ContextObject = {
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  [name: string]: any
+initialiseTelemetry({
+  serviceName: 'hmpps-template-typescript',
+  serviceVersion: process.env.BUILD_NUMBER || 'unknown',
+  connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
+  debug: process.env.DEBUG_TELEMETRY === 'true',
+})
+  .addFilter(telemetry.processors.filterSpanWherePath(['/health', '/ping', '/info', '/assets/*', '/favicon.ico']))
+  .addModifier(telemetry.processors.enrichSpanNameWithHttpRoute())
+  .startRecording()
+
+const shutdown = async (signal: string) => {
+  logger.info(`${signal} received, shutting down...`)
+  await flushTelemetry()
+  process.exit(0)
 }
 
-export function initialiseAppInsights(): void {
-  if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
-    // eslint-disable-next-line no-console
-    console.log('Enabling azure application insights')
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))
 
-    setup().setDistributedTracingMode(DistributedTracingModes.AI_AND_W3C).start()
-  }
-}
+export default function addUsernameAndCaseloadToTelemetry(): RequestHandler {
+  return (req, res, next) => {
+    const { username, activeCaseLoadId } = res?.locals?.user || {}
 
-export function buildAppInsightsClient(
-  { applicationName, buildNumber }: ApplicationInfo,
-  overrideName?: string,
-): TelemetryClient {
-  if (process.env.APPLICATIONINSIGHTS_CONNECTION_STRING) {
-    defaultClient.context.tags['ai.cloud.role'] = overrideName || applicationName
-    defaultClient.context.tags['ai.application.ver'] = buildNumber
-    defaultClient.addTelemetryProcessor(addUserDataToRequests)
-    return defaultClient
-  }
-  return null
-}
+    telemetry.setSpanAttributes({
+      ...(username && { username }),
+      ...(activeCaseLoadId && { activeCaseLoadId }),
+    })
 
-export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
-  const isRequest = envelope.data.baseType === Contracts.TelemetryTypeString.Request
-  if (isRequest) {
-    const { username, activeCaseLoadId } = contextObjects?.['http.ServerRequest']?.res?.locals?.user || {}
-    if (username) {
-      const { properties } = envelope.data.baseData
-      // eslint-disable-next-line no-param-reassign
-      envelope.data.baseData.properties = {
-        username,
-        activeCaseLoadId,
-        ...properties,
-      }
-    }
+    return next()
   }
-  return true
 }
