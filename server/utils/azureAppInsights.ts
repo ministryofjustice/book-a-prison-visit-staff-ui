@@ -25,10 +25,12 @@ export default function addUsernameAndCaseloadToTelemetry(): RequestHandler {
   return (req, res, next) => {
     const { username, activeCaseLoadId } = res?.locals?.user || {}
 
-    telemetry.setSpanAttributes({
-      ...(username && { username }),
-      ...(activeCaseLoadId && { activeCaseLoadId }),
-    })
+    if (username) {
+      telemetry.setSpanAttributes({
+        ...(username && { username }),
+        ...(activeCaseLoadId && { activeCaseLoadId }),
+      })
+    }
 
     return next()
   }
