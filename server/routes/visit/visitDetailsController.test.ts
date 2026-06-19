@@ -2,7 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, user } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
@@ -13,6 +13,7 @@ import config from '../../config'
 import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
+let flashData: FlashData
 
 const auditService = createMockAuditService()
 const visitService = createMockVisitService()
@@ -61,6 +62,9 @@ describe('Visit details page', () => {
 
   beforeEach(() => {
     setFeature('printVisitPasses', true)
+
+    flashData = { messages: [] }
+    flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
     availableVisitActions = {
       update: false,
@@ -341,7 +345,8 @@ describe('Visit details page', () => {
 
     describe('Visit alert messages', () => {
       it('should render visit alert messages', () => {
-        visitAlerts = [TestData.mojAlert({ title: 'alert title', text: 'alert text' })]
+        flashData.messages = [TestData.mojAlert({ title: 'flash alert title', text: 'flash alert text' })]
+        visitAlerts = [TestData.mojAlert({ title: 'visit alert title', text: 'visit alert text' })]
 
         return request(app)
           .get('/visit/ab-cd-ef-gh')
@@ -349,10 +354,12 @@ describe('Visit details page', () => {
           .expect('Content-Type', /html/)
           .expect(res => {
             const $ = cheerio.load(res.text)
-            expect($('.moj-alert').length).toBe(1)
+            expect($('.moj-alert').length).toBe(2)
 
-            expect($('.moj-alert').eq(0).text()).toContain('alert title')
-            expect($('.moj-alert').eq(0).text()).toContain('alert text')
+            expect($('.moj-alert').eq(0).text()).toContain('flash alert title')
+            expect($('.moj-alert').eq(0).text()).toContain('flash alert text')
+            expect($('.moj-alert').eq(1).text()).toContain('visit alert title')
+            expect($('.moj-alert').eq(1).text()).toContain('visit alert text')
           })
       })
     })

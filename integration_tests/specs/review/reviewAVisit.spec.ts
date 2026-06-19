@@ -98,7 +98,7 @@ test.describe('Review a visit', () => {
 
     await clearNotificationsPage.submit()
 
-    await expect(visitDetailsPage.messages).toHaveCount(0)
+    await expect(visitDetailsPage.messages).toContainText('You confirmed the visit does not need to change')
     await expect(visitDetailsPage.eventHeader(0)).toContainText(eventAuditTypes.IGNORE_VISIT_NOTIFICATIONS_EVENT)
     await expect(visitDetailsPage.actionedBy(0)).toContainText('User One')
     await expect(visitDetailsPage.eventTime(0)).toContainText('Thursday 11 April 2024 at 11am')

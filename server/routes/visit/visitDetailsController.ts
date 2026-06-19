@@ -51,7 +51,7 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const messages = getVisitAlerts(visitDetails)
+      const messages = [...req.flash('messages'), ...getVisitAlerts(visitDetails)]
 
       const flaggedVisitorRestrictionIds = getIdsToFlag({
         notificationType: 'VISITOR_RESTRICTION',
