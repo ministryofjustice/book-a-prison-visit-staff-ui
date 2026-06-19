@@ -3,7 +3,7 @@ import type { RequestHandler } from 'express'
 import logger from '../../logger'
 
 initialiseTelemetry({
-  serviceName: 'hmpps-template-typescript',
+  serviceName: 'book-a-prison-visit-staff-ui',
   serviceVersion: process.env.BUILD_NUMBER || 'unknown',
   connectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING,
   debug: process.env.DEBUG_TELEMETRY === 'true',
