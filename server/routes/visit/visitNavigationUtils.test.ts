@@ -3,7 +3,7 @@ import {
   buildVisitNavQuery,
   extractVisitNavState,
   getVisitDetailsBackLink,
-  VisitNavState,
+  type VisitNavState,
 } from './visitNavigationUtils'
 
 describe('visitNavigationUtils', () => {

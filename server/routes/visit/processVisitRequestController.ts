@@ -5,7 +5,7 @@ import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
 import { isValidPrisonerNumber } from '../validationChecks'
-import { extractVisitNavState, VisitNavState } from './visitNavigationUtils'
+import { extractVisitNavState, type VisitNavState } from './visitNavigationUtils'
 
 type RequestAction = 'approve' | 'reject'
 
