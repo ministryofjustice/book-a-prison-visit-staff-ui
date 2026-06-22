@@ -6,23 +6,6 @@
 {% from "components/visitors.njk" import visitorDateOfBirth %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
-{% set fromPrisonerProfile = false %}
-
-{% if fromPage == "visit-search" %}
-  {% set backLinkHref = "/search/visit/results?" + fromPageQuery %}
-{% elseif fromPage == "visits" %}
-  {% set backLinkHref = "/visits?" + fromPageQuery %}
-{% elseif fromPage == "request" %}
-  {% set backLinkHref = "/requested-visits" %}
-{% elseif fromPage == "review" %}
-  {% set backLinkHref = "/review" %}
-{% elseif fromPage == "vo-history" %}
-  {% set backLinkHref = "/prisoner/" + visitDetails.prisoner.prisonerNumber + "/visiting-orders-history" %}
-{% else %}
-  {% set backLinkHref = "/prisoner/" + visitDetails.prisoner.prisonerNumber %}
-  {% set fromPrisonerProfile = true %}
-{% endif %}
-
 {% set mainClasses = "bapv-visit-details" %}
 
 {% block content %}
@@ -55,7 +38,7 @@
         <dl class="govuk-list">
           <dt>Main contact</dt>
           <dd data-test="visit-contact">{{ visitDetails.visitContact.name }}</dd>
-          
+
           <dt>Contact details</dt>
           <dd>
             {%- if visitDetails.visitContact.telephone -%}
@@ -85,7 +68,7 @@
       or availableVisitActions.clearNotifications
       or availableVisitActions.print %}
       <div class="govuk-button-group" data-test="visit-actions">
-        <form action="/visit/{{ visitDetails.reference }}/update" method="POST" novalidate>
+        <form action="{{ startUpdateAction }}" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
           {{ govukButton({
@@ -98,7 +81,7 @@
           {{ govukButton({
             text: "Cancel booking",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
-            href: "/visit/" + visitDetails.reference + "/cancel",
+            href: cancelHref,
             attributes: { "data-test": "cancel-visit" },
             preventDoubleClick: true
           }) if availableVisitActions.cancel }}
@@ -106,7 +89,7 @@
           {{ govukButton({
             text: "Do not change",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
-            href: "/visit/" + visitDetails.reference + "/clear-notifications",
+            href: clearNotificationsHref,
             attributes: { "data-test": "clear-notifications" },
             preventDoubleClick: true
           }) if availableVisitActions.clearNotifications }}
@@ -126,13 +109,8 @@
     {# Visit request actions #}
     {% if availableVisitActions.processRequest %}
       <div class="govuk-button-group" data-test="visit-request-actions">
-        <form action="/visit/{{ visitDetails.reference }}/request/approve" method="POST" novalidate>
+        <form action="{{ processRequestApproveAction }}" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% if fromPage == "visits" %}<input type="hidden" name="redirectTo" value="visits" data-test="redirect-to">{% endif %}
-          {% if fromPrisonerProfile %}
-            <input type="hidden" name="redirectTo" value="profile" data-test="redirect-to">
-            <input type="hidden" name="prisonerId" value="{{ prisonerId }}" data-test="prisoner-id">
-          {% endif %}
           {{ govukButton({
             text: "Approve request",
             classes: "govuk-!-margin-top-5 govuk-button--secondary",
@@ -141,13 +119,8 @@
           }) }}
         </form>
 
-        <form action="/visit/{{ visitDetails.reference }}/request/reject" method="POST" novalidate>
+        <form action="{{ processRequestRejectAction }}" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-          {% if fromPage == "visits" %}<input type="hidden" name="redirectTo" value="visits" data-test="redirect-to">{% endif %}
-          {% if fromPrisonerProfile %}
-            <input type="hidden" name="redirectTo" value="profile" data-test="redirect-to">
-            <input type="hidden" name="prisonerId" value="{{ prisonerId }}" data-test="prisoner-id">
-          {% endif %}
           {{ govukButton({
             text: "Reject request",
             classes: "govuk-!-margin-top-5 govuk-!-margin-left-6 govuk-button--secondary",

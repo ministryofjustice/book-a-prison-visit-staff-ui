@@ -7,8 +7,6 @@
 
 {% set pageHeaderTitle = "Select visitors" %}
 
-{% set backLinkHref = backLink %}
-
 {% set visitors = [] %}
 {% set noVisitorsText = '' %}
 
@@ -136,11 +134,11 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
             {# if no restrictions, show this under the restriction header #}
             <p data-test="restriction-description">There are no restrictions to review.</p>
           {% endif %}
-          
+
           <h2 class="govuk-heading-m">Alerts</h2>
 
           {% if alerts | length %}
-            
+
             <p data-test="alert-description">This table shows alerts that are relevant for social visits. {{ alertDpsContent | safe }}</p>
 
             {{ govukTable({
@@ -180,7 +178,7 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
             <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
           </p>
         {% endif %}
-    
+
         {% if atLeastOneAdult === false %}
           <p data-test="no-suitable-visitors">There are no approved visitors 18 years old or older for this prisoner. A booking cannot be made at this time.</p>
         {% elif atLeastOneAdult === true and eligibleVisitors === false %}
@@ -203,7 +201,7 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
           </ul>
           <p>At least one visitor must be 18 years or older.</p>
         {% endif %}
-      
+
         <form action="{{ urlPrefix }}/select-visitors" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 

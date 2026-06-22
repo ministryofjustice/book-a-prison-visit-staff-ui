@@ -91,6 +91,18 @@ describe('GET /visit/:reference/cancel', () => {
       })
   })
 
+  it('should preserve navigation state in back link and form action', () => {
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-back-link').attr('href')).toBe('/visit/ab-cd-ef-gh?from=visits&query=type%3DOPEN')
+        expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN')
+      })
+  })
+
   it('should render the cancellation reasons page, showing validation errors and re-populating fields', () => {
     flashData.errors = <FieldValidationError[]>[
       { msg: 'No answer selected', path: 'cancel' },
@@ -229,6 +241,14 @@ describe('POST /visit/:reference/cancel', () => {
         expect(auditService.cancelledVisit).not.toHaveBeenCalled()
         expect(sessionData.cancelledVisitInfo).toBeUndefined()
       })
+  })
+
+  it('should preserve navigation state on validation redirect', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN')
+      .send({})
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN')
   })
 
   it('should set validation errors in flash and redirect if VISITOR_CANCELLED and no method selected', () => {

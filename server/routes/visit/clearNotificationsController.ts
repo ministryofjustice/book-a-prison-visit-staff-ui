@@ -4,6 +4,7 @@ import { AuditService, VisitNotificationsService } from '../../services'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { IgnoreVisitNotificationsDto } from '../../data/orchestrationApiTypes'
 import { getFlashFormValues } from '../visitorUtils'
+import { extractVisitNavState, appendNavStateToPath } from './visitNavigationUtils'
 
 export default class ClearNotificationsController {
   public constructor(
@@ -14,11 +15,16 @@ export default class ClearNotificationsController {
   public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
+
+      const backLinkHref = appendNavStateToPath(`/visit/${reference}`, navState)
+      const formAction = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
 
       return res.render('pages/visit/clearNotifications', {
         errors: req.flash('errors'),
         formValues: getFlashFormValues(req),
-        backLinkHref: `/visit/${reference}`,
+        backLinkHref,
+        formAction,
       })
     }
   }
@@ -28,11 +34,13 @@ export default class ClearNotificationsController {
       const errors = validationResult(req)
       const { reference } = req.params
       const { username } = res.locals.user
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
         req.flash('formValues', req.body)
-        return res.redirect(`/visit/${reference}/clear-notifications`)
+        const redirectUrl = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
+        return res.redirect(redirectUrl)
       }
 
       if (req.body.clearNotifications === 'yes') {
@@ -63,7 +71,8 @@ export default class ClearNotificationsController {
         })
       }
 
-      return res.redirect(`/visit/${reference}`)
+      const redirectUrl = appendNavStateToPath(`/visit/${reference}`, navState)
+      return res.redirect(redirectUrl)
     }
   }
 

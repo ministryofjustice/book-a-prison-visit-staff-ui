@@ -39,7 +39,7 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitorIds.map(id => id.toString())
     }
 
-    const returnAddress = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
+    const backLinkHref = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
@@ -54,7 +54,7 @@ export default class SelectVisitors {
       formValues,
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(offenderNo),
       urlPrefix: getUrlPrefix(isUpdate),
-      backLink: returnAddress,
+      backLinkHref,
     })
   }
 

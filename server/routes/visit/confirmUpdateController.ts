@@ -2,6 +2,7 @@ import { RequestHandler, Request } from 'express'
 import { BadRequest } from 'http-errors'
 import { isValidVisitReference } from '../validationChecks'
 import { VisitReferenceParams } from '../../@types/requestParameterTypes'
+import { appendNavStateToPath, extractVisitNavState } from './visitNavigationUtils'
 
 export default class ConfirmUpdateController {
   public constructor() {}
@@ -10,10 +11,12 @@ export default class ConfirmUpdateController {
     return async (req, res) => {
       const reference = getVisitReference(req)
       const { policyNoticeDaysMin } = req.session.selectedEstablishment
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       return res.render('pages/visit/confirmUpdate', {
         errors: req.flash('errors'),
-        backLinkHref: `/visit/${reference}`,
+        backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
+        formAction: appendNavStateToPath(`/visit/${reference}/confirm-update`, navState),
         policyNoticeDaysMin,
         reference,
       })
@@ -24,13 +27,14 @@ export default class ConfirmUpdateController {
     return async (req, res) => {
       const reference = getVisitReference(req)
       const { confirmUpdate } = req.body
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       if (confirmUpdate === 'yes') {
         req.session.visitSessionData.overrideBookingWindow = true
         return res.redirect('/update-a-visit/select-visitors')
       }
       if (confirmUpdate === 'no') {
-        return res.redirect(`/visit/${reference}`)
+        return res.redirect(appendNavStateToPath(`/visit/${reference}`, navState))
       }
 
       req.flash('errors', [
@@ -42,7 +46,7 @@ export default class ConfirmUpdateController {
         },
       ] as unknown as [])
 
-      return res.redirect(`/visit/${reference}/confirm-update`)
+      return res.redirect(appendNavStateToPath(`/visit/${reference}/confirm-update`, navState))
     }
   }
 }
