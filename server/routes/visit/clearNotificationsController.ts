@@ -47,6 +47,12 @@ export default class ClearNotificationsController {
           ignoreVisitNotificationsDto,
         })
 
+        req.flash('messages', {
+          variant: 'success',
+          title: 'The visit has not been changed',
+          text: 'You confirmed the visit does not need to change',
+        })
+
         await this.auditService.dismissedNotifications({
           visitReference: reference,
           prisonerId: visit.prisonerId.toString(),
