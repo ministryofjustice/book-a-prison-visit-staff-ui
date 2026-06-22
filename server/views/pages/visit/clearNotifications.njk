@@ -9,7 +9,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
-      <form action="{{ backLinkHref }}/clear-notifications" method="POST" novalidate>
+      <form action="{{ formAction }}" method="POST" novalidate>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
           {% set clearReasonHtml %}
@@ -63,12 +63,12 @@
             ],
             errorMessage: errors | findError('clearNotifications')
           }) }}
-          
+
           {{ govukButton({
             text: "Continue",
             attributes: { "data-test": "submit" },
             preventDoubleClick: true
-          }) }} 
+          }) }}
       </form>
     </div>
   </div>

@@ -7,6 +7,7 @@ import { requestMethodsCancellation } from '../../constants/requestMethods'
 import { getFlashFormValues } from '../visitorUtils'
 import { visitCancellationReasons } from '../../constants/visitCancellation'
 import { isMobilePhoneNumber } from '../../utils/utils'
+import { appendNavStateToPath, extractVisitNavState } from './visitNavigationUtils'
 
 export default class CancelVisitController {
   public constructor(
@@ -29,9 +30,12 @@ export default class CancelVisitController {
   public showCancellationReasons(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       return res.render('pages/visit/cancel', {
         errors: req.flash('errors'),
+        backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
+        formAction: appendNavStateToPath(`/visit/${reference}/cancel`, navState),
         reference,
         visitCancellationReasons,
         requestMethodsCancellation,
@@ -43,6 +47,7 @@ export default class CancelVisitController {
   public cancelVisit(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       const errors = validationResult(req)
       const { username } = res.locals.user
@@ -50,7 +55,7 @@ export default class CancelVisitController {
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array() as [])
         req.flash('formValues', req.body)
-        return res.redirect(`/visit/${reference}/cancel`)
+        return res.redirect(appendNavStateToPath(`/visit/${reference}/cancel`, navState))
       }
 
       const outcomeStatus = req.body.cancel

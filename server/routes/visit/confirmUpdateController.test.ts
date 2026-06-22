@@ -42,6 +42,18 @@ describe('GET /visit/:reference/confirm-update', () => {
         expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/confirm-update')
       })
   })
+
+  it('should preserve navigation state in back link and form action', () => {
+    return request(app)
+      .get('/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
+      .expect(200)
+      .expect('Content-Type', /html/)
+      .expect(res => {
+        const $ = cheerio.load(res.text)
+        expect($('.govuk-back-link').attr('href')).toBe('/visit/ab-cd-ef-gh?from=visits&query=type%3DOPEN')
+        expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
+      })
+  })
 })
 
 describe('POST /visit/:reference/confirm-update', () => {
@@ -68,6 +80,14 @@ describe('POST /visit/:reference/confirm-update', () => {
       })
   })
 
+  it('should preserve navigation state when redirecting back to visit details', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
+      .send('confirmUpdate=no')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh?from=visits&query=type%3DOPEN')
+  })
+
   it('should redirect to select visitors page if choosing to proceed with update', () => {
     return request(app)
       .post('/visit/ab-cd-ef-gh/confirm-update')
@@ -91,5 +111,13 @@ describe('POST /visit/:reference/confirm-update', () => {
           { location: 'body', msg: 'No option selected', path: 'confirmUpdate', type: 'field' },
         ])
       })
+  })
+
+  it('should preserve navigation state when redirecting to self with validation errors', () => {
+    return request(app)
+      .post('/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
+      .send('confirmUpdate=')
+      .expect(302)
+      .expect('location', '/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
   })
 })

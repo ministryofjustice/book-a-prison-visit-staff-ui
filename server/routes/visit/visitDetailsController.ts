@@ -9,6 +9,12 @@ import {
   getVisitAlerts,
   getHideAlertsInset,
 } from './visitUtils'
+import {
+  appendNavStateToPath,
+  extractVisitNavState,
+  getVisitDetailsBackLink,
+  type VisitNavState,
+} from './visitNavigationUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
 import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
 
@@ -79,19 +85,34 @@ export default class VisitDetailsController {
         visitNotes: visitDetails.visitNotes,
       })
 
-      const fromPage = typeof req.query?.from === 'string' ? req.query.from : null
-      const fromPageQuery = typeof req.query?.query === 'string' ? req.query.query : null
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
+      const { backLinkHref } = getVisitDetailsBackLink({
+        navState,
+        prisonerNumber: prisoner.prisonerNumber,
+      })
+      const cancelHref = appendNavStateToPath(`/visit/${reference}/cancel`, navState)
+      const clearNotificationsHref = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
+      const startUpdateAction = appendNavStateToPath(`/visit/${reference}/update`, navState)
+      const { processRequestApproveAction, processRequestRejectAction } = this.getProcessRequestActions(
+        reference,
+        navState,
+        navState.fromPage === 'prisoner' ? prisoner.prisonerNumber : undefined,
+      )
 
       const prisonerDpsAlertsUrl = getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber)
       const prisonerLocation = getPrisonerLocation(prisoner)
 
       return res.render('pages/visit/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
+        backLinkHref,
         hideAlertsInset,
         availableVisitActions,
         eventsTimeline,
-        fromPage,
-        fromPageQuery,
+        cancelHref,
+        clearNotificationsHref,
+        startUpdateAction,
+        processRequestApproveAction,
+        processRequestRejectAction,
         messages,
         prisonerDpsAlertsUrl,
         prisonerLocation,
@@ -113,5 +134,30 @@ export default class VisitDetailsController {
       'WITHDRAWN',
     ]
     return requestTitleSubStatuses.includes(visitSubStatus) ? 'Visit request details' : 'Visit booking details'
+  }
+
+  private getProcessRequestActions(
+    reference: string,
+    navState: VisitNavState,
+    prisonerNumber?: string,
+  ): {
+    processRequestApproveAction: string
+    processRequestRejectAction: string
+  } {
+    const approveAction = appendNavStateToPath(`/visit/${reference}/request/approve`, navState)
+    const rejectAction = appendNavStateToPath(`/visit/${reference}/request/reject`, navState)
+
+    if (prisonerNumber) {
+      const separator = (url: string) => (url.includes('?') ? '&' : '?')
+      return {
+        processRequestApproveAction: `${approveAction}${separator(approveAction)}prisonerId=${prisonerNumber}`,
+        processRequestRejectAction: `${rejectAction}${separator(rejectAction)}prisonerId=${prisonerNumber}`,
+      }
+    }
+
+    return {
+      processRequestApproveAction: approveAction,
+      processRequestRejectAction: rejectAction,
+    }
   }
 }

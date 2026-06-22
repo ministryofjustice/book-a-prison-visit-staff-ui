@@ -250,6 +250,9 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"]').eq(0).text()).toBe(
             upcomingVisit.reference,
           )
+          expect(
+            $('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-reference"] a').eq(0).attr('href'),
+          ).toBe(`/visit/${upcomingVisit.reference}?from=prisoner`)
           expect($('.prisoner-profile-visits:nth-child(1) [data-test="tab-visits-type"] > span').eq(0).html()).toBe(
             'Social<br>(Open)',
           )

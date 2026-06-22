@@ -96,7 +96,7 @@ test.describe('Prisoner profile page', () => {
     await expect(prisonerProfilePage.visitTabCaption(1)).toContainText('January 2022 (1 past visit)')
     await expect(prisonerProfilePage.visitTabReference(profile.visits[0].reference)).toHaveAttribute(
       'href',
-      `/visit/${profile.visits[0].reference}`,
+      `/visit/${profile.visits[0].reference}?from=prisoner`,
     )
     await expect(prisonerProfilePage.visitTabType.nth(0)).toContainText('Social')
     await expect(prisonerProfilePage.visitTabLocation.nth(0)).toContainText('Hewell (HMP)')

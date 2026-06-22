@@ -165,6 +165,15 @@ describe('Start a visit update journey', () => {
         .expect('location', '/visit/ab-cd-ef-gh/confirm-update')
     })
 
+    it('should preserve navigation state when redirecting to confirm-update', () => {
+      visitDetails.startTimestamp = '2022-01-03T10:00:00'
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update?from=visits&query=type%3DOPEN')
+        .expect(302)
+        .expect('location', '/visit/ab-cd-ef-gh/confirm-update?from=visits&query=type%3DOPEN')
+    })
+
     it('should render 400 Bad Request error for invalid visit reference', () => {
       return request(app)
         .post('/visit/12-34-56-78/update')

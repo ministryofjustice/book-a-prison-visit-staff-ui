@@ -185,7 +185,7 @@ describe('Visit details page', () => {
         })
     })
 
-    it('should render hidden redirect-to field for a visit request when coming from visits page', () => {
+    it('should render process request action URLs with navigation state when coming from visits page', () => {
       availableVisitActions = {
         update: false,
         cancel: false,
@@ -201,11 +201,16 @@ describe('Visit details page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="redirect-to"]').val()).toBe('visits')
+          expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/approve?from=visits',
+          )
+          expect($('[data-test="reject-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject?from=visits',
+          )
         })
     })
 
-    it('should render hidden redirect-to field and prisonerId for a visit request when coming from prisoner profile page', () => {
+    it('should render process request action URLs with prisonerId when coming from prisoner profile page', () => {
       setFeature('printVisitPasses', true)
       availableVisitActions = {
         update: false,
@@ -222,8 +227,12 @@ describe('Visit details page', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test="redirect-to"]').val()).toBe('profile')
-          expect($('[data-test="prisoner-id"]').val()).toBe('A1234BC')
+          expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/approve?from=prisoner&prisonerId=A1234BC',
+          )
+          expect($('[data-test="reject-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject?from=prisoner&prisonerId=A1234BC',
+          )
         })
     })
 
@@ -406,6 +415,30 @@ describe('Visit details page', () => {
 
             expect($('[data-test=print-visit-pass]').text().trim()).toBe('Print visit pass')
             expect($('[data-test=print-visit-pass]').attr('href')).toBe('/visit/ab-cd-ef-gh/visit-pass?from=visit')
+          })
+      })
+
+      it('should preserve navigation state in update and cancel actions', () => {
+        availableVisitActions = {
+          update: true,
+          cancel: true,
+          clearNotifications: true,
+          print: true,
+          processRequest: false,
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh?from=visits&query=type%3DOPEN')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=visit-actions] form').attr('action')).toBe(
+              '/visit/ab-cd-ef-gh/update?from=visits&query=type%3DOPEN',
+            )
+            expect($('[data-test=cancel-visit]').attr('href')).toBe(
+              '/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN',
+            )
           })
       })
 
