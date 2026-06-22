@@ -5,6 +5,7 @@ import { VisitReferenceParams } from '../../@types/requestParameterTypes'
 import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
 import { isValidPrisonerNumber } from '../validationChecks'
+import { extractVisitNavState, type VisitNavState } from './visitNavigationUtils'
 
 type RequestAction = 'approve' | 'reject'
 
@@ -18,17 +19,8 @@ export default class ProcessVisitRequestController {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user
-      let redirectPath = '/requested-visits'
-
-      if (req.body?.redirectTo === 'visits') {
-        redirectPath = '/visits'
-      } else if (req.body?.redirectTo === 'profile') {
-        const prisonerId = req.body?.prisonerId
-
-        if (isValidPrisonerNumber(prisonerId)) {
-          redirectPath = `/prisoner/${prisonerId}`
-        }
-      }
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
+      const redirectPath = this.getRedirectPath(navState, req.query?.prisonerId)
 
       try {
         const visitRequestResponse =
@@ -51,6 +43,21 @@ export default class ProcessVisitRequestController {
         return next(error)
       }
     }
+  }
+
+  private getRedirectPath(navState: VisitNavState, prisonerIdParam: unknown): string {
+    if (navState.fromPage === 'visits') {
+      return navState.fromPageQuery ? `/visits?${navState.fromPageQuery}` : '/visits'
+    }
+
+    if (navState.fromPage === 'prisoner') {
+      const prisonerId = typeof prisonerIdParam === 'string' ? prisonerIdParam : undefined
+      if (prisonerId && isValidPrisonerNumber(prisonerId)) {
+        return `/prisoner/${prisonerId}`
+      }
+    }
+
+    return '/requested-visits'
   }
 
   private getSuccessMessage(action: RequestAction, visitRequestResponse: VisitRequestResponse): MoJAlert {

@@ -5,15 +5,13 @@
 
 {% set pageHeaderTitle = "Why is this booking being cancelled?" %}
 
-{% set backLinkHref = "/visit/" + reference %}
-
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
       {% include "partials/errorSummary.njk" %}
 
-      <form action="/visit/{{ reference }}/cancel" method="POST" novalidate>
+      <form action="{{ formAction }}" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {% set requestMethods = [] %}
@@ -92,7 +90,7 @@
             "data-test": "cancel-booking"
           },
           preventDoubleClick: true
-        }) }} 
+        }) }}
       </form>
     </div>
   </div>

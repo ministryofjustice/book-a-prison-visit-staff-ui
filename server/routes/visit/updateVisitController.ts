@@ -6,6 +6,7 @@ import { clearSession } from '../visitorUtils'
 import { VisitSessionData } from '../../@types/bapv'
 import { convertToTitleCase } from '../../utils/utils'
 import { getIdsToFlag, getPrisonerLocation, isPublicBooking } from './visitUtils'
+import { appendNavStateToPath, extractVisitNavState } from './visitNavigationUtils'
 
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
@@ -14,6 +15,7 @@ export default class UpdateVisitController {
     return async (req, res) => {
       const { reference } = req.params
       const { username } = res.locals.user
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
       const { prison, prisoner } = visitDetails
@@ -21,7 +23,7 @@ export default class UpdateVisitController {
       const prisonerInVisitPrison = prison.prisonId === prisoner.prisonId
       const visitInSelectedEstablishment = prison.prisonId === req.session.selectedEstablishment.prisonId
       if (!prisonerInVisitPrison || !visitInSelectedEstablishment) {
-        return res.redirect(`/visit/${visitDetails.reference}`)
+        return res.redirect(appendNavStateToPath(`/visit/${visitDetails.reference}`, navState))
       }
 
       // clean session then pre-populate with visit to update
@@ -100,7 +102,7 @@ export default class UpdateVisitController {
       if (numberOfDays > policyNoticeDaysMin) {
         return res.redirect('/update-a-visit/select-visitors')
       }
-      return res.redirect(`/visit/${reference}/confirm-update`)
+      return res.redirect(appendNavStateToPath(`/visit/${reference}/confirm-update`, navState))
     }
   }
 }
