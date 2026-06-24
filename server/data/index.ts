@@ -1,8 +1,3 @@
-/* eslint-disable import/first */
-import applicationInfoSupplier from '../applicationInfo'
-
-const applicationInfo = applicationInfoSupplier()
-
 import HmppsAuthClient from './hmppsAuthClient'
 import IncentivesApiClient from './incentivesApiClient'
 import OrchestrationApiClient from './orchestrationApiClient'
@@ -10,6 +5,9 @@ import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient
 import PrisonerSearchClient from './prisonerSearchClient'
 import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
+import applicationInfoSupplier from '../applicationInfo'
+
+const applicationInfo = applicationInfoSupplier()
 
 export type RestClientBuilder<T> = (token: string) => T
 
