@@ -1,4 +1,4 @@
-     import { components } from '../@types/orchestration-api'
+import { components } from '../@types/orchestration-api'
 
 // Visitor restrictions can be 2 types (local/global). Raw API values are processed in the data layer
 // and replaced with the VISITOR_RESTRICTION value for use within the application
