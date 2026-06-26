@@ -1,4 +1,4 @@
-import { components } from '../@types/orchestration-api'
+     import { components } from '../@types/orchestration-api'
 
 // Visitor restrictions can be 2 types (local/global). Raw API values are processed in the data layer
 // and replaced with the VISITOR_RESTRICTION value for use within the application
@@ -44,6 +44,8 @@ export type VisitSession = components['schemas']['VisitSessionDto']
 
 export type Alert = components['schemas']['AlertDto']
 export type OffenderRestriction = components['schemas']['OffenderRestrictionDto']
+
+export type VisitSchedulerUpdatePrisonDto = components['schemas']['VisitSchedulerUpdatePrisonDto']
 
 // Visit orders
 export type PrisonerBalanceDto = components['schemas']['PrisonerBalanceDto']

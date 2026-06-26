@@ -1,0 +1,107 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageHeaderTitle = "Visit allowances for unconvicted prisoners" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <h2 class="govuk-heading-m">Unconvicted prisoners</h2>
+
+      <p>
+        Unconvicted prisoners are remand prisoners, immigration detainees and civil prisoners.
+      </p>
+      <p>
+        They must be allowed visits on at least 1 days each week, which includes weekends.
+      </p>
+
+      <form action="/visit-allowances/remand" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukInput({
+          name: "remandVisitLimitPerWeek",
+          label: {
+            text: "How many visits can unconvicted prisoners have?",
+            classes: "govuk-label--m"
+          },
+          suffix: {
+            text: "visits every 7 days",
+            classes: "bapv-suffix-no-style"
+          },
+          classes: "govuk-input--width-2",
+          autocomplete: "off",
+          value: formValues.remandVisitLimitPerWeek,
+          errorMessage: errors | findError('remandVisitLimitPerWeek')
+        }) }}
+
+        {{ govukRadios({
+          name: "weekStartDay",
+          fieldset: {
+            legend: {
+              text: "On which day does the allowances renew?",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          items: [
+            {
+              value: "MONDAY",
+              text: "Monday",
+              checked: formValues.weekStartDay == "MONDAY"
+            },
+            {
+              value: "TUESDAY",
+              text: "Tuesday",
+              checked: formValues.weekStartDay == "TUESDAY"
+            },
+            {
+              value: "WEDNESDAY",
+              text: "Wednesday",
+              checked: formValues.weekStartDay == "WEDNESDAY"
+            },
+            {
+              value: "THURSDAY",
+              text: "Thursday",
+              checked: formValues.weekStartDay == "THURSDAY"
+            },
+            {
+              value: "FRIDAY",
+              text: "Friday",
+              checked: formValues.weekStartDay == "FRIDAY"
+            },
+            {
+              value: "SATURDAY",
+              text: "Saturday",
+              checked: formValues.weekStartDay == "SATURDAY"
+            },
+            {
+              value: "SUNDAY",
+              text: "Sunday",
+              checked: formValues.weekStartDay == "SUNDAY"
+            }
+          ],
+          errorMessage: errors | findError('weekStartDay'),
+          attributes: { "data-test": "week-start-day" }
+        }) }}
+
+        {{ govukButton({
+          text: "Submit",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }}
+      </form>
+      
+    </div>
+  </div>
+{% endblock %}

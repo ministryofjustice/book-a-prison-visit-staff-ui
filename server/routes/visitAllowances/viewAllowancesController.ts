@@ -13,6 +13,7 @@ export default class ViewAllowancesController {
       })
 
       return res.render('pages/visitAllowances/view', {
+        message: req.flash('messages')?.[0],
         incentiveLevels,
       })
     }

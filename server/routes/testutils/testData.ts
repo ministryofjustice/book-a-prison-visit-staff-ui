@@ -41,7 +41,7 @@ import {
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import { MoJAlert, Prison } from '../../@types/bapv'
+import { MoJAlert, Prison, PrisonRemandConfig } from '../../@types/bapv'
 import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
 import { PrisonIncentiveLevel } from '../../data/incentivesApiTypes'
 
@@ -434,6 +434,14 @@ export default class TestData {
     convictedSpendLimitInPence,
     visitOrders,
     privilegedVisitOrders,
+  })
+
+  static prisonRemandConfig = ({
+    weekStartDay = 'MONDAY',
+    remandVisitLimitPerWeek = 3,
+  }: Partial<PrisonRemandConfig> = {}): PrisonRemandConfig => ({
+    weekStartDay,
+    remandVisitLimitPerWeek,
   })
 
   // Visitor restrictions

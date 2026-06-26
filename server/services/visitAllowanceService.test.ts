@@ -11,10 +11,15 @@ describe('Visit allowance service', () => {
   let visitAllowanceService: VisitAllowanceService
 
   const IncentivesApiClientFactory = jest.fn()
+  const OrchestrationApiClient = jest.fn()
 
   beforeEach(() => {
     IncentivesApiClientFactory.mockReturnValue(incentivesApiClient)
-    visitAllowanceService = new VisitAllowanceService(IncentivesApiClientFactory, hmppsAuthClient)
+    visitAllowanceService = new VisitAllowanceService(
+      IncentivesApiClientFactory,
+      OrchestrationApiClient,
+      hmppsAuthClient,
+    )
 
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
