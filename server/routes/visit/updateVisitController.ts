@@ -41,6 +41,7 @@ export default class UpdateVisitController {
         phoneNumber: visitDetails.visitContact.telephone,
         email: visitDetails.visitContact.email,
         contactName: visitDetails.visitContact.name,
+        languagePreference: visitDetails.visitContact.languagePreference ?? 'en',
       }
 
       const startDateTime = parseISO(visitDetails.startTimestamp)
