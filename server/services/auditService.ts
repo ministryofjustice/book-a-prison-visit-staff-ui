@@ -480,14 +480,14 @@ export default class AuditService {
 
   async updatedPrisonAllowances({
     prisonId,
-    originalConfig,
-    newConfig,
+    weekStartDay,
+    remandVisitLimitPerWeek,
     username,
     operationId,
   }: {
     prisonId: string
-    originalConfig: PrisonRemandConfig
-    newConfig: PrisonRemandConfig
+    weekStartDay: PrisonRemandConfig['weekStartDay']
+    remandVisitLimitPerWeek: PrisonRemandConfig['remandVisitLimitPerWeek']
     username: string
     operationId: string
   }) {
@@ -495,7 +495,7 @@ export default class AuditService {
       action: 'UPDATED_VISIT_ALLOWANCES',
       who: username,
       operationId,
-      details: { originalConfig, newConfig, prisonId },
+      details: { weekStartDay, remandVisitLimitPerWeek, prisonId },
     })
   }
 

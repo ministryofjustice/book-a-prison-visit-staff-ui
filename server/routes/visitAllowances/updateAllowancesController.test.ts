@@ -88,13 +88,6 @@ describe('Update visit allowances - change remand visit limit and allowance rese
     })
 
     it('should update prison config if suitable answers added to form', () => {
-      const originalConfig = TestData.prisonRemandConfig()
-      visitAllowanceService.getRemandConfig.mockResolvedValue(originalConfig)
-      const newConfig = {
-        weekStartDay: 'THURSDAY',
-        remandVisitLimitPerWeek: 2,
-      }
-
       return request(app)
         .post(url)
         .send({ remandVisitLimitPerWeek: '2', weekStartDay: 'THURSDAY' })
@@ -109,8 +102,8 @@ describe('Update visit allowances - change remand visit limit and allowance rese
           })
           expect(auditService.updatedPrisonAllowances).toHaveBeenCalledWith({
             prisonId: 'HEI',
-            originalConfig,
-            newConfig,
+            weekStartDay: 'THURSDAY',
+            remandVisitLimitPerWeek: 2,
             username: 'user1',
             operationId: undefined,
           })

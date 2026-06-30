@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitAllowanceService } from '../../services'
-import { getFlashFormValues } from '../visitorUtils'
 import { properCase } from '../../utils/utils'
 
 export default class UpdatesAllowancesController {
@@ -13,15 +12,17 @@ export default class UpdatesAllowancesController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { prisonId } = req.session.selectedEstablishment
-      const formValues = getFlashFormValues(req)
 
       const remandConfig = await this.visitAllowanceService.getRemandConfig({
         username: res.locals.user.username,
         prisonId,
       })
 
-      formValues.weekStartDay = remandConfig.weekStartDay
-      formValues.remandVisitLimitPerWeek = remandConfig.remandVisitLimitPerWeek
+      const formValues = {
+        weekStartDay: remandConfig.weekStartDay,
+        remandVisitLimitPerWeek: remandConfig.remandVisitLimitPerWeek,
+        ...req.flash('formValues')?.[0],
+      }
 
       return res.render('pages/visitAllowances/remand', {
         formValues,
@@ -50,19 +51,10 @@ export default class UpdatesAllowancesController {
         remandVisitLimitPerWeek,
       })
 
-      const originalConfig = await this.visitAllowanceService.getRemandConfig({
-        username,
-        prisonId,
-      })
-      const newConfig = {
-        weekStartDay,
-        remandVisitLimitPerWeek,
-      }
-
       await this.auditService.updatedPrisonAllowances({
         prisonId,
-        originalConfig,
-        newConfig,
+        weekStartDay,
+        remandVisitLimitPerWeek,
         username,
         operationId: res.locals.appInsightsOperationId,
       })
