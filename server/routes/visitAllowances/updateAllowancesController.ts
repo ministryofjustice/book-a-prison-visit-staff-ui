@@ -24,7 +24,7 @@ export default class UpdatesAllowancesController {
         ...req.flash('formValues')?.[0],
       }
 
-      return res.render('pages/visitAllowances/remand', {
+      return res.render('pages/visitAllowances/update', {
         formValues,
         errors: req.flash('errors'),
       })

@@ -437,8 +437,8 @@ export default class TestData {
   })
 
   static prisonRemandConfig = ({
-    weekStartDay = 'MONDAY',
-    remandVisitLimitPerWeek = 3,
+    weekStartDay = this.prisonDto().weekStartDay,
+    remandVisitLimitPerWeek = this.prisonDto().remandVisitLimitPerWeek,
   }: Partial<PrisonRemandConfig> = {}): PrisonRemandConfig => ({
     weekStartDay,
     remandVisitLimitPerWeek,
@@ -542,6 +542,8 @@ export default class TestData {
     adultAgeYears = this.prisonDto().adultAgeYears,
     webAddress = this.prisonDto().webAddress,
     clients = this.prisonDto().clients,
+    weekStartDay = this.prisonDto().weekStartDay,
+    remandVisitLimitPerWeek = this.prisonDto().remandVisitLimitPerWeek,
   }: Partial<Prison> = {}): Prison =>
     ({
       prisonId,
@@ -555,6 +557,8 @@ export default class TestData {
       adultAgeYears,
       webAddress,
       clients,
+      weekStartDay,
+      remandVisitLimitPerWeek,
     }) as Prison
 
   static prisonDto = ({
@@ -569,6 +573,8 @@ export default class TestData {
     adultAgeYears = 18,
     webAddress = 'https://www.example.com/hewell',
     clients = [{ userType: 'STAFF', active: true }],
+    weekStartDay = 'MONDAY',
+    remandVisitLimitPerWeek = 3,
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -582,6 +588,8 @@ export default class TestData {
       adultAgeYears,
       webAddress,
       clients,
+      weekStartDay,
+      remandVisitLimitPerWeek,
     }) as PrisonDto
 
   static prisonerVoBalance = ({

@@ -15,12 +15,14 @@ const visitAllowanceService = createMockVisitAllowanceService()
 
 const url = '/visit-allowances'
 const prisonIncentiveLevels = [TestData.prisonIncentiveLevel()]
+const remandConfig = TestData.prisonRemandConfig()
 
 beforeEach(() => {
   flashData = { messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
   visitAllowanceService.getPrisonIncentiveLevels.mockResolvedValue(prisonIncentiveLevels)
+  visitAllowanceService.getRemandConfig.mockResolvedValue(remandConfig)
   sessionData = {} as SessionData
   app = appWithAllRoutes({
     services: { visitAllowanceService },
