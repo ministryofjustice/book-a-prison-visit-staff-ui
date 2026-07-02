@@ -143,6 +143,11 @@ export interface Prison extends Omit<PrisonDto, 'code'> {
   prisonId: string
 }
 
+export type PrisonRemandConfig = {
+  weekStartDay: PrisonDto['weekStartDay']
+  remandVisitLimitPerWeek: PrisonDto['remandVisitLimitPerWeek']
+}
+
 export type FilterField = {
   id: string
   label: string

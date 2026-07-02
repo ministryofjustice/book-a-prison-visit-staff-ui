@@ -2,21 +2,27 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { createMockVisitAllowanceService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
 import config from '../../config'
 
 let app: Express
+let flashData: FlashData
 let sessionData: SessionData
 
 const visitAllowanceService = createMockVisitAllowanceService()
 
 const url = '/visit-allowances'
 const prisonIncentiveLevels = [TestData.prisonIncentiveLevel()]
+const remandConfig = TestData.prisonRemandConfig()
 
 beforeEach(() => {
+  flashData = { messages: [] }
+  flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
   visitAllowanceService.getPrisonIncentiveLevels.mockResolvedValue(prisonIncentiveLevels)
+  visitAllowanceService.getRemandConfig.mockResolvedValue(remandConfig)
   sessionData = {} as SessionData
   app = appWithAllRoutes({
     services: { visitAllowanceService },
@@ -30,13 +36,17 @@ afterEach(() => {
 
 describe('Visit allowances - View current visit allowances', () => {
   describe(`GET ${url}`, () => {
-    it('should render view visit allowances page with all active incentive levels', () => {
+    it('should render view visit allowances page with all active incentive levels and alert from update journey', () => {
+      flashData.messages = [TestData.mojAlert({ title: 'test alert message' })]
+
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Page header
+          expect($('.moj-alert').length).toBe(1)
+          expect($('.moj-alert').text()).toContain('test alert message')
           expect($('title').text()).toMatch(/^Visit allowances -/)
           expect($('h1').text().trim()).toBe('Visit allowances')
           expect($('[data-test=remand-limit]').text()).toBe('3 visits every 7 days')

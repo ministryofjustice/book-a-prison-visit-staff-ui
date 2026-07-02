@@ -2,6 +2,7 @@ import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
 import { PrisonerBalanceAdjustmentReason, RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
+import { PrisonRemandConfig } from '../@types/bapv'
 
 export default class AuditService {
   private sqsClient: SQSClient
@@ -474,6 +475,27 @@ export default class AuditService {
       who: username,
       operationId,
       details: { prisonerId, voChange, pvoChange, reason, reasonDetails },
+    })
+  }
+
+  async updatedPrisonAllowances({
+    prisonId,
+    weekStartDay,
+    remandVisitLimitPerWeek,
+    username,
+    operationId,
+  }: {
+    prisonId: string
+    weekStartDay: PrisonRemandConfig['weekStartDay']
+    remandVisitLimitPerWeek: PrisonRemandConfig['remandVisitLimitPerWeek']
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'UPDATED_VISIT_ALLOWANCES',
+      who: username,
+      operationId,
+      details: { weekStartDay, remandVisitLimitPerWeek, prisonId },
     })
   }
 

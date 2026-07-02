@@ -1186,4 +1186,20 @@ describe('orchestrationApiClient', () => {
       expect(output).toStrictEqual(expectedPrison)
     })
   })
+
+  describe('updatePrisonConfig', () => {
+    it('should update a prisons remand limits', async () => {
+      fakeOrchestrationApi
+        .put(`/config/prisons/prison/${prisonId}`)
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.updatePrisonConfig({
+        prisonId: 'HEI',
+        visitSchedulerUpdatePrisonDto: { weekStartDay: 'SUNDAY', remandVisitLimitPerWeek: 4 },
+      })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
 })

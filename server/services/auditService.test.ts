@@ -528,6 +528,31 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends a update prison allowances audit message', async () => {
+    await auditService.updatedPrisonAllowances({
+      prisonId: 'HEI',
+      weekStartDay: 'MONDAY',
+      remandVisitLimitPerWeek: 3,
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UPDATED_VISIT_ALLOWANCES',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"weekStartDay":"MONDAY","remandVisitLimitPerWeek":3,"prisonId":"HEI"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends a printed visit pass audit message', async () => {
     await auditService.printedVisitPass({
       visitReference: 'ab-cd-ef-gh',

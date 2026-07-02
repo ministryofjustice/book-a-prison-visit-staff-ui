@@ -343,3 +343,9 @@ p.bapv-visit-details__restriction--flagged, p.bapv-visit-details__alert--flagged
 .bapv-vertical-align-middle {
   vertical-align: middle;
 }
+
+.bapv-suffix-no-style {
+  border: 0;
+  background-color: inherit;
+  padding-left: govuk-spacing(4);
+}
