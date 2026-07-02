@@ -3,7 +3,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { AuditService, VisitAllowanceService } from '../../services'
 import { properCase } from '../../utils/utils'
 
-export default class UpdatesAllowancesController {
+export default class UpdateAllowancesController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly visitAllowanceService: VisitAllowanceService,
