@@ -27,6 +27,7 @@ test.describe('Cancel visit journey', () => {
       name: 'Jeanette Smith',
       telephone: '07771 123456',
       email: 'visitor@example.com',
+      languagePreference: 'en',
     },
   })
 
