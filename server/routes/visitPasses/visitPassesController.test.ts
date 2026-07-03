@@ -5,7 +5,6 @@ import { BadRequest, InternalServerError } from 'http-errors'
 import { appWithAllRoutes } from '../testutils/appSetup'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
-import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 
@@ -15,8 +14,6 @@ const visitService = createMockVisitService()
 const fakeDate = new Date('2026-05-20T11:00:00')
 
 beforeEach(() => {
-  setFeature('printVisitPasses', true)
-
   jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
   app = appWithAllRoutes({ services: { auditService, visitService } })
 })
@@ -68,12 +65,6 @@ describe('Print visit passes by date', () => {
   })
 
   describe('GET /visit-passes', () => {
-    it('should return a 404 if the feature is not enabled', () => {
-      setFeature('printVisitPasses', false)
-      app = appWithAllRoutes({ services: { auditService, visitService } })
-      return request(app).get(url).expect(404)
-    })
-
     it('should render visit passes page for given date and selected establishment', () => {
       const visitPasses = [visitPass1, visitPass2]
       visitService.getVisitPasses.mockResolvedValue(visitPasses)
@@ -201,12 +192,6 @@ describe('Print visit pass by visit reference', () => {
   const url = `/visit/${reference}/visit-pass?from=visit`
 
   describe(`GET ${url}`, () => {
-    it('should return a 404 if the feature is not enabled', () => {
-      setFeature('printVisitPasses', false)
-      app = appWithAllRoutes({ services: { auditService, visitService } })
-      return request(app).get(url).expect(404)
-    })
-
     it('should render visit passes page for given visit reference and selected establishment', () => {
       visitService.getVisitPass.mockResolvedValue(visitPass)
 

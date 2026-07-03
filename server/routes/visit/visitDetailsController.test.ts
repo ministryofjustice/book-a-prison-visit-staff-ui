@@ -10,7 +10,6 @@ import { MojTimelineItem } from './visitEventsTimelineBuilder'
 import { AvailableVisitActions } from './visitUtils'
 import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
 import config from '../../config'
-import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
@@ -61,8 +60,6 @@ describe('Visit details page', () => {
   ]
 
   beforeEach(() => {
-    setFeature('printVisitPasses', true)
-
     flashData = { messages: [] }
     flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
@@ -211,7 +208,6 @@ describe('Visit details page', () => {
     })
 
     it('should render process request action URLs with prisonerId when coming from prisoner profile page', () => {
-      setFeature('printVisitPasses', true)
       availableVisitActions = {
         update: false,
         cancel: false,
@@ -439,31 +435,6 @@ describe('Visit details page', () => {
             expect($('[data-test=cancel-visit]').attr('href')).toBe(
               '/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN',
             )
-          })
-      })
-
-      it('should NOT render print visit pass button if the feature is disabled', () => {
-        availableVisitActions = {
-          update: true,
-          cancel: true,
-          clearNotifications: true,
-          print: true,
-          processRequest: false,
-        }
-
-        setFeature('printVisitPasses', false)
-        app = appWithAllRoutes({ services: { auditService, visitService } })
-
-        return request(app)
-          .get('/visit/ab-cd-ef-gh')
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('[data-test=update-visit]').length).toBe(1)
-            expect($('[data-test=cancel-visit]').length).toBe(1)
-            expect($('[data-test=clear-notifications]').length).toBe(1)
-            expect($('[data-test=print-visit-pass]').length).toBe(0)
           })
       })
 

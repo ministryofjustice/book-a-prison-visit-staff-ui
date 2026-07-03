@@ -168,7 +168,6 @@
     </div>
   </div>
 
-  {% if features.printVisitPasses %}
   <h2 class="govuk-heading-m govuk-!-padding-top-0 {{ "govuk-!-margin-bottom-6" if not showPrintPassesButton }}">
     {{- selectedDateString | formatDate("EEEE d MMMM yyyy") -}}
   </h2>
@@ -181,14 +180,13 @@
     preventDoubleClick: true,
     attributes: { "data-test": "print-visit-passes" }
   }) if showPrintPassesButton }}
-  {% endif %}
 
   <div class="govuk-grid-row">
 
     {% set selectedTimeSlotLabel = "" %}
     {% if sessionsSideNav | length %}
       <div class="govuk-grid-column-one-quarter">
-        {# build side nav time slot nav for each visit room #} 
+        {# build side nav time slot nav for each visit room #}
         {% set sessionSideNavSections = [] %}
         {% for heading, items in sessionsSideNav %}
           {% set sectionItems = [] %}
@@ -246,4 +244,3 @@
 {% block pageScripts %}
   <script src="/assets/viewVisitsDatePicker.js"></script>
 {% endblock %}
-

@@ -8,7 +8,6 @@ import ClearNotificationsController from './clearNotificationsController'
 import ConfirmUpdateController from './confirmUpdateController'
 import UpdateVisitController from './updateVisitController'
 import ProcessVisitRequestController from './processVisitRequestController'
-import config from '../../config'
 import VisitPassesController from '../visitPasses/visitPassesController'
 
 export default function routes(services: Services): Router {
@@ -20,6 +19,7 @@ export default function routes(services: Services): Router {
   const confirmUpdate = new ConfirmUpdateController()
   const updateVisit = new UpdateVisitController(services.visitService)
   const processVisitRequest = new ProcessVisitRequestController(services.visitRequestsService, services.visitService)
+  const visitPassesController = new VisitPassesController(services.auditService, services.visitService)
 
   // middleware to ensure valid visit reference for all /visit/:reference routes
   router.use('/:reference', (req, res, next) => {
@@ -41,10 +41,7 @@ export default function routes(services: Services): Router {
   router.get('/:reference/clear-notifications', clearNotifications.view())
   router.post('/:reference/clear-notifications', clearNotifications.validate(), clearNotifications.clearNotifications())
 
-  if (config.features.printVisitPasses) {
-    const visitPassesController = new VisitPassesController(services.auditService, services.visitService)
-    router.get('/:reference/visit-pass', visitPassesController.viewByVisit())
-  }
+  router.get('/:reference/visit-pass', visitPassesController.viewByVisit())
 
   router.get('/:reference/confirm-update', confirmUpdate.viewConfirmUpdate())
   router.post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())

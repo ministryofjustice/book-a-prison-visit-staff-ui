@@ -23,8 +23,6 @@ generic-service:
     ENVIRONMENT_NAME: prod
     REDIS_KEY: "bapv-staff-prod"
 
-    FEATURE_PRINT_VISIT_PASSES: "true"
-
 
 generic-prometheus-alerts:
   alertSeverity: visits-alerts

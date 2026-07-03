@@ -161,7 +161,6 @@ export default {
         ).split(',')
       ),
     },
-    printVisitPasses: get('FEATURE_PRINT_VISIT_PASSES', 'false') === 'true',
     remandLimits: get('FEATURE_REMAND_LIMITS', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
