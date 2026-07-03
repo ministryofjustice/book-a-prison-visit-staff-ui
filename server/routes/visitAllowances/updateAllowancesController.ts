@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitAllowanceService } from '../../services'
-import { properCase } from '../../utils/utils'
 
 export default class UpdateAllowancesController {
   public constructor(
@@ -62,7 +61,7 @@ export default class UpdateAllowancesController {
       req.flash('messages', {
         variant: 'success',
         title: 'Visit allowances updated',
-        text: `${remandVisitLimitPerWeek} visits every 7 days. This allowance renews on ${properCase(weekStartDay)}.`,
+        text: `You changed the visit allowance for unconvicted prisoners.`,
       })
       return res.redirect('/visit-allowances')
     }
@@ -76,7 +75,9 @@ export default class UpdateAllowancesController {
       body('remandVisitLimitPerWeek')
         .toInt()
         .isInt({ min: 1 })
-        .withMessage('Unconvicted prisoners must be allowed at least 1 visit every 7 days'),
+        .withMessage('Unconvicted prisoners must be allowed at least 1 visit every 7 days')
+        .isInt({ max: 20 })
+        .withMessage('Please enter a number less than 20'),
     ]
   }
 }

@@ -5,7 +5,7 @@ export default class UpdateVisitAllowancesPage extends AbstractPage {
   readonly submitFromButton: Locator
 
   constructor(page: Page) {
-    super(page, 'Visit allowances for unconvicted prisoners')
+    super(page, 'Visit allowance for unconvicted prisoners')
 
     this.submitFromButton = page.getByTestId('submit')
   }

@@ -55,7 +55,7 @@ test.describe('Full visit allowances journey', () => {
 
     await ViewVisitAllowancesPage.verifyOnPage(page)
     await expect(visitAllowancePage.messages.first()).toContainText(
-      '5 visits every 7 days. This allowance renews on Sunday',
+      'You changed the visit allowance for unconvicted prisoners.',
     )
     await expect(visitAllowancePage.getRemandLimit()).toContainText('5 visits every 7 days')
     await expect(visitAllowancePage.getWeekStartDay()).toContainText('Sunday')

@@ -45,7 +45,7 @@
         Unconvicted prisoners are remand prisoners, immigration detainees and civil prisoners.
       </p>
       <p>
-        They are allowed <span data-test="remand-limit">{{ prisonConfig.remandVisitLimitPerWeek }} visits every 7 days</span>. This allowance renews on <span data-test="week-start-day">{{ prisonConfig.weekStartDay | capitalize }}</span>.
+        They are allowed <span data-test="remand-limit">{{ prisonConfig.remandVisitLimitPerWeek }} {{ "visit" | pluralise(prisonConfig.remandVisitLimitPerWeek) }} every 7 days</span>. This allowance renews on <span data-test="week-start-day">{{ prisonConfig.weekStartDay | capitalize }}</span>.
       </p>
 
         <form action="/visit-allowances" method="POST" novalidate>
@@ -74,10 +74,15 @@
         ],
         rows: displayRows
       }) }}
-
-      <p><a data-test="incentives-service-url" class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
-        Go to the incentives service to change visit allowances for convicted prisoners.
-      </a></p>
+      {% if iepManagementRole %}
+        <p><a data-test="incentives-service-url" class="govuk-link--no-visited-state" href="{{ dpsIncentives }}prison-incentive-levels">
+          Go to the incentives service to change visit allowances for convicted prisoners.
+        </a></p>
+      {% else %}
+          <p><a data-test="incentives-service-url" class="govuk-link--no-visited-state" href="{{ dpsIncentives }}">
+          Visit allowances for convicted prisoners can be changed in the incentives service, but requires an extra user role.
+        </a></p>
+      {% endif %}
 
     </div>
   </div>

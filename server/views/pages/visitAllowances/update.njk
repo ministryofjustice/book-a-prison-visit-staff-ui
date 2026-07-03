@@ -4,7 +4,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
-{% set pageHeaderTitle = "Visit allowances for unconvicted prisoners" %}
+{% set pageHeaderTitle = "Visit allowance for unconvicted prisoners" %}
 
 {% block beforeContent %}
   {{ breadcrumbs() }}
@@ -17,8 +17,6 @@
       {% include "partials/errorSummary.njk" %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-
-      <h2 class="govuk-heading-m">Unconvicted prisoners</h2>
 
       <p>
         Unconvicted prisoners are remand prisoners, immigration detainees and civil prisoners.
@@ -50,7 +48,7 @@
           name: "weekStartDay",
           fieldset: {
             legend: {
-              text: "On which day does the allowances renew?",
+              text: "On which day does the allowance renew?",
               classes: "govuk-fieldset__legend--m"
             }
           },

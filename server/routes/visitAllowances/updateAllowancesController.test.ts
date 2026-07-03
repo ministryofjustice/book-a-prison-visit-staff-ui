@@ -43,13 +43,12 @@ describe('Update visit allowances - change remand visit limit and allowance rese
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Page header
-          expect($('title').text()).toMatch(/^Visit allowances for unconvicted prisoners -/)
+          expect($('title').text()).toMatch(/^Visit allowance for unconvicted prisoners -/)
           expect($('.govuk-breadcrumbs li').length).toBe(2)
           expect($('.govuk-back-link').length).toBe(0)
           expect($('.moj-alert').length).toBe(0)
-          expect($('h1').text().trim()).toBe('Visit allowances for unconvicted prisoners')
+          expect($('h1').text().trim()).toBe('Visit allowance for unconvicted prisoners')
 
-          expect($('h2').eq(0).text().trim()).toBe('Unconvicted prisoners')
           expect($('form').attr('action')).toBe(url)
           expect($('input[name=remandVisitLimitPerWeek]').val()).toBe('3')
           expect($('input[name=weekStartDay]').val()).toBe('MONDAY')
