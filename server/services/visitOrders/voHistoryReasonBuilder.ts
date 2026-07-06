@@ -84,8 +84,7 @@ const getManualAdjustmentReason = (
   userName: string,
 ): string | undefined => {
   const adjustmentReason = getAttributeValue(attributes, 'ADJUSTMENT_REASON_TYPE') as
-    | PrisonerBalanceAdjustmentReason
-    | undefined
+    PrisonerBalanceAdjustmentReason | undefined
 
   switch (adjustmentReason) {
     case 'GOVERNOR_ADJUSTMENT':

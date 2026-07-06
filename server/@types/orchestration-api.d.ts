@@ -1406,13 +1406,7 @@ export interface components {
        * @enum {string}
        */
       applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
+        'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE' | 'BY_PRISONER'
       /** @description Username for user who actioned this request */
       actionedBy: string
       /**
@@ -1548,13 +1542,7 @@ export interface components {
        * @enum {string}
        */
       visitSubStatus:
-        | 'APPROVED'
-        | 'AUTO_APPROVED'
-        | 'REQUESTED'
-        | 'REJECTED'
-        | 'AUTO_REJECTED'
-        | 'WITHDRAWN'
-        | 'CANCELLED'
+        'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -1706,13 +1694,7 @@ export interface components {
        * @enum {string}
        */
       applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
+        'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE' | 'BY_PRISONER'
       /** @description allow over booking method */
       allowOverBooking: boolean
       /**
@@ -2596,13 +2578,7 @@ export interface components {
        * @enum {string}
        */
       applicationMethodType:
-        | 'PHONE'
-        | 'WEBSITE'
-        | 'EMAIL'
-        | 'IN_PERSON'
-        | 'NOT_KNOWN'
-        | 'NOT_APPLICABLE'
-        | 'BY_PRISONER'
+        'PHONE' | 'WEBSITE' | 'EMAIL' | 'IN_PERSON' | 'NOT_KNOWN' | 'NOT_APPLICABLE' | 'BY_PRISONER'
       /**
        * @description Actioned by full name
        * @example Aled Evans
@@ -2783,13 +2759,7 @@ export interface components {
        * @enum {string}
        */
       visitSubStatus:
-        | 'APPROVED'
-        | 'AUTO_APPROVED'
-        | 'REQUESTED'
-        | 'REJECTED'
-        | 'AUTO_REJECTED'
-        | 'WITHDRAWN'
-        | 'CANCELLED'
+        'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -3050,13 +3020,7 @@ export interface components {
        * @enum {string}
        */
       visitSubStatus:
-        | 'APPROVED'
-        | 'AUTO_APPROVED'
-        | 'REQUESTED'
-        | 'REJECTED'
-        | 'AUTO_REJECTED'
-        | 'WITHDRAWN'
-        | 'CANCELLED'
+        'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
     }
     PageVisitDto: {
       /** Format: int64 */
@@ -3793,13 +3757,7 @@ export interface components {
        * @enum {string}
        */
       visitSubStatus:
-        | 'APPROVED'
-        | 'AUTO_APPROVED'
-        | 'REQUESTED'
-        | 'REJECTED'
-        | 'AUTO_REJECTED'
-        | 'WITHDRAWN'
-        | 'CANCELLED'
+        'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
       /**
        * @description Outcome Status
        * @example VISITOR_CANCELLED
@@ -4132,13 +4090,7 @@ export interface components {
        * @enum {string}
        */
       visitSubStatus:
-        | 'APPROVED'
-        | 'AUTO_APPROVED'
-        | 'REQUESTED'
-        | 'REJECTED'
-        | 'AUTO_REJECTED'
-        | 'WITHDRAWN'
-        | 'CANCELLED'
+        'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
       /**
        * @description Visit Restriction
        * @example OPEN
