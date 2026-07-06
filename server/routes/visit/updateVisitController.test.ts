@@ -87,11 +87,24 @@ describe('Start a visit update journey', () => {
               phoneNumber: '01234 567890',
               email: 'visitor@example.com',
               contactName: 'Jeanette Smith',
+              languagePreference: 'en',
             },
             visitReference: 'ab-cd-ef-gh',
             publicBooker: false,
           })
           expect(flashProvider).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should populate visitSessionData and preserve Welsh language preference', () => {
+      visitDetails.visitContact.languagePreference = 'cy'
+
+      return request(app)
+        .post('/visit/ab-cd-ef-gh/update')
+        .expect(302)
+        .expect('location', '/update-a-visit/select-visitors')
+        .expect(res => {
+          expect(visitSessionData.mainContact?.languagePreference).toBe('cy')
         })
     })
 

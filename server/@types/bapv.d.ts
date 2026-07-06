@@ -92,6 +92,7 @@ export type VisitSessionData = {
     phoneNumber?: string
     email?: string
     contactName?: string
+    languagePreference?: Visit['visitContact']['languagePreference']
   }
   applicationReference?: string
   visitReference?: string // only set during an update journey; during initial booking it's unknown

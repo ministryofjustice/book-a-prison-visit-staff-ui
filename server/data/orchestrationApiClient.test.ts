@@ -332,6 +332,7 @@ describe('orchestrationApiClient', () => {
             name: visitSessionData.mainContact.contactName,
             telephone: visitSessionData.mainContact.phoneNumber,
             email: visitSessionData.mainContact.email,
+            languagePreference: 'en',
           },
           visitors: visitSessionData.visitors.map(visitor => {
             return {
@@ -352,8 +353,14 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('createVisitApplicationFromVisit', () => {
-    it('should return a new Visit Application from a BOOKED visit', async () => {
-      const visitSessionData = <VisitSessionData>{
+    const result: Partial<ApplicationDto> = {
+      reference: 'aaa-bbb-ccc',
+    }
+
+    let visitSessionData: VisitSessionData
+
+    beforeEach(() => {
+      visitSessionData = {
         prisoner: {
           offenderNo: 'A1234BC',
         },
@@ -372,11 +379,43 @@ describe('orchestrationApiClient', () => {
           contactName: 'John Smith',
         },
         visitReference: 'ab-cd-ef-gh',
-      }
+      } as VisitSessionData
+    })
 
-      const result: Partial<ApplicationDto> = {
-        reference: 'aaa-bbb-ccc',
-      }
+    it('should return a new Visit Application from a BOOKED visit', async () => {
+      fakeOrchestrationApi
+        .put(`/visits/application/${visitSessionData.visitReference}/change`, <CreateApplicationDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+          sessionDate: '2022-02-14',
+          applicationRestriction: visitSessionData.visitRestriction,
+          visitContact: {
+            name: visitSessionData.mainContact.contactName,
+            telephone: visitSessionData.mainContact.phoneNumber,
+            email: visitSessionData.mainContact.email,
+            languagePreference: 'en',
+          },
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: false,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+          userType: 'STAFF',
+          actionedBy: 'user1',
+          allowOverBooking: true,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, result)
+
+      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, 'user1')
+
+      expect(output).toStrictEqual(result)
+    })
+
+    it('should return a new Visit Application from a BOOKED visit and preserve Welsh language preference', async () => {
+      visitSessionData.mainContact.languagePreference = 'cy'
 
       fakeOrchestrationApi
         .put(`/visits/application/${visitSessionData.visitReference}/change`, <CreateApplicationDto>{
@@ -388,6 +427,7 @@ describe('orchestrationApiClient', () => {
             name: visitSessionData.mainContact.contactName,
             telephone: visitSessionData.mainContact.phoneNumber,
             email: visitSessionData.mainContact.email,
+            languagePreference: visitSessionData.mainContact.languagePreference,
           },
           visitors: visitSessionData.visitors.map(visitor => {
             return {

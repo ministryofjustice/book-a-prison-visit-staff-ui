@@ -25,7 +25,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
 
-    FEATURE_PRINT_VISIT_PASSES: "true"
     FEATURE_REMAND_LIMITS: "true"
 
   allowlist:

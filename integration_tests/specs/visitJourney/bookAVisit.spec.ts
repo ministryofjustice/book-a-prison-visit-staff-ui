@@ -195,6 +195,7 @@ test.describe('Book a visit', () => {
         visitContact: {
           name: 'Jeanette Smith',
           telephone: '07712 000 000',
+          languagePreference: 'en',
         },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
@@ -236,6 +237,7 @@ test.describe('Book a visit', () => {
         visitContact: {
           name: 'Jeanette smith',
           telephone: '07712 000 000',
+          languagePreference: 'en',
         },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },

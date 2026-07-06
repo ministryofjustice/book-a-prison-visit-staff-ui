@@ -117,7 +117,12 @@ test.describe('Update a visit', () => {
     const updatedApplication = TestData.application({
       startTimestamp: session8Start,
       endTimestamp: session8End,
-      visitContact: { telephone: '01234 567890', email: 'visitor@example.com', name: 'Jeanette Smith' },
+      visitContact: {
+        telephone: '01234 567890',
+        email: 'visitor@example.com',
+        name: 'Jeanette Smith',
+        languagePreference: 'en',
+      },
       visitors: [
         { nomisPersonId: 4321, visitContact: true },
         { nomisPersonId: 4322, visitContact: false },
@@ -155,6 +160,7 @@ test.describe('Update a visit', () => {
         visitContact: {
           name: 'Jeanette Smith',
           telephone: '09876 543 321',
+          languagePreference: 'en',
         },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },

@@ -12,7 +12,6 @@ import {
   createMockVisitService,
   createMockVisitSessionsService,
 } from '../../services/testutils/mocks'
-import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
@@ -24,8 +23,6 @@ const visitService = createMockVisitService()
 const visitSessionsService = createMockVisitSessionsService()
 
 beforeEach(() => {
-  setFeature('printVisitPasses', true)
-
   flashData = { errors: [], formValues: [], messages: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
 
@@ -166,29 +163,6 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             operationId: undefined,
           })
-        })
-    })
-
-    it('should hide the print visit passes button when feature is disabled', () => {
-      setFeature('printVisitPasses', false)
-      app = appWithAllRoutes({
-        services: {
-          auditService,
-          blockedDatesService,
-          visitNotificationsService,
-          visitService,
-          visitSessionsService,
-        },
-      })
-
-      return request(app)
-        .get('/visits')
-        .expect(200)
-        .expect('Content-Type', /html/)
-        .expect(res => {
-          const $ = cheerio.load(res.text)
-          expect($('h2').length).toBe(0)
-          expect($('[data-test=print-visit-passes]').length).toBe(0)
         })
     })
 

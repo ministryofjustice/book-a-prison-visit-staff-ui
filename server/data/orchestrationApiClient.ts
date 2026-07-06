@@ -698,6 +698,7 @@ export default class OrchestrationApiClient {
           ...(mainContact.phoneNumber && { telephone: mainContact.phoneNumber }),
           ...(mainContact.email && { email: mainContact.email }),
           name: mainContact.contactName,
+          languagePreference: mainContact.languagePreference ?? 'en',
         }
       : undefined
     const mainContactId = mainContact?.contactId ?? null

@@ -109,6 +109,7 @@ export default class TestData {
     visitContact = {
       name: 'Jeanette Smith',
       telephone: '01234 567890',
+      languagePreference: 'en',
     },
     visitors = [
       {
@@ -213,6 +214,7 @@ export default class TestData {
     lastName = 'Jones',
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
+    languagePreference = 'en',
   }: Partial<BookerPrisonerVisitorRequestDto> = {}): BookerPrisonerVisitorRequestDto => ({
     reference,
     prisonerId,
@@ -220,6 +222,7 @@ export default class TestData {
     lastName,
     dateOfBirth,
     requestedOn,
+    languagePreference,
   })
 
   static bookerSearchResult = ({
@@ -496,6 +499,8 @@ export default class TestData {
     weeklyFrequency = 1,
     visitType = 'SOCIAL',
     visitRoom = 'Visits hall',
+    visitOrderRestriction = 'VO_PVO',
+    isSessionExcluded = false,
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -510,6 +515,8 @@ export default class TestData {
     weeklyFrequency,
     visitType,
     visitRoom,
+    visitOrderRestriction,
+    isSessionExcluded,
   })
 
   static socialContact = ({
@@ -633,6 +640,7 @@ export default class TestData {
       name: 'Jeanette Smith',
       telephone: '01234 567890',
       email: 'visitor@example.com',
+      languagePreference: 'en',
     },
     visitors = [
       {
@@ -686,6 +694,7 @@ export default class TestData {
       name: 'Jeanette Smith',
       telephone: '01234 567890',
       email: 'visitor@example.com',
+      languagePreference: 'en',
     },
     visitorSupport = { description: 'Wheelchair ramp' },
     prison = {
@@ -960,6 +969,7 @@ export default class TestData {
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
     status = 'APPROVED',
+    languagePreference = 'en',
   }: Partial<PrisonVisitorRequestDto> = {}): PrisonVisitorRequestDto => ({
     reference,
     bookerReference,
@@ -970,6 +980,7 @@ export default class TestData {
     dateOfBirth,
     requestedOn,
     status,
+    languagePreference,
   })
 
   static visitorRequestForReview = ({
@@ -984,6 +995,7 @@ export default class TestData {
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
     status = 'REQUESTED',
+    languagePreference = 'en',
     socialContacts = [this.socialContact()],
   }: Partial<VisitorRequestForReviewDto> = {}): VisitorRequestForReviewDto => ({
     reference,
@@ -998,6 +1010,7 @@ export default class TestData {
     requestedOn,
     status,
     socialContacts,
+    languagePreference,
   })
 
   static visitorRequestListEntry = ({
@@ -1011,6 +1024,7 @@ export default class TestData {
     lastName = 'Jones',
     dateOfBirth = '1999-11-10',
     requestedOn = '2025-12-10',
+    languagePreference = 'en',
   }: Partial<PrisonVisitorRequestListEntryDto> = {}): PrisonVisitorRequestListEntryDto => ({
     reference,
     bookerReference,
@@ -1022,6 +1036,7 @@ export default class TestData {
     lastName,
     dateOfBirth,
     requestedOn,
+    languagePreference,
   })
 
   static visitPassDto = ({
@@ -1116,6 +1131,7 @@ export default class TestData {
     sessionTemplateReference = 'v9d.7ed.7u',
     visitRoom = 'Visit room 1',
     visitType = 'SOCIAL',
+    visitOrderRestriction = 'VO_PVO',
     prisonId = 'HEI',
     openVisitCapacity = 20,
     openVisitBookedCount = 2,
@@ -1128,6 +1144,7 @@ export default class TestData {
     sessionTemplateReference,
     visitRoom,
     visitType,
+    visitOrderRestriction,
     prisonId,
     openVisitCapacity,
     openVisitBookedCount,
@@ -1148,6 +1165,7 @@ export default class TestData {
     startTime = '10:00',
     endTime = '11:00',
     sessionConflicts = [],
+    visitOrderRestriction = 'VO_PVO',
   }: Partial<VisitSessionV2Dto> = {}): VisitSessionV2Dto => ({
     sessionTemplateReference,
     visitRoom,
@@ -1158,6 +1176,7 @@ export default class TestData {
     startTime,
     endTime,
     sessionConflicts,
+    visitOrderRestriction,
   })
 
   static visitSessionsAndSchedule = ({
