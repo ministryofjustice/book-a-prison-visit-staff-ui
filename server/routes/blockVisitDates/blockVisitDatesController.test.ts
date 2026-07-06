@@ -50,9 +50,6 @@ describe('Block visit dates listing page', () => {
           expect($('.moj-alert').length).toBe(0)
 
           expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
-          expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(
-            `${format(tomorrow, 'dd/MM/yyyy')} ${format(nextWeek, 'dd/MM/yyyy')}`,
-          )
           expect($('input[name=date]').val()).toBeFalsy()
 
           expect($('[data-test="blocked-date-1"]').text()).toBe(format(blockedDate1.excludeDate, 'EEEE d MMMM yyyy'))

@@ -14,7 +14,6 @@ export default class BlockVisitDatesController {
       )
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
-      const datePickerExcludedDates = blockedDates.map(date => format(date.excludeDate, 'dd/MM/yyyy')).join(' ')
 
       res.render('pages/blockVisitDates/blockVisitDates', {
         errors: req.flash('errors'),
@@ -22,7 +21,6 @@ export default class BlockVisitDatesController {
         message: req.flash('messages')?.[0],
         blockedDates,
         datePickerMinDate,
-        datePickerExcludedDates,
       })
     }
   }
