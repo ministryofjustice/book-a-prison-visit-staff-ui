@@ -151,7 +151,10 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .expect(302)
         .expect('location', '/manage-bookers')
         .expect(() => {
-          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestAlreadyReviewedMessage(visitorRequestForReview.bookerReference),
+          )
 
           expect(bookerService.getVisitorRequestForReview).toHaveBeenCalledWith({
             username: 'user1',
@@ -380,7 +383,10 @@ describe('Booker management - visitor requests - link a visitor', () => {
             visitorId: 4321,
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestAlreadyReviewedMessage(visitorRequestForReview.bookerReference),
+          )
           expect(auditService.approvedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequestJourney).toBeUndefined()
         })
