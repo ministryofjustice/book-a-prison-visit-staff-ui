@@ -7,6 +7,7 @@ export const notificationTypes: Partial<Record<NotificationType, string>> = {
   PRISONER_ALERT_UPDATED_EVENT: 'Prisoner alert',
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
+  SESSION_VISITS_BLOCKED_FOR_DATE: 'Session blocked',
   PRISONER_RECEIVED_EVENT: 'Prisoner transferred',
   VISITOR_RESTRICTION: 'Visitor restriction',
   VISITOR_UNAPPROVED_EVENT: 'Visitor unapproved',
@@ -18,6 +19,7 @@ export const notificationTypeReasons: Partial<Record<NotificationType, string>> 
   // PRISONER_ALERT_UPDATED_EVENT: 'the prisoner has a new or updated alert that may impact visits',
   PRISONER_RELEASED_EVENT: 'the prisoner is released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'the date is no longer available for social visits',
+  SESSION_VISITS_BLOCKED_FOR_DATE: 'the session is no longer available for social visits',
   PRISONER_RECEIVED_EVENT: 'the prisoner has been transferred',
   VISITOR_RESTRICTION: 'a visitor has a new or updated restriction',
   VISITOR_UNAPPROVED_EVENT: 'a visitor has been removed from the approved visitor list',
@@ -42,6 +44,13 @@ export const notificationTypeAlerts: Partial<Record<NotificationType, MoJAlert>>
   PRISON_VISITS_BLOCKED_FOR_DATE: {
     variant: 'error',
     title: 'This date is no longer available for social visits',
+    showTitleAsHeading: true,
+    text: 'A new visit time should be selected.',
+  },
+
+  SESSION_VISITS_BLOCKED_FOR_DATE: {
+    variant: 'error',
+    title: 'This session is no longer available for social visits',
     showTitleAsHeading: true,
     text: 'A new visit time should be selected.',
   },
