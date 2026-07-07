@@ -77,15 +77,17 @@ export default class VisitSessionsService {
     username,
     prisonId,
     date,
+    includeExcludedSessions,
   }: {
     username: string
     prisonId: string
     date: string
+    includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getSessionSchedule(prisonId, date)
+    return orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
   }
 
   async getVisitSessionCapacity(

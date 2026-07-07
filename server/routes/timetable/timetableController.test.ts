@@ -58,6 +58,7 @@ describe('View visits timetable', () => {
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
           date: fakeDate,
+          includeExcludedSessions: false,
           username: 'user1',
         })
       })
@@ -92,6 +93,7 @@ describe('View visits timetable', () => {
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
           date: fakeDate,
+          includeExcludedSessions: false,
           username: 'user1',
         })
       })
@@ -126,6 +128,7 @@ describe('View visits timetable', () => {
         expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
           prisonId: 'HEI',
           date: fakeDate,
+          includeExcludedSessions: false,
           username: 'user1',
         })
       })

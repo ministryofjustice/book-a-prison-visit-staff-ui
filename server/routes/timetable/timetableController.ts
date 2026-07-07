@@ -19,6 +19,7 @@ export default class TimetableController {
         username: res.locals.user.username,
         prisonId,
         date: selectedDate,
+        includeExcludedSessions: false,
       })
 
       const timetableItems = timetableItemBuilder({ schedules, selectedDate })

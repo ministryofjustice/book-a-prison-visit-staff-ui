@@ -32,6 +32,7 @@ export default function routes({
         username,
         prisonId,
         date: selectedDateString,
+        includeExcludedSessions: false,
       }),
       visitService.getVisitsWithoutSessionTemplate({
         username,

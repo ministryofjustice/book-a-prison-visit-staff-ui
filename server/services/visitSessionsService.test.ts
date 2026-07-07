@@ -54,13 +54,23 @@ describe('Visit sessions service', () => {
   describe('getSessionSchedule', () => {
     it('should return an array of scheduled sessions for the specified prison and date', async () => {
       const date = '2023-02-01'
+      const includeExcludedSessions = false
       const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
 
       orchestrationApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
-      const results = await visitSessionsService.getSessionSchedule({ username, prisonId, date })
+      const results = await visitSessionsService.getSessionSchedule({
+        username,
+        prisonId,
+        date,
+        includeExcludedSessions,
+      })
 
-      expect(orchestrationApiClient.getSessionSchedule).toHaveBeenCalledWith(prisonId, date)
+      expect(orchestrationApiClient.getSessionSchedule).toHaveBeenCalledWith({
+        prisonId,
+        date,
+        includeExcludedSessions,
+      })
       expect(results).toEqual(sessionSchedule)
     })
   })

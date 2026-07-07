@@ -562,12 +562,21 @@ export default class OrchestrationApiClient {
     })
   }
 
-  async getSessionSchedule(prisonId: string, date: string): Promise<SessionSchedule[]> {
+  async getSessionSchedule({
+    prisonId,
+    date,
+    includeExcludedSessions,
+  }: {
+    prisonId: string
+    date: string
+    includeExcludedSessions: boolean
+  }): Promise<SessionSchedule[]> {
     return this.restClient.get({
       path: '/visit-sessions/schedule',
       query: new URLSearchParams({
         prisonId,
         date,
+        includeExcludedSessions: includeExcludedSessions.toString(),
       }).toString(),
     })
   }

@@ -145,6 +145,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: today,
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
             username: 'user1',
@@ -245,6 +246,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: '2024-02-02',
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
             username: 'user1',
@@ -301,6 +303,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: today,
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
             username: 'user1',
@@ -395,6 +398,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: today,
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).not.toHaveBeenCalled()
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
@@ -455,6 +459,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: '2024-02-02',
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).not.toHaveBeenCalled()
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
@@ -534,6 +539,7 @@ describe('GET /visits - Visits by date page', () => {
             username: 'user1',
             prisonId,
             date: today,
+            includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
             username: 'user1',
