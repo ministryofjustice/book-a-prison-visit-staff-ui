@@ -1,18 +1,18 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { format, parse, startOfYesterday } from 'date-fns'
-import { BlockedDatesService, VisitSessionsService } from '../../services'
+import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
 import config from '../../config'
 
 export default class BlockDatesOrSessionsController {
   public constructor(
-    private readonly blockedDatesService: BlockedDatesService,
+    private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const blockedDates = await this.blockedDatesService.getFutureBlockedDates(
+      const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
         req.session.selectedEstablishment.prisonId,
         res.locals.user.username,
       )
@@ -81,7 +81,7 @@ export default class BlockDatesOrSessionsController {
         .bail()
         // date cannot be an existing blocked date
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
-          const blockedDates = await this.blockedDatesService.getFutureBlockedDates(
+          const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
             req.session.selectedEstablishment.prisonId,
             req.user.username,
           )

@@ -8,15 +8,18 @@ export default function routes(services: Services): Router {
   const router = Router()
 
   const blockDatesOrSessionsController = new BlockDatesOrSessionsController(
-    services.blockedDatesService,
+    services.blockDatesOrSessionsService,
     services.visitSessionsService,
   )
   const blockDateController = new BlockDateController(
     services.auditService,
-    services.blockedDatesService,
+    services.blockDatesOrSessionsService,
     services.visitService,
   )
-  const unblockDateController = new UnblockVisitDateController(services.auditService, services.blockedDatesService)
+  const unblockDateController = new UnblockVisitDateController(
+    services.auditService,
+    services.blockDatesOrSessionsService,
+  )
 
   router.get('/', blockDatesOrSessionsController.view())
   router.post('/', blockDatesOrSessionsController.validate(), blockDatesOrSessionsController.submit())

@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { format } from 'date-fns'
-import { AuditService, BlockedDatesService } from '../../../services'
+import { AuditService, BlockDatesOrSessionsService } from '../../../services'
 import logger from '../../../../logger'
 
 export default class UnblockDateController {
   public constructor(
     private readonly auditService: AuditService,
-    private readonly blockedDatesService: BlockedDatesService,
+    private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
   ) {}
 
   public submit(): RequestHandler {
@@ -21,7 +21,7 @@ export default class UnblockDateController {
       const { prisonId } = req.session.selectedEstablishment
 
       try {
-        await this.blockedDatesService.unblockVisitDate(res.locals.user.username, prisonId, date)
+        await this.blockDatesOrSessionsService.unblockVisitDate(res.locals.user.username, prisonId, date)
 
         req.flash('messages', {
           variant: 'success',

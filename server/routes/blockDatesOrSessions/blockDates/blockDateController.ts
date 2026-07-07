@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { format } from 'date-fns'
-import { AuditService, BlockedDatesService, VisitService } from '../../../services'
+import { AuditService, BlockDatesOrSessionsService, VisitService } from '../../../services'
 import logger from '../../../../logger'
 
 export default class BlockDateController {
   public constructor(
     private readonly auditService: AuditService,
-    private readonly blockedDatesService: BlockedDatesService,
+    private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
     private readonly visitService: VisitService,
   ) {}
 
@@ -56,7 +56,7 @@ export default class BlockDateController {
         const { date } = blockDateOrSession
 
         try {
-          await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, date)
+          await this.blockDatesOrSessionsService.blockVisitDate(res.locals.user.username, prisonId, date)
 
           req.flash('messages', {
             variant: 'success',

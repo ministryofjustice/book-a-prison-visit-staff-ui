@@ -6,7 +6,7 @@ import { FieldValidationError } from 'express-validator'
 import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import {
   createMockAuditService,
-  createMockBlockedDatesService,
+  createMockBlockDatesOrSessionsService,
   createMockVisitService,
 } from '../../../services/testutils/mocks'
 import { MoJAlert } from '../../../@types/bapv'
@@ -15,7 +15,7 @@ let app: Express
 let sessionData: SessionData
 
 const auditService = createMockAuditService()
-const blockedDatesService = createMockBlockedDatesService()
+const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitService = createMockVisitService()
 
 const url = '/block-visit-dates/block-new-date'
@@ -23,7 +23,7 @@ const date = '2024-09-06'
 
 beforeEach(() => {
   sessionData = { blockDateOrSession: { date, backLinkHref: '#back-link-from-session' } } as SessionData
-  app = appWithAllRoutes({ services: { auditService, blockedDatesService, visitService }, sessionData })
+  app = appWithAllRoutes({ services: { auditService, blockDatesOrSessionsService, visitService }, sessionData })
 })
 
 afterEach(() => {
@@ -107,7 +107,7 @@ describe('Block new visit date', () => {
     })
 
     it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
-      blockedDatesService.blockVisitDate.mockResolvedValue()
+      blockDatesOrSessionsService.blockVisitDate.mockResolvedValue()
       const blockedDateSuccessMessage: MoJAlert = {
         variant: 'success',
         title: 'Date blocked for visits',
@@ -120,7 +120,7 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', date)
+          expect(blockDatesOrSessionsService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', date)
           expect(auditService.blockedVisitDate).toHaveBeenCalledWith({
             prisonId: 'HEI',
             date,
@@ -140,7 +140,7 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
         })
@@ -161,7 +161,7 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates/block-new-date')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledTimes(1)
