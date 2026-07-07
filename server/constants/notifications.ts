@@ -7,7 +7,7 @@ export const notificationTypes: Partial<Record<NotificationType, string>> = {
   PRISONER_ALERT_UPDATED_EVENT: 'Prisoner alert',
   PRISONER_RELEASED_EVENT: 'Prisoner released',
   PRISON_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
-  SESSION_VISITS_BLOCKED_FOR_DATE: 'Session blocked',
+  SESSION_VISITS_BLOCKED_FOR_DATE: 'Time slot removed',
   PRISONER_RECEIVED_EVENT: 'Prisoner transferred',
   VISITOR_RESTRICTION: 'Visitor restriction',
   VISITOR_UNAPPROVED_EVENT: 'Visitor unapproved',
