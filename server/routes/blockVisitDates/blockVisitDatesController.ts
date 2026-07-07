@@ -1,10 +1,14 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { format, parse, startOfYesterday } from 'date-fns'
-import { BlockedDatesService } from '../../services'
+import { BlockedDatesService, VisitSessionsService } from '../../services'
+import config from '../../config'
 
 export default class BlockVisitDatesController {
-  public constructor(private readonly blockedDatesService: BlockedDatesService) {}
+  public constructor(
+    private readonly blockedDatesService: BlockedDatesService,
+    private readonly visitSessionsService: VisitSessionsService,
+  ) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
@@ -36,7 +40,23 @@ export default class BlockVisitDatesController {
       }
 
       const { date } = matchedData<{ date: string }>(req)
-      req.session.visitBlockDate = date
+      req.session.blockDateOrSession = {
+        backLinkHref: '/block-visit-dates',
+        date,
+      }
+
+      const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
+        username: res.locals.user.username,
+        prisonId: req.session.selectedEstablishment.prisonId,
+        date,
+        includeExcludedSessions: false,
+      })
+
+      const dateHasActiveSessions = sessionSchedule.length > 0
+
+      if (dateHasActiveSessions && config.features.sessionDateBlocks) {
+        return res.redirect('/block-visit-dates/block-date-or-session')
+      }
 
       return res.redirect('/block-visit-dates/block-new-date')
     }

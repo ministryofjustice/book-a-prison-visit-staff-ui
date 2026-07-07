@@ -7,7 +7,10 @@ import UnblockVisitDateController from './unblockVisitDateController'
 export default function routes(services: Services): Router {
   const router = Router()
 
-  const blockVisitDatesController = new BlockVisitDatesController(services.blockedDatesService)
+  const blockVisitDatesController = new BlockVisitDatesController(
+    services.blockedDatesService,
+    services.visitSessionsService,
+  )
   const blockNewDateController = new BlockNewDateController(
     services.auditService,
     services.blockedDatesService,

@@ -19,10 +19,10 @@ const blockedDatesService = createMockBlockedDatesService()
 const visitService = createMockVisitService()
 
 const url = '/block-visit-dates/block-new-date'
-const visitBlockDate = '2024-09-06'
+const date = '2024-09-06'
 
 beforeEach(() => {
-  sessionData = { visitBlockDate } as SessionData
+  sessionData = { blockDateOrSession: { date, backLinkHref: '#back-link-from-session' } } as SessionData
   app = appWithAllRoutes({ services: { auditService, blockedDatesService, visitService }, sessionData })
 })
 
@@ -33,7 +33,7 @@ afterEach(() => {
 describe('Block new visit date', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
-      sessionData.visitBlockDate = undefined
+      sessionData.blockDateOrSession = undefined
       return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
     })
 
@@ -45,7 +45,7 @@ describe('Block new visit date', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates')
+          expect($('.govuk-back-link').attr('href')).toBe('#back-link-from-session')
           expect($('h1').text()).toBe('Are you sure you want to block visits on Friday 6 September 2024?')
 
           expect($('[data-test=existing-bookings]').text().trim()).toBe('There is 1 existing booking for this date.')
@@ -59,7 +59,7 @@ describe('Block new visit date', () => {
           expect(visitService.getBookedVisitCountByDate).toHaveBeenCalledWith({
             username: 'user1',
             prisonId: 'HEI',
-            date: sessionData.visitBlockDate,
+            date: sessionData.blockDateOrSession.date,
           })
         })
     })
@@ -102,7 +102,7 @@ describe('Block new visit date', () => {
     })
 
     it('should redirect to blocked dates listing page if no new block date in session', () => {
-      sessionData.visitBlockDate = undefined
+      sessionData.blockDateOrSession = undefined
       return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
     })
 
@@ -120,16 +120,16 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', visitBlockDate)
+          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', date)
           expect(auditService.blockedVisitDate).toHaveBeenCalledWith({
             prisonId: 'HEI',
-            date: visitBlockDate,
+            date,
             username: 'user1',
             operationId: undefined,
           })
           expect(flashProvider).toHaveBeenCalledTimes(1)
           expect(flashProvider).toHaveBeenCalledWith('messages', blockedDateSuccessMessage)
-          expect(sessionData.visitBlockDate).toBe(undefined)
+          expect(sessionData.blockDateOrSession).toBe(undefined)
         })
     })
 

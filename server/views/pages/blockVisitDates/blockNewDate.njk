@@ -2,9 +2,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageHeaderTitle = "Are you sure you want to block visits on " + visitBlockDate | formatDate('EEEE d MMMM yyyy') + "?" %}
-
-{% set backLinkHref = "/block-visit-dates" %}
+{% set pageHeaderTitle = "Are you sure you want to block visits on " + date | formatDate('EEEE d MMMM yyyy') + "?" %}
 
 {% block content %}
   <div class="govuk-grid-row">
