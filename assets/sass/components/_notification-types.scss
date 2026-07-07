@@ -5,7 +5,8 @@
     @extend .govuk-tag--pink;
   }
 
-  &--prison_visits_blocked_for_date {
+  &--prison_visits_blocked_for_date,
+  &--session_visits_blocked_for_date {
     @extend .govuk-tag--turquoise;
   }
 

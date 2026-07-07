@@ -156,6 +156,14 @@ describe('Visit utils', () => {
           expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
         })
 
+        it('should set clearNotifications to false if visit notifications includes SESSION_VISITS_BLOCKED_FOR_DATE', () => {
+          params.notifications = [
+            { type: 'NON_ASSOCIATION_EVENT' },
+            { type: 'SESSION_VISITS_BLOCKED_FOR_DATE' },
+          ] as VisitBookingDetails['notifications']
+          expect(getAvailableVisitActions(params).clearNotifications).toBe(false)
+        })
+
         it('should set clearNotifications to false if visit notifications includes VISITOR_UNAPPROVED_EVENT', () => {
           params.notifications = [
             { type: 'NON_ASSOCIATION_EVENT' },
