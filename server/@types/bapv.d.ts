@@ -11,6 +11,7 @@ import {
 } from '../data/orchestrationApiTypes'
 import type { CalendarVisitSession } from '../services/visitSessionsService'
 import type { Restriction } from '../data/prisonerContactRegistryApiTypes'
+import { DAYS_OF_WEEK } from '../constants/daysOfWeek'
 
 export type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
@@ -145,7 +146,7 @@ export interface Prison extends Omit<PrisonDto, 'code'> {
 }
 
 export type PrisonRemandConfig = {
-  weekStartDay: PrisonDto['weekStartDay']
+  weekStartDay: DAYS_OF_WEEK
   remandVisitLimitPerWeek: PrisonDto['remandVisitLimitPerWeek']
 }
 

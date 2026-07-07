@@ -9,23 +9,25 @@ export default class ViewAllowancesController {
     return async (req, res) => {
       const { prisonId } = req.session.selectedEstablishment
       const { username, userRoles } = res.locals.user
-      const incentiveLevels = await this.visitAllowanceService.getPrisonIncentiveLevels({
-        username,
-        prisonId,
-      })
 
-      const prisonConfig = await this.visitAllowanceService.getRemandConfig({
-        username,
-        prisonId,
-      })
+      const [prisonConfig, incentiveLevels] = await Promise.all([
+        this.visitAllowanceService.getRemandConfig({
+          username,
+          prisonId,
+        }),
+        this.visitAllowanceService.getPrisonIncentiveLevels({
+          username,
+          prisonId,
+        }),
+      ])
 
-      const iepManagementRole = userRoles.includes(bapvUserRoles.PRISON_IEP_ADMIN)
+      const userHasIepManagementRole = userRoles.includes(bapvUserRoles.PRISON_IEP_ADMIN)
 
       return res.render('pages/visitAllowances/view', {
         message: req.flash('messages')?.[0],
         incentiveLevels,
         prisonConfig,
-        iepManagementRole,
+        userHasIepManagementRole,
       })
     }
   }

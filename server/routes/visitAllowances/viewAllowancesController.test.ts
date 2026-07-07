@@ -2,10 +2,11 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
 import { createMockVisitAllowanceService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
 import config from '../../config'
+import bapvUserRoles from '../../constants/bapvUserRoles'
 
 let app: Express
 let flashData: FlashData
@@ -26,6 +27,7 @@ beforeEach(() => {
   sessionData = {} as SessionData
   app = appWithAllRoutes({
     services: { visitAllowanceService },
+    userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.PRISON_IEP_ADMIN] }),
     sessionData,
   })
 })
@@ -61,7 +63,26 @@ describe('Visit allowances - View current visit allowances', () => {
           expect($('[data-test=pvo-count-1]').text().trim()).toBe('3 every 28 days')
 
           // Incentives service link
-          expect($('a[data-test=incentives-service-url]').attr('href')).toBe(config.dpsIncentives)
+          expect($('a[data-test=incentives-service-url]').attr('href')).toBe(
+            `${config.dpsIncentives}prison-incentive-levels`,
+          )
+          expect($('a[data-test=incentives-service-url]').text()).toContain(
+            'Go to the incentives service to change visit allowances for convicted prisoners.',
+          )
+        })
+    })
+    it('should show alternate message and have different link without role', () => {
+      app = appWithAllRoutes({ services: { visitAllowanceService }, sessionData })
+      return request(app)
+        .get(url)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          // Incentives service link
+          expect($('a[data-test=incentives-service-url]').attr('href')).toBe(`${config.dpsIncentives}`)
+          expect($('a[data-test=incentives-service-url]').text()).toContain(
+            'Visit allowances for convicted prisoners can be changed in the incentives service, but requires an extra user role.',
+          )
         })
     })
   })

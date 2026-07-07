@@ -1,6 +1,8 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitAllowanceService } from '../../services'
+import { daysOfWeek } from '../../constants/daysOfWeek'
+import { PrisonRemandConfig } from '../../@types/bapv'
 
 export default class UpdateAllowancesController {
   public constructor(
@@ -34,7 +36,6 @@ export default class UpdateAllowancesController {
     return async (req, res) => {
       const { username } = res.locals.user
       const { prisonId } = req.session.selectedEstablishment
-      const { weekStartDay, remandVisitLimitPerWeek } = req.body
 
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
@@ -42,6 +43,8 @@ export default class UpdateAllowancesController {
         req.flash('formValues', matchedData(req, { onlyValidData: false }))
         return res.redirect('/visit-allowances/remand')
       }
+
+      const { weekStartDay, remandVisitLimitPerWeek } = matchedData<PrisonRemandConfig>(req)
 
       await this.visitAllowanceService.updateRemandConfig({
         username: res.locals.user.username,
@@ -69,9 +72,7 @@ export default class UpdateAllowancesController {
 
   public validate(): ValidationChain[] {
     return [
-      body('weekStartDay')
-        .isIn(['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'])
-        .withMessage('Select a valid day of the week'),
+      body('weekStartDay').isIn(daysOfWeek).withMessage('Select a valid day of the week'),
       body('remandVisitLimitPerWeek')
         .toInt()
         .isInt({ min: 1 })
