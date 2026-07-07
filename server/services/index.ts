@@ -37,7 +37,11 @@ export const services = () => {
 
   const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient)
 
-  const visitAllowanceService = new VisitAllowanceService(incentivesApiClientBuilder, hmppsAuthClient)
+  const visitAllowanceService = new VisitAllowanceService(
+    incentivesApiClientBuilder,
+    orchestrationApiClientBuilder,
+    hmppsAuthClient,
+  )
 
   const visitNotificationsService = new VisitNotificationsService(orchestrationApiClientBuilder, hmppsAuthClient)
 

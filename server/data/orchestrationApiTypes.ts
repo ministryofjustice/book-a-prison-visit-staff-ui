@@ -45,6 +45,8 @@ export type VisitSession = components['schemas']['VisitSessionDto']
 export type Alert = components['schemas']['AlertDto']
 export type OffenderRestriction = components['schemas']['OffenderRestrictionDto']
 
+export type VisitSchedulerUpdatePrisonDto = components['schemas']['VisitSchedulerUpdatePrisonDto']
+
 // Visit orders
 export type PrisonerBalanceDto = components['schemas']['PrisonerBalanceDto']
 export type PrisonerBalanceAdjustmentDto = components['schemas']['PrisonerBalanceAdjustmentDto']

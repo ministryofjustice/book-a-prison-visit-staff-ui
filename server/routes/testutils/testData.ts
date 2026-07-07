@@ -41,7 +41,7 @@ import {
 } from '../../data/orchestrationApiTypes'
 import { CurrentIncentive, Prisoner } from '../../data/prisonerOffenderSearchTypes'
 import { Address, Contact, Restriction } from '../../data/prisonerContactRegistryApiTypes'
-import { MoJAlert, Prison } from '../../@types/bapv'
+import { MoJAlert, Prison, PrisonRemandConfig } from '../../@types/bapv'
 import { VisitOrderHistoryPage } from '../../services/visitOrders/visitOrdersService'
 import { PrisonIncentiveLevel } from '../../data/incentivesApiTypes'
 
@@ -439,6 +439,14 @@ export default class TestData {
     privilegedVisitOrders,
   })
 
+  static prisonRemandConfig = ({
+    weekStartDay = this.prisonDto().weekStartDay,
+    remandVisitLimitPerWeek = this.prisonDto().remandVisitLimitPerWeek,
+  }: Partial<PrisonRemandConfig> = {}): PrisonRemandConfig => ({
+    weekStartDay,
+    remandVisitLimitPerWeek,
+  })
+
   // Visitor restrictions
   static restriction = ({
     restrictionId = 1,
@@ -541,6 +549,8 @@ export default class TestData {
     adultAgeYears = this.prisonDto().adultAgeYears,
     webAddress = this.prisonDto().webAddress,
     clients = this.prisonDto().clients,
+    weekStartDay = this.prisonDto().weekStartDay,
+    remandVisitLimitPerWeek = this.prisonDto().remandVisitLimitPerWeek,
   }: Partial<Prison> = {}): Prison =>
     ({
       prisonId,
@@ -554,6 +564,8 @@ export default class TestData {
       adultAgeYears,
       webAddress,
       clients,
+      weekStartDay,
+      remandVisitLimitPerWeek,
     }) as Prison
 
   static prisonDto = ({
@@ -568,6 +580,8 @@ export default class TestData {
     adultAgeYears = 18,
     webAddress = 'https://www.example.com/hewell',
     clients = [{ userType: 'STAFF', active: true }],
+    weekStartDay = 'MONDAY',
+    remandVisitLimitPerWeek = 3,
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -581,6 +595,8 @@ export default class TestData {
       adultAgeYears,
       webAddress,
       clients,
+      weekStartDay,
+      remandVisitLimitPerWeek,
     }) as PrisonDto
 
   static prisonerVoBalance = ({
