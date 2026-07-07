@@ -52,6 +52,7 @@ export default class CheckLinkedVisitorsController {
       const { rejectionReason } = matchedData<{ rejectionReason: RejectVisitorRequestDto['rejectionReason'] }>(req)
       const { username } = res.locals.user
       const { returnTo } = visitorRequestJourney
+      const { bookerReference } = visitorRequestJourney.visitorRequest
       const includeBookerDetailsLink = returnTo === 'manage-bookers'
 
       try {
@@ -77,10 +78,9 @@ export default class CheckLinkedVisitorsController {
           return next(error)
         }
 
-        req.flash('messages', requestAlreadyReviewedMessage())
+        req.flash('messages', requestAlreadyReviewedMessage(bookerReference))
       }
 
-      const { bookerReference } = visitorRequestJourney.visitorRequest
       delete req.session.visitorRequestJourney
 
       return returnTo === 'manage-bookers'
