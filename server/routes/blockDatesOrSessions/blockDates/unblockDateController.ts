@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { format } from 'date-fns'
-import { AuditService, BlockedDatesService } from '../../services'
-import logger from '../../../logger'
+import { AuditService, BlockedDatesService } from '../../../services'
+import logger from '../../../../logger'
 
-export default class UnblockVisitDateController {
+export default class UnblockDateController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly blockedDatesService: BlockedDatesService,

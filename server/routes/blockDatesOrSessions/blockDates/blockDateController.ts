@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { format } from 'date-fns'
-import { AuditService, BlockedDatesService, VisitService } from '../../services'
-import logger from '../../../logger'
+import { AuditService, BlockedDatesService, VisitService } from '../../../services'
+import logger from '../../../../logger'
 
-export default class BlockNewDateController {
+export default class BlockDateController {
   public constructor(
     private readonly auditService: AuditService,
     private readonly blockedDatesService: BlockedDatesService,
@@ -27,7 +27,7 @@ export default class BlockNewDateController {
         date,
       })
 
-      return res.render('pages/blockVisitDates/blockNewDate', {
+      return res.render('pages/blockDatesOrSessions/blockDates/blockDate', {
         backLinkHref,
         errors: req.flash('errors'),
         date,

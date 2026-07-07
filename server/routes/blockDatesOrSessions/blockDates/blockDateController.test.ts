@@ -3,13 +3,13 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import {
   createMockAuditService,
   createMockBlockedDatesService,
   createMockVisitService,
-} from '../../services/testutils/mocks'
-import { MoJAlert } from '../../@types/bapv'
+} from '../../../services/testutils/mocks'
+import { MoJAlert } from '../../../@types/bapv'
 
 let app: Express
 let sessionData: SessionData

@@ -20,7 +20,7 @@ import setUpWebSession from './middleware/setUpWebSession'
 
 import indexRoutes from './routes'
 import visitJourneyRoutes from './routes/visitJourney'
-import blockVisitDatesRoutes from './routes/blockVisitDates'
+import blockVisitDatesRoutes from './routes/blockDatesOrSessions'
 import bookerManagementRoutes from './routes/bookerManagement'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
 import maintenancePageRoute from './routes/maintenancePageRoute'

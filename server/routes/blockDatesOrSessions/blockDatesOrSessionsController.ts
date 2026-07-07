@@ -4,7 +4,7 @@ import { format, parse, startOfYesterday } from 'date-fns'
 import { BlockedDatesService, VisitSessionsService } from '../../services'
 import config from '../../config'
 
-export default class BlockVisitDatesController {
+export default class BlockDatesOrSessionsController {
   public constructor(
     private readonly blockedDatesService: BlockedDatesService,
     private readonly visitSessionsService: VisitSessionsService,
@@ -19,7 +19,7 @@ export default class BlockVisitDatesController {
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
 
-      res.render('pages/blockVisitDates/blockVisitDates', {
+      res.render('pages/blockDatesOrSessions/blockDatesOrSessions', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
         message: req.flash('messages')?.[0],
