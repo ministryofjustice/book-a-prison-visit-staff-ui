@@ -78,16 +78,17 @@ export const getAvailableVisitActions = ({
     availableVisitActions.cancel = true
   }
 
-  // do not change
-  const hasBlockedDateNotification = notifications.some(
-    notification => notification.type === 'PRISON_VISITS_BLOCKED_FOR_DATE',
+  // clear notifications ('do not change')
+  const hasBlockedDateOrSessionNotification = notifications.some(
+    notification =>
+      notification.type === 'PRISON_VISITS_BLOCKED_FOR_DATE' || notification.type === 'SESSION_VISITS_BLOCKED_FOR_DATE',
   )
 
   const hasUnapprovedVisitorNotification = notifications.some(
     notification => notification.type === 'VISITOR_UNAPPROVED_EVENT',
   )
 
-  if (!hasBlockedDateNotification && !hasUnapprovedVisitorNotification && notifications.length > 0) {
+  if (!hasBlockedDateOrSessionNotification && !hasUnapprovedVisitorNotification && notifications.length > 0) {
     availableVisitActions.clearNotifications = true
   }
 

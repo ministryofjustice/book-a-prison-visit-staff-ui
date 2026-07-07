@@ -20,6 +20,8 @@ export default class HomePage extends AbstractPage {
 
   readonly bookerManagementTile: Locator
 
+  readonly viewVisitAllowancesTile: Locator
+
   constructor(page: Page) {
     super(page, 'Social visits')
 
@@ -32,5 +34,6 @@ export default class HomePage extends AbstractPage {
     this.viewTimetableTile = page.getByTestId('view-timetable')
     this.blockDatesTile = page.getByTestId('block-dates')
     this.bookerManagementTile = page.getByTestId('booker-management')
+    this.viewVisitAllowancesTile = page.getByTestId('visit-allowances')
   }
 }

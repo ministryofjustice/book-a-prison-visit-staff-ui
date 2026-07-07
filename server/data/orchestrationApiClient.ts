@@ -53,6 +53,7 @@ import {
   VisitRequestsCountDto,
   VisitRequestSummary,
   VisitRestriction,
+  VisitSchedulerUpdatePrisonDto,
   VisitSession,
   VisitSessionsAndScheduleDto,
 } from './orchestrationApiTypes'
@@ -673,6 +674,19 @@ export default class OrchestrationApiClient {
       path: `/config/prisons/prison/${id}`,
     })
     return { prisonId, ...prisonDto }
+  }
+
+  async updatePrisonConfig({
+    prisonId,
+    visitSchedulerUpdatePrisonDto,
+  }: {
+    prisonId: string
+    visitSchedulerUpdatePrisonDto: VisitSchedulerUpdatePrisonDto
+  }): Promise<void> {
+    await this.restClient.put({
+      path: `/config/prisons/prison/${prisonId}`,
+      data: visitSchedulerUpdatePrisonDto,
+    })
   }
 
   private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {

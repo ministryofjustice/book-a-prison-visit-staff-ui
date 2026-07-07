@@ -41,7 +41,7 @@ test.describe('Home page', () => {
     await expect(homePage.viewVisitsTile).toContainText('View visits by date')
     await expect(homePage.viewTimetableTile).toContainText('Visits timetable')
     await expect(homePage.bookerManagementTile).toHaveCount(0)
-    await expect(homePage.blockDatesTile).toContainText('Block visit dates')
+    await expect(homePage.blockDatesTile).toContainText('Block visit dates or sessions')
   })
 
   test('should render the index page with the booker management tile', async ({ page }) => {
@@ -71,6 +71,6 @@ test.describe('Home page', () => {
     await expect(homePage.viewVisitsTile).toContainText('View visits by date')
     await expect(homePage.viewTimetableTile).toContainText('Visits timetable')
     await expect(homePage.bookerManagementTile).toContainText('Manage online bookers')
-    await expect(homePage.blockDatesTile).toContainText('Block visit dates')
+    await expect(homePage.blockDatesTile).toContainText('Block visit dates or sessions')
   })
 })

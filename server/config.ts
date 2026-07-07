@@ -154,14 +154,16 @@ export default {
       url: get('FEATURE_FEEDBACK_BANNER_URL', '#feedback'),
     },
     notificationTypes: {
-      enabledRawNotifications: <NotificationTypeRaw[]>(
-        get(
-          'FEATURE_ENABLED_RAW_NOTIFICATION_TYPES',
-          'PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PERSON_RESTRICTION_UPSERTED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE,VISITOR_RESTRICTION_UPSERTED_EVENT,VISITOR_UNAPPROVED_EVENT,PRISONER_ALERT_UPDATED_EVENT,PRISONER_ALERT_CREATED_EVENT',
-        ).split(',')
-      ),
+      enabledRawNotifications: <NotificationTypeRaw[]>get(
+        'FEATURE_ENABLED_RAW_NOTIFICATION_TYPES',
+        'PRISONER_RECEIVED_EVENT,PRISONER_RELEASED_EVENT,PERSON_RESTRICTION_UPSERTED_EVENT,PRISON_VISITS_BLOCKED_FOR_DATE,VISITOR_RESTRICTION_UPSERTED_EVENT,VISITOR_UNAPPROVED_EVENT,PRISONER_ALERT_UPDATED_EVENT,PRISONER_ALERT_CREATED_EVENT',
+      )
+        .split(',')
+        .map(value => value.trim())
+        .filter(Boolean),
     },
     remandLimits: get('FEATURE_REMAND_LIMITS', 'false') === 'true',
+    sessionDateBlocks: get('FEATURE_SESSION_DATE_BLOCKS', 'false') === 'true',
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
