@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient } from '../data'
 import { GOVUKTag, VisitSessionData } from '../@types/bapv'
 import {
@@ -77,15 +77,17 @@ export default class VisitSessionsService {
     username,
     prisonId,
     date,
+    includeExcludedSessions,
   }: {
     username: string
     prisonId: string
     date: string
+    includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)
 
-    return orchestrationApiClient.getSessionSchedule(prisonId, date)
+    return orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
   }
 
   async getVisitSessionCapacity(
@@ -147,7 +149,7 @@ export default class VisitSessionsService {
 
       return {
         date,
-        monthHeading: format(date, 'MMMM'),
+        monthHeading: format(parseISO(date), 'MMMM'),
         ...(colour && { colour }),
         selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,

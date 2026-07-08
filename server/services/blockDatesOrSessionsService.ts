@@ -1,7 +1,7 @@
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import { ExcludeDateDto } from '../data/orchestrationApiTypes'
 
-export default class BlockedDatesService {
+export default class BlockDatesOrSessionsService {
   constructor(
     private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
     private readonly hmppsAuthClient: HmppsAuthClient,

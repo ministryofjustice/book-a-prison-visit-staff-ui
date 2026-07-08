@@ -1,23 +1,23 @@
 import TestData from '../routes/testutils/testData'
 import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
-import BlockedDatesService from './blockedDatesService'
+import BlockDatesOrSessionsService from './blockDatesOrSessionsService'
 
 const token = 'some token'
 const prisonId = 'HEI'
 const username = 'user1'
 
-describe('Blocked dates service', () => {
+describe('Blocked dates or sessions service', () => {
   const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
-  let blockedDatesService: BlockedDatesService
+  let blockDatesOrSessionsService: BlockDatesOrSessionsService
 
   const OrchestrationApiClientFactory = jest.fn()
 
   beforeEach(() => {
     OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
 
-    blockedDatesService = new BlockedDatesService(OrchestrationApiClientFactory, hmppsAuthClient)
+    blockDatesOrSessionsService = new BlockDatesOrSessionsService(OrchestrationApiClientFactory, hmppsAuthClient)
     hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
   })
 
@@ -30,7 +30,7 @@ describe('Blocked dates service', () => {
       const date = '2024-09-06'
       orchestrationApiClient.blockVisitDate.mockResolvedValue()
 
-      await blockedDatesService.blockVisitDate(username, prisonId, date)
+      await blockDatesOrSessionsService.blockVisitDate(username, prisonId, date)
 
       expect(orchestrationApiClient.blockVisitDate).toHaveBeenCalledWith(prisonId, date, username)
     })
@@ -41,7 +41,7 @@ describe('Blocked dates service', () => {
       const date = '2024-09-06'
       orchestrationApiClient.unblockVisitDate.mockResolvedValue()
 
-      await blockedDatesService.unblockVisitDate(username, prisonId, date)
+      await blockDatesOrSessionsService.unblockVisitDate(username, prisonId, date)
 
       expect(orchestrationApiClient.unblockVisitDate).toHaveBeenCalledWith(prisonId, date, username)
     })
@@ -52,7 +52,7 @@ describe('Blocked dates service', () => {
       const excludeDateDto = TestData.excludeDateDto()
       orchestrationApiClient.getFutureBlockedDates.mockResolvedValue([excludeDateDto])
 
-      const result = await blockedDatesService.getFutureBlockedDates(prisonId, username)
+      const result = await blockDatesOrSessionsService.getFutureBlockedDates(prisonId, username)
 
       expect(orchestrationApiClient.getFutureBlockedDates).toHaveBeenCalledWith(prisonId)
       expect(result).toStrictEqual([excludeDateDto])
@@ -63,7 +63,7 @@ describe('Blocked dates service', () => {
     it('should return boolean indicating whether given date is a blocked date', async () => {
       const date = '2000-02-01'
       orchestrationApiClient.isBlockedDate.mockResolvedValue(true)
-      const result = await blockedDatesService.isBlockedDate(prisonId, date, username)
+      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
       expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
       expect(result).toBe(true)
     })
@@ -72,7 +72,7 @@ describe('Blocked dates service', () => {
       const date = '2000-02-01'
       orchestrationApiClient.isBlockedDate.mockResolvedValue(false)
 
-      const result = await blockedDatesService.isBlockedDate(prisonId, date, username)
+      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
 
       expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
       expect(result).toStrictEqual(false)

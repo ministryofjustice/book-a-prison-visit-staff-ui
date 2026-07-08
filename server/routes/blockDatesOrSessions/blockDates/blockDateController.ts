@@ -1,33 +1,36 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { format } from 'date-fns'
-import { AuditService, BlockedDatesService, VisitService } from '../../services'
-import logger from '../../../logger'
+import { format, parseISO } from 'date-fns'
+import { AuditService, BlockDatesOrSessionsService, VisitService } from '../../../services'
+import logger from '../../../../logger'
 
-export default class BlockNewDateController {
+export default class BlockDateController {
   public constructor(
     private readonly auditService: AuditService,
-    private readonly blockedDatesService: BlockedDatesService,
+    private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
     private readonly visitService: VisitService,
   ) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { visitBlockDate } = req.session
-      if (!visitBlockDate) {
+      const { blockDateOrSession } = req.session
+      if (!blockDateOrSession) {
         return res.redirect('/block-visit-dates')
       }
+
+      const { backLinkHref, date } = blockDateOrSession
 
       const { prisonId } = req.session.selectedEstablishment
       const visitCount = await this.visitService.getBookedVisitCountByDate({
         username: res.locals.user.username,
         prisonId,
-        date: visitBlockDate,
+        date,
       })
 
-      return res.render('pages/blockVisitDates/blockNewDate', {
+      return res.render('pages/blockDatesOrSessions/blockDates/blockDate', {
+        backLinkHref,
         errors: req.flash('errors'),
-        visitBlockDate,
+        date,
         visitCount,
       })
     }
@@ -35,8 +38,8 @@ export default class BlockNewDateController {
 
   public submit(): RequestHandler {
     return async (req, res) => {
-      const { visitBlockDate } = req.session
-      if (!visitBlockDate) {
+      const { blockDateOrSession } = req.session
+      if (!blockDateOrSession) {
         return res.redirect('/block-visit-dates')
       }
 
@@ -50,27 +53,29 @@ export default class BlockNewDateController {
 
       if (confirmBlockDate === 'yes') {
         const { prisonId } = req.session.selectedEstablishment
+        const { date } = blockDateOrSession
+
         try {
-          await this.blockedDatesService.blockVisitDate(res.locals.user.username, prisonId, visitBlockDate)
+          await this.blockDatesOrSessionsService.blockVisitDate(res.locals.user.username, prisonId, date)
 
           req.flash('messages', {
             variant: 'success',
             title: 'Date blocked for visits',
-            text: `Visits are blocked for ${format(visitBlockDate, 'EEEE d MMMM yyyy')}.`,
+            text: `Visits are blocked for ${format(parseISO(date), 'EEEE d MMMM yyyy')}.`,
           })
 
           await this.auditService.blockedVisitDate({
             prisonId,
-            date: visitBlockDate,
+            date,
             username: res.locals.user.username,
             operationId: res.locals.appInsightsOperationId,
           })
         } catch (error) {
-          logger.error(error, `Could not block visit date ${visitBlockDate} for ${res.locals.user.username}`)
+          logger.error(error, `Could not block visit date ${date} for ${res.locals.user.username}`)
         }
       }
 
-      delete req.session.visitBlockDate
+      delete req.session.blockDateOrSession
       return res.redirect('/block-visit-dates')
     }
   }

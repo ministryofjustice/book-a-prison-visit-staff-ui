@@ -45,7 +45,12 @@ test.describe('View visit schedule timetable', () => {
       }),
     ]
 
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: format(today, shortDateFormat), sessionSchedule })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: format(today, shortDateFormat),
+      includeExcludedSessions: false,
+      sessionSchedule,
+    })
 
     // Home page
     const homePage = await HomePage.verifyOnPage(page)
@@ -95,7 +100,12 @@ test.describe('View visit schedule timetable', () => {
   })
 
   test('should allow navigation between weeks and date selection', async ({ page }) => {
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: format(today, shortDateFormat), sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: format(today, shortDateFormat),
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
 
     const homePage = await HomePage.verifyOnPage(page)
     await homePage.viewTimetableTile.click()
@@ -109,6 +119,7 @@ test.describe('View visit schedule timetable', () => {
     await orchestrationApi.stubSessionSchedule({
       prisonId,
       date: format(nextMon, shortDateFormat),
+      includeExcludedSessions: false,
       sessionSchedule: [],
     })
     await visitTimetablePage.goToNextWeek()
@@ -119,6 +130,7 @@ test.describe('View visit schedule timetable', () => {
     await orchestrationApi.stubSessionSchedule({
       prisonId,
       date: format(followingWeds, shortDateFormat),
+      includeExcludedSessions: false,
       sessionSchedule: [],
     })
     await visitTimetablePage.goToDay(2)
@@ -129,6 +141,7 @@ test.describe('View visit schedule timetable', () => {
     await orchestrationApi.stubSessionSchedule({
       prisonId,
       date: format(previousMon, shortDateFormat),
+      includeExcludedSessions: false,
       sessionSchedule: [],
     })
     await visitTimetablePage.goToPreviousWeek()

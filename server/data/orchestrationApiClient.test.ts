@@ -1027,14 +1027,15 @@ describe('orchestrationApiClient', () => {
     it('should return an array of scheduled sessions for the specified prison and date', async () => {
       const date = '2023-02-01'
       const sessionSchedule: SessionSchedule[] = [TestData.sessionSchedule()]
+      const includeExcludedSessions = false
 
       fakeOrchestrationApi
         .get('/visit-sessions/schedule')
-        .query({ prisonId, date })
+        .query({ prisonId, date, includeExcludedSessions })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, sessionSchedule)
 
-      const output = await orchestrationApiClient.getSessionSchedule(prisonId, date)
+      const output = await orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
 
       expect(output).toEqual(sessionSchedule)
     })

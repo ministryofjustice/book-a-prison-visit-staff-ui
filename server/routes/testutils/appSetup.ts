@@ -23,7 +23,7 @@ import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dis
 
 import indexRoutes from '../index'
 import visitJourneyRoutes from '../visitJourney'
-import blockVisitDatesRoutes from '../blockVisitDates'
+import blockVisitDatesRoutes from '../blockDatesOrSessions'
 import bookerManagementRoutes from '../bookerManagement'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import maintenancePageRoute from '../maintenancePageRoute'

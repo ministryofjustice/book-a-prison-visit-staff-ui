@@ -5,18 +5,22 @@ import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
 import { addDays, addWeeks, format, startOfYesterday } from 'date-fns'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import { createMockBlockedDatesService } from '../../services/testutils/mocks'
+import { createMockBlockDatesOrSessionsService, createMockVisitSessionsService } from '../../services/testutils/mocks'
 import TestData from '../testutils/testData'
+import { setFeature } from '../../data/testutils/mockFeature'
 
 let app: Express
 let flashData: FlashData
 let sessionData: SessionData
 
-const blockedDatesService = createMockBlockedDatesService()
+const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
+const visitSessionsService = createMockVisitSessionsService()
 const url = '/block-visit-dates'
 
 beforeEach(() => {
-  app = appWithAllRoutes({ services: { blockedDatesService } })
+  setFeature('sessionDateBlocks', true)
+
+  app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService } })
 })
 
 afterEach(() => {
@@ -37,7 +41,7 @@ describe('Block visit dates listing page', () => {
       const blockedDate1 = TestData.excludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
       const blockedDate2 = TestData.excludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
 
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
 
       return request(app)
         .get(url)
@@ -50,9 +54,6 @@ describe('Block visit dates listing page', () => {
           expect($('.moj-alert').length).toBe(0)
 
           expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
-          expect($('.moj-datepicker').attr('data-excluded-dates')).toBe(
-            `${format(tomorrow, 'dd/MM/yyyy')} ${format(nextWeek, 'dd/MM/yyyy')}`,
-          )
           expect($('input[name=date]').val()).toBeFalsy()
 
           expect($('[data-test="blocked-date-1"]').text()).toBe(format(blockedDate1.excludeDate, 'EEEE d MMMM yyyy'))
@@ -67,7 +68,7 @@ describe('Block visit dates listing page', () => {
     })
 
     it('should display block visit dates page with no blocked dates listed', () => {
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
 
       return request(app)
         .get(url)
@@ -85,7 +86,7 @@ describe('Block visit dates listing page', () => {
       const alert = TestData.mojAlert({ showTitleAsHeading: false })
       flashData = { messages: [alert] }
 
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
 
       return request(app)
         .get(url)
@@ -109,7 +110,7 @@ describe('Block visit dates listing page', () => {
       const formValues = { date: '1/2/2000' }
       flashData = { errors: [validationError], formValues: [formValues] }
 
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
 
       return request(app)
         .get(url)
@@ -134,12 +135,13 @@ describe('Block visit dates listing page', () => {
       flashData = { errors: [], formValues: [] }
 
       sessionData = {} as SessionData
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+      visitSessionsService.getSessionSchedule.mockResolvedValue([])
 
-      app = appWithAllRoutes({ services: { blockedDatesService }, sessionData })
+      app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService }, sessionData })
     })
 
-    it('should set date to block in session and redirect to confirmation page for a valid date', () => {
+    it('should set date to block in session and redirect to block new date confirmation page for a valid date (date with no active sessions)', () => {
       const inputDate = format(today, datePickerDateFormat)
       const expectedOutputDate = format(today, expectedDateFormat)
 
@@ -149,10 +151,60 @@ describe('Block visit dates listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates/block-new-date')
         .expect(() => {
-          expect(blockedDatesService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
-          expect(sessionData.visitBlockDate).toBe(expectedOutputDate)
+          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+            username: 'user1',
+            prisonId: 'HEI',
+            date: expectedOutputDate,
+            includeExcludedSessions: false,
+          })
+          expect(sessionData.blockDateOrSession).toStrictEqual({
+            backLinkHref: '/block-visit-dates',
+            date: expectedOutputDate,
+          })
           expect(flashProvider).not.toHaveBeenCalled()
         })
+    })
+
+    it('should set date to block in session and redirect to date or session choice page for a valid date (date with active sessions)', () => {
+      const inputDate = format(today, datePickerDateFormat)
+      const expectedOutputDate = format(today, expectedDateFormat)
+
+      visitSessionsService.getSessionSchedule.mockResolvedValue([TestData.sessionSchedule()])
+
+      return request(app)
+        .post(url)
+        .send({ date: inputDate })
+        .expect(302)
+        .expect('location', '/block-visit-dates/block-date-or-session')
+        .expect(() => {
+          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
+            username: 'user1',
+            prisonId: 'HEI',
+            date: expectedOutputDate,
+            includeExcludedSessions: false,
+          })
+          expect(sessionData.blockDateOrSession).toStrictEqual({
+            backLinkHref: '/block-visit-dates',
+            date: expectedOutputDate,
+          })
+          expect(flashProvider).not.toHaveBeenCalled()
+        })
+    })
+
+    it('should NOT redirect to date or session choice page if feature not enabled', () => {
+      setFeature('sessionDateBlocks', false)
+      app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService }, sessionData })
+
+      const inputDate = format(today, datePickerDateFormat)
+      visitSessionsService.getSessionSchedule.mockResolvedValue([TestData.sessionSchedule()])
+
+      return request(app)
+        .post(url)
+        .send({ date: inputDate })
+        .expect(302)
+        .expect('location', '/block-visit-dates/block-new-date')
     })
 
     describe('should set error and redirect back to listing page for an invalid date', () => {
@@ -179,8 +231,8 @@ describe('Block visit dates listing page', () => {
           .expect(302)
           .expect('location', '/block-visit-dates')
           .expect(() => {
-            expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
-            expect(sessionData.visitBlockDate).toBe(undefined)
+            expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
+            expect(sessionData.blockDateOrSession).toBe(undefined)
             expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { date: expected })
           })
@@ -206,8 +258,8 @@ describe('Block visit dates listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.getFutureBlockedDates).not.toHaveBeenCalled()
-          expect(sessionData.visitBlockDate).toBe(undefined)
+          expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
+          expect(sessionData.blockDateOrSession).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })
         })
@@ -217,7 +269,7 @@ describe('Block visit dates listing page', () => {
       const inputDate = format(today, datePickerDateFormat)
       const expectedOutputDate = format(today, expectedDateFormat)
 
-      blockedDatesService.getFutureBlockedDates.mockResolvedValue([
+      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([
         TestData.excludeDateDto({ excludeDate: expectedOutputDate }),
       ])
 
@@ -235,8 +287,8 @@ describe('Block visit dates listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
-          expect(sessionData.visitBlockDate).toBe(undefined)
+          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(sessionData.blockDateOrSession).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })
         })

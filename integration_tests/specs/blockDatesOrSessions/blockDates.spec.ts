@@ -17,6 +17,8 @@ test.describe('Block visit dates', () => {
   const firstOfNextMonthShort = format(firstOfNextMonth, shortDateFormat)
   const firstOfNextMonthLong = format(firstOfNextMonth, longDateFormat)
 
+  const prisonId = 'HEI'
+
   test.beforeEach(async () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
@@ -27,7 +29,7 @@ test.describe('Block visit dates', () => {
     await resetStubs()
   })
 
-  test('should block a new date', async ({ page }) => {
+  test('should block a new date - where date has no sessions to block', async ({ page }) => {
     await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] })
     await login(page)
     const homePage = await HomePage.verifyOnPage(page)
@@ -42,11 +44,17 @@ test.describe('Block visit dates', () => {
     await blockVisitDatesPage.datePicker.goToNextMonth()
     await blockVisitDatesPage.datePicker.selectDay(1)
 
-    // Stub booked visits count
+    // Stub booked visits count and no sessions for the selected date
     await orchestrationApi.stubGetBookedVisitCountByDate({
-      prisonId: 'HEI',
+      prisonId,
       date: firstOfNextMonthShort,
       count: 0,
+    })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: firstOfNextMonthShort,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
     })
 
     await blockVisitDatesPage.continueButton.click()
@@ -56,13 +64,13 @@ test.describe('Block visit dates', () => {
 
     // Stub block visit date correctly
     await orchestrationApi.stubBlockVisitDate({
-      prisonId: 'HEI',
+      prisonId,
       date: firstOfNextMonthShort,
       username: 'USER1',
     })
 
     await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId: 'HEI',
+      prisonId,
       blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
     })
 
@@ -80,7 +88,7 @@ test.describe('Block visit dates', () => {
   test('should go to block dates listing page and unblock a date', async ({ page }) => {
     // Stub API to show an existing blocked date
     await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId: 'HEI',
+      prisonId,
       blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
     })
 
@@ -98,14 +106,14 @@ test.describe('Block visit dates', () => {
 
     // Stub API for unblocking
     await orchestrationApi.stubUnblockVisitDate({
-      prisonId: 'HEI',
+      prisonId,
       date: firstOfNextMonthShort,
       username: 'USER1',
     })
 
     // Stub future blocked dates after unblock
     await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId: 'HEI',
+      prisonId,
       blockedDates: [],
     })
 

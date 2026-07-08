@@ -1,28 +1,30 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { format, parse, startOfYesterday } from 'date-fns'
-import { BlockedDatesService } from '../../services'
+import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
+import config from '../../config'
 
-export default class BlockVisitDatesController {
-  public constructor(private readonly blockedDatesService: BlockedDatesService) {}
+export default class BlockDatesOrSessionsController {
+  public constructor(
+    private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
+    private readonly visitSessionsService: VisitSessionsService,
+  ) {}
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const blockedDates = await this.blockedDatesService.getFutureBlockedDates(
+      const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
         req.session.selectedEstablishment.prisonId,
         res.locals.user.username,
       )
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
-      const datePickerExcludedDates = blockedDates.map(date => format(date.excludeDate, 'dd/MM/yyyy')).join(' ')
 
-      res.render('pages/blockVisitDates/blockVisitDates', {
+      res.render('pages/blockDatesOrSessions/blockDatesOrSessions', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
         message: req.flash('messages')?.[0],
         blockedDates,
         datePickerMinDate,
-        datePickerExcludedDates,
       })
     }
   }
@@ -38,7 +40,23 @@ export default class BlockVisitDatesController {
       }
 
       const { date } = matchedData<{ date: string }>(req)
-      req.session.visitBlockDate = date
+      req.session.blockDateOrSession = {
+        backLinkHref: '/block-visit-dates',
+        date,
+      }
+
+      const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
+        username: res.locals.user.username,
+        prisonId: req.session.selectedEstablishment.prisonId,
+        date,
+        includeExcludedSessions: false,
+      })
+
+      const dateHasActiveSessions = sessionSchedule.length > 0
+
+      if (dateHasActiveSessions && config.features.sessionDateBlocks) {
+        return res.redirect('/block-visit-dates/block-date-or-session')
+      }
 
       return res.redirect('/block-visit-dates/block-new-date')
     }
@@ -63,7 +81,7 @@ export default class BlockVisitDatesController {
         .bail()
         // date cannot be an existing blocked date
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
-          const blockedDates = await this.blockedDatesService.getFutureBlockedDates(
+          const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
             req.session.selectedEstablishment.prisonId,
             req.user.username,
           )

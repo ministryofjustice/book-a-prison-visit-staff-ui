@@ -994,16 +994,18 @@ export default {
   stubSessionSchedule: ({
     prisonId,
     date,
+    includeExcludedSessions,
     sessionSchedule,
   }: {
     prisonId: string
     date: string
+    includeExcludedSessions: boolean
     sessionSchedule: SessionSchedule[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visit-sessions/schedule?prisonId=${prisonId}&date=${date}`,
+        url: `/orchestration/visit-sessions/schedule?prisonId=${prisonId}&date=${date}&includeExcludedSessions=${includeExcludedSessions}`,
       },
       response: {
         status: 200,

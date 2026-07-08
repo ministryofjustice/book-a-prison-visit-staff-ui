@@ -26,7 +26,7 @@
 
     </div>
   </div>
-  
+
   <h2 class="govuk-heading-m">Block a new date</h2>
 
   <form action="/block-visit-dates" method="POST" novalidate>
@@ -44,7 +44,6 @@
       },
       value: formValues.date,
       minDate: datePickerMinDate,
-      excludedDates: datePickerExcludedDates,
       errorMessage: errors | findError("date")
     }) }}
 

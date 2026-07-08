@@ -3,27 +3,27 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import {
   createMockAuditService,
-  createMockBlockedDatesService,
+  createMockBlockDatesOrSessionsService,
   createMockVisitService,
-} from '../../services/testutils/mocks'
-import { MoJAlert } from '../../@types/bapv'
+} from '../../../services/testutils/mocks'
+import { MoJAlert } from '../../../@types/bapv'
 
 let app: Express
 let sessionData: SessionData
 
 const auditService = createMockAuditService()
-const blockedDatesService = createMockBlockedDatesService()
+const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitService = createMockVisitService()
 
 const url = '/block-visit-dates/block-new-date'
-const visitBlockDate = '2024-09-06'
+const date = '2024-09-06'
 
 beforeEach(() => {
-  sessionData = { visitBlockDate } as SessionData
-  app = appWithAllRoutes({ services: { auditService, blockedDatesService, visitService }, sessionData })
+  sessionData = { blockDateOrSession: { date, backLinkHref: '#back-link-from-session' } } as SessionData
+  app = appWithAllRoutes({ services: { auditService, blockDatesOrSessionsService, visitService }, sessionData })
 })
 
 afterEach(() => {
@@ -33,7 +33,7 @@ afterEach(() => {
 describe('Block new visit date', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
-      sessionData.visitBlockDate = undefined
+      sessionData.blockDateOrSession = undefined
       return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
     })
 
@@ -45,7 +45,7 @@ describe('Block new visit date', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates')
+          expect($('.govuk-back-link').attr('href')).toBe('#back-link-from-session')
           expect($('h1').text()).toBe('Are you sure you want to block visits on Friday 6 September 2024?')
 
           expect($('[data-test=existing-bookings]').text().trim()).toBe('There is 1 existing booking for this date.')
@@ -59,7 +59,7 @@ describe('Block new visit date', () => {
           expect(visitService.getBookedVisitCountByDate).toHaveBeenCalledWith({
             username: 'user1',
             prisonId: 'HEI',
-            date: sessionData.visitBlockDate,
+            date: sessionData.blockDateOrSession.date,
           })
         })
     })
@@ -102,12 +102,12 @@ describe('Block new visit date', () => {
     })
 
     it('should redirect to blocked dates listing page if no new block date in session', () => {
-      sessionData.visitBlockDate = undefined
+      sessionData.blockDateOrSession = undefined
       return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
     })
 
     it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
-      blockedDatesService.blockVisitDate.mockResolvedValue()
+      blockDatesOrSessionsService.blockVisitDate.mockResolvedValue()
       const blockedDateSuccessMessage: MoJAlert = {
         variant: 'success',
         title: 'Date blocked for visits',
@@ -120,16 +120,16 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', visitBlockDate)
+          expect(blockDatesOrSessionsService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', date)
           expect(auditService.blockedVisitDate).toHaveBeenCalledWith({
             prisonId: 'HEI',
-            date: visitBlockDate,
+            date,
             username: 'user1',
             operationId: undefined,
           })
           expect(flashProvider).toHaveBeenCalledTimes(1)
           expect(flashProvider).toHaveBeenCalledWith('messages', blockedDateSuccessMessage)
-          expect(sessionData.visitBlockDate).toBe(undefined)
+          expect(sessionData.blockDateOrSession).toBe(undefined)
         })
     })
 
@@ -140,7 +140,7 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).not.toHaveBeenCalled()
         })
@@ -161,7 +161,7 @@ describe('Block new visit date', () => {
         .expect(302)
         .expect('location', '/block-visit-dates/block-new-date')
         .expect(() => {
-          expect(blockedDatesService.blockVisitDate).not.toHaveBeenCalled()
+          expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledTimes(1)

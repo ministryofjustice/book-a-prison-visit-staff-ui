@@ -29,7 +29,12 @@ test.describe('Print visit passes by date (via visits by date page)', () => {
   const visitPassDto = TestData.visitPassDto({ visitDate: todayShortFormat })
 
   test('should navigate to print visit passes page and trigger print dialog', async ({ page }) => {
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: todayShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({ prisonId, sessionDate: todayShortFormat, visits: [] })
     await orchestrationApi.stubIsBlockedDate({ prisonId, excludeDate: todayShortFormat, excludeDates: [] })
     await orchestrationApi.stubGetVisitPasses({ date: todayShortFormat, visitPassDtos: [visitPassDto] })

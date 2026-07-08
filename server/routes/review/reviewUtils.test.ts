@@ -30,6 +30,13 @@ describe('Visits to review utils', () => {
         bookedByName: 'User A',
         notifications: [TestData.visitNotificationEvent({ type: 'PRISONER_RELEASED_EVENT' })],
       }),
+
+      // this should be mapped to PRISON_VISITS_BLOCKED_FOR_DATE in the filter (because they share a label)
+      TestData.visitNotifications({
+        bookedByUserName: 'user2',
+        bookedByName: 'User A',
+        notifications: [TestData.visitNotificationEvent({ type: 'SESSION_VISITS_BLOCKED_FOR_DATE' })],
+      }),
     ]
 
     it('should build list filters sorted alphabetically by label - when current user not in list', async () => {
@@ -52,6 +59,7 @@ describe('Visits to review utils', () => {
           items: [
             { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
             { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
+            { label: 'Time slot removed', value: 'PRISON_VISITS_BLOCKED_FOR_DATE', checked: false },
           ],
         },
       ]
@@ -81,6 +89,7 @@ describe('Visits to review utils', () => {
           items: [
             { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
             { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
+            { label: 'Time slot removed', value: 'PRISON_VISITS_BLOCKED_FOR_DATE', checked: false },
           ],
         },
       ]
@@ -147,6 +156,7 @@ describe('Visits to review utils', () => {
           items: [
             { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: true },
             { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
+            { label: 'Time slot removed', value: 'PRISON_VISITS_BLOCKED_FOR_DATE', checked: false },
           ],
         },
       ]
@@ -184,6 +194,7 @@ describe('Visits to review utils', () => {
           items: [
             { label: 'Prisoner released', value: 'PRISONER_RELEASED_EVENT', checked: false },
             { label: 'Prisoner transferred', value: 'PRISONER_RECEIVED_EVENT', checked: false },
+            { label: 'Time slot removed', value: 'PRISON_VISITS_BLOCKED_FOR_DATE', checked: false },
           ],
         },
       ]
@@ -231,22 +242,31 @@ describe('Visits to review utils', () => {
         }),
 
         TestData.visitNotifications({
-          notifications: [TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' })],
+          notifications: [TestData.visitNotificationEvent({ type: 'PRISONER_ALERTS_UPDATED_EVENT' })],
         }),
 
         TestData.visitNotifications({
           notifications: [
-            TestData.visitNotificationEvent({ type: 'PRISON_VISITS_BLOCKED_FOR_DATE' }),
+            TestData.visitNotificationEvent({ type: 'PRISONER_ALERTS_UPDATED_EVENT' }),
             TestData.visitNotificationEvent({ type: 'VISITOR_RESTRICTION' }),
           ],
         }),
+
+        TestData.visitNotifications({
+          notifications: [TestData.visitNotificationEvent({ type: 'SESSION_VISITS_BLOCKED_FOR_DATE' })],
+        }),
       ]
 
-      const appliedFilters: AppliedFilters = { bookedBy: [], type: ['PRISONER_RECEIVED_EVENT', 'VISITOR_RESTRICTION'] }
+      const appliedFilters: AppliedFilters = {
+        bookedBy: [],
+        type: ['PRISONER_RECEIVED_EVENT', 'VISITOR_RESTRICTION', 'PRISON_VISITS_BLOCKED_FOR_DATE'],
+      }
 
       const result = filterVisitNotifications({ appliedFilters, visitNotifications })
 
-      expect(result).toStrictEqual([visitNotifications[0], visitNotifications[2]])
+      // SESSION_VISITS_BLOCKED_FOR_DATE should be included because PRISON_VISITS_BLOCKED_FOR_DATE is selected
+      // (types mapped together because they share a label)
+      expect(result).toStrictEqual([visitNotifications[0], visitNotifications[2], visitNotifications[3]])
     })
 
     it('should filter visits by both user and notification type', () => {

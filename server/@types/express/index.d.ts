@@ -18,8 +18,13 @@ export declare module 'express-session' {
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison & { isEnabledForPublic: boolean }
-    visitBlockDate?: string // format YYYY-MM-DD
     cancelledVisitInfo?: CancelledVisitInfo
+
+    // Block visit date or session journey
+    blockDateOrSession?: {
+      backLinkHref: string
+      date: string // format YYYY-MM-DD
+    }
 
     // Booker management
     // matched booker accounts from an email search (sorted, most recent 'active' account first)
