@@ -109,7 +109,7 @@ export default function routes({
       from: 'visits',
     }).toString()
 
-    const showPrintPassesButton = isToday(selectedDateString) || isFuture(selectedDateString)
+    const showPrintPassesButton = !isAnExcludeDate && (isToday(selectedDateString) || isFuture(selectedDateString))
 
     await auditService.viewedVisits({
       viewDate: selectedDateString,

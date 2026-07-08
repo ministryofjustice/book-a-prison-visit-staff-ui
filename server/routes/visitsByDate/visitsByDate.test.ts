@@ -611,6 +611,20 @@ describe('GET /visits - Visits by date page', () => {
           expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })
+
+    it('should not show the print visit passes button for a blocked date', () => {
+      blockDatesOrSessionsService.isBlockedDate.mockResolvedValue(true)
+      visitNotificationsService.dateHasNotifications.mockResolvedValue(false)
+
+      return request(app)
+        .get('/visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test=print-visit-passes]').length).toBe(0)
+        })
+    })
   })
 })
 
