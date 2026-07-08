@@ -7,6 +7,7 @@ import {
   BookerSearchResultsDto,
   ExcludeDateDto,
   OffenderRestriction,
+  PrisonAndSessionsExcludeDatesDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
@@ -15,6 +16,7 @@ import {
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SessionCapacity,
+  SessionExcludeDateDto,
   SessionsAndScheduleDto,
   SessionSchedule,
   SocialContactsDto,
@@ -469,6 +471,37 @@ export default class TestData {
   static sessionCapacity = ({ open = 30, closed = 3 }: Partial<SessionCapacity> = {}): SessionCapacity =>
     ({ open, closed }) as SessionCapacity
 
+  static sessionExcludeDateDto = ({
+    excludeDate = { excludeDate: '2024-12-14', actionedBy: 'User two' },
+    sessionTemplateReference = 'a1b.2cd.3e',
+    sessionTimeSlot = { startTime: '10:00', endTime: '11:30' },
+    visitType = 'SOCIAL',
+    areLocationGroupsInclusive = true,
+    prisonerLocationGroupNames = [],
+    areCategoryGroupsInclusive = true,
+    prisonerCategoryGroupNames = [],
+    areIncentiveGroupsInclusive = true,
+    prisonerIncentiveLevelGroupNames = [],
+    weeklyFrequency = 1,
+    visitRoom = 'Visits hall',
+    visitOrderRestriction = 'VO_PVO',
+  }: Partial<SessionExcludeDateDto> = {}): SessionExcludeDateDto =>
+    ({
+      excludeDate,
+      sessionTemplateReference,
+      sessionTimeSlot,
+      visitType,
+      areLocationGroupsInclusive,
+      prisonerLocationGroupNames,
+      areCategoryGroupsInclusive,
+      prisonerCategoryGroupNames,
+      areIncentiveGroupsInclusive,
+      prisonerIncentiveLevelGroupNames,
+      weeklyFrequency,
+      visitRoom,
+      visitOrderRestriction,
+    }) as SessionExcludeDateDto
+
   static sessionsAndScheduleDto = ({
     date = '2022-01-14',
     visitSessions = [this.visitSessionV2()],
@@ -567,6 +600,15 @@ export default class TestData {
       weekStartDay,
       remandVisitLimitPerWeek,
     }) as Prison
+
+  static prisonAndSessionsExcludeDatesDto = ({
+    fullDateExclusions = [this.excludeDateDto()],
+    sessionExclusions = [this.sessionExcludeDateDto()],
+  }: Partial<PrisonAndSessionsExcludeDatesDto> = {}): PrisonAndSessionsExcludeDatesDto =>
+    ({
+      fullDateExclusions,
+      sessionExclusions,
+    }) as PrisonAndSessionsExcludeDatesDto
 
   static prisonDto = ({
     code = 'HEI',

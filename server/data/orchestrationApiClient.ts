@@ -23,6 +23,7 @@ import {
   NotificationType,
   NotificationTypeRaw,
   PageVisitDto,
+  PrisonAndSessionsExcludeDatesDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
@@ -466,6 +467,20 @@ export default class OrchestrationApiClient {
     })
   }
 
+  async getFutureBlockedDatesAndSessions({
+    prisonId,
+    includeSessions,
+  }: {
+    prisonId: string
+    includeSessions: boolean
+  }): Promise<PrisonAndSessionsExcludeDatesDto> {
+    return this.restClient.get({
+      path: `/v2/prisons/${prisonId}/config/exclude-dates/future`,
+      query: new URLSearchParams({ includeSessions: includeSessions.toString() }).toString(),
+    })
+  }
+
+  // FIXME this endpoint is deprecated; remove this and wiremock stub and use call above with includeSessions=false instead
   async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
     return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
   }
