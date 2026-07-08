@@ -4,6 +4,7 @@ import BlockDatesOrSessionsController from './blockDatesOrSessionsController'
 import BlockDateController from './blockDates/blockDateController'
 import UnblockDateController from './blockDates/unblockDateController'
 import ChooseDateOrSessionBlockController from './chooseDateOrSessionBlockController'
+import config from '../../config'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -26,8 +27,13 @@ export default function routes(services: Services): Router {
 
   const unblockDateController = new UnblockDateController(services.auditService, services.blockDatesOrSessionsService)
 
-  // Block visit dates or sessions main page
-  router.get('/', blockDatesOrSessionsController.view())
+  // Block visit dates or sessions main page with listing
+  router.get(
+    '/',
+    config.features.sessionDateBlocks
+      ? blockDatesOrSessionsController.view()
+      : blockDatesOrSessionsController.viewDateBlocksOnly(),
+  )
   router.post('/', blockDatesOrSessionsController.validate(), blockDatesOrSessionsController.submit())
 
   // Choose whether to block a date or a session

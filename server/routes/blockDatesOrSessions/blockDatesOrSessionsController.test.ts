@@ -28,8 +28,10 @@ afterEach(() => {
 })
 
 describe('Block visit dates listing page', () => {
-  describe(`GET ${url}`, () => {
+  describe(`GET ${url} (date blocks ONLY - sessionDateBlocks feature disabled)`, () => {
     beforeEach(() => {
+      setFeature('sessionDateBlocks', false)
+
       flashData = {}
       flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
     })
