@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { Services } from '../../services'
 import BlockDatesOrSessionsController from './blockDatesOrSessionsController'
 import BlockDateController from './blockDates/blockDateController'
-import UnblockVisitDateController from './blockDates/unblockDateController'
+import UnblockDateController from './blockDates/unblockDateController'
 import ChooseDateOrSessionBlockController from './chooseDateOrSessionBlockController'
 
 export default function routes(services: Services): Router {
@@ -24,10 +24,7 @@ export default function routes(services: Services): Router {
     services.visitService,
   )
 
-  const unblockDateController = new UnblockVisitDateController(
-    services.auditService,
-    services.blockDatesOrSessionsService,
-  )
+  const unblockDateController = new UnblockDateController(services.auditService, services.blockDatesOrSessionsService)
 
   // Block visit dates or sessions main page
   router.get('/', blockDatesOrSessionsController.view())

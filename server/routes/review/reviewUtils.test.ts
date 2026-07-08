@@ -265,7 +265,7 @@ describe('Visits to review utils', () => {
       const result = filterVisitNotifications({ appliedFilters, visitNotifications })
 
       // SESSION_VISITS_BLOCKED_FOR_DATE should be included because PRISON_VISITS_BLOCKED_FOR_DATE is selected
-      // (types mapped together because they they share a label)
+      // (types mapped together because they share a label)
       expect(result).toStrictEqual([visitNotifications[0], visitNotifications[2], visitNotifications[3]])
     })
 

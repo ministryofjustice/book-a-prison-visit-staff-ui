@@ -67,13 +67,14 @@ export const filterVisitNotifications = ({
   appliedFilters: AppliedFilters
   visitNotifications: VisitNotifications[]
 }): VisitNotifications[] => {
-  const { bookedBy, type } = appliedFilters
+  const { bookedBy, type: rawType } = appliedFilters
 
-  if (!bookedBy.length && !type.length) {
+  if (!bookedBy.length && !rawType.length) {
     return visitNotifications
   }
 
-  // if SESSION_VISITS_BLOCKED_FOR_DATE is selected, also include PRISON_VISITS_BLOCKED_FOR_DATE in the filter
+  const type = [...rawType]
+  // if PRISON_VISITS_BLOCKED_FOR_DATE is selected, also include SESSION_VISITS_BLOCKED_FOR_DATE in the filter
   if (type.includes('PRISON_VISITS_BLOCKED_FOR_DATE')) type.push('SESSION_VISITS_BLOCKED_FOR_DATE')
 
   return visitNotifications.filter(visitNotification => {
