@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { AuditService, BlockDatesOrSessionsService } from '../../../services'
 import logger from '../../../../logger'
 
@@ -26,7 +26,7 @@ export default class UnblockDateController {
         req.flash('messages', {
           variant: 'success',
           title: 'Date unblocked for visits',
-          text: `Visits are unblocked for ${format(date, 'EEEE d MMMM yyyy')}.`,
+          text: `Visits are unblocked for ${format(parseISO(date), 'EEEE d MMMM yyyy')}.`,
         })
 
         await this.auditService.unblockedVisitDate({

@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { AuditService, BlockDatesOrSessionsService, VisitService } from '../../../services'
 import logger from '../../../../logger'
 
@@ -61,7 +61,7 @@ export default class BlockDateController {
           req.flash('messages', {
             variant: 'success',
             title: 'Date blocked for visits',
-            text: `Visits are blocked for ${format(date, 'EEEE d MMMM yyyy')}.`,
+            text: `Visits are blocked for ${format(parseISO(date), 'EEEE d MMMM yyyy')}.`,
           })
 
           await this.auditService.blockedVisitDate({

@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient } from '../data'
 import { GOVUKTag, VisitSessionData } from '../@types/bapv'
 import {
@@ -149,7 +149,7 @@ export default class VisitSessionsService {
 
       return {
         date,
-        monthHeading: format(date, 'MMMM'),
+        monthHeading: format(parseISO(date), 'MMMM'),
         ...(colour && { colour }),
         selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
