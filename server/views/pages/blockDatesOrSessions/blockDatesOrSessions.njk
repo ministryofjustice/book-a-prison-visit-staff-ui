@@ -1,0 +1,143 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+
+{% set pageHeaderTitle = "Block visit dates or sessions" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% set blocksTableRows = [] %}
+
+{% for blockedDateOrSession in blockedDatesAndSessions %}
+
+  {% set actionUrl = "/block-visit-dates/unblock-" +
+    ("session" if blockedDateOrSession.sessionTemplateReference else "date") %}
+
+    {%- set unblockButtonHtml -%}
+    <form action="{{ actionUrl }}" method="POST" novalidate>
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+      <input type="hidden" name="date" value="{{ blockedDateOrSession.date }}">
+      {% if blockedDateOrSession.sessionTemplateReference %}
+        <input type="hidden" name="sessionTemplateReference" value="{{ blockedDateOrSession.sessionTemplateReference }}">
+      {% endif %}
+
+      {{ govukButton({
+        text: "Unblock",
+        classes: "bapv-link-button",
+        preventDoubleClick: true,
+        attributes: { "data-test": "unblock-" + loop.index }
+      }) }}
+    </form>
+  {%- endset %}
+
+  {% set blocksTableRows = (blocksTableRows.push([
+    {
+      text: blockedDateOrSession.date | formatDate("EEEE d MMMM yyyy"),
+      attributes: { "data-test": "blocked-date-" + loop.index }
+    },
+    {
+      text: blockedDateOrSession.when,
+      attributes: { "data-test": "blocked-when-" + loop.index }
+    },
+    {
+      text: blockedDateOrSession.attendees,
+      classes: "govuk-!-width-one-third",
+      attributes: { "data-test": "blocked-attendees-" + loop.index }
+    },
+    {
+      text: "Unknown" if blockedDateOrSession.actionedBy === "NOT_KNOWN" else blockedDateOrSession.actionedBy ,
+      attributes: { "data-test": "blocked-by-" + loop.index }
+    },
+    {
+      html: unblockButtonHtml
+    }
+  ]), blocksTableRows) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ mojAlert(message) if message }}
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p>You can block visits for a date or for sessions.</p>
+      <p>Blocking visits will stop new bookings being made for the date or session.</p>
+      <p>
+        Any existing bookings for a blocked date or session will be moved to
+        the ‘Need review’ page to be rescheduled or cancelled.
+      </p>
+
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-m">Block a new date or session</h2>
+
+  <form action="/block-visit-dates" method="POST" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    {{ mojDatePicker({
+      id: "date",
+      name: "date",
+      label: {
+        text: "Enter a date",
+        classes: "govuk-label--s"
+      },
+      hint: {
+        text: "For example, 31/3/2024"
+      },
+      value: formValues.date,
+      minDate: datePickerMinDate,
+      errorMessage: errors | findError("date")
+    }) }}
+
+    {{ govukButton({
+      text: "Continue",
+      classes: "govuk-!-margin-bottom-7",
+      preventDoubleClick: true,
+      attributes: { "data-test": "submit" }
+    }) }}
+  </form>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% if blocksTableRows | length %}
+        {{ govukTable({
+          caption: "Blocked dates and sessions",
+          captionClasses: "govuk-table__caption--m",
+          head: [
+            {
+              text: "Date"
+            },
+            {
+              text: "When"
+            },
+            {
+              text: "Who can attend"
+            },
+            {
+              text: "Blocked by"
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: blocksTableRows,
+          attributes: { "data-test": "blocked-dates-and-sessions-table" }
+        }) }}
+      {% else %}
+        <h2 class="govuk-heading-m">Blocked dates and sessions</h2>
+        <p data-test="no-blocked-dates-or-sessions">There are no upcoming blocked visit dates or sessions for this prison.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -5,8 +5,8 @@ import { buildAttendeesText } from '../timetable/timetableItemBuilder'
 export type BlockedDateOrSessionRow = {
   date: string // YYYY-MM-DD
   when: string
-  who: string
-  blockedBy: string
+  attendees: string
+  actionedBy: string
   sessionTemplateReference?: string
 }
 
@@ -20,8 +20,8 @@ const buildBlockedDatesAndSessionsTable = ({
     rows.push({
       date: excludeDate,
       when: 'All day',
-      who: 'All prisoners',
-      blockedBy: actionedBy,
+      attendees: 'All prisoners',
+      actionedBy,
     })
   })
 
@@ -32,8 +32,8 @@ const buildBlockedDatesAndSessionsTable = ({
         sessionExclusion.sessionTimeSlot?.startTime,
         sessionExclusion.sessionTimeSlot?.endTime,
       ),
-      who: buildAttendeesText({ ...sessionExclusion }),
-      blockedBy: sessionExclusion.excludeDate.actionedBy,
+      attendees: buildAttendeesText({ ...sessionExclusion }),
+      actionedBy: sessionExclusion.excludeDate.actionedBy,
       sessionTemplateReference: sessionExclusion.sessionTemplateReference,
     })
   })

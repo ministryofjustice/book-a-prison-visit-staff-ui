@@ -3,6 +3,7 @@ import { body, matchedData, Meta, ValidationChain, validationResult } from 'expr
 import { format, parse, startOfYesterday } from 'date-fns'
 import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
 import config from '../../config'
+import buildBlockedDatesAndSessionsTable from './blockedDatesAndSessionsTableBuilder'
 
 export default class BlockDatesOrSessionsController {
   public constructor(
@@ -32,13 +33,14 @@ export default class BlockDatesOrSessionsController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const blockedDatesAndSessions = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
+      const rawBlockedDatesAndSessions = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
         prisonId: req.session.selectedEstablishment.prisonId,
         includeSessions: true,
         username: res.locals.user.username,
       })
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
+      const blockedDatesAndSessions = buildBlockedDatesAndSessionsTable(rawBlockedDatesAndSessions)
 
       res.render('pages/blockDatesOrSessions/blockDatesOrSessions', {
         errors: req.flash('errors'),

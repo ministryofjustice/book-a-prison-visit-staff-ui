@@ -27,31 +27,31 @@ describe('buildBlockedDatesAndSessionsTable', () => {
       {
         date: '2026-07-01',
         when: 'All day',
-        who: 'All prisoners',
-        blockedBy: 'User One',
+        attendees: 'All prisoners',
+        actionedBy: 'User One',
       },
       // Row 2
       {
         date: '2026-07-01',
         when: '10am to 11:30am',
-        who: 'All prisoners',
-        blockedBy: 'User Three',
+        attendees: 'All prisoners',
+        actionedBy: 'User Three',
         sessionTemplateReference: 'session-1',
       },
       // Row 3
       {
         date: '2026-07-03',
         when: '1pm to 2:30pm',
-        who: 'Category A and Category B prisoners',
-        blockedBy: 'User Four',
+        attendees: 'Category A and Category B prisoners',
+        actionedBy: 'User Four',
         sessionTemplateReference: 'session-2',
       },
       // Row 4
       {
         date: '2026-07-05',
         when: 'All day',
-        who: 'All prisoners',
-        blockedBy: 'User Two',
+        attendees: 'All prisoners',
+        actionedBy: 'User Two',
       },
     ]
 
