@@ -86,7 +86,7 @@ export default class BlockDatesOrSessionsController {
             req.user.username,
           )
           if (blockedDates.some(blockedDate => blockedDate.excludeDate === date)) {
-            throw new Error('The date entered is already blocked')
+            throw new Error('The full day is already blocked for the date entered')
           }
         }),
     ]

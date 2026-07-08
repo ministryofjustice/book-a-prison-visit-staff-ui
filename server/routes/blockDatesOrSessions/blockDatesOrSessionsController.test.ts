@@ -275,7 +275,7 @@ describe('Block visit dates listing page', () => {
 
       const expectedValidationError: FieldValidationError = {
         location: 'body',
-        msg: 'The date entered is already blocked',
+        msg: 'The full day is already blocked for the date entered',
         path: 'date',
         type: 'field',
         value: expectedOutputDate,
