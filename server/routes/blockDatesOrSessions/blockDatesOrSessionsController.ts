@@ -3,6 +3,7 @@ import { body, matchedData, Meta, ValidationChain, validationResult } from 'expr
 import { format, parse, startOfYesterday } from 'date-fns'
 import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
 import config from '../../config'
+import buildBlockedDatesAndSessionsTable from './blockedDatesAndSessionsTableBuilder'
 
 export default class BlockDatesOrSessionsController {
   public constructor(
@@ -10,7 +11,8 @@ export default class BlockDatesOrSessionsController {
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
 
-  public view(): RequestHandler {
+  // TODO remove this method once session blocks are fully implemented
+  public viewDateBlocksOnly(): RequestHandler {
     return async (req, res) => {
       const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
         req.session.selectedEstablishment.prisonId,
@@ -19,11 +21,32 @@ export default class BlockDatesOrSessionsController {
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
 
-      res.render('pages/blockDatesOrSessions/blockDatesOrSessions', {
+      res.render('pages/blockDatesOrSessions/blockDates', {
         errors: req.flash('errors'),
         formValues: req.flash('formValues')?.[0],
         message: req.flash('messages')?.[0],
         blockedDates,
+        datePickerMinDate,
+      })
+    }
+  }
+
+  public view(): RequestHandler {
+    return async (req, res) => {
+      const rawBlockedDatesAndSessions = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
+        prisonId: req.session.selectedEstablishment.prisonId,
+        includeSessions: true,
+        username: res.locals.user.username,
+      })
+
+      const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
+      const blockedDatesAndSessions = buildBlockedDatesAndSessionsTable(rawBlockedDatesAndSessions)
+
+      res.render('pages/blockDatesOrSessions/blockDatesOrSessions', {
+        errors: req.flash('errors'),
+        formValues: req.flash('formValues')?.[0],
+        message: req.flash('messages')?.[0],
+        blockedDatesAndSessions,
         datePickerMinDate,
       })
     }
@@ -86,7 +109,7 @@ export default class BlockDatesOrSessionsController {
             req.user.username,
           )
           if (blockedDates.some(blockedDate => blockedDate.excludeDate === date)) {
-            throw new Error('The date entered is already blocked')
+            throw new Error('The full day is already blocked for the date entered')
           }
         }),
     ]

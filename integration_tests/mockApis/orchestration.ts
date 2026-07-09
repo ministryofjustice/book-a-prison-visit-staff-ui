@@ -11,6 +11,7 @@ import {
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
+  PrisonAndSessionsExcludeDatesDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceAdjustmentValidationError,
@@ -782,6 +783,28 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: [],
+      },
+    })
+  },
+
+  stubGetFutureBlockedDatesAndSessions: ({
+    prisonId = 'HEI',
+    includeSessions = false,
+    blockedDatesAndSessions = { fullDateExclusions: [], sessionExclusions: [] },
+  }: {
+    prisonId?: string
+    includeSessions?: boolean
+    blockedDatesAndSessions?: PrisonAndSessionsExcludeDatesDto
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'GET',
+        url: `/orchestration/v2/prisons/${prisonId}/config/exclude-dates/future?includeSessions=${includeSessions}`,
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: blockedDatesAndSessions,
       },
     })
   },

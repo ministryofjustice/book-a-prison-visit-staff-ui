@@ -74,14 +74,22 @@ const mergeGroupNames = (groupNames: string[]): string => {
 }
 
 // Function to build description of groups included/excluded from this particular session
-const buildAttendeesText = ({
+export const buildAttendeesText = ({
   prisonerCategoryGroupNames,
   prisonerIncentiveLevelGroupNames,
   prisonerLocationGroupNames,
   areCategoryGroupsInclusive,
   areIncentiveGroupsInclusive,
   areLocationGroupsInclusive,
-}: SessionSchedule): string => {
+}: Pick<
+  SessionSchedule,
+  | 'prisonerCategoryGroupNames'
+  | 'prisonerIncentiveLevelGroupNames'
+  | 'prisonerLocationGroupNames'
+  | 'areCategoryGroupsInclusive'
+  | 'areIncentiveGroupsInclusive'
+  | 'areLocationGroupsInclusive'
+>): string => {
   if (
     !prisonerCategoryGroupNames.length &&
     !prisonerIncentiveLevelGroupNames.length &&

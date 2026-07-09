@@ -867,6 +867,22 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('getFutureBlockedDatesAndSessions', () => {
+    it('should return future blocked dates and visit sessions for given prison', async () => {
+      const results = TestData.prisonAndSessionsExcludeDatesDto()
+
+      fakeOrchestrationApi
+        .get(`/v2/prisons/${prisonId}/config/exclude-dates/future`)
+        .query(new URLSearchParams({ includeSessions: 'true' }).toString())
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, results)
+
+      const output = await orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions: true })
+
+      expect(output).toStrictEqual(results)
+    })
+  })
+
   describe('getFutureBlockedDates', () => {
     it('should return future blocked dates for given prison', async () => {
       const results = [TestData.excludeDateDto()]
