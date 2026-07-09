@@ -34,7 +34,7 @@ generic-service:
     # Optional maintenance end date (in ISO format, YYYY-MM-DDTHH:MM)
     MAINTENANCE_MODE_END_DATE_TIME: ""
 
-    FEATURE_FEEDBACK_BANNER_ENABLED: "true"
+    FEATURE_FEEDBACK_BANNER_ENABLED: "false"
     FEATURE_FEEDBACK_BANNER_URL: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2AYNZK8DJCZBgXxIreDRN5tUQTIwNlJCU1IzSFVMU1JPMUdUVklRUTdNMS4u"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
