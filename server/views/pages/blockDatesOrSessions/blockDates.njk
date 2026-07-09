@@ -1,0 +1,117 @@
+{# TODO remove this template once session blocks are fully implemented #}
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+{%- from "govuk/components/table/macro.njk" import govukTable -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+
+{% set pageHeaderTitle = "Block visit dates" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {{ mojAlert(message) if message }}
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <p>Blocking a date will stop new bookings being made for this date.</p>
+      <p>Any existing bookings for a blocked date will be moved to the ‘Need review’ page to be rescheduled or cancelled.</p>
+
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-m">Block a new date</h2>
+
+  <form action="/block-visit-dates" method="POST" novalidate>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+    {{ mojDatePicker({
+      id: "date",
+      name: "date",
+      label: {
+        text: "Enter a date",
+        classes: "govuk-label--s"
+      },
+      hint: {
+        text: "For example, 31/3/2024"
+      },
+      value: formValues.date,
+      minDate: datePickerMinDate,
+      errorMessage: errors | findError("date")
+    }) }}
+
+    {{ govukButton({
+      text: "Continue",
+      classes: "govuk-!-margin-bottom-7",
+      preventDoubleClick: true,
+      attributes: { "data-test": "submit" }
+    }) }}
+  </form>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% set displayRows = [] %}
+
+      {% for blockedDate in blockedDates %}
+
+        {%- set unblockButtonHtml -%}
+          <form action="/block-visit-dates/unblock-date" method="POST" novalidate>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="date" value="{{ blockedDate.excludeDate }}">
+            {{ govukButton({
+              text: "Unblock",
+              classes: "bapv-link-button",
+              preventDoubleClick: true,
+              attributes: { "data-test": "unblock-date-" + loop.index }
+            }) }}
+          </form>
+        {%- endset %}
+
+        {% set displayRows = (displayRows.push([
+          {
+            text: blockedDate.excludeDate | formatDate("EEEE d MMMM yyyy"),
+            attributes: { "data-test": "blocked-date-" + loop.index }
+          },
+          {
+            text: "Unknown" if blockedDate.actionedBy === "NOT_KNOWN" else blockedDate.actionedBy ,
+            attributes: { "data-test": "blocked-by-" + loop.index }
+          },
+          {
+            html: unblockButtonHtml
+          }
+        ]), displayRows) %}
+      {% endfor %}
+
+      {% if blockedDates | length %}
+        {{ govukTable({
+          caption: "Blocked dates",
+          captionClasses: "govuk-table__caption--m",
+          head: [
+            {
+              text: "Date"
+            },
+            {
+              text: "Blocked by"
+            },
+            {
+              text: "Action"
+            }
+          ],
+          rows: displayRows,
+          attributes: { "data-test": "blocked-dates-table" }
+        }) }}
+      {% else %}
+        <h2 class="govuk-heading-m">Blocked dates</h2>
+        <p data-test="no-blocked-dates">There are no upcoming blocked dates for this prison.</p>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

@@ -3053,8 +3053,8 @@ export interface components {
     }
     SortObject: {
       empty?: boolean
-      unsorted?: boolean
       sorted?: boolean
+      unsorted?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -3547,10 +3547,62 @@ export interface components {
     PrisonAndSessionsExcludeDatesDto: {
       /** @description Dates excluded for visits (full day exclusions), empty if none. */
       fullDateExclusions: components['schemas']['ExcludeDateDto'][]
-      /** @description Map of session template reference and list of dates for which the session has been excluded for visits, empty if none. */
-      sessionExclusions: {
-        [key: string]: components['schemas']['ExcludeDateDto'][]
-      }
+      /** @description List of sessions that have future exclusions, empty if none. */
+      sessionExclusions: components['schemas']['SessionExcludeDateDto'][]
+    }
+    SessionExcludeDateDto: {
+      /** @description Exclude date details */
+      excludeDate: components['schemas']['ExcludeDateDto']
+      /**
+       * @description Session Template Reference
+       * @example v9d.7ed.7u
+       */
+      sessionTemplateReference: string
+      /** @description The time slot of the generated visit session(s) */
+      sessionTimeSlot: components['schemas']['SessionTimeSlotDto']
+      /**
+       * @description visit type
+       * @example Social
+       * @enum {string}
+       */
+      visitType: 'SOCIAL'
+      /** @description Determines behaviour of location groups. True will mean the location groups are inclusive, false means they are exclusive. */
+      areLocationGroupsInclusive: boolean
+      /**
+       * @description prisoner location group
+       * @example Wing C
+       */
+      prisonerLocationGroupNames: string[]
+      /** @description Determines behaviour of category groups. True will mean the category groups are inclusive, false means they are exclusive. */
+      areCategoryGroupsInclusive: boolean
+      /**
+       * @description prisoner category groups
+       * @example Category A Prisoners
+       */
+      prisonerCategoryGroupNames: string[]
+      /** @description Determines behaviour of incentive groups. True will mean the incentive groups are inclusive, false means they are exclusive. */
+      areIncentiveGroupsInclusive: boolean
+      /**
+       * @description prisoner incentive level groups
+       * @example Enhanced Incentive Level Prisoners
+       */
+      prisonerIncentiveLevelGroupNames: string[]
+      /**
+       * Format: int32
+       * @description number of weeks until the weekly day is repeated
+       * @example 1
+       */
+      weeklyFrequency: number
+      /**
+       * @description visit room name
+       * @example Visits Room
+       */
+      visitRoom: string
+      /**
+       * @description Session vo restriction
+       * @enum {string}
+       */
+      visitOrderRestriction: 'VO_PVO' | 'VO' | 'PVO' | 'NONE'
     }
     DlqMessage: {
       body: {

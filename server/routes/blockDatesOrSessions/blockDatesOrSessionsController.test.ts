@@ -17,31 +17,138 @@ const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitSessionsService = createMockVisitSessionsService()
 const url = '/block-visit-dates'
 
-beforeEach(() => {
-  setFeature('sessionDateBlocks', true)
-
-  app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService } })
-})
-
 afterEach(() => {
   jest.resetAllMocks()
 })
 
-describe('Block visit dates listing page', () => {
+describe('Block visit dates and sessions listing page', () => {
   describe(`GET ${url}`, () => {
     beforeEach(() => {
+      setFeature('sessionDateBlocks', true)
+
+      app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService } })
+
       flashData = {}
       flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
     })
 
-    it('should display block visit dates page with a blocked dates listed', () => {
-      const today = new Date()
-      const tomorrow = addDays(today, 1)
-      const nextWeek = addWeeks(today, 1)
-      const blockedDate1 = TestData.excludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
-      const blockedDate2 = TestData.excludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
+    // TODO remove this test block once session blocks are fully implemented
+    describe(`GET ${url} (date blocks ONLY - sessionDateBlocks feature disabled)`, () => {
+      beforeEach(() => {
+        setFeature('sessionDateBlocks', false)
+        app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService } })
+      })
 
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
+      it('should display block visit dates page with a blocked dates listed', () => {
+        const today = new Date()
+        const tomorrow = addDays(today, 1)
+        const nextWeek = addWeeks(today, 1)
+        const blockedDate1 = TestData.excludeDateDto({ excludeDate: format(tomorrow, 'yyyy-MM-dd') })
+        const blockedDate2 = TestData.excludeDateDto({ excludeDate: format(nextWeek, 'yyyy-MM-dd') })
+
+        blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([blockedDate1, blockedDate2])
+
+        return request(app)
+          .get(url)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.govuk-breadcrumbs li').length).toBe(2)
+            expect($('h1').text()).toBe('Block visit dates')
+
+            expect($('.moj-alert').length).toBe(0)
+
+            expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
+            expect($('input[name=date]').val()).toBeFalsy()
+
+            expect($('[data-test="blocked-date-1"]').text()).toBe(format(blockedDate1.excludeDate, 'EEEE d MMMM yyyy'))
+            expect($('[data-test="blocked-by-1"]').text()).toBe('User one')
+            expect($('[data-test="unblock-date-1"]').text().trim()).toBe('Unblock')
+            expect($('[data-test="blocked-date-2"]').text()).toBe(format(blockedDate2.excludeDate, 'EEEE d MMMM yyyy'))
+            expect($('[data-test="blocked-by-2"]').text()).toBe('User one')
+            expect($('[data-test="unblock-date-2"]').text().trim()).toBe('Unblock')
+
+            expect($('[data-test=no-blocked-dates]').length).toBe(0)
+          })
+      })
+
+      it('should display block visit dates page with no blocked dates listed', () => {
+        blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+
+        return request(app)
+          .get(url)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Block visit dates')
+
+            expect($('[data-test=blocked-dates-table]').length).toBe(0)
+            expect($('[data-test=no-blocked-dates]').length).toBe(1)
+          })
+      })
+
+      it('should render success message', () => {
+        const alert = TestData.mojAlert({ showTitleAsHeading: false })
+        flashData = { messages: [alert] }
+
+        blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+
+        return request(app)
+          .get(url)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Block visit dates')
+
+            expect($('.moj-alert__content').text()).toBe(alert.text)
+          })
+      })
+
+      it('should render validation errors and pre-populate with formValues', () => {
+        const validationError: FieldValidationError = {
+          type: 'field',
+          location: 'body',
+          path: 'date',
+          value: '1/2/2000',
+          msg: 'The date must be in the future',
+        }
+        const formValues = { date: '1/2/2000' }
+        flashData = { errors: [validationError], formValues: [formValues] }
+
+        blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+
+        return request(app)
+          .get(url)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Block visit dates')
+
+            expect($('.govuk-error-summary a[href="#date-error"]').text()).toBe(validationError.msg)
+            expect($('#date-error').text()).toContain(validationError.msg)
+            expect($('input[name=date]').val()).toBe('1/2/2000')
+          })
+      })
+    })
+
+    it('should display block visit dates or sessions page with a blocked dates listed', () => {
+      const today = new Date()
+
+      const blockedDatesAndSessions = TestData.prisonAndSessionsExcludeDatesDto({
+        fullDateExclusions: [
+          // Row 1
+          { excludeDate: '2026-07-01', actionedBy: 'User One' },
+        ],
+        sessionExclusions: [
+          // Row 2
+          TestData.sessionExcludeDateDto({
+            excludeDate: { excludeDate: '2026-07-02', actionedBy: 'User Two' },
+            sessionTemplateReference: 'session-1',
+          }),
+        ],
+      })
+
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue(blockedDatesAndSessions)
 
       return request(app)
         .get(url)
@@ -49,36 +156,54 @@ describe('Block visit dates listing page', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('.govuk-breadcrumbs li').length).toBe(2)
-          expect($('h1').text()).toBe('Block visit dates')
+          expect($('h1').text()).toBe('Block visit dates or sessions')
 
           expect($('.moj-alert').length).toBe(0)
 
           expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
           expect($('input[name=date]').val()).toBeFalsy()
 
-          expect($('[data-test="blocked-date-1"]').text()).toBe(format(blockedDate1.excludeDate, 'EEEE d MMMM yyyy'))
-          expect($('[data-test="blocked-by-1"]').text()).toBe('User one')
-          expect($('[data-test="unblock-date-1"]').text().trim()).toBe('Unblock')
-          expect($('[data-test="blocked-date-2"]').text()).toBe(format(blockedDate2.excludeDate, 'EEEE d MMMM yyyy'))
-          expect($('[data-test="blocked-by-2"]').text()).toBe('User one')
-          expect($('[data-test="unblock-date-2"]').text().trim()).toBe('Unblock')
+          // Row 1
+          expect($('[data-test="blocked-date-1"]').text()).toBe('Wednesday 1 July 2026')
+          expect($('[data-test="blocked-when-1"]').text()).toBe('All day')
+          expect($('[data-test="blocked-attendees-1"]').text()).toBe('All prisoners')
+          expect($('[data-test="unblock-1"]').text().trim()).toBe('Unblock')
+          expect($('[data-test="unblock-1"]').parent().attr('action')).toBe('/block-visit-dates/unblock-date')
+          expect($('[data-test="unblock-1"]').siblings('input[type=hidden][name=date]').val()).toBe('2026-07-01')
+          expect(
+            $('[data-test="unblock-1"]').siblings('input[type=hidden][name=sessionTemplateReference]').length,
+          ).toBe(0)
 
-          expect($('[data-test=no-blocked-dates]').length).toBe(0)
+          // Row 2
+          expect($('[data-test="blocked-date-2"]').text()).toBe('Thursday 2 July 2026')
+          expect($('[data-test="blocked-when-2"]').text()).toBe('10am to 11:30am')
+          expect($('[data-test="blocked-attendees-2"]').text()).toBe('All prisoners')
+          expect($('[data-test="unblock-2"]').text().trim()).toBe('Unblock')
+          expect($('[data-test="unblock-2"]').parent().attr('action')).toBe('/block-visit-dates/unblock-session')
+          expect($('[data-test="unblock-2"]').siblings('input[type=hidden][name=date]').val()).toBe('2026-07-02')
+          expect($('[data-test="unblock-2"]').siblings('input[type=hidden][name=sessionTemplateReference]').val()).toBe(
+            'session-1',
+          )
+
+          expect($('[data-test=no-blocked-dates-or-sessions]').length).toBe(0)
         })
     })
 
-    it('should display block visit dates page with no blocked dates listed', () => {
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+    it('should display block visit dates or sessions page with no blocked dates or sessions listed', () => {
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue({
+        fullDateExclusions: [],
+        sessionExclusions: [],
+      })
 
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Block visit dates')
+          expect($('h1').text()).toBe('Block visit dates or sessions')
 
-          expect($('[data-test=blocked-dates-table]').length).toBe(0)
-          expect($('[data-test=no-blocked-dates]').length).toBe(1)
+          expect($('[data-test=blocked-dates-and-sessions-table]').length).toBe(0)
+          expect($('[data-test=no-blocked-dates-or-sessions]').length).toBe(1)
         })
     })
 
@@ -86,14 +211,17 @@ describe('Block visit dates listing page', () => {
       const alert = TestData.mojAlert({ showTitleAsHeading: false })
       flashData = { messages: [alert] }
 
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue({
+        fullDateExclusions: [],
+        sessionExclusions: [],
+      })
 
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Block visit dates')
+          expect($('h1').text()).toBe('Block visit dates or sessions')
 
           expect($('.moj-alert__content').text()).toBe(alert.text)
         })
@@ -110,14 +238,17 @@ describe('Block visit dates listing page', () => {
       const formValues = { date: '1/2/2000' }
       flashData = { errors: [validationError], formValues: [formValues] }
 
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue({
+        fullDateExclusions: [],
+        sessionExclusions: [],
+      })
 
       return request(app)
         .get(url)
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('h1').text()).toBe('Block visit dates')
+          expect($('h1').text()).toBe('Block visit dates or sessions')
 
           expect($('.govuk-error-summary a[href="#date-error"]').text()).toBe(validationError.msg)
           expect($('#date-error').text()).toContain(validationError.msg)
@@ -132,6 +263,8 @@ describe('Block visit dates listing page', () => {
     const today = new Date()
 
     beforeEach(() => {
+      setFeature('sessionDateBlocks', true)
+
       flashData = { errors: [], formValues: [] }
 
       sessionData = {} as SessionData
@@ -275,7 +408,7 @@ describe('Block visit dates listing page', () => {
 
       const expectedValidationError: FieldValidationError = {
         location: 'body',
-        msg: 'The date entered is already blocked',
+        msg: 'The full day is already blocked for the date entered',
         path: 'date',
         type: 'field',
         value: expectedOutputDate,

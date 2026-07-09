@@ -37,6 +37,9 @@ export type ApplicationMethodType = components['schemas']['BookingOrchestrationR
 export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']
 export type BookingRequestVisitorDetailsDto = components['schemas']['BookingRequestVisitorDetailsDto']
 
+export type SessionExcludeDateDto = components['schemas']['SessionExcludeDateDto']
+export type PrisonAndSessionsExcludeDatesDto = components['schemas']['PrisonAndSessionsExcludeDatesDto']
+
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
 

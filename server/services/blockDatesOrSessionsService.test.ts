@@ -78,4 +78,23 @@ describe('Blocked dates or sessions service', () => {
       expect(result).toStrictEqual(false)
     })
   })
+
+  describe('getFutureBlockedDatesAndSessions', () => {
+    it('should return future blocked dates and sessions for given prison', async () => {
+      const prisonAndSessionsExcludeDatesDto = TestData.prisonAndSessionsExcludeDatesDto()
+      orchestrationApiClient.getFutureBlockedDatesAndSessions.mockResolvedValue(prisonAndSessionsExcludeDatesDto)
+
+      const result = await blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
+        prisonId,
+        includeSessions: true,
+        username,
+      })
+
+      expect(orchestrationApiClient.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
+        prisonId,
+        includeSessions: true,
+      })
+      expect(result).toStrictEqual(prisonAndSessionsExcludeDatesDto)
+    })
+  })
 })
