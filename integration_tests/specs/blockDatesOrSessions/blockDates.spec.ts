@@ -4,11 +4,11 @@ import orchestrationApi from '../../mockApis/orchestration'
 import { login, resetStubs } from '../../testUtils'
 import HomePage from '../../pages/homePage'
 
-import BlockVisitDatesPage from '../../pages/blockVisitDates/blockVisitDatesPage'
-import BlockVisitDateConfirmationPage from '../../pages/blockVisitDates/blockVisitDateConfirmationPage'
+import BlockDatesOrSessionsPage from '../../pages/blockDatesOrSessions/blockDatesOrSessionsPage'
+import BlockDateConfirmationPage from '../../pages/blockDatesOrSessions/blockDateConfirmationPage'
 import TestData from '../../../server/routes/testutils/testData'
 
-test.describe('Block visit dates', () => {
+test.describe('Block visit dates or sessions', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
@@ -30,21 +30,24 @@ test.describe('Block visit dates', () => {
   })
 
   test('should block a new date - where date has no sessions to block', async ({ page }) => {
-    await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] })
+    await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: true })
     await login(page)
     const homePage = await HomePage.verifyOnPage(page)
     await homePage.blockDatesTile.click()
 
-    // verify page
-    const blockVisitDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
-    await expect(blockVisitDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
+    // Blocked dates or sessions page
+    const blockDatesOrSessionsPage = await BlockDatesOrSessionsPage.verifyOnPage(page)
+    await expect(blockDatesOrSessionsPage.noBlockedDatesOrSessions).toContainText(
+      'no upcoming blocked visit dates or sessions',
+    )
 
-    // select the 1st day of next month
-    await blockVisitDatesPage.datePicker.toggleCalendar()
-    await blockVisitDatesPage.datePicker.goToNextMonth()
-    await blockVisitDatesPage.datePicker.selectDay(1)
+    // Select the 1st day of next month
+    await blockDatesOrSessionsPage.datePicker.toggleCalendar()
+    await blockDatesOrSessionsPage.datePicker.goToNextMonth()
+    await blockDatesOrSessionsPage.datePicker.selectDay(1)
 
-    // Stub booked visits count and no sessions for the selected date
+    // Stub booked visits count and no scheduled sessions for the selected date
+    await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] }) // TODO this can be removed once this deprecated endpoint is replaced
     await orchestrationApi.stubGetBookedVisitCountByDate({
       prisonId,
       date: firstOfNextMonthShort,
@@ -57,75 +60,82 @@ test.describe('Block visit dates', () => {
       sessionSchedule: [],
     })
 
-    await blockVisitDatesPage.continueButton.click()
+    await blockDatesOrSessionsPage.continueButton.click()
 
     // Confirmation page
-    const blockVisitDateConfirmationPage = await BlockVisitDateConfirmationPage.verifyOnPage(page, firstOfNextMonthLong)
+    const blockDateConfirmationPage = await BlockDateConfirmationPage.verifyOnPage(page, firstOfNextMonthLong)
 
-    // Stub block visit date correctly
+    // Stub adding visit date block
     await orchestrationApi.stubBlockVisitDate({
       prisonId,
       date: firstOfNextMonthShort,
       username: 'USER1',
     })
 
-    await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId,
-      blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
+    await orchestrationApi.stubGetFutureBlockedDatesAndSessions({
+      includeSessions: true,
+      blockedDatesAndSessions: {
+        fullDateExclusions: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
+        sessionExclusions: [],
+      },
     })
 
-    await blockVisitDateConfirmationPage.selectYes()
-    await blockVisitDateConfirmationPage.continue()
-    const successMessage = blockVisitDatesPage.getSuccessMessage()
-    await expect(successMessage).toBeVisible()
-    await expect(successMessage).toContainText(`Visits are blocked for ${firstOfNextMonthLong}.`)
+    // Confirm visit date block
+    await blockDateConfirmationPage.selectYes()
+    await blockDateConfirmationPage.continue()
 
-    await expect(blockVisitDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
-    await expect(blockVisitDatesPage.blockedBy(1)).toContainText('User one')
-    await expect(blockVisitDatesPage.unblockLink(1)).toContainText('Unblock')
+    // Verify success message and blocked date exists
+    await expect(blockDatesOrSessionsPage.messages).toBeVisible()
+    await expect(blockDatesOrSessionsPage.messages).toContainText(`Visits are blocked for ${firstOfNextMonthLong}.`)
+
+    await expect(blockDatesOrSessionsPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
+    await expect(blockDatesOrSessionsPage.blockedWhen(1)).toContainText('All day')
+    await expect(blockDatesOrSessionsPage.blockedAttendees(1)).toContainText('All prisoners')
+    await expect(blockDatesOrSessionsPage.blockedBy(1)).toContainText('User one')
+    await expect(blockDatesOrSessionsPage.unblockLink(1)).toContainText('Unblock')
   })
 
-  test('should go to block dates listing page and unblock a date', async ({ page }) => {
-    // Stub API to show an existing blocked date
-    await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId,
-      blockedDates: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
+  test('should unblock a date', async ({ page }) => {
+    // Stub an existing blocked date
+    await orchestrationApi.stubGetFutureBlockedDatesAndSessions({
+      includeSessions: true,
+      blockedDatesAndSessions: {
+        fullDateExclusions: [TestData.excludeDateDto({ excludeDate: firstOfNextMonthShort })],
+        sessionExclusions: [],
+      },
     })
 
-    // Login and navigate to Blocked Dates page
+    // Navigate to blocked visit dates or sessions page
     await login(page)
     const homePage = await HomePage.verifyOnPage(page)
     await homePage.blockDatesTile.click()
 
-    const blockVisitDatesPage = await BlockVisitDatesPage.verifyOnPage(page)
-
     // Verify blocked date exists
-    await expect(blockVisitDatesPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
-    await expect(blockVisitDatesPage.blockedBy(1)).toContainText('User one')
-    await expect(blockVisitDatesPage.unblockLink(1)).toBeVisible()
+    const blockDatesOrSessionsPage = await BlockDatesOrSessionsPage.verifyOnPage(page)
+    await expect(blockDatesOrSessionsPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
+    await expect(blockDatesOrSessionsPage.blockedBy(1)).toContainText('User one')
+    await expect(blockDatesOrSessionsPage.unblockLink(1)).toBeVisible()
 
-    // Stub API for unblocking
+    // Stub unblocking date
     await orchestrationApi.stubUnblockVisitDate({
       prisonId,
       date: firstOfNextMonthShort,
       username: 'USER1',
     })
 
-    // Stub future blocked dates after unblock
-    await orchestrationApi.stubGetFutureBlockedDates({
-      prisonId,
-      blockedDates: [],
-    })
+    // Stub no future blocked dates after unblock
+    await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: true })
 
-    // Click unblock
-    await blockVisitDatesPage.unblockLink(1).click()
+    // Unblock date
+    await blockDatesOrSessionsPage.unblockLink(1).click()
 
     // Verify success message
-    const successMessage = blockVisitDatesPage.getSuccessMessage()
-    await expect(successMessage).toBeVisible()
-    await expect(successMessage).toContainText(`Visits are unblocked for ${firstOfNextMonthLong}.`)
+    await expect(blockDatesOrSessionsPage.messages).toBeVisible()
+    await expect(blockDatesOrSessionsPage.messages).toContainText(`Visits are unblocked for ${firstOfNextMonthLong}.`)
 
     // Verify no upcoming blocked dates
-    await expect(blockVisitDatesPage.noBlockedDates).toContainText('no upcoming blocked dates')
+    await expect(blockDatesOrSessionsPage.noBlockedDatesOrSessions).toContainText(
+      'no upcoming blocked visit dates or sessions',
+    )
   })
 })
