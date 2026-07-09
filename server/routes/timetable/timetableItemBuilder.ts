@@ -81,7 +81,15 @@ export const buildAttendeesText = ({
   areCategoryGroupsInclusive,
   areIncentiveGroupsInclusive,
   areLocationGroupsInclusive,
-}: Partial<SessionSchedule>): string => {
+}: Pick<
+  SessionSchedule,
+  | 'prisonerCategoryGroupNames'
+  | 'prisonerIncentiveLevelGroupNames'
+  | 'prisonerLocationGroupNames'
+  | 'areCategoryGroupsInclusive'
+  | 'areIncentiveGroupsInclusive'
+  | 'areLocationGroupsInclusive'
+>): string => {
   if (
     !prisonerCategoryGroupNames.length &&
     !prisonerIncentiveLevelGroupNames.length &&

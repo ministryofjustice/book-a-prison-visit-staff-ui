@@ -43,7 +43,11 @@ export default function routes(services: Services): Router {
   router.get('/block-new-date', blockDateController.view())
   router.post('/block-new-date', blockDateController.validate(), blockDateController.submit())
 
+  // Unblock date
   router.post('/unblock-date', unblockDateController.validate(), unblockDateController.submit())
+
+  // Unblock session
+  router.post('/unblock-session', (req, res) => res.redirect('/block-visit-dates')) // TODO implement unblock session functionality
 
   return router
 }

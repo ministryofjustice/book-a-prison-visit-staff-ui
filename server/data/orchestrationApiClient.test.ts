@@ -869,7 +869,7 @@ describe('orchestrationApiClient', () => {
 
   describe('getFutureBlockedDatesAndSessions', () => {
     it('should return future blocked dates and visit sessions for given prison', async () => {
-      const results = [TestData.prisonAndSessionsExcludeDatesDto()]
+      const results = TestData.prisonAndSessionsExcludeDatesDto()
 
       fakeOrchestrationApi
         .get(`/v2/prisons/${prisonId}/config/exclude-dates/future`)
