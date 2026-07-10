@@ -40,6 +40,14 @@
       text: contact.lastApprovedForVisitDate | formatDate if contact.lastApprovedForVisitDate else "None",
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-last-visit" }
+    },
+    {
+      html: '<a href="' + dpsContacts +'/prisoner/'+ visitorRequest.prisonerId + '/contacts/manage/'
+        + contact.visitorId + '/relationship/' + contact.relationshipId + '" target="_blank" rel="noopener noreferrer">
+        View Contact
+      </a>',
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }
     }
   ]), contactRows)%}
 {% endfor %}
@@ -105,6 +113,9 @@
                 },
                 {
                   text: "Last visit approved on"
+                },
+                {
+                  html: 'Contact information<div class="govuk-caption-m">(opens in a new tab)</div>'
                 }
               ],
               rows: contactRows
