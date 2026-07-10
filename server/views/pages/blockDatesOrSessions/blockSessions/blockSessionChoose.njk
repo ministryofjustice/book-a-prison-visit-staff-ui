@@ -1,0 +1,33 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Which sessions would you like to block on " +
+  date | formatDate('EEEE d MMMM yyyy') + "?" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <form action="/block-visit-dates/block-new-session/choose" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukRadios({
+          name: "sessionTemplateReference",
+          items: sessionsRadioItems,
+          errorMessage: errors | findError('sessionTemplateReference'),
+          attributes: { "data-test": "session-template-reference" }
+        }) }}
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

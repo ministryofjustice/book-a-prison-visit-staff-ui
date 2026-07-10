@@ -48,6 +48,9 @@ describe('Choose date or session block', () => {
 
           expect($('[data-test=submit]').text().trim()).toBe('Continue')
         })
+        .expect(() => {
+          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates')
+        })
     })
 
     it('should render validation errors', () => {
@@ -84,12 +87,12 @@ describe('Choose date or session block', () => {
         })
     })
 
-    it('should redirect to block new session page if this is selected', () => {
+    it('should redirect to block new session choose page if this is selected', () => {
       return request(app)
         .post(url)
         .send({ blockType: 'session' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-session')
+        .expect('location', '/block-visit-dates/block-new-session/choose')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledTimes(0)
           expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates/block-date-or-session')
