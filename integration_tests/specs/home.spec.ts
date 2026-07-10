@@ -7,11 +7,13 @@ import TestData from '../../server/routes/testutils/testData'
 import bapvUserRoles from '../../server/constants/bapvUserRoles'
 
 test.describe('Home page', () => {
-  const prisonStaffOnly = TestData.prisonDto({ clients: [{ userType: 'STAFF', active: true }] })
+  const prisonStaffOnly = TestData.prisonDto({
+    clients: [{ userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 }],
+  })
   const prisonStaffAndPublic = TestData.prisonDto({
     clients: [
-      { userType: 'STAFF', active: true },
-      { userType: 'PUBLIC', active: true },
+      { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
+      { userType: 'PUBLIC', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
     ],
   })
 

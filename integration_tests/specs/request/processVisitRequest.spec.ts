@@ -10,8 +10,8 @@ test.describe('Process a visit Request', () => {
   const prisonStaffAndPublic = TestData.prisonDto({
     policyNoticeDaysMin: 0,
     clients: [
-      { userType: 'STAFF', active: true },
-      { userType: 'PUBLIC', active: true },
+      { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
+      { userType: 'PUBLIC', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
     ],
   })
 

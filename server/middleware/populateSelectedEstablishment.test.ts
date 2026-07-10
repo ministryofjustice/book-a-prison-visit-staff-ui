@@ -110,8 +110,8 @@ describe('populateSelectedEstablishment', () => {
       supportedPrisonsService.getPrison.mockResolvedValue({
         ...prison,
         clients: [
-          { userType: 'STAFF', active: true },
-          { userType: 'PUBLIC', active: false },
+          { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
+          { userType: 'PUBLIC', active: false, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
         ],
       })
 
