@@ -94,6 +94,22 @@ describe('validationErrorToMoJAlert', () => {
     expect(url).toBe('select-date-and-time')
   })
 
+  it('should return an MoJAlert for 422 error APPLICATION_INVALID_REMAND_VISIT_LIMIT_FOR_WEEK_REACHED', () => {
+    const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
+      'APPLICATION_INVALID_REMAND_VISIT_LIMIT_FOR_WEEK_REACHED',
+    ]
+
+    const { mojAlert, url } = validationErrorsToMoJAlert(prisonerName, visitStartTimestamp, validationErrors)
+
+    expect(mojAlert).toStrictEqual({
+      title: 'There is a problem',
+      showTitleAsHeading: true,
+      text: 'Remand visit limit reached',
+      variant: 'error',
+    })
+    expect(url).toBe('select-date-and-time')
+  })
+
   it('should return a single, prioritised MoJAlert for multiple 422 errors', () => {
     const validationErrors: ApplicationValidationErrorResponse['validationErrors'] = [
       'APPLICATION_INVALID_NO_SLOT_CAPACITY',

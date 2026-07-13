@@ -62,6 +62,18 @@ export const validationErrorsToMoJAlert = (
     }
   }
 
+  if (validationErrors.includes('APPLICATION_INVALID_REMAND_VISIT_LIMIT_FOR_WEEK_REACHED')) {
+    return {
+      mojAlert: {
+        title: 'There is a problem',
+        text: 'Remand visit limit reached',
+        variant: 'error',
+        showTitleAsHeading: true,
+      },
+      url: `select-date-and-time`,
+    }
+  }
+
   if (validationErrors.includes('APPLICATION_INVALID_NO_SLOT_CAPACITY')) {
     return {
       mojAlert: {
