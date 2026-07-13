@@ -7,6 +7,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
+import testScreenReaderAndVisibleOnlyText from '../../testutils/testScreenReaderAndVisibleOnlyText'
 
 let app: Express
 let flashData: FlashData
@@ -75,6 +76,12 @@ describe('Booker management - visitor list', () => {
           expect($('[data-test=visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=visitor-1-last-visit]').text()).toBe('11 October 2025')
+
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test="visitor-1-contact-link"]'),
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'View contact',
+          )
 
           expect($('[data-test=link-visitor]').parent('form').attr('action')).toBe(
             `/manage-bookers/${booker.reference}/prisoner/${prisoner.prisonerNumber}/link-visitor`,
