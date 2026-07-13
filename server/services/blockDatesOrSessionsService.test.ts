@@ -79,6 +79,38 @@ describe('Blocked dates or sessions service', () => {
     })
   })
 
+  describe('blockVisitSession', () => {
+    it('should block a visit session for given date and send username', async () => {
+      const date = '2024-09-06'
+      const sessionTemplateReference = 'v9d.7ed.7u'
+      orchestrationApiClient.blockVisitSession.mockResolvedValue()
+
+      await blockDatesOrSessionsService.blockVisitSession({ sessionTemplateReference, date, username })
+
+      expect(orchestrationApiClient.blockVisitSession).toHaveBeenCalledWith({
+        sessionTemplateReference,
+        date,
+        username,
+      })
+    })
+  })
+
+  describe('unblockVisitSession', () => {
+    it('should unblock a visit session for given date and send username', async () => {
+      const date = '2024-09-06'
+      const sessionTemplateReference = 'v9d.7ed.7u'
+      orchestrationApiClient.unblockVisitSession.mockResolvedValue()
+
+      await blockDatesOrSessionsService.unblockVisitSession({ sessionTemplateReference, date, username })
+
+      expect(orchestrationApiClient.unblockVisitSession).toHaveBeenCalledWith({
+        sessionTemplateReference,
+        date,
+        username,
+      })
+    })
+  })
+
   describe('getFutureBlockedDatesAndSessions', () => {
     it('should return future blocked dates and sessions for given prison', async () => {
       const prisonAndSessionsExcludeDatesDto = TestData.prisonAndSessionsExcludeDatesDto()

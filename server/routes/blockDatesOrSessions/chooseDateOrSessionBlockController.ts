@@ -14,6 +14,7 @@ export default class ChooseDateOrSessionBlockController {
       return res.render('pages/blockDatesOrSessions/chooseDateOrSessionBlock', {
         backLinkHref,
         errors: req.flash('errors'),
+        formValues: req.flash('formValues')?.[0],
         date,
       })
     }

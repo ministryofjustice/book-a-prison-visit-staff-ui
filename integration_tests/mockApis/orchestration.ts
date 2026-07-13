@@ -1199,6 +1199,66 @@ export default {
     })
   },
 
+  stubBlockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
+  stubUnblockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
   stubPrisonerProfile: (profile: PrisonerProfileDto): SuperAgentRequest => {
     return stubFor({
       request: {

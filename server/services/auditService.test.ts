@@ -355,6 +355,54 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends a visit session blocked message', async () => {
+    await auditService.blockedVisitSession({
+      date: '2024-09-06',
+      sessionReference: 'session-ref',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'BLOCKED_VISIT_SESSION',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"date":"2024-09-06","sessionReference":"session-ref"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit session unblocked message', async () => {
+    await auditService.unblockedVisitSession({
+      date: '2024-09-06',
+      sessionReference: 'session-ref',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UNBLOCKED_VISIT_SESSION',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"date":"2024-09-06","sessionReference":"session-ref"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends a booker search audit message', async () => {
     await auditService.bookerSearch({
       search: 'booker@example.com',

@@ -2,7 +2,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageHeaderTitle = "Are you sure you want to block visits on " + date | formatDate('EEEE d MMMM yyyy') + "?" %}
+{% set pageHeaderTitle = "Are you sure you want to block visits for this session on " + (date | formatDate('EEEE d MMMM yyyy')) + "?" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -11,22 +11,24 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
+      <p data-test="session-details">{{ time }}, {{ attendees }}</p>
+
       {% if visitCount %}
         <p data-test="existing-bookings">
-          There {{ "is" | pluralise(visitCount, "are") }} {{ visitCount }} existing {{ "booking" | pluralise(visitCount) }} for this date.
+          There {{ "is" | pluralise(visitCount, "are") }} {{ visitCount }} existing {{ "booking" | pluralise(visitCount) }} for this session.
         </p>
         <p>
           {{ "This" | pluralise(visitCount, "These") }} will be shown on the ‘Need review’ page to be rescheduled or cancelled.
         </p>
       {% else %}
-        <p data-test="no-existing-bookings">There are no existing bookings for this date.</p>
+        <p data-test="no-existing-bookings">There are no existing bookings for this session.</p>
       {% endif %}
 
-      <form action="/block-visit-dates/block-new-date" method="POST" novalidate>
+      <form action="/block-visit-dates/block-new-session/confirm" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({
-          name: "confirmBlockDate",
+          name: "confirmBlockSession",
           items: [
             {
               value: "yes",
@@ -37,8 +39,8 @@
               text: "No"
             }
           ],
-          errorMessage: errors | findError('confirmBlockDate'),
-          attributes: { "data-test": "confirm-block-date" }
+          errorMessage: errors | findError('confirmBlockSession'),
+          attributes: { "data-test": "confirm-block-session" }
         }) }}
 
         {{ govukButton({

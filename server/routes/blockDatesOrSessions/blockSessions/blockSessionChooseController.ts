@@ -33,9 +33,10 @@ export default class BlockSessionChooseController {
             msg: 'All sessions for that date are already blocked',
             path: 'blockType',
             type: 'field',
-            value: 'invalid',
+            value: 'session',
           },
         ])
+        req.flash('formValues', { blockType: 'session' })
         return res.redirect('/block-visit-dates/block-date-or-session')
       }
 
@@ -75,8 +76,9 @@ export default class BlockSessionChooseController {
       // Selected session must be one of the sessions available for the selected date
       body('sessionTemplateReference', 'No session selected').custom((sessionTemplateReference: string, { req }) => {
         const { blockDateOrSession } = req.session as SessionData
-        return blockDateOrSession.sessions.some(
-          session => session.sessionTemplateReference === sessionTemplateReference,
+        return (
+          blockDateOrSession.sessions?.some(session => session.sessionTemplateReference === sessionTemplateReference) ??
+          false
         )
       }),
     ]

@@ -6,6 +6,8 @@ import UnblockDateController from './blockDates/unblockDateController'
 import ChooseDateOrSessionBlockController from './chooseDateOrSessionBlockController'
 import config from '../../config'
 import BlockSessionChooseController from './blockSessions/blockSessionChooseController'
+import BlockSessionConfirmController from './blockSessions/blockSessionConfirmController'
+import UnblockSessionController from './blockSessions/unblockSessionController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -22,60 +24,79 @@ export default function routes(services: Services): Router {
     services.blockDatesOrSessionsService,
     services.visitService,
   )
-
   const unblockDateController = new UnblockDateController(services.auditService, services.blockDatesOrSessionsService)
 
   const blockSessionChooseController = new BlockSessionChooseController(services.visitSessionsService)
 
-  // Block visit dates or sessions main page with listing
-  router.get(
-    '/',
-    config.features.sessionDateBlocks
-      ? blockDatesOrSessionsController.view()
-      : blockDatesOrSessionsController.viewDateBlocksOnly(),
+  const blockSessionConfirmController = new BlockSessionConfirmController(
+    services.auditService,
+    services.blockDatesOrSessionsService,
+    services.visitService,
   )
-  router.post('/', blockDatesOrSessionsController.validate(), blockDatesOrSessionsController.submit())
+
+  const unblockSessionController = new UnblockSessionController(
+    services.auditService,
+    services.blockDatesOrSessionsService,
+    services.visitSessionsService,
+  )
+
+  // Middlewares to ensure route has required session data
+  const checkSessionDataMiddleware: RequestHandler = (req, res, next) => {
+    if (!req.session.blockDateOrSession) {
+      return res.redirect('/block-visit-dates')
+    }
+    return next()
+  }
+  const checkSelectedSessionMiddleware: RequestHandler = (req, res, next) => {
+    if (!req.session.blockDateOrSession?.selectedSession) {
+      return res.redirect('/block-visit-dates')
+    }
+    return next()
+  }
+
+  // Block visit dates or sessions main page with listing
+  router
+    .route('/')
+    .get(
+      config.features.sessionDateBlocks
+        ? blockDatesOrSessionsController.view()
+        : blockDatesOrSessionsController.viewDateBlocksOnly(),
+    )
+    .post(blockDatesOrSessionsController.validate(), blockDatesOrSessionsController.submit())
 
   // Choose whether to block a date or a session
-  router.get('/block-date-or-session', checkSessionDataMiddleware, chooseDateOrSessionBlockController.view())
-  router.post(
-    '/block-date-or-session',
-    checkSessionDataMiddleware,
-    chooseDateOrSessionBlockController.validate(),
-    chooseDateOrSessionBlockController.submit(),
-  )
+  router
+    .route('/block-date-or-session')
+    .all(checkSessionDataMiddleware)
+    .get(chooseDateOrSessionBlockController.view())
+    .post(chooseDateOrSessionBlockController.validate(), chooseDateOrSessionBlockController.submit())
 
   // Date block pages
-  router.get('/block-new-date', checkSessionDataMiddleware, blockDateController.view())
-  router.post(
-    '/block-new-date',
-    checkSessionDataMiddleware,
-    blockDateController.validate(),
-    blockDateController.submit(),
-  )
+  router
+    .route('/block-new-date')
+    .all(checkSessionDataMiddleware)
+    .get(blockDateController.view())
+    .post(blockDateController.validate(), blockDateController.submit())
 
   // Unblock date
   router.post('/unblock-date', unblockDateController.validate(), unblockDateController.submit())
 
   // Session block - choose session page
-  router.get('/block-new-session/choose', checkSessionDataMiddleware, blockSessionChooseController.view())
-  router.post(
-    '/block-new-session/choose',
-    checkSessionDataMiddleware,
-    blockSessionChooseController.validate(),
-    blockSessionChooseController.submit(),
-  )
+  router
+    .route('/block-new-session/choose')
+    .all(checkSessionDataMiddleware)
+    .get(blockSessionChooseController.view())
+    .post(blockSessionChooseController.validate(), blockSessionChooseController.submit())
+
+  // Session block - confirm session page
+  router
+    .route('/block-new-session/confirm')
+    .all(checkSessionDataMiddleware, checkSelectedSessionMiddleware)
+    .get(blockSessionConfirmController.view())
+    .post(blockSessionConfirmController.validate(), blockSessionConfirmController.submit())
 
   // Unblock session
-  router.post('/unblock-session', (req, res) => res.redirect('/block-visit-dates')) // TODO implement unblock session functionality
+  router.post('/unblock-session', unblockSessionController.validate(), unblockSessionController.submit())
 
   return router
-}
-
-// Middleware to ensure route has required session data
-const checkSessionDataMiddleware: RequestHandler = (req, res, next) => {
-  if (!req.session.blockDateOrSession) {
-    return res.redirect('/block-visit-dates')
-  }
-  return next()
 }

@@ -676,6 +676,44 @@ export default class OrchestrationApiClient {
     })
   }
 
+  // orchestration-sessions-exclude-date-controller
+
+  async blockVisitSession({
+    sessionTemplateReference,
+    date,
+    username,
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username: string
+  }): Promise<void> {
+    await this.restClient.put({
+      path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
+      data: <ExcludeDateDto>{
+        excludeDate: date,
+        actionedBy: username,
+      },
+    })
+  }
+
+  async unblockVisitSession({
+    sessionTemplateReference,
+    date,
+    username,
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username: string
+  }): Promise<void> {
+    await this.restClient.put({
+      path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
+      data: <ExcludeDateDto>{
+        excludeDate: date,
+        actionedBy: username,
+      },
+    })
+  }
+
   // prisoner-profile-controller
 
   async getPrisonerProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfileDto> {

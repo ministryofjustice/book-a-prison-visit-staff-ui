@@ -59,6 +59,7 @@ describe('Choose which session to block', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates/block-date-or-session')
           expect($('h1').text()).toBe('Which sessions would you like to block on Friday 6 September 2024?')
 
+          expect($('form[action="/block-visit-dates/block-new-session/choose"][method=POST]').length).toBe(1)
           expect($('input[name=sessionTemplateReference]').length).toBe(2)
           expect($('input[name=sessionTemplateReference]:checked').length).toBe(0)
           // session 1
@@ -101,9 +102,10 @@ describe('Choose which session to block', () => {
               msg: 'All sessions for that date are already blocked',
               path: 'blockType',
               type: 'field',
-              value: 'invalid',
+              value: 'session',
             },
           ])
+          expect(flashProvider).toHaveBeenCalledWith('formValues', { blockType: 'session' })
         })
     })
 

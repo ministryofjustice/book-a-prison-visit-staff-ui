@@ -51,6 +51,7 @@ describe('Block new visit date', () => {
           expect($('[data-test=existing-bookings]').text().trim()).toBe('There is 1 existing booking for this date.')
           expect($('[data-test=no-existing-bookings]').length).toBe(0)
 
+          expect($('form[action="/block-visit-dates/block-new-date"][method=POST]').length).toBe(1)
           expect($('input[name=confirmBlockDate]').length).toBe(2)
           expect($('input[name=confirmBlockDate]:checked').length).toBe(0)
 

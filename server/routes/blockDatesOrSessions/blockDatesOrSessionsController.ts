@@ -72,12 +72,12 @@ export default class BlockDatesOrSessionsController {
         username: res.locals.user.username,
         prisonId: req.session.selectedEstablishment.prisonId,
         date,
-        includeExcludedSessions: false,
+        includeExcludedSessions: true,
       })
 
-      const dateHasActiveSessions = sessionSchedule.length > 0
+      const dateHasSessions = sessionSchedule.length > 0
 
-      if (dateHasActiveSessions && config.features.sessionDateBlocks) {
+      if (dateHasSessions && config.features.sessionDateBlocks) {
         return res.redirect('/block-visit-dates/block-date-or-session')
       }
 

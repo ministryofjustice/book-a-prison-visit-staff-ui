@@ -32,6 +32,34 @@ export default class BlockDatesOrSessionsService {
     return orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
   }
 
+  async blockVisitSession({
+    sessionTemplateReference,
+    date,
+    username,
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username: string
+  }): Promise<void> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    await orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
+  }
+
+  async unblockVisitSession({
+    sessionTemplateReference,
+    date,
+    username,
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username: string
+  }): Promise<void> {
+    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    await orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
+  }
+
   async getFutureBlockedDatesAndSessions({
     prisonId,
     includeSessions,

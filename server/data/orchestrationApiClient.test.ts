@@ -1198,6 +1198,46 @@ describe('orchestrationApiClient', () => {
     })
   })
 
+  describe('blockVisitSession', () => {
+    it('should block a visit session date for given session template reference', async () => {
+      const sessionTemplateReference = 'v9d.7ed.7u'
+      const date = '2024-09-06'
+      const username = 'user'
+
+      fakeOrchestrationApi
+        .put(`/config/sessions/session/${sessionTemplateReference}/exclude-date/add`, <ExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: username,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
+
+  describe('unblockVisitSession', () => {
+    it('should unblock a visit session date for given session template reference', async () => {
+      const sessionTemplateReference = 'v9d.7ed.7u'
+      const date = '2024-09-06'
+      const username = 'user'
+
+      fakeOrchestrationApi
+        .put(`/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`, <ExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: username,
+        })
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200)
+
+      await orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
+
+      expect(fakeOrchestrationApi.isDone()).toBe(true)
+    })
+  })
+
   describe('getPrisonerProfile', () => {
     it('should return prisoner profile page for selected prisoner', async () => {
       const prisonerProfile = TestData.prisonerProfile()

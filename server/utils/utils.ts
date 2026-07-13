@@ -9,8 +9,11 @@ import {
   subWeeks,
   parse,
 } from 'date-fns'
+import nunjucks from 'nunjucks'
 import { parsePhoneNumberFromString as parsePhoneNumber } from 'libphonenumber-js/mobile'
 import config from '../config'
+
+const nunjucksEnvironment = new nunjucks.Environment()
 
 export const properCase = (word: string): string =>
   word.length >= 1 ? word[0].toUpperCase() + word.toLowerCase().slice(1) : word
@@ -184,4 +187,9 @@ export const formatStartToEndTime = (startTime: string, endTime: string): string
 
 export const pluralise = (word: string, count: string | number, plural = `${word}s`): string => {
   return parseInt(count.toString(), 10) === 1 ? word : plural
+}
+
+export const escapeHtml = (value: string | undefined | null): string => {
+  const escape = nunjucksEnvironment.getFilter('escape')
+  return String(escape(value))
 }

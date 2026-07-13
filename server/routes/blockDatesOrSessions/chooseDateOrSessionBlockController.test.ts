@@ -41,6 +41,7 @@ describe('Choose date or session block', () => {
           expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates')
           expect($('h1').text()).toBe('What would you like to block on Friday 6 September 2024?')
 
+          expect($('form[action="/block-visit-dates/block-date-or-session"][method=POST]').length).toBe(1)
           expect($('input[name=blockType]').length).toBe(2)
           expect($('input[name=blockType]').eq(0).val()).toBe('date')
           expect($('input[name=blockType]').eq(1).val()).toBe('session')
