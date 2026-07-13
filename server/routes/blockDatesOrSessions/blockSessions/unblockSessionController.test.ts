@@ -52,7 +52,7 @@ describe('Unblock visit session', () => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
             title: 'Visit session unblocked for date',
-            html: 'Visits are unblocked on Friday 6 September 2024 for 1:45pm to 3:45pm,<br>All prisoners',
+            html: 'Visits are unblocked on Friday 6 September 2024 for 1:45pm to 3:45pm, <br>All prisoners',
           })
           expect(flashProvider).toHaveBeenCalledTimes(1)
         })

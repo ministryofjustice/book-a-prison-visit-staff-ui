@@ -162,7 +162,7 @@ describe('Confirm session block', () => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
             title: 'Visit session blocked for date',
-            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am,<br>All prisoners',
+            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am, <br>All prisoners',
           })
           expect(sessionData.blockDateOrSession).toBe(undefined)
         })
