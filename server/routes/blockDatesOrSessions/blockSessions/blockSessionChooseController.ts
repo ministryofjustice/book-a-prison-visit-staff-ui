@@ -15,7 +15,7 @@ export default class BlockSessionChooseController {
       const { prisonId } = req.session.selectedEstablishment
       const { blockDateOrSession } = req.session
 
-      blockDateOrSession.backLinkHref = '/block-visit-dates/block-date-or-session'
+      blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-date-or-session'
       const { backLinkHref, date } = blockDateOrSession
 
       const sessions = await this.visitSessionsService.getSessionSchedule({
@@ -37,7 +37,7 @@ export default class BlockSessionChooseController {
           },
         ])
         req.flash('formValues', { blockType: 'session' })
-        return res.redirect('/block-visit-dates/block-date-or-session')
+        return res.redirect('/block-visit-dates-or-sessions/block-date-or-session')
       }
 
       blockDateOrSession.sessions = sessions
@@ -56,7 +56,7 @@ export default class BlockSessionChooseController {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
-        return res.redirect('/block-visit-dates/block-new-session/choose')
+        return res.redirect('/block-visit-dates-or-sessions/block-new-session/choose')
       }
 
       const { blockDateOrSession } = req.session
@@ -65,9 +65,9 @@ export default class BlockSessionChooseController {
       blockDateOrSession.selectedSession = blockDateOrSession.sessions.find(
         session => session.sessionTemplateReference === sessionTemplateReference,
       )
-      blockDateOrSession.backLinkHref = '/block-visit-dates/block-new-session/choose'
+      blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-new-session/choose'
 
-      return res.redirect('/block-visit-dates/block-new-session/confirm')
+      return res.redirect('/block-visit-dates-or-sessions/block-new-session/confirm')
     }
   }
 

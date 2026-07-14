@@ -9,7 +9,7 @@ let app: Express
 const auditService = createMockAuditService()
 const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 
-const url = '/block-visit-dates/unblock-date'
+const url = '/block-visit-dates-or-sessions/unblock-date'
 const unblockDate = '2024-09-06'
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ describe('Unblock visit date', () => {
         .post(url)
         .send({ date: unblockDate })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.unblockVisitDate).toHaveBeenCalledWith('user1', 'HEI', unblockDate)
           expect(auditService.unblockedVisitDate).toHaveBeenCalledWith({
@@ -53,7 +53,7 @@ describe('Unblock visit date', () => {
         .post(url)
         .send({ date: 'invalid' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.unblockVisitDate).not.toHaveBeenCalled()
           expect(auditService.unblockedVisitDate).not.toHaveBeenCalled()

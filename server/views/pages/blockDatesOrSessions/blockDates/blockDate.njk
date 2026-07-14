@@ -22,7 +22,7 @@
         <p data-test="no-existing-bookings">There are no existing bookings for this date.</p>
       {% endif %}
 
-      <form action="/block-visit-dates/block-new-date" method="POST" novalidate>
+      <form action="/block-visit-dates-or-sessions/block-new-date" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({

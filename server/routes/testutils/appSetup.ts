@@ -110,7 +110,7 @@ function appSetup(
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
   app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
-  app.use('/block-visit-dates', blockVisitDatesRoutes(services))
+  app.use('/block-visit-dates-or-sessions', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))

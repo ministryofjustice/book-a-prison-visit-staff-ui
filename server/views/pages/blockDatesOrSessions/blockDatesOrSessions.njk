@@ -15,7 +15,7 @@
 
 {% for blockedDateOrSession in blockedDatesAndSessions %}
 
-  {% set actionUrl = "/block-visit-dates/unblock-" +
+  {% set actionUrl = "/block-visit-dates-or-sessions/unblock-" +
     ("session" if blockedDateOrSession.sessionTemplateReference else "date") %}
 
     {%- set unblockButtonHtml -%}
@@ -81,7 +81,7 @@
 
   <h2 class="govuk-heading-m">Block a new date or session</h2>
 
-  <form action="/block-visit-dates" method="POST" novalidate>
+  <form action="/block-visit-dates-or-sessions" method="POST" novalidate>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
     {{ mojDatePicker({

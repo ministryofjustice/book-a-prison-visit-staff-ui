@@ -72,8 +72,10 @@ describe('GET /', () => {
         expect($('[data-test="view-timetable"] .card__link').text()).toBe('Visits timetable')
         expect($('[data-test="view-timetable"] .card__link').attr('href')).toBe('/timetable')
 
-        expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates or sessions')
-        expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
+        expect($('[data-test="block-dates-or-sessions"] .card__link').text()).toBe('Block visit dates or sessions')
+        expect($('[data-test="block-dates-or-sessions"] .card__link').attr('href')).toBe(
+          '/block-visit-dates-or-sessions',
+        )
 
         expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
         expect(visitRequestsService.getVisitRequestCount).not.toHaveBeenCalled()
@@ -97,8 +99,7 @@ describe('GET /', () => {
       .expect('Content-Type', /html/)
       .expect(res => {
         const $ = cheerio.load(res.text)
-        expect($('[data-test="block-dates"] .card__link').text()).toBe('Block visit dates')
-        expect($('[data-test="block-dates"] .card__link').attr('href')).toBe('/block-visit-dates')
+        expect($('[data-test="block-dates-or-sessions"] .card__link').text()).toBe('Block visit dates')
       })
   })
 
