@@ -28,6 +28,13 @@ export default class UnblockSessionController {
           username,
         })
 
+        await this.auditService.unblockedVisitSession({
+          date,
+          sessionReference: sessionTemplateReference,
+          username,
+          operationId: res.locals.appInsightsOperationId,
+        })
+
         const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
           username,
           prisonId: req.session.selectedEstablishment.prisonId,
@@ -42,13 +49,6 @@ export default class UnblockSessionController {
         if (unblockedSession) {
           req.flash('messages', getSessionUnblockedMessage({ date, session: unblockedSession }))
         }
-
-        await this.auditService.unblockedVisitSession({
-          date,
-          sessionReference: unblockedSession.sessionTemplateReference,
-          username,
-          operationId: res.locals.appInsightsOperationId,
-        })
       } catch (error) {
         logger.error(error, `Could not unblock visit session ${date} for ${username}`)
       }

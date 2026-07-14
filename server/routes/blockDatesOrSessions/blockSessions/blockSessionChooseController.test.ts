@@ -168,5 +168,18 @@ describe('Choose which session to block', () => {
           expect(sessionData.blockDateOrSession.selectedSession).toBeUndefined()
         })
     })
+
+    it('should not allow an already-blocked session to be selected', () => {
+      return request(app)
+        .post(url)
+        .send({ sessionTemplateReference: session2Blocked.sessionTemplateReference })
+        .expect(302)
+        .expect('location', '/block-visit-dates/block-new-session/choose')
+        .expect(() => {
+          expect(flashProvider).toHaveBeenCalledWith('errors', expect.anything())
+          expect(flashProvider).toHaveBeenCalledTimes(1)
+          expect(sessionData.blockDateOrSession.selectedSession).toBeUndefined()
+        })
+    })
   })
 })

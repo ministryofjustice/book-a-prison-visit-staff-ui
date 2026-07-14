@@ -77,8 +77,9 @@ export default class BlockSessionChooseController {
       body('sessionTemplateReference', 'No session selected').custom((sessionTemplateReference: string, { req }) => {
         const { blockDateOrSession } = req.session as SessionData
         return (
-          blockDateOrSession.sessions?.some(session => session.sessionTemplateReference === sessionTemplateReference) ??
-          false
+          blockDateOrSession.sessions?.some(
+            session => session.sessionTemplateReference === sessionTemplateReference && !session.isSessionExcluded,
+          ) ?? false
         )
       }),
     ]
