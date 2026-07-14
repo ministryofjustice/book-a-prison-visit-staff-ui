@@ -11,7 +11,7 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <form action="/block-visit-dates/block-date-or-session" method="POST" novalidate>
+      <form action="/block-visit-dates-or-sessions/block-date-or-session" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({

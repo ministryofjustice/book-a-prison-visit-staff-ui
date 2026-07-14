@@ -15,7 +15,7 @@ let sessionData: SessionData
 
 const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitSessionsService = createMockVisitSessionsService()
-const url = '/block-visit-dates'
+const url = '/block-visit-dates-or-sessions'
 
 afterEach(() => {
   jest.resetAllMocks()
@@ -58,7 +58,7 @@ describe('Block visit dates and sessions listing page', () => {
 
             expect($('.moj-alert').length).toBe(0)
 
-            expect($('form[action="/block-visit-dates"][method=POST]').length).toBe(1)
+            expect($('form[action="/block-visit-dates-or-sessions"][method=POST]').length).toBe(1)
             expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
             expect($('input[name=date]').val()).toBeFalsy()
 
@@ -169,7 +169,9 @@ describe('Block visit dates and sessions listing page', () => {
           expect($('[data-test="blocked-when-1"]').text()).toBe('All day')
           expect($('[data-test="blocked-attendees-1"]').text()).toBe('All prisoners')
           expect($('[data-test="unblock-1"]').text().trim()).toBe('Unblock')
-          expect($('[data-test="unblock-1"]').parent().attr('action')).toBe('/block-visit-dates/unblock-date')
+          expect($('[data-test="unblock-1"]').parent().attr('action')).toBe(
+            '/block-visit-dates-or-sessions/unblock-date',
+          )
           expect($('[data-test="unblock-1"]').siblings('input[type=hidden][name=date]').val()).toBe('2026-07-01')
           expect(
             $('[data-test="unblock-1"]').siblings('input[type=hidden][name=sessionTemplateReference]').length,
@@ -180,7 +182,9 @@ describe('Block visit dates and sessions listing page', () => {
           expect($('[data-test="blocked-when-2"]').text()).toBe('10am to 11:30am')
           expect($('[data-test="blocked-attendees-2"]').text()).toBe('All prisoners')
           expect($('[data-test="unblock-2"]').text().trim()).toBe('Unblock')
-          expect($('[data-test="unblock-2"]').parent().attr('action')).toBe('/block-visit-dates/unblock-session')
+          expect($('[data-test="unblock-2"]').parent().attr('action')).toBe(
+            '/block-visit-dates-or-sessions/unblock-session',
+          )
           expect($('[data-test="unblock-2"]').siblings('input[type=hidden][name=date]').val()).toBe('2026-07-02')
           expect($('[data-test="unblock-2"]').siblings('input[type=hidden][name=sessionTemplateReference]').val()).toBe(
             'session-1',
@@ -283,7 +287,7 @@ describe('Block visit dates and sessions listing page', () => {
         .post(url)
         .send({ date: inputDate })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-date')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-date')
         .expect(() => {
           expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
@@ -293,7 +297,7 @@ describe('Block visit dates and sessions listing page', () => {
             includeExcludedSessions: true,
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
-            backLinkHref: '/block-visit-dates',
+            backLinkHref: '/block-visit-dates-or-sessions',
             date: expectedOutputDate,
           })
           expect(flashProvider).not.toHaveBeenCalled()
@@ -310,7 +314,7 @@ describe('Block visit dates and sessions listing page', () => {
         .post(url)
         .send({ date: inputDate })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-date-or-session')
+        .expect('location', '/block-visit-dates-or-sessions/block-date-or-session')
         .expect(() => {
           expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
@@ -320,7 +324,7 @@ describe('Block visit dates and sessions listing page', () => {
             includeExcludedSessions: true,
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
-            backLinkHref: '/block-visit-dates',
+            backLinkHref: '/block-visit-dates-or-sessions',
             date: expectedOutputDate,
           })
           expect(flashProvider).not.toHaveBeenCalled()
@@ -338,7 +342,7 @@ describe('Block visit dates and sessions listing page', () => {
         .post(url)
         .send({ date: inputDate })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-date')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-date')
     })
 
     describe('should set error and redirect back to listing page for an invalid date', () => {
@@ -363,7 +367,7 @@ describe('Block visit dates and sessions listing page', () => {
           .post(url)
           .send({ date: input })
           .expect(302)
-          .expect('location', '/block-visit-dates')
+          .expect('location', '/block-visit-dates-or-sessions')
           .expect(() => {
             expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
             expect(sessionData.blockDateOrSession).toBe(undefined)
@@ -390,7 +394,7 @@ describe('Block visit dates and sessions listing page', () => {
         .post(url)
         .send({ date: inputDate })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
           expect(sessionData.blockDateOrSession).toBe(undefined)
@@ -419,7 +423,7 @@ describe('Block visit dates and sessions listing page', () => {
         .post(url)
         .send({ date: inputDate })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
           expect(sessionData.blockDateOrSession).toBe(undefined)

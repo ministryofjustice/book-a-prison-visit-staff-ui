@@ -32,7 +32,7 @@ export default class HomePage extends AbstractPage {
     this.needReviewBadgeCount = page.getByTestId('need-review-count')
     this.viewVisitsTile = page.getByTestId('view-visits-by-date')
     this.viewTimetableTile = page.getByTestId('view-timetable')
-    this.blockDatesTile = page.getByTestId('block-dates')
+    this.blockDatesTile = page.getByTestId('block-dates-or-sessions')
     this.bookerManagementTile = page.getByTestId('booker-management')
     this.viewVisitAllowancesTile = page.getByTestId('visit-allowances')
   }

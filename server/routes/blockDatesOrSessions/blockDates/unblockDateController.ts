@@ -14,7 +14,7 @@ export default class UnblockDateController {
     return async (req, res) => {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
-        return res.redirect('/block-visit-dates')
+        return res.redirect('/block-visit-dates-or-sessions')
       }
 
       const { date } = matchedData<{ date: string }>(req)
@@ -39,7 +39,7 @@ export default class UnblockDateController {
         logger.error(error, `Could not unblock visit date ${date} for ${res.locals.user.username}`)
       }
 
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
   }
 

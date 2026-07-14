@@ -9,7 +9,7 @@ let app: Express
 let flashData: FlashData
 let sessionData: SessionData
 
-const url = '/block-visit-dates/block-date-or-session'
+const url = '/block-visit-dates-or-sessions/block-date-or-session'
 const date = '2024-09-06'
 
 beforeEach(() => {
@@ -29,7 +29,7 @@ describe('Choose date or session block', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).get(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should display choose date or session block page', () => {
@@ -38,10 +38,10 @@ describe('Choose date or session block', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates')
+          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates-or-sessions')
           expect($('h1').text()).toBe('What would you like to block on Friday 6 September 2024?')
 
-          expect($('form[action="/block-visit-dates/block-date-or-session"][method=POST]').length).toBe(1)
+          expect($('form[action="/block-visit-dates-or-sessions/block-date-or-session"][method=POST]').length).toBe(1)
           expect($('input[name=blockType]').length).toBe(2)
           expect($('input[name=blockType]').eq(0).val()).toBe('date')
           expect($('input[name=blockType]').eq(1).val()).toBe('session')
@@ -50,7 +50,7 @@ describe('Choose date or session block', () => {
           expect($('[data-test=submit]').text().trim()).toBe('Continue')
         })
         .expect(() => {
-          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates')
+          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates-or-sessions')
         })
     })
 
@@ -73,7 +73,7 @@ describe('Choose date or session block', () => {
   describe(`POST ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).post(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should redirect to block new date page if this is selected', () => {
@@ -81,10 +81,12 @@ describe('Choose date or session block', () => {
         .post(url)
         .send({ blockType: 'date' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-date')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-date')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledTimes(0)
-          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates/block-date-or-session')
+          expect(sessionData.blockDateOrSession.backLinkHref).toBe(
+            '/block-visit-dates-or-sessions/block-date-or-session',
+          )
         })
     })
 
@@ -93,10 +95,12 @@ describe('Choose date or session block', () => {
         .post(url)
         .send({ blockType: 'session' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-session/choose')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-session/choose')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledTimes(0)
-          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates/block-date-or-session')
+          expect(sessionData.blockDateOrSession.backLinkHref).toBe(
+            '/block-visit-dates-or-sessions/block-date-or-session',
+          )
         })
     })
 
@@ -113,7 +117,7 @@ describe('Choose date or session block', () => {
         .post(url)
         .send({ blockType: 'invalid' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-date-or-session')
+        .expect('location', '/block-visit-dates-or-sessions/block-date-or-session')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledTimes(1)
