@@ -48,6 +48,10 @@
               {% set visitorIndex = prisonerIndex + "-visitor-" + loop.index %}
               {% set visitorName %}{{ visitor.firstName }} {{ visitor.lastName }}{% endset %}
 
+              {% set contactDetailsUrl = dpsContacts + '/prisoner/' + prisonerNumber
+                                                     + '/contacts/manage/' + visitor.visitorId
+                                                     + '/relationship/' + visitor.relationshipId %}
+
               {%- set unlinkVisitorHtml -%}
                 <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/visitor/{{ visitor.visitorId }}/unlink" method="POST" novalidate>
                   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
@@ -73,8 +77,16 @@
                   text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
                   attributes: { "data-test": visitorIndex + "-dob" }
                 },
+                {
+                  html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state">
+                    View contact <span class="govuk-visually-hidden">details for ' + visitorName + ' (opens in a new tab)</span>
+                  </a>',
+                  classes: "bapv-vertical-align-middle",
+                  attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }
+                },
                 ({
-                  html: unlinkVisitorHtml
+                  html: unlinkVisitorHtml,
+                  classes: "bapv-vertical-align-middle"
                 } if active)
                 ]), visitorRowItems) %}
             {% endfor -%}
@@ -86,6 +98,7 @@
                 { text: "Name"},
                 { text: "Relationship to prisoner"},
                 { text: "Date of birth"},
+                { html: 'Contact information<div class="govuk-caption-m">(opens in a new tab)</div>' },
                 ({ text: "Action"} if active)
               ],
               rows: visitorRowItems
@@ -128,7 +141,7 @@
                   attributes: { "data-test": requestIndex + "-requested-date" }
                 },
                 {
-                  html: '<a class="govuk-link--no-visited-state" 
+                  html: '<a class="govuk-link--no-visited-state"
                         href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
                         'View<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
                   classes: "govuk-!-text-align-right",
