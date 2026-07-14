@@ -11,7 +11,7 @@ import ChooseDateOrSessionBlockPage from '../../pages/blockDatesOrSessions/choos
 import BlockSessionChoosePage from '../../pages/blockDatesOrSessions/blockSessions/blockSessionChoosePage'
 import BlockSessionConfirmPage from '../../pages/blockDatesOrSessions/blockSessions/blockSessionConfirmPage'
 
-test.describe('Block visit dates or sessions', () => {
+test.describe('Block visit dates and sessions', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
