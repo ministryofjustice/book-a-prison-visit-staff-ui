@@ -1,8 +1,7 @@
-import { Cheerio } from 'cheerio'
-import { AnyNode } from 'domhandler'
+import type { CheerioAPI } from 'cheerio'
 
 export default function testScreenReaderAndVisibleOnlyText(
-  $el: Cheerio<AnyNode>,
+  $el: ReturnType<CheerioAPI>,
   screenReaderText: string,
   visibleOnlyText: string,
 ): void {

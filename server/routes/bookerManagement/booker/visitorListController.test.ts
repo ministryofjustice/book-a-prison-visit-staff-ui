@@ -77,10 +77,14 @@ describe('Booker management - visitor list', () => {
           expect($('[data-test=visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=visitor-1-last-visit]').text()).toBe('11 October 2025')
 
+          const $linkElement = $('[data-test="visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
-            $('[data-test="visitor-1-contact-link"]'),
+            $linkElement,
             'View contact details for Jeanette Smith (opens in a new tab)',
             'View contact',
+          )
+          expect($linkElement.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
           )
 
           expect($('[data-test=link-visitor]').parent('form').attr('action')).toBe(
