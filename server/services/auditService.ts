@@ -345,6 +345,50 @@ export default class AuditService {
     })
   }
 
+  async blockedVisitSession({
+    date,
+    sessionReference,
+    username,
+    operationId,
+  }: {
+    date: string
+    sessionReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'BLOCKED_VISIT_SESSION',
+      who: username,
+      operationId,
+      details: {
+        date,
+        sessionReference,
+      },
+    })
+  }
+
+  async unblockedVisitSession({
+    date,
+    sessionReference,
+    username,
+    operationId,
+  }: {
+    date: string
+    sessionReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'UNBLOCKED_VISIT_SESSION',
+      who: username,
+      operationId,
+      details: {
+        date,
+        sessionReference,
+      },
+    })
+  }
+
   async bookerSearch({ search, username, operationId }: { search: string; username: string; operationId: string }) {
     return this.sendAuditMessage({
       action: 'SEARCHED_BOOKERS',

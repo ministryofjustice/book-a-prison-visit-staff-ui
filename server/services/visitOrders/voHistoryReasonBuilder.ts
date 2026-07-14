@@ -3,7 +3,7 @@ import {
   VisitOrderHistoryAttributeType,
   VisitOrderHistoryDto,
 } from '../../data/orchestrationApiTypes'
-import ViewUtils from '../../utils/viewUtils'
+import { escapeHtml } from '../../utils/utils'
 
 export default ({ visitOrderHistoryType, comment, userName, attributes }: VisitOrderHistoryDto): string => {
   switch (visitOrderHistoryType) {
@@ -89,7 +89,7 @@ const getManualAdjustmentReason = (
   switch (adjustmentReason) {
     case 'GOVERNOR_ADJUSTMENT':
       return typeof comment === 'string'
-        ? `Governor’s adjustment by ${userName}<br><br>${ViewUtils.escape(comment)}`
+        ? `Governor’s adjustment by ${userName}<br><br>${escapeHtml(comment)}`
         : `Governor’s adjustment by ${userName}`
 
     case 'BALANCE_TRANSFER_FROM_PREVIOUS_PRISON':
@@ -102,7 +102,7 @@ const getManualAdjustmentReason = (
       return `Exchange for PIN phone credit by ${userName}`
 
     case 'OTHER':
-      return `${ViewUtils.escape(comment)}<br><br>${userName}`
+      return `${escapeHtml(comment)}<br><br>${userName}`
 
     default: {
       const unhandledCase: never = adjustmentReason

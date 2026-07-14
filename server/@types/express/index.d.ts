@@ -4,6 +4,7 @@ import { PrisonUser } from '../../interfaces/hmppsUser'
 import { CancelledVisitInfo, FlashFormValues, MoJAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
 import {
   BookerSearchResultsDto,
+  SessionSchedule,
   SocialContactsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
@@ -24,6 +25,8 @@ export declare module 'express-session' {
     blockDateOrSession?: {
       backLinkHref: string
       date: string // format YYYY-MM-DD
+      sessions?: SessionSchedule[]
+      selectedSession?: SessionSchedule
     }
 
     // Booker management

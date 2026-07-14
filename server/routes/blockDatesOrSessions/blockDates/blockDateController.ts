@@ -14,10 +14,6 @@ export default class BlockDateController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { blockDateOrSession } = req.session
-      if (!blockDateOrSession) {
-        return res.redirect('/block-visit-dates')
-      }
-
       const { backLinkHref, date } = blockDateOrSession
 
       const { prisonId } = req.session.selectedEstablishment
@@ -38,17 +34,13 @@ export default class BlockDateController {
 
   public submit(): RequestHandler {
     return async (req, res) => {
-      const { blockDateOrSession } = req.session
-      if (!blockDateOrSession) {
-        return res.redirect('/block-visit-dates')
-      }
-
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
         return res.redirect('/block-visit-dates/block-new-date')
       }
 
+      const { blockDateOrSession } = req.session
       const { confirmBlockDate } = matchedData<{ confirmBlockDate: 'yes' | 'no' }>(req)
 
       if (confirmBlockDate === 'yes') {

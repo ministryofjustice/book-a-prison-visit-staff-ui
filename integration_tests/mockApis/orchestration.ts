@@ -285,12 +285,12 @@ export default {
     })
   },
   stubGetVisitsBySessionTemplate: ({
-    prisonId,
+    prisonId = 'HEI',
     reference,
     sessionDate,
     visits,
   }: {
-    prisonId: string
+    prisonId?: string
     reference: string
     sessionDate: string
     visits: VisitPreview[]
@@ -348,7 +348,7 @@ export default {
     date,
     count = 0,
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
     count: number
   }): SuperAgentRequest => {
@@ -732,9 +732,9 @@ export default {
     date,
     username = 'USER1',
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -762,9 +762,9 @@ export default {
     date,
     username = 'USER1',
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -1015,12 +1015,12 @@ export default {
   },
 
   stubSessionSchedule: ({
-    prisonId,
+    prisonId = 'HEI',
     date,
     includeExcludedSessions,
     sessionSchedule,
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
     includeExcludedSessions: boolean
     sessionSchedule: SessionSchedule[]
@@ -1195,6 +1195,66 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: voHistoryDetails,
+      },
+    })
+  },
+
+  stubBlockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
+  stubUnblockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
       },
     })
   },

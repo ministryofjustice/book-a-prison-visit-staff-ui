@@ -13,6 +13,7 @@ import {
   isMobilePhoneNumber,
   formatStartToEndTime,
   pluralise,
+  escapeHtml,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
 
@@ -221,5 +222,16 @@ describe('pluralise', () => {
     ])('%s pluralise(%s, %s) = %s', (_: string, word: string, count: string, plural: string, expected: string) => {
       expect(pluralise(word, count, plural)).toBe(expected)
     })
+  })
+})
+
+describe('escapeHtml', () => {
+  it('should escape HTML characters', () => {
+    expect(escapeHtml('Escape <this> & "that" !')).toBe('Escape &lt;this&gt; &amp; &quot;that&quot; !')
+  })
+
+  it('should handle undefined and null', () => {
+    expect(escapeHtml(null)).toBe('')
+    expect(escapeHtml(undefined)).toBe('')
   })
 })

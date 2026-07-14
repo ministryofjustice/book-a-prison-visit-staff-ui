@@ -1,5 +1,5 @@
 import { type Locator, type Page } from '@playwright/test'
-import AbstractPage from '../abstractPage'
+import AbstractPage from '../../abstractPage'
 
 export default class BlockDateConfirmationPage extends AbstractPage {
   readonly noExistingBookingsMessage: Locator

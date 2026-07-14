@@ -58,6 +58,7 @@ describe('Block visit dates and sessions listing page', () => {
 
             expect($('.moj-alert').length).toBe(0)
 
+            expect($('form[action="/block-visit-dates"][method=POST]').length).toBe(1)
             expect($('.moj-datepicker').attr('data-min-date')).toBe(format(today, 'dd/MM/yyyy'))
             expect($('input[name=date]').val()).toBeFalsy()
 
@@ -274,7 +275,7 @@ describe('Block visit dates and sessions listing page', () => {
       app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService }, sessionData })
     })
 
-    it('should set date to block in session and redirect to block new date confirmation page for a valid date (date with no active sessions)', () => {
+    it('should set date to block in session and redirect to block new date confirmation page for a valid date (date with no sessions)', () => {
       const inputDate = format(today, datePickerDateFormat)
       const expectedOutputDate = format(today, expectedDateFormat)
 
@@ -289,7 +290,7 @@ describe('Block visit dates and sessions listing page', () => {
             username: 'user1',
             prisonId: 'HEI',
             date: expectedOutputDate,
-            includeExcludedSessions: false,
+            includeExcludedSessions: true,
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
             backLinkHref: '/block-visit-dates',
@@ -299,7 +300,7 @@ describe('Block visit dates and sessions listing page', () => {
         })
     })
 
-    it('should set date to block in session and redirect to date or session choice page for a valid date (date with active sessions)', () => {
+    it('should set date to block in session and redirect to date or session choice page for a valid date (date with sessions)', () => {
       const inputDate = format(today, datePickerDateFormat)
       const expectedOutputDate = format(today, expectedDateFormat)
 
@@ -316,7 +317,7 @@ describe('Block visit dates and sessions listing page', () => {
             username: 'user1',
             prisonId: 'HEI',
             date: expectedOutputDate,
-            includeExcludedSessions: false,
+            includeExcludedSessions: true,
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
             backLinkHref: '/block-visit-dates',
