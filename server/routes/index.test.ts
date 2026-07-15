@@ -6,7 +6,6 @@ import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import {
   createMockBookerService,
-  createMockSupportedPrisonsService,
   createMockVisitNotificationsService,
   createMockVisitRequestsService,
 } from '../services/testutils/mocks'
@@ -46,23 +45,6 @@ describe('GET /', () => {
     bookerService.getVisitorRequestCount.mockResolvedValue(visitorRequestCount)
     visitNotificationsService.getNotificationCount.mockResolvedValue(notificationCount)
     visitRequestsService.getVisitRequestCount.mockResolvedValue(visitRequestCount)
-  })
-
-  it('should redirect to establishment-not-supported if selectedEstablishment is missing', () => {
-    const supportedPrisonsService = createMockSupportedPrisonsService()
-
-    app = appWithAllRoutes({
-      services: {
-        bookerService,
-        visitNotificationsService,
-        visitRequestsService,
-        supportedPrisonsService,
-      },
-      sessionData: {} as SessionData,
-      userSupplier: () => ({ ...user, activeCaseLoadId: undefined }),
-    })
-
-    return request(app).get('/').expect(302).expect('location', '/establishment-not-supported')
   })
 
   it('should render the home page cards', () => {

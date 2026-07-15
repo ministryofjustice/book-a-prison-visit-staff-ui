@@ -12,10 +12,6 @@ export default function routes({ bookerService, visitNotificationsService, visit
     const prison = req.session.selectedEstablishment
     const { username, userRoles } = res.locals.user
 
-    if (!prison) {
-      return res.redirect('/establishment-not-supported')
-    }
-
     // Requested visits tile and count (public-enabled prisons only)
     const showRequestedVisitsTile = prison.isEnabledForPublic
     const visitRequestCount = showRequestedVisitsTile
@@ -34,7 +30,7 @@ export default function routes({ bookerService, visitNotificationsService, visit
 
     const showVisitAllowanceTile = config.features.remandLimits
 
-    return res.render('pages/index', {
+    res.render('pages/index', {
       showRequestedVisitsTile,
       visitRequestCount,
       visitReviewCount,
