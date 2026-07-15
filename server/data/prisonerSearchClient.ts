@@ -1,15 +1,19 @@
 import { URLSearchParams } from 'url'
-import RestClient from './restClient'
+import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
 import { Prisoner } from './prisonerOffenderSearchTypes'
-import config, { ApiConfig } from '../config'
+import config from '../config'
+import logger from '../../logger'
 
 export default class PrisonerSearchClient {
-  private restClient: RestClient
+  private restClient: Pick<RestClient, 'get'>
 
   private pageSize = config.apis.prisonerSearch.pageSize
 
   constructor(token: string) {
-    this.restClient = new RestClient('prisonerSearchApiClient', config.apis.prisonerSearch as ApiConfig, token)
+    const client = new RestClient('prisonerSearchApiClient', config.apis.prisonerSearch, logger)
+    this.restClient = {
+      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
+    }
   }
 
   async getPrisoners(

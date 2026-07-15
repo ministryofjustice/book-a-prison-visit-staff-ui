@@ -1,17 +1,21 @@
 import { URLSearchParams } from 'url'
-import RestClient from './restClient'
+import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
 import { Contact } from './prisonerContactRegistryApiTypes'
-import config, { ApiConfig } from '../config'
+import config from '../config'
+import logger from '../../logger'
 
 export default class PrisonerContactRegistryApiClient {
-  private restClient: RestClient
+  private restClient: Pick<RestClient, 'get'>
+
+  private static getStatus(error: { status?: number; responseStatus?: number }): number | undefined {
+    return error.status ?? error.responseStatus
+  }
 
   constructor(token: string) {
-    this.restClient = new RestClient(
-      'prisonerContactRegistryApiClient',
-      config.apis.prisonerContactRegistry as ApiConfig,
-      token,
-    )
+    const client = new RestClient('prisonerContactRegistryApiClient', config.apis.prisonerContactRegistry, logger)
+    this.restClient = {
+      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
+    }
   }
 
   async getPrisonersApprovedSocialContacts(offenderNo: string): Promise<Contact[]> {
@@ -26,7 +30,7 @@ export default class PrisonerContactRegistryApiClient {
 
       return contacts
     } catch (error) {
-      if (error.status !== 404) {
+      if (PrisonerContactRegistryApiClient.getStatus(error as { status?: number; responseStatus?: number }) !== 404) {
         throw error
       }
 

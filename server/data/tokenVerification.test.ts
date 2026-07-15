@@ -35,20 +35,20 @@ describe('token verification api tests', () => {
       })
       it('Calls verify and parses response', async () => {
         fakeApi.post('/token/verify', '').reply(200, { active: true })
-        const data = await verifyToken({ user: {}, verified: false } as Request)
+        const data = await verifyToken({ user: { username: 'bob', token: 'token-1' }, verified: false } as Request)
         expect(data).toEqual(true)
         expect(nock.isDone()).toBe(true) // assert api was called
       })
 
       it('Calls verify and parses inactive response', async () => {
         fakeApi.post('/token/verify', '').reply(200, { active: false })
-        const data = await verifyToken({ user: {}, verified: false } as Request)
+        const data = await verifyToken({ user: { username: 'bob', token: 'token-1' }, verified: false } as Request)
         expect(data).toEqual(false)
       })
 
       it('Calls verify and parses no response', async () => {
         fakeApi.post('/token/verify', '').reply(200, {})
-        const data = await verifyToken({ user: {}, verified: false } as Request)
+        const data = await verifyToken({ user: { username: 'bob', token: 'token-1' }, verified: false } as Request)
         expect(data).toEqual(false)
       })
 

@@ -1,10 +1,10 @@
+import { RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
 import HmppsAuthClient from './hmppsAuthClient'
 import IncentivesApiClient from './incentivesApiClient'
 import OrchestrationApiClient from './orchestrationApiClient'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
 import { createRedisClient } from './redisClient'
-import TokenStore from './tokenStore'
 import applicationInfoSupplier from '../applicationInfo'
 
 const applicationInfo = applicationInfoSupplier()
@@ -13,7 +13,7 @@ export type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = () => ({
   applicationInfo,
-  hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
+  hmppsAuthClient: new HmppsAuthClient(new RedisTokenStore(createRedisClient())),
 
   incentivesApiClientBuilder: ((token: string) =>
     new IncentivesApiClient(token)) as RestClientBuilder<IncentivesApiClient>,

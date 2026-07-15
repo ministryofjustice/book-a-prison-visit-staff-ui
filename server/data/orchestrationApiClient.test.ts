@@ -1101,7 +1101,7 @@ describe('orchestrationApiClient', () => {
     // API returns 500 IllegalStateException if multiple capacities found for specified date & times
     it('should return null if error retrieving session capacity (500 from API)', async () => {
       fakeOrchestrationApi
-        .persist() // required because 500 causes server/data/restClient.ts to retry but the mock has been consumed
+        .persist() // required because the API client retries on 500 and the mock would otherwise be consumed
         .get('/visit-sessions/capacity')
         .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
         .matchHeader('authorization', `Bearer ${token}`)

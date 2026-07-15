@@ -2,11 +2,11 @@ import nock from 'nock'
 
 import config from '../config'
 import HmppsAuthClient from './hmppsAuthClient'
-import TokenStore from './tokenStore'
 
-jest.mock('./tokenStore')
-
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const tokenStore = {
+  getToken: jest.fn(),
+  setToken: jest.fn(),
+}
 
 const username = 'Bob'
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -26,7 +26,7 @@ describe('hmppsAuthClient', () => {
   })
 
   describe('getSystemClientToken', () => {
-    it('should instantiate the redis client', async () => {
+    it('should return token from the token store if one exists', async () => {
       tokenStore.getToken.mockResolvedValue(token.access_token)
       await hmppsAuthClient.getSystemClientToken(username)
     })

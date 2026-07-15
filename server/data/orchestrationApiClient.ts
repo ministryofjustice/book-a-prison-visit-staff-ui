@@ -1,6 +1,7 @@
 import { format, subMonths } from 'date-fns'
-import RestClient from './restClient'
-import config, { ApiConfig } from '../config'
+import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
+import config from '../config'
+import logger from '../../logger'
 import {
   ApplicationDto,
   ApplicationMethodType,
@@ -61,7 +62,11 @@ import {
 import { Prison, VisitSessionData } from '../@types/bapv'
 
 export default class OrchestrationApiClient {
-  private restClient: RestClient
+  private restClient: Pick<RestClient, 'get' | 'post' | 'put'>
+
+  private static getStatus(error: { status?: number; responseStatus?: number }): number | undefined {
+    return error.status ?? error.responseStatus
+  }
 
   private enabledRawNotifications = config.features.notificationTypes.enabledRawNotifications
 
@@ -83,7 +88,12 @@ export default class OrchestrationApiClient {
   ]
 
   constructor(token: string) {
-    this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
+    const client = new RestClient('orchestrationApiClient', config.apis.orchestration, logger)
+    this.restClient = {
+      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
+      post: (request, authOptions) => client.post(request, authOptions ?? asUser(token)),
+      put: (request, authOptions) => client.put(request, authOptions ?? asUser(token)),
+    }
   }
 
   // orchestration-visits-controller
@@ -330,7 +340,7 @@ export default class OrchestrationApiClient {
         data: <SearchBookerDto>{ email },
       })
     } catch (error) {
-      if (error.status === 404) {
+      if (OrchestrationApiClient.getStatus(error as { status?: number; responseStatus?: number }) === 404) {
         return []
       }
       throw error
@@ -396,7 +406,7 @@ export default class OrchestrationApiClient {
       })
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
-      if (error.status !== 404) {
+      if (OrchestrationApiClient.getStatus(error as { status?: number; responseStatus?: number }) !== 404) {
         throw error
       }
     }

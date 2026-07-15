@@ -1,41 +1,13 @@
-import superagent from 'superagent'
 import type { Request } from 'express'
-import getSanitisedError from '../sanitisedError'
+import { VerificationClient } from '@ministryofjustice/hmpps-auth-clients'
+import type { AuthenticatedRequest } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import logger from '../../logger'
 
-function getApiClientToken(token: string) {
-  return superagent
-    .post(`${config.apis.tokenVerification.url}/token/verify`)
-    .auth(token, { type: 'bearer' })
-    .timeout(config.apis.tokenVerification.timeout)
-    .then(response => Boolean(response.body && response.body.active))
-    .catch(error => {
-      logger.error(getSanitisedError(error), 'Error calling tokenVerificationApi')
-    })
-}
+const verificationClient = new VerificationClient(config.apis.tokenVerification, logger)
 
 export type TokenVerifier = (request: Request) => Promise<boolean | void>
 
-const tokenVerifier: TokenVerifier = async request => {
-  const { user, verified } = request
-
-  if (!config.apis.tokenVerification.enabled) {
-    logger.debug('Token verification disabled, returning token is valid')
-    return true
-  }
-
-  if (verified) {
-    return true
-  }
-
-  logger.debug(`token request for user "${user.username}'`)
-
-  const result = await getApiClientToken(user.token)
-  if (result) {
-    request.verified = true
-  }
-  return result
-}
+const tokenVerifier: TokenVerifier = request => verificationClient.verifyToken(request as AuthenticatedRequest)
 
 export default tokenVerifier

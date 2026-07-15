@@ -1,12 +1,16 @@
-import RestClient from './restClient'
-import config, { ApiConfig } from '../config'
+import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
+import config from '../config'
+import logger from '../../logger'
 import { PrisonIncentiveLevel } from './incentivesApiTypes'
 
 export default class IncentivesApiClient {
-  private restClient: RestClient
+  private restClient: Pick<RestClient, 'get'>
 
   constructor(token: string) {
-    this.restClient = new RestClient('incentivesApiClient', config.apis.incentives as ApiConfig, token)
+    const client = new RestClient('incentivesApiClient', config.apis.incentives, logger)
+    this.restClient = {
+      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
+    }
   }
 
   async getPrisonIncentiveLevels(prisonId: string): Promise<PrisonIncentiveLevel[]> {
