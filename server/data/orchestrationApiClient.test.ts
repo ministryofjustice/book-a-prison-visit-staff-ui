@@ -1,4 +1,5 @@
 import nock from 'nock'
+import { type AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
@@ -35,13 +36,17 @@ import { setFeature } from './testutils/mockFeature'
 describe('orchestrationApiClient', () => {
   let fakeOrchestrationApi: nock.Scope
   let orchestrationApiClient: OrchestrationApiClient
+  let authenticationClient: AuthenticationClient
   const token = 'token-1'
   const prisonId = 'HEI'
   const prisonerId = 'A1234BC'
 
   beforeEach(() => {
     fakeOrchestrationApi = nock(config.apis.orchestration.url)
-    orchestrationApiClient = new OrchestrationApiClient(token)
+    authenticationClient = {
+      getToken: jest.fn().mockResolvedValue(token),
+    } as unknown as AuthenticationClient
+    orchestrationApiClient = new OrchestrationApiClient(authenticationClient)
   })
 
   afterEach(() => {
@@ -174,7 +179,7 @@ describe('orchestrationApiClient', () => {
         ],
       })
 
-      orchestrationApiClient = new OrchestrationApiClient(token)
+      orchestrationApiClient = new OrchestrationApiClient(authenticationClient)
     })
 
     it('should return visit details with events and notifications filtered and processed', async () => {

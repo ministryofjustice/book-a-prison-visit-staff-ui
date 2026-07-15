@@ -1,24 +1,17 @@
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BlockDatesOrSessionsService from './blockDatesOrSessionsService'
 
-const token = 'some token'
 const prisonId = 'HEI'
 const username = 'user1'
 
 describe('Blocked dates or sessions service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let blockDatesOrSessionsService: BlockDatesOrSessionsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    blockDatesOrSessionsService = new BlockDatesOrSessionsService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    blockDatesOrSessionsService = new BlockDatesOrSessionsService(orchestrationApiClient)
   })
 
   afterEach(() => {

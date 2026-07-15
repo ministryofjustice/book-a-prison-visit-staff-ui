@@ -1,13 +1,12 @@
 import { PrisonRemandConfig } from '../@types/bapv'
-import { HmppsAuthClient, IncentivesApiClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { IncentivesApiClient, OrchestrationApiClient } from '../data'
 import { PrisonIncentiveLevel } from '../data/incentivesApiTypes'
 import { VisitSchedulerUpdatePrisonDto } from '../data/orchestrationApiTypes'
 
 export default class VisitAllowanceService {
   constructor(
-    private readonly incentivesApiClientFactory: RestClientBuilder<IncentivesApiClient>,
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
+    private readonly incentivesApiClient: IncentivesApiClient,
+    private readonly orchestrationApiClient: OrchestrationApiClient,
   ) {}
 
   async getPrisonIncentiveLevels({
@@ -17,15 +16,15 @@ export default class VisitAllowanceService {
     username: string
     prisonId: string
   }): Promise<PrisonIncentiveLevel[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const incentivesApiClient = this.incentivesApiClientFactory(token)
+    void username
+    const incentivesApiClient = this.incentivesApiClient
 
     return incentivesApiClient.getPrisonIncentiveLevels(prisonId)
   }
 
   async getRemandConfig({ username, prisonId }: { username: string; prisonId: string }): Promise<PrisonRemandConfig> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
 
     const prison = await orchestrationApiClient.getPrison(prisonId)
 
@@ -43,8 +42,8 @@ export default class VisitAllowanceService {
     weekStartDay: VisitSchedulerUpdatePrisonDto['weekStartDay']
     remandVisitLimitPerWeek: VisitSchedulerUpdatePrisonDto['remandVisitLimitPerWeek']
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
 
     const visitSchedulerUpdatePrisonDto = { weekStartDay, remandVisitLimitPerWeek }
 

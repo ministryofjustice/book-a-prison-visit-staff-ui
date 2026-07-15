@@ -1,19 +1,21 @@
 import { URLSearchParams } from 'url'
-import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
+import { type AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
 import { Prisoner } from './prisonerOffenderSearchTypes'
 import config from '../config'
 import logger from '../../logger'
 
-export default class PrisonerSearchClient {
-  private restClient: Pick<RestClient, 'get'>
+type GetRequest = Parameters<RestClient['get']>[0]
+
+export default class PrisonerSearchClient extends RestClient {
+  constructor(authenticationClient: AuthenticationClient) {
+    super('prisonerSearchApiClient', config.apis.prisonerSearch, logger, authenticationClient)
+  }
 
   private pageSize = config.apis.prisonerSearch.pageSize
 
-  constructor(token: string) {
-    const client = new RestClient('prisonerSearchApiClient', config.apis.prisonerSearch, logger)
-    this.restClient = {
-      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
-    }
+  private systemGet<Response = unknown>(request: GetRequest): Promise<Response> {
+    return this.get(request, asSystem()) as Promise<Response>
   }
 
   async getPrisoners(
@@ -21,7 +23,7 @@ export default class PrisonerSearchClient {
     prisonId: string,
     page = 0,
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
-    return this.restClient.get({
+    return this.systemGet({
       path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({
         term: search,
@@ -32,7 +34,7 @@ export default class PrisonerSearchClient {
   }
 
   async getPrisoner(search: string, prisonId: string): Promise<{ content: Prisoner[] }> {
-    return this.restClient.get({
+    return this.systemGet({
       path: `/prison/${prisonId}/prisoners`,
       query: new URLSearchParams({
         term: search,
@@ -41,7 +43,7 @@ export default class PrisonerSearchClient {
   }
 
   async getPrisonerById(id: string): Promise<Prisoner> {
-    return this.restClient.get({
+    return this.systemGet({
       path: `/prisoner/${id}`,
     })
   }

@@ -1,24 +1,17 @@
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BookerService from './bookerService'
 import { BookerSearchResultsDto, RejectVisitorRequestDto } from '../data/orchestrationApiTypes'
 
-const token = 'some token'
 const username = 'user1'
 
 describe('Booker service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let bookerService: BookerService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    bookerService = new BookerService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    bookerService = new BookerService(orchestrationApiClient)
   })
 
   afterEach(() => {

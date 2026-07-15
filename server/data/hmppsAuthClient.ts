@@ -13,4 +13,8 @@ export default class HmppsAuthClient {
   async getSystemClientToken(username?: string): Promise<string> {
     return this.authClient.getToken(username)
   }
+
+  async getToken(username?: string): Promise<string> {
+    return this.authClient.getToken(username)
+  }
 }

@@ -1,20 +1,22 @@
-import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
+import { type AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
 import config from '../config'
 import logger from '../../logger'
 import { PrisonIncentiveLevel } from './incentivesApiTypes'
 
-export default class IncentivesApiClient {
-  private restClient: Pick<RestClient, 'get'>
+type GetRequest = Parameters<RestClient['get']>[0]
 
-  constructor(token: string) {
-    const client = new RestClient('incentivesApiClient', config.apis.incentives, logger)
-    this.restClient = {
-      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
-    }
+export default class IncentivesApiClient extends RestClient {
+  constructor(authenticationClient: AuthenticationClient) {
+    super('incentivesApiClient', config.apis.incentives, logger, authenticationClient)
+  }
+
+  private systemGet<Response = unknown>(request: GetRequest): Promise<Response> {
+    return this.get(request, asSystem()) as Promise<Response>
   }
 
   async getPrisonIncentiveLevels(prisonId: string): Promise<PrisonIncentiveLevel[]> {
-    return this.restClient.get({
+    return this.systemGet({
       path: `/incentive/prison-levels/${prisonId}`,
     })
   }

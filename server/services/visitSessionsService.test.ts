@@ -2,26 +2,18 @@ import { GOVUKTag } from '../@types/bapv'
 import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService, { CalendarDay } from './visitSessionsService'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
-
-const token = 'some token'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 const username = 'user1'
 
 describe('Visit sessions service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitSessionsService: VisitSessionsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   const prisonId = 'HEI'
 
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitSessionsService = new VisitSessionsService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitSessionsService = new VisitSessionsService(orchestrationApiClient)
   })
 
   afterEach(() => {

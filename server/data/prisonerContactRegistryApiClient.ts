@@ -1,26 +1,28 @@
 import { URLSearchParams } from 'url'
-import { RestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
+import { type AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
 import { Contact } from './prisonerContactRegistryApiTypes'
 import config from '../config'
 import logger from '../../logger'
 
-export default class PrisonerContactRegistryApiClient {
-  private restClient: Pick<RestClient, 'get'>
+type GetRequest = Parameters<RestClient['get']>[0]
+
+export default class PrisonerContactRegistryApiClient extends RestClient {
+  constructor(authenticationClient: AuthenticationClient) {
+    super('prisonerContactRegistryApiClient', config.apis.prisonerContactRegistry, logger, authenticationClient)
+  }
 
   private static getStatus(error: { status?: number; responseStatus?: number }): number | undefined {
     return error.status ?? error.responseStatus
   }
 
-  constructor(token: string) {
-    const client = new RestClient('prisonerContactRegistryApiClient', config.apis.prisonerContactRegistry, logger)
-    this.restClient = {
-      get: (request, authOptions) => client.get(request, authOptions ?? asUser(token)),
-    }
+  private systemGet<Response = unknown>(request: GetRequest): Promise<Response> {
+    return this.get(request, asSystem()) as Promise<Response>
   }
 
   async getPrisonersApprovedSocialContacts(offenderNo: string): Promise<Contact[]> {
     try {
-      const contacts = await this.restClient.get<Contact[]>({
+      const contacts = await this.systemGet<Contact[]>({
         path: `/v2/prisoners/${offenderNo}/contacts/social/approved`,
         query: new URLSearchParams({
           hasDateOfBirth: 'false',

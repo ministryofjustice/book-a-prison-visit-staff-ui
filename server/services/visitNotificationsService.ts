@@ -1,15 +1,12 @@
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 import { IgnoreVisitNotificationsDto, Visit, VisitNotifications } from '../data/orchestrationApiTypes'
 
 export default class VisitNotificationsService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getNotificationCount(username: string, prisonId: string): Promise<number> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getNotificationCount(prisonId)
   }
@@ -21,14 +18,14 @@ export default class VisitNotificationsService {
     username: string
     prisonId: string
   }): Promise<VisitNotifications[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
     return orchestrationApiClient.getVisitNotifications(prisonId)
   }
 
   async dateHasNotifications(username: string, prisonId: string, date: string): Promise<boolean> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
 
     const visitNotifications = await orchestrationApiClient.getVisitNotifications(prisonId)
 
@@ -44,8 +41,8 @@ export default class VisitNotificationsService {
     reference: string
     ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
   }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
   }

@@ -1,33 +1,18 @@
 import TestData from '../routes/testutils/testData'
 import {
-  createMockHmppsAuthClient,
   createMockIncentivesApiClient,
   createMockOrchestrationApiClient,
 } from '../data/testutils/mocks'
 import VisitAllowanceService from './visitAllowanceService'
 
-const token = 'some token'
-
 describe('Visit allowance service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const incentivesApiClient = createMockIncentivesApiClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitAllowanceService: VisitAllowanceService
 
-  const IncentivesApiClientFactory = jest.fn()
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    IncentivesApiClientFactory.mockReturnValue(incentivesApiClient)
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    visitAllowanceService = new VisitAllowanceService(
-      IncentivesApiClientFactory,
-      OrchestrationApiClientFactory,
-      hmppsAuthClient,
-    )
-
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitAllowanceService = new VisitAllowanceService(incentivesApiClient, orchestrationApiClient)
   })
 
   afterEach(() => {

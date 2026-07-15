@@ -1,17 +1,12 @@
 import createError, { BadRequest } from 'http-errors'
 import PrisonerSearchService from './prisonerSearchService'
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockPrisonerSearchClient } from '../data/testutils/mocks'
-
-const token = 'some token'
+import { createMockPrisonerSearchClient } from '../data/testutils/mocks'
 
 describe('Prisoner search service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const prisonerSearchClient = createMockPrisonerSearchClient()
 
   let prisonerSearchService: PrisonerSearchService
-
-  const PrisonerSearchClientFactory = jest.fn()
 
   const prisonId = 'HEI'
   const prisonName = 'Hewell (HMP)'
@@ -20,9 +15,7 @@ describe('Prisoner search service', () => {
   const prisoner = TestData.prisoner()
 
   beforeEach(() => {
-    PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
-    prisonerSearchService = new PrisonerSearchService(PrisonerSearchClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
   })
 
   afterEach(() => {

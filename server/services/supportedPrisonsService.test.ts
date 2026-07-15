@@ -1,24 +1,16 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
-
-const token = 'some token'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
 describe('Supported prisons service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let supportedPrisonsService: SupportedPrisonsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    supportedPrisonsService = new SupportedPrisonsService(OrchestrationApiClientFactory, hmppsAuthClient)
-
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -31,7 +23,6 @@ describe('Supported prisons service', () => {
 
       const results = await supportedPrisonsService.getActiveAgencies()
 
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(undefined)
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })
@@ -43,7 +34,6 @@ describe('Supported prisons service', () => {
 
       const results = await supportedPrisonsService.getSupportedPrisonIds('user')
 
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })

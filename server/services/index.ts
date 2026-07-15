@@ -15,43 +15,38 @@ import VisitAllowanceService from './visitAllowanceService'
 
 export const services = () => {
   const {
-    hmppsAuthClient,
-    orchestrationApiClientBuilder,
-    prisonerContactRegistryApiClientBuilder,
-    prisonerSearchClientBuilder,
-    incentivesApiClientBuilder,
+    orchestrationApiClient,
+    prisonerContactRegistryApiClient,
+    prisonerSearchClient,
+    incentivesApiClient,
     applicationInfo,
   } = dataAccess()
 
   const auditService = new AuditService()
 
-  const blockDatesOrSessionsService = new BlockDatesOrSessionsService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const blockDatesOrSessionsService = new BlockDatesOrSessionsService(orchestrationApiClient)
 
-  const bookerService = new BookerService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const bookerService = new BookerService(orchestrationApiClient)
 
-  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
 
-  const prisonerProfileService = new PrisonerProfileService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const prisonerProfileService = new PrisonerProfileService(orchestrationApiClient)
 
-  const prisonerSearchService = new PrisonerSearchService(prisonerSearchClientBuilder, hmppsAuthClient)
+  const prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
 
-  const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClientBuilder, hmppsAuthClient)
+  const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClient)
 
-  const visitAllowanceService = new VisitAllowanceService(
-    incentivesApiClientBuilder,
-    orchestrationApiClientBuilder,
-    hmppsAuthClient,
-  )
+  const visitAllowanceService = new VisitAllowanceService(incentivesApiClient, orchestrationApiClient)
 
-  const visitNotificationsService = new VisitNotificationsService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const visitNotificationsService = new VisitNotificationsService(orchestrationApiClient)
 
-  const visitOrdersService = new VisitOrdersService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const visitOrdersService = new VisitOrdersService(orchestrationApiClient)
 
-  const visitRequestsService = new VisitRequestsService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const visitRequestsService = new VisitRequestsService(orchestrationApiClient)
 
-  const visitSessionsService = new VisitSessionsService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const visitSessionsService = new VisitSessionsService(orchestrationApiClient)
 
-  const visitService = new VisitService(orchestrationApiClientBuilder, hmppsAuthClient)
+  const visitService = new VisitService(orchestrationApiClient)
 
   return {
     auditService,

@@ -1,5 +1,5 @@
 import { compareDesc } from 'date-fns'
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 import {
   BookerDetailedInfoDto,
   BookerPrisonerVisitorRequestDto,
@@ -13,10 +13,7 @@ import {
 } from '../data/orchestrationApiTypes'
 
 export default class BookerService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   // get bookers by email address with most recently created (the active one) first
   async getSortedBookersByEmail({
@@ -26,8 +23,7 @@ export default class BookerService {
     username: string
     email: string
   }): Promise<BookerSearchResultsDto[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     const unsortedBookers = await orchestrationApiClient.getBookersByEmail(email)
     const bookersByCreatedDesc = unsortedBookers.toSorted((a, b) =>
@@ -44,8 +40,7 @@ export default class BookerService {
     username: string
     reference: string
   }): Promise<BookerDetailedInfoDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getBookerDetails(reference)
   }
@@ -59,8 +54,7 @@ export default class BookerService {
     bookerReference: string
     prisonerId: string
   }): Promise<VisitorInfoDto[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId })
   }
@@ -74,8 +68,7 @@ export default class BookerService {
     reference: string
     prisonerId: string
   }): Promise<SocialContactsDto[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
   }
@@ -109,8 +102,7 @@ export default class BookerService {
     visitorId: number
     sendNotification: boolean
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     await orchestrationApiClient.linkBookerVisitor({ reference, prisonerId, visitorId, sendNotification, username })
   }
@@ -126,8 +118,7 @@ export default class BookerService {
     prisonerId: string
     visitorId: number
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     await orchestrationApiClient.unlinkBookerVisitor({ reference, prisonerId, visitorId, username })
   }
@@ -139,8 +130,7 @@ export default class BookerService {
     username: string
     reference: string
   }): Promise<Record<string, BookerPrisonerVisitorRequestDto[]>> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     const requests = await orchestrationApiClient.getBookerVisitorRequests(reference)
     return { ...Object.groupBy(requests, request => request.prisonerId) }
@@ -153,15 +143,13 @@ export default class BookerService {
     username: string
     prisonId: string
   }): Promise<PrisonVisitorRequestListEntryDto[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getVisitorRequests(prisonId)
   }
 
   async getVisitorRequestCount({ username, prisonId }: { username: string; prisonId: string }): Promise<number> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getVisitorRequestCount(prisonId)
   }
@@ -173,8 +161,7 @@ export default class BookerService {
     username: string
     requestReference: string
   }): Promise<VisitorRequestForReviewDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.getVisitorRequestForReview(requestReference)
   }
@@ -188,8 +175,7 @@ export default class BookerService {
     requestReference: string
     visitorId: number
   }): Promise<PrisonVisitorRequestDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.approveVisitorRequest({ requestReference, visitorId, username })
   }
@@ -203,8 +189,7 @@ export default class BookerService {
     requestReference: string
     rejectionReason: RejectVisitorRequestDto['rejectionReason']
   }): Promise<PrisonVisitorRequestDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
 
     return orchestrationApiClient.rejectVisitorRequest({ requestReference, rejectionReason, username })
   }

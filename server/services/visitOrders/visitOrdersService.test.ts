@@ -1,26 +1,19 @@
 import TestData from '../../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../../data/testutils/mocks'
 import VisitOrdersService, { VisitOrderHistoryPage } from './visitOrdersService'
 
-const token = 'some token'
 const username = 'user1'
 
 const prisonId = 'HEI'
 const prisonerId = 'A1234BC'
 
 describe('Visit orders service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitOrdersService: VisitOrdersService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitOrdersService = new VisitOrdersService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitOrdersService = new VisitOrdersService(orchestrationApiClient)
   })
 
   afterEach(() => {

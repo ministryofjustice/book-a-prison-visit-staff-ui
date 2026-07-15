@@ -1,19 +1,16 @@
 import { Prison } from '../@types/bapv'
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 
 export default class SupportedPrisonsService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getActiveAgencies(): Promise<string[]> {
     return this.getSupportedPrisonIds(undefined)
   }
 
   async getSupportedPrisonIds(username: string): Promise<string[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
     return orchestrationApiClient.getSupportedPrisonIds()
   }
 
@@ -22,8 +19,8 @@ export default class SupportedPrisonsService {
   }
 
   async getPrison(username: string, prisonId: string): Promise<Prison> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    void username
+    const orchestrationApiClient = this.orchestrationApiClient
     return orchestrationApiClient.getPrison(prisonId)
   }
 }

@@ -2,19 +2,15 @@ import { format, isBefore } from 'date-fns'
 import { PrisonerProfilePage } from '../@types/bapv'
 import { convertToTitleCase, prisonerDateTimePretty } from '../utils/utils'
 import { Alert, Visit } from '../data/orchestrationApiTypes'
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 
 export default class PrisonerProfileService {
   private alertCodesToFlag = ['UPIU', 'RCDR', 'URCU']
 
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
+    const orchestrationApiClient = this.orchestrationApiClient
     const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
     const { alerts, prisonerRestrictions } = prisonerProfile

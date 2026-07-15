@@ -1,4 +1,5 @@
 import nock from 'nock'
+import { type AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import PrisonerSearchClient from './prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
@@ -6,13 +7,17 @@ import TestData from '../routes/testutils/testData'
 describe('prisonSearchClientBuilder', () => {
   let fakePrisonerSearchApi: nock.Scope
   let prisonerSearchClient: PrisonerSearchClient
+  let authenticationClient: AuthenticationClient
 
   const prisonId = 'HEI'
   const token = 'token-1'
 
   beforeEach(() => {
     fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
-    prisonerSearchClient = new PrisonerSearchClient(token)
+    authenticationClient = {
+      getToken: jest.fn().mockResolvedValue(token),
+    } as unknown as AuthenticationClient
+    prisonerSearchClient = new PrisonerSearchClient(authenticationClient)
   })
 
   afterEach(() => {
