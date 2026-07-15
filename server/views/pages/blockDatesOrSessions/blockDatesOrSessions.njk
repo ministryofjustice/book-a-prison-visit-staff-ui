@@ -61,7 +61,7 @@
 
 {% block content %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-full">
 
       {{ mojAlert(message) if message }}
 
@@ -76,39 +76,33 @@
         the ‘Need review’ page to be rescheduled or cancelled.
       </p>
 
-    </div>
-  </div>
+      <h2 class="govuk-heading-m">Block a new date or session</h2>
 
-  <h2 class="govuk-heading-m">Block a new date or session</h2>
+      <form action="/block-visit-dates-or-sessions" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-  <form action="/block-visit-dates-or-sessions" method="POST" novalidate>
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        {{ mojDatePicker({
+          id: "date",
+          name: "date",
+          label: {
+            text: "Enter a date",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "For example, 31/3/2024"
+          },
+          value: formValues.date,
+          minDate: datePickerMinDate,
+          errorMessage: errors | findError("date")
+        }) }}
 
-    {{ mojDatePicker({
-      id: "date",
-      name: "date",
-      label: {
-        text: "Enter a date",
-        classes: "govuk-label--s"
-      },
-      hint: {
-        text: "For example, 31/3/2024"
-      },
-      value: formValues.date,
-      minDate: datePickerMinDate,
-      errorMessage: errors | findError("date")
-    }) }}
-
-    {{ govukButton({
-      text: "Continue",
-      classes: "govuk-!-margin-bottom-7",
-      preventDoubleClick: true,
-      attributes: { "data-test": "submit" }
-    }) }}
-  </form>
-
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+        {{ govukButton({
+          text: "Continue",
+          classes: "govuk-!-margin-bottom-7",
+          preventDoubleClick: true,
+          attributes: { "data-test": "submit" }
+        }) }}
+      </form>
 
       {% if blocksTableRows | length %}
         {{ govukTable({
