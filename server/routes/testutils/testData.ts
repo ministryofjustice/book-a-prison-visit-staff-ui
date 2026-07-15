@@ -506,10 +506,12 @@ export default class TestData {
     date = '2022-01-14',
     visitSessions = [this.visitSessionV2()],
     scheduledEvents = [this.prisonerScheduledEvent()],
+    sessionDateConflicts = [],
   }: Partial<SessionsAndScheduleDto> = {}): SessionsAndScheduleDto => ({
     date,
     visitSessions,
     scheduledEvents,
+    sessionDateConflicts,
   })
 
   static sessionSchedule = ({

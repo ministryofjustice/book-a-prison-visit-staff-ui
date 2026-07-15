@@ -523,7 +523,7 @@ describe('Visit sessions service', () => {
       })
       const visitSessionWithExistingVisit = TestData.visitSessionV2({
         sessionTemplateReference: 'c',
-        sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+        sessionConflicts: [{ sessionConflict: 'DOUBLE_BOOKING_OR_RESERVATION', additionalAttributes: [] }],
       })
 
       it('should be blue if there are no available visit sessions', async () => {
@@ -845,7 +845,7 @@ describe('Visit sessions service', () => {
       it('should tag and disable the visit session if prisoner already has a visit', async () => {
         const visitSessionWithExistingVisit = TestData.visitSessionV2({
           sessionTemplateReference: 'a',
-          sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+          sessionConflicts: [{ sessionConflict: 'DOUBLE_BOOKING_OR_RESERVATION', additionalAttributes: [] }],
         })
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
