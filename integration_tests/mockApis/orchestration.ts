@@ -21,7 +21,6 @@ import {
   PrisonVisitorRequestListEntryDto,
   RejectVisitorRequestDto,
   SessionCapacity,
-  SessionConflict,
   SessionSchedule,
   SocialContactsDto,
   StaffUsernameDto,
@@ -1092,12 +1091,7 @@ export default {
           prisonerId: { equalTo: prisonerId },
           min: { equalTo: minNumberOfDays.toString() },
           username: { equalTo: username },
-          includedSessionConflicts: {
-            equalTo: JSON.stringify(<SessionConflict[]>[
-              'DOUBLE_BOOKING_OR_RESERVATION',
-              'REMAND_VISITS_LIMIT_REACHED',
-            ]),
-          },
+          includedSessionConflicts: { equalTo: 'DOUBLE_BOOKING_OR_RESERVATION,REMAND_VISITS_LIMIT_REACHED' },
         },
       },
       response: {
