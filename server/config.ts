@@ -149,7 +149,6 @@ export default {
     remandLimits: get('FEATURE_REMAND_LIMITS', 'false') === 'true',
     sessionDateBlocks: get('FEATURE_SESSION_DATE_BLOCKS', 'false') === 'true',
   },
-  domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   ingressUrl: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   maintenance: {

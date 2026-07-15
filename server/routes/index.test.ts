@@ -10,7 +10,6 @@ import {
   createMockVisitRequestsService,
 } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
-import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
 import { setFeature } from '../data/testutils/mockFeature'
 
@@ -35,7 +34,6 @@ describe('GET /', () => {
   beforeEach(() => {
     setFeature('sessionDateBlocks', true)
 
-    populateCurrentUser()
     selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 
