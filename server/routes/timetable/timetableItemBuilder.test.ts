@@ -1,24 +1,22 @@
+import { SessionSchedule } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 import timetableItemBuilder, { TimetableItem } from './timetableItemBuilder'
 
 describe('timetableItemBuilder - Build timetable rows from visit schedules', () => {
-  let params: Parameters<typeof timetableItemBuilder>[0]
+  let schedules: SessionSchedule[]
 
   beforeEach(() => {
-    params = {
-      schedules: [],
-      selectedDate: '2025-05-05',
-    }
+    schedules = []
   })
 
   it('should return an empty array of timetable items if no visit schedules found', () => {
     const expectedTimetable: TimetableItem[] = []
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
   it('should return "all prisoners" for who can attend, if no category group names present', () => {
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: [],
         prisonerIncentiveLevelGroupNames: [],
@@ -36,12 +34,12 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         endDate: 'Not entered',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
   it('should correctly concatenate group names, dependant on number of names present', () => {
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: ['Category 1'],
         prisonerIncentiveLevelGroupNames: ['Incentive 1', 'Incentive 2'],
@@ -58,12 +56,12 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         endDate: 'Not entered',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
   it('should correctly display different schedule frequency options', () => {
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         sessionDateRange: {
           validToDate: '2025-05-05',
@@ -100,12 +98,12 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         endDate: 'Not entered',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
   it('should correctly show capacity when both open and closed tables are available', () => {
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         capacity: {
           open: 15,
@@ -131,7 +129,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         capacity: '25 tables',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
@@ -141,7 +139,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       prisonerIncentiveLevelGroupNames: ['Incentive'],
       prisonerLocationGroupNames: ['Location'],
     }
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         ...groupNames,
         areCategoryGroupsInclusive: false,
@@ -222,7 +220,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         attendees: 'Category prisoners on Incentive in Location',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
@@ -232,7 +230,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       prisonerIncentiveLevelGroupNames: ['Incentive'],
       prisonerLocationGroupNames: [''],
     }
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         ...groupNames,
         areCategoryGroupsInclusive: true,
@@ -282,7 +280,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         attendees: 'All prisoners except Category prisoners and prisoners on Incentive',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
@@ -292,7 +290,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       prisonerIncentiveLevelGroupNames: [''],
       prisonerLocationGroupNames: ['Location'],
     }
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         ...groupNames,
         areCategoryGroupsInclusive: true,
@@ -339,7 +337,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         attendees: 'All prisoners except Category prisoners and prisoners in Location',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
@@ -349,7 +347,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       prisonerIncentiveLevelGroupNames: ['Incentive'],
       prisonerLocationGroupNames: ['Location'],
     }
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         ...groupNames,
         areIncentiveGroupsInclusive: true,
@@ -396,12 +394,12 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         attendees: 'All prisoners except prisoners on Incentive and prisoners in Location',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
   it('should display correct group name orders, when just one group name present', () => {
-    params.schedules = [
+    schedules = [
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: ['Category'],
         prisonerIncentiveLevelGroupNames: [''],
@@ -472,7 +470,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         attendees: 'All prisoners except prisoners in Location',
       },
     ]
-    const timetable = timetableItemBuilder(params)
+    const timetable = timetableItemBuilder(schedules)
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 })
