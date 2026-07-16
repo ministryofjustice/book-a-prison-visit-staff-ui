@@ -179,7 +179,8 @@ describe('Block visit dates and sessions listing page', () => {
 
           // Row 2
           expect($('[data-test="blocked-date-2"]').text()).toBe('Thursday 2 July 2026')
-          expect($('[data-test="blocked-when-2"]').text()).toBe('10am to 11:30am')
+          expect($('[data-test="blocked-when-2"]').text()).toContain('10am to 11:30am')
+          expect($('[data-test="blocked-when-2"]').text()).toContain('Visits hall')
           expect($('[data-test="blocked-attendees-2"]').text()).toBe('All prisoners')
           expect($('[data-test="unblock-2"]').text().trim()).toBe('Unblock')
           expect($('[data-test="unblock-2"]').parent().attr('action')).toBe(
