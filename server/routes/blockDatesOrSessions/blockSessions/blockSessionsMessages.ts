@@ -15,11 +15,12 @@ export const getSessionUnblockedMessage = ({ date, session }: { date: string; se
 const buildMessage = (date: string, session: SessionSchedule, type: 'blocked' | 'unblocked'): MoJAlert => {
   const formattedDate = format(parseISO(date), 'EEEE d MMMM yyyy')
   const time = formatStartToEndTime(session.sessionTimeSlot.startTime, session.sessionTimeSlot.endTime)
+  const visitRoom = escapeHtml(session.visitRoom)
   const attendees = escapeHtml(buildAttendeesText({ ...session }))
 
   return {
     variant: 'success',
     title: `Visit session ${type} for date`,
-    html: `Visits are ${type} on ${formattedDate} for ${time} (${session.visitRoom}), <br>${attendees}`,
+    html: `Visits are ${type} on ${formattedDate} for ${time} (${visitRoom}), <br>${attendees}`,
   }
 }
