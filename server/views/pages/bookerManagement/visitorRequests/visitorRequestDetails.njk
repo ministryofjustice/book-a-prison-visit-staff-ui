@@ -11,7 +11,7 @@
   {# Radio input markup or blank for contacts with no DoB #}
   {% set selectContactInputHtml %}
     <div class="govuk-radios__item">
-      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
+      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}" {{"disabled" if not contact.dateOfBirth}}>
       <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
         <span class="govuk-visually-hidden">Select {{ contact.firstName }} {{ contact.lastName }}</span>
       </label>
@@ -20,7 +20,7 @@
 
   {% set contactRows = (contactRows.push([
     {
-      html: selectContactInputHtml if contact.dateOfBirth,
+      html: selectContactInputHtml,
       classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6" if not contact.dateOfBirth,
       attributes: { "data-test": "visitor-" + loop.index + "-select" }
     },
