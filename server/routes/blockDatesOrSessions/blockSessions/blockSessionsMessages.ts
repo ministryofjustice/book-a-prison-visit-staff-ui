@@ -20,6 +20,6 @@ const buildMessage = (date: string, session: SessionSchedule, type: 'blocked' | 
   return {
     variant: 'success',
     title: `Visit session ${type} for date`,
-    html: `Visits are ${type} on ${formattedDate} for ${time}, <br>${attendees}`,
+    html: `Visits are ${type} on ${formattedDate} for ${time} (${session.visitRoom}), <br>${attendees}`,
   }
 }

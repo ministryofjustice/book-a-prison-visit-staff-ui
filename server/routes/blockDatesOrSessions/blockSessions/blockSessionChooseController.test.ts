@@ -66,10 +66,14 @@ describe('Choose which session to block', () => {
           expect($('input[name=sessionTemplateReference]:checked').length).toBe(0)
           // session 1
           expect($('input[name=sessionTemplateReference]').eq(0).val()).toBe('session-1')
-          expect($('label[for=sessionTemplateReference]').text().trim()).toBe('10am to 11am, All prisoners')
+          expect($('label[for=sessionTemplateReference]').text().trim()).toBe(
+            '10am to 11am (Visits hall), All prisoners',
+          )
           // session 2 (blocked)
           expect($('input[name=sessionTemplateReference]').eq(1).val()).toBe('session-2')
-          expect($('label[for=sessionTemplateReference-2]').text().trim()).toBe('2pm to 3pm, Prisoners on Standard')
+          expect($('label[for=sessionTemplateReference-2]').text().trim()).toBe(
+            '2pm to 3pm (Visits hall), Prisoners on Standard',
+          )
           expect($('input[name=sessionTemplateReference]').eq(1).prop('disabled')).toBe(true)
 
           expect($('[data-test=submit]').text().trim()).toBe('Continue')

@@ -91,7 +91,7 @@ export default class BlockSessionChooseController {
       const attendees = buildAttendeesText({ ...session })
       return {
         value: session.sessionTemplateReference,
-        text: `${time}, ${attendees}`,
+        text: `${time} (${session.visitRoom}), ${attendees}`,
         ...(session.isSessionExcluded && { disabled: true }),
       }
     })

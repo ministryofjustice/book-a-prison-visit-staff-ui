@@ -42,6 +42,7 @@ export default class BlockSessionConfirmController {
         errors: req.flash('errors'),
         date,
         time,
+        visitRoom: selectedSession.visitRoom,
         attendees,
         visitCount,
       })

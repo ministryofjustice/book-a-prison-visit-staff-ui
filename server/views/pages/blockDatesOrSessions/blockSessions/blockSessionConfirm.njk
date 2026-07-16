@@ -11,7 +11,7 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p data-test="session-details">{{ time }}, {{ attendees }}</p>
+      <p data-test="session-details">{{ time }} ({{ visitRoom }}), {{ attendees }}</p>
 
       {% if visitCount %}
         <p data-test="existing-bookings">
