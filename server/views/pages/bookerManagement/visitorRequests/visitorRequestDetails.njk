@@ -18,7 +18,7 @@
   {# Radio input markup or blank for contacts with no DoB #}
   {% set selectContactInputHtml %}
     <div class="govuk-radios__item">
-      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
+      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}" {{"disabled" if not contact.dateOfBirth}}>
       <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
         <span class="govuk-visually-hidden">Select {{ contactName }}</span>
       </label>
@@ -27,7 +27,7 @@
 
   {% set contactRows = (contactRows.push([
     {
-      html: selectContactInputHtml if contact.dateOfBirth,
+      html: selectContactInputHtml,
       classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6" if not contact.dateOfBirth,
       attributes: { "data-test": "visitor-" + loop.index + "-select" }
     },
@@ -79,7 +79,9 @@
         <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>’s visitors
       </h2>
 
-      <p>Visitors already linked to this prisoner are not shown.</p>
+      {% if hasLinkedVisitors %}
+        <p>Visitors already linked to this prisoner are not shown.</p>
+      {% endif %}
 
       {{ govukWarningText({
         text: "Contacts must have a date of birth before they can be added as a visitor.",
@@ -87,8 +89,12 @@
         attributes: { "data-test": "no-dob-warning" }
       }) if showNoDobWarning }}
 
+      {% set extraText %}
+         {{ "that are not already " if hasLinkedVisitors else "" }}
+      {% endset %}
+
       {{ govukWarningText({
-        text: "The prisoner does not have any visitors that are not already linked to the booker’s account. " +
+        text: "The prisoner does not have any visitors " + extraText + "linked to the booker’s account. " +
           "Any new visitors will need to be added as social contacts before they can be linked.",
         iconFallbackText: "Warning",
         classes: "govuk-!-width-two-thirds",
@@ -152,11 +158,19 @@
             classes: "govuk-!-margin-top-3",
             preventDoubleClick: true
           }) }}
-        {% else %}
+        {% elif hasLinkedVisitors %}
           {{ govukButton({
             text: "Check linked visitors",
             href: "/manage-bookers/visitor-request/" + visitorRequest.reference + "/check-linked-visitors",
             attributes: { "data-test": "check-linked-visitors" },
+            classes: "govuk-!-margin-top-3",
+            preventDoubleClick: true
+          }) }}
+         {% else %}
+          <input id="visitor-none" name="visitorId" type="hidden" value="reject">
+          {{ govukButton({
+            text: "Reject the request",
+            attributes: { "data-test": "reject-visitor" },
             classes: "govuk-!-margin-top-3",
             preventDoubleClick: true
           }) }}

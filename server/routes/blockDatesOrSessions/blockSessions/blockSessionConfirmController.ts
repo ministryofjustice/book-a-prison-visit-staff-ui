@@ -19,7 +19,7 @@ export default class BlockSessionConfirmController {
       const { prisonId } = req.session.selectedEstablishment
       const { blockDateOrSession } = req.session
 
-      blockDateOrSession.backLinkHref = '/block-visit-dates/block-new-session/choose'
+      blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-new-session/choose'
       const { backLinkHref, date, selectedSession } = blockDateOrSession
 
       const visitCount = (
@@ -42,6 +42,7 @@ export default class BlockSessionConfirmController {
         errors: req.flash('errors'),
         date,
         time,
+        visitRoom: selectedSession.visitRoom,
         attendees,
         visitCount,
       })
@@ -53,7 +54,7 @@ export default class BlockSessionConfirmController {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
-        return res.redirect('/block-visit-dates/block-new-session/confirm')
+        return res.redirect('/block-visit-dates-or-sessions/block-new-session/confirm')
       }
 
       const { confirmBlockSession } = matchedData<{ confirmBlockSession: 'yes' | 'no' }>(req)
@@ -86,7 +87,7 @@ export default class BlockSessionConfirmController {
       }
 
       delete req.session.blockDateOrSession
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
   }
 

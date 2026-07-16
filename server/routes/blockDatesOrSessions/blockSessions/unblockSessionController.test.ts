@@ -14,7 +14,7 @@ const auditService = createMockAuditService()
 const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitSessionsService = createMockVisitSessionsService()
 
-const url = '/block-visit-dates/unblock-session'
+const url = '/block-visit-dates-or-sessions/unblock-session'
 const unblockDate = '2024-09-06'
 const session = TestData.sessionSchedule()
 
@@ -36,7 +36,7 @@ describe('Unblock visit session', () => {
         .post(url)
         .send({ date: unblockDate, sessionTemplateReference: session.sessionTemplateReference })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.unblockVisitSession).toHaveBeenCalledWith({
             sessionTemplateReference: session.sessionTemplateReference,
@@ -52,7 +52,7 @@ describe('Unblock visit session', () => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
             title: 'Visit session unblocked for date',
-            html: 'Visits are unblocked on Friday 6 September 2024 for 1:45pm to 3:45pm, <br>All prisoners',
+            html: 'Visits are unblocked on Friday 6 September 2024 for 1:45pm to 3:45pm (Visits hall), <br>All prisoners',
           })
           expect(flashProvider).toHaveBeenCalledTimes(1)
         })
@@ -63,7 +63,7 @@ describe('Unblock visit session', () => {
         .post(url)
         .send({ date: 'invalid' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.unblockVisitSession).not.toHaveBeenCalled()
           expect(auditService.unblockedVisitSession).not.toHaveBeenCalled()

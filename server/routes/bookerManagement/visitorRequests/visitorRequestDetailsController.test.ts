@@ -184,7 +184,8 @@ describe('Booker management - visitor requests - link a visitor', () => {
 
           expect($('[data-test=no-dob-warning]').text()).toContain('must have a date of birth')
           expect($('[data-test=no-visitors-warning]').length).toBe(0)
-          expect($('[data-test=visitor-1-select] input').length).toBe(0)
+          expect($('[data-test=visitor-1-select] input').length).toBe(1)
+          expect($('[data-test=visitor-1-select] input').prop('disabled')).toBe(true)
           expect($('[data-test=visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=visitor-1-dob]').text()).toBe('Not entered')
           expect($('[data-test=visitor-1-last-visit]').text()).toBe('None')

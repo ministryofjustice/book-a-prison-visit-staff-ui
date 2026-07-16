@@ -20,7 +20,7 @@ const auditService = createMockAuditService()
 const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitService = createMockVisitService()
 
-const url = '/block-visit-dates/block-new-session/confirm'
+const url = '/block-visit-dates-or-sessions/block-new-session/confirm'
 const date = '2024-09-06'
 
 const selectedSession = TestData.sessionSchedule({
@@ -49,7 +49,7 @@ describe('Confirm session block', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).get(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should display confirm session block page - no existing visits', () => {
@@ -58,24 +58,28 @@ describe('Confirm session block', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates/block-new-session/choose')
+          expect($('.govuk-back-link').attr('href')).toBe('/block-visit-dates-or-sessions/block-new-session/choose')
           expect($('h1').text()).toBe(
             'Are you sure you want to block visits for this session on Friday 6 September 2024?',
           )
 
-          expect($('[data-test=session-details]').text()).toBe('10am to 11am, All prisoners')
+          expect($('[data-test=session-details]').text()).toBe('10am to 11am (Visits hall), All prisoners')
 
           expect($('[data-test=no-existing-bookings]').length).toBe(1)
           expect($('[data-test=existing-bookings]').length).toBe(0)
 
-          expect($('form[action="/block-visit-dates/block-new-session/confirm"][method=POST]').length).toBe(1)
+          expect($('form[action="/block-visit-dates-or-sessions/block-new-session/confirm"][method=POST]').length).toBe(
+            1,
+          )
           expect($('input[name=confirmBlockSession]').length).toBe(2)
           expect($('input[name=confirmBlockSession]:checked').length).toBe(0)
 
           expect($('[data-test=submit]').text().trim()).toBe('Continue')
         })
         .expect(() => {
-          expect(sessionData.blockDateOrSession.backLinkHref).toBe('/block-visit-dates/block-new-session/choose')
+          expect(sessionData.blockDateOrSession.backLinkHref).toBe(
+            '/block-visit-dates-or-sessions/block-new-session/choose',
+          )
 
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
             username: 'user1',
@@ -133,7 +137,7 @@ describe('Confirm session block', () => {
   describe(`POST ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).post(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should block selected session for date and redirect to block visit dates or sessions page if confirmed', () => {
@@ -143,7 +147,7 @@ describe('Confirm session block', () => {
         .post(url)
         .send({ confirmBlockSession: 'yes' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.blockVisitSession).toHaveBeenCalledWith({
             sessionTemplateReference: selectedSession.sessionTemplateReference,
@@ -162,7 +166,7 @@ describe('Confirm session block', () => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
             title: 'Visit session blocked for date',
-            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am, <br>All prisoners',
+            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am (Visits hall), <br>All prisoners',
           })
           expect(sessionData.blockDateOrSession).toBe(undefined)
         })
@@ -173,7 +177,7 @@ describe('Confirm session block', () => {
         .post(url)
         .send({ confirmBlockSession: 'no' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.blockVisitSession).not.toHaveBeenCalled()
           expect(auditService.blockedVisitSession).not.toHaveBeenCalled()
@@ -195,7 +199,7 @@ describe('Confirm session block', () => {
         .post(url)
         .send({ confirmBlockSession: 'invalid' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-session/confirm')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-session/confirm')
         .expect(() => {
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledTimes(1)

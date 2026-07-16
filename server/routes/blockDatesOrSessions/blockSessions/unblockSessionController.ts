@@ -15,7 +15,7 @@ export default class UnblockSessionController {
     return async (req, res) => {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
-        return res.redirect('/block-visit-dates')
+        return res.redirect('/block-visit-dates-or-sessions')
       }
 
       const { date, sessionTemplateReference } = matchedData<{ date: string; sessionTemplateReference: string }>(req)
@@ -53,7 +53,7 @@ export default class UnblockSessionController {
         logger.error(error, `Could not unblock visit session ${date} for ${username}`)
       }
 
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
   }
 

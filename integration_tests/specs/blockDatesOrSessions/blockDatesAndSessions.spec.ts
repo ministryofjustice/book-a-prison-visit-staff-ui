@@ -11,7 +11,7 @@ import ChooseDateOrSessionBlockPage from '../../pages/blockDatesOrSessions/choos
 import BlockSessionChoosePage from '../../pages/blockDatesOrSessions/blockSessions/blockSessionChoosePage'
 import BlockSessionConfirmPage from '../../pages/blockDatesOrSessions/blockSessions/blockSessionConfirmPage'
 
-test.describe('Block visit dates or sessions', () => {
+test.describe('Block visit dates and sessions', () => {
   const shortDateFormat = 'yyyy-MM-dd'
   const longDateFormat = 'EEEE d MMMM yyyy'
 
@@ -177,7 +177,7 @@ test.describe('Block visit dates or sessions', () => {
 
       // Choose which session to block page
       const blockSessionChoosePage = await BlockSessionChoosePage.verifyOnPage(page, firstOfNextMonthLong)
-      await blockSessionChoosePage.selectSession('2pm to 3:30pm, All prisoners') // afternoon session
+      await blockSessionChoosePage.selectSession('2pm to 3:30pm (Visits hall), All prisoners') // afternoon session
       await orchestrationApi.stubGetVisitsBySessionTemplate({
         reference: afternoonSession.sessionTemplateReference,
         sessionDate: firstOfNextMonthShort,
@@ -187,7 +187,7 @@ test.describe('Block visit dates or sessions', () => {
 
       // Confirmation page
       const blockSessionConfirmPage = await BlockSessionConfirmPage.verifyOnPage(page, firstOfNextMonthLong)
-      await expect(blockSessionConfirmPage.sessionDetails).toContainText('2pm to 3:30pm, All prisoners')
+      await expect(blockSessionConfirmPage.sessionDetails).toContainText('2pm to 3:30pm (Visits hall), All prisoners')
 
       // Stub adding session date block
       await orchestrationApi.stubBlockVisitSession({
@@ -215,7 +215,7 @@ test.describe('Block visit dates or sessions', () => {
       // Verify success message and blocked date exists
       await expect(blockDatesOrSessionsPage.messages).toBeVisible()
       await expect(blockDatesOrSessionsPage.messages).toContainText(
-        `Visits are blocked on ${firstOfNextMonthLong} for 2pm to 3:30pm, All prisoners`,
+        `Visits are blocked on ${firstOfNextMonthLong} for 2pm to 3:30pm (Visits hall), All prisoners`,
       )
 
       await expect(blockDatesOrSessionsPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
@@ -250,6 +250,7 @@ test.describe('Block visit dates or sessions', () => {
       const blockDatesOrSessionsPage = await BlockDatesOrSessionsPage.verifyOnPage(page)
       await expect(blockDatesOrSessionsPage.blockedDate(1)).toContainText(firstOfNextMonthLong)
       await expect(blockDatesOrSessionsPage.blockedWhen(1)).toContainText('9am to 10am')
+      await expect(blockDatesOrSessionsPage.blockedWhen(1)).toContainText('Visits hall')
       await expect(blockDatesOrSessionsPage.blockedAttendees(1)).toContainText('All prisoners')
       await expect(blockDatesOrSessionsPage.blockedBy(1)).toContainText('User two')
       await expect(blockDatesOrSessionsPage.unblockLink(1)).toContainText('Unblock')
@@ -274,7 +275,7 @@ test.describe('Block visit dates or sessions', () => {
       // Verify success message
       await expect(blockDatesOrSessionsPage.messages).toBeVisible()
       await expect(blockDatesOrSessionsPage.messages).toContainText(
-        `Visits are unblocked on ${firstOfNextMonthLong} for 9am to 10am, All prisoners`,
+        `Visits are unblocked on ${firstOfNextMonthLong} for 9am to 10am (Visits hall), All prisoners`,
       )
 
       // Verify no upcoming blocked dates or sessions

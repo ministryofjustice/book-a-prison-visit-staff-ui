@@ -43,13 +43,13 @@ export default function routes(services: Services): Router {
   // Middlewares to ensure route has required session data
   const checkSessionDataMiddleware: RequestHandler = (req, res, next) => {
     if (!req.session.blockDateOrSession) {
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
     return next()
   }
   const checkSelectedSessionMiddleware: RequestHandler = (req, res, next) => {
     if (!req.session.blockDateOrSession?.selectedSession) {
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
     return next()
   }

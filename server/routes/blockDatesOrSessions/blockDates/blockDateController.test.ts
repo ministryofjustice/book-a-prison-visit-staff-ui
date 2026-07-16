@@ -18,7 +18,7 @@ const auditService = createMockAuditService()
 const blockDatesOrSessionsService = createMockBlockDatesOrSessionsService()
 const visitService = createMockVisitService()
 
-const url = '/block-visit-dates/block-new-date'
+const url = '/block-visit-dates-or-sessions/block-new-date'
 const date = '2024-09-06'
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ describe('Block new visit date', () => {
   describe(`GET ${url}`, () => {
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).get(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).get(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should display block new date page - with one existing booking', () => {
@@ -51,7 +51,7 @@ describe('Block new visit date', () => {
           expect($('[data-test=existing-bookings]').text().trim()).toBe('There is 1 existing booking for this date.')
           expect($('[data-test=no-existing-bookings]').length).toBe(0)
 
-          expect($('form[action="/block-visit-dates/block-new-date"][method=POST]').length).toBe(1)
+          expect($('form[action="/block-visit-dates-or-sessions/block-new-date"][method=POST]').length).toBe(1)
           expect($('input[name=confirmBlockDate]').length).toBe(2)
           expect($('input[name=confirmBlockDate]:checked').length).toBe(0)
 
@@ -104,7 +104,7 @@ describe('Block new visit date', () => {
 
     it('should redirect to blocked dates listing page if no new block date in session', () => {
       sessionData.blockDateOrSession = undefined
-      return request(app).post(url).expect(302).expect('location', '/block-visit-dates')
+      return request(app).post(url).expect(302).expect('location', '/block-visit-dates-or-sessions')
     })
 
     it('should block date set, remove date from session, and redirect to blocked dates listing page if block confirmed', () => {
@@ -119,7 +119,7 @@ describe('Block new visit date', () => {
         .post(url)
         .send({ confirmBlockDate: 'yes' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.blockVisitDate).toHaveBeenCalledWith('user1', 'HEI', date)
           expect(auditService.blockedVisitDate).toHaveBeenCalledWith({
@@ -139,7 +139,7 @@ describe('Block new visit date', () => {
         .post(url)
         .send({ confirmBlockDate: 'no' })
         .expect(302)
-        .expect('location', '/block-visit-dates')
+        .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
           expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()
@@ -160,7 +160,7 @@ describe('Block new visit date', () => {
         .post(url)
         .send({ confirmBlockDate: 'invalid' })
         .expect(302)
-        .expect('location', '/block-visit-dates/block-new-date')
+        .expect('location', '/block-visit-dates-or-sessions/block-new-date')
         .expect(() => {
           expect(blockDatesOrSessionsService.blockVisitDate).not.toHaveBeenCalled()
           expect(auditService.blockedVisitDate).not.toHaveBeenCalled()

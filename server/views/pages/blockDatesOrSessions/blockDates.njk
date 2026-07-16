@@ -30,7 +30,7 @@
 
   <h2 class="govuk-heading-m">Block a new date</h2>
 
-  <form action="/block-visit-dates" method="POST" novalidate>
+  <form action="/block-visit-dates-or-sessions" method="POST" novalidate>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
     {{ mojDatePicker({
@@ -63,7 +63,7 @@
       {% for blockedDate in blockedDates %}
 
         {%- set unblockButtonHtml -%}
-          <form action="/block-visit-dates/unblock-date" method="POST" novalidate>
+          <form action="/block-visit-dates-or-sessions/unblock-date" method="POST" novalidate>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <input type="hidden" name="date" value="{{ blockedDate.excludeDate }}">
             {{ govukButton({

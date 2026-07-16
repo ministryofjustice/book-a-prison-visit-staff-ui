@@ -103,27 +103,15 @@
           }) }}
         </li>
 
-        {% if features.sessionDateBlocks %}
-          <li class="govuk-grid-column-one-third card-group__item">
-            {{ card({
-              href: "/block-visit-dates",
-              clickable: "true",
-              heading: "Block visit dates or sessions",
-              description: "Block or unblock dates or sessions for social visits",
-              id: "block-dates"
-            }) }}
-          </li>
-        {% else %}
-          <li class="govuk-grid-column-one-third card-group__item">
-            {{ card({
-              href: "/block-visit-dates",
-              clickable: "true",
-              heading: "Block visit dates",
-              description: "Block or unblock dates for social visits",
-              id: "block-dates"
-            }) }}
-          </li>
-        {% endif %}
+        <li class="govuk-grid-column-one-third card-group__item">
+          {{ card({
+            href: "/block-visit-dates-or-sessions",
+            clickable: "true",
+            heading: "Block visit dates or sessions" if features.sessionDateBlocks else "Block visit dates",
+            description: "Block or unblock dates or sessions for social visits" if features.sessionDateBlocks else "Block or unblock dates for social visits",
+            id: "block-dates-or-sessions"
+          }) }}
+        </li>
 
         {% if showVisitAllowanceTile %}
           <li class="govuk-grid-column-one-third card-group__item">

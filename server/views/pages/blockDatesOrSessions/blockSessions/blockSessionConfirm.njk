@@ -11,7 +11,7 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <p data-test="session-details">{{ time }}, {{ attendees }}</p>
+      <p data-test="session-details">{{ time }} ({{ visitRoom }}), {{ attendees }}</p>
 
       {% if visitCount %}
         <p data-test="existing-bookings">
@@ -24,7 +24,7 @@
         <p data-test="no-existing-bookings">There are no existing bookings for this session.</p>
       {% endif %}
 
-      <form action="/block-visit-dates/block-new-session/confirm" method="POST" novalidate>
+      <form action="/block-visit-dates-or-sessions/block-new-session/confirm" method="POST" novalidate>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukRadios({

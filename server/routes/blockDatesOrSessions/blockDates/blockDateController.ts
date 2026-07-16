@@ -37,7 +37,7 @@ export default class BlockDateController {
       const errors = validationResult(req)
       if (!errors.isEmpty()) {
         req.flash('errors', errors.array())
-        return res.redirect('/block-visit-dates/block-new-date')
+        return res.redirect('/block-visit-dates-or-sessions/block-new-date')
       }
 
       const { blockDateOrSession } = req.session
@@ -68,7 +68,7 @@ export default class BlockDateController {
       }
 
       delete req.session.blockDateOrSession
-      return res.redirect('/block-visit-dates')
+      return res.redirect('/block-visit-dates-or-sessions')
     }
   }
 

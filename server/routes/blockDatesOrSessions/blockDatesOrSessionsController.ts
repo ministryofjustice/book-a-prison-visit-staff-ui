@@ -59,12 +59,12 @@ export default class BlockDatesOrSessionsController {
         req.flash('errors', errors.array())
         const { rawDate } = matchedData<{ rawDate: string }>(req)
         req.flash('formValues', { date: rawDate })
-        return res.redirect('/block-visit-dates')
+        return res.redirect('/block-visit-dates-or-sessions')
       }
 
       const { date } = matchedData<{ date: string }>(req)
       req.session.blockDateOrSession = {
-        backLinkHref: '/block-visit-dates',
+        backLinkHref: '/block-visit-dates-or-sessions',
         date,
       }
 
@@ -78,10 +78,10 @@ export default class BlockDatesOrSessionsController {
       const dateHasSessions = sessionSchedule.length > 0
 
       if (dateHasSessions && config.features.sessionDateBlocks) {
-        return res.redirect('/block-visit-dates/block-date-or-session')
+        return res.redirect('/block-visit-dates-or-sessions/block-date-or-session')
       }
 
-      return res.redirect('/block-visit-dates/block-new-date')
+      return res.redirect('/block-visit-dates-or-sessions/block-new-date')
     }
   }
 
