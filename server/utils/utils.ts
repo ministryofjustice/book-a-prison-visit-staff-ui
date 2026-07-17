@@ -171,11 +171,13 @@ export const isMobilePhoneNumber = (phoneNumber: string): boolean => {
 }
 
 // E.g. 10:00, 13:30 => "10am to 1:30pm"
+// Handles either 5-digit 24H times (HH:mm format) or ISO date strings
 export const formatStartToEndTime = (startTime: string, endTime: string): string => {
+  const timeRegex = /^\d{2}:\d{2}$/
   try {
     const now = new Date()
-    const startTimeAsDate = parse(startTime, 'HH:mm', now)
-    const endTimeAsDate = parse(endTime, 'HH:mm', now)
+    const startTimeAsDate = timeRegex.test(startTime) ? parse(startTime, 'HH:mm', now) : parseISO(startTime)
+    const endTimeAsDate = timeRegex.test(endTime) ? parse(endTime, 'HH:mm', now) : parseISO(endTime)
     const startTimeAs12h = format(startTimeAsDate, 'h:mmaaa')
     const endTimeAs12h = format(endTimeAsDate, 'h:mmaaa')
 

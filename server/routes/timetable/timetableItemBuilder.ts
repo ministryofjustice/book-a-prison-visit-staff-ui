@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { SessionSchedule } from '../../data/orchestrationApiTypes'
-import { prisonerTimePretty } from '../../utils/utils'
+import { formatStartToEndTime } from '../../utils/utils'
 
 export type TimetableItem = {
   time: string
@@ -18,20 +18,14 @@ const listFormatter = new Intl.ListFormat('en-GB', {
 })
 
 // Builds timetable rows, using all session schedules for the selected date
-export default ({
-  schedules,
-  selectedDate,
-}: {
-  schedules: SessionSchedule[]
-  selectedDate: string
-}): TimetableItem[] => {
+export default (schedules: SessionSchedule[]): TimetableItem[] => {
   const dateFormat = 'd MMMM yyyy'
   const timetableItems: TimetableItem[] = []
   schedules.forEach(schedule => {
     const { validToDate, validFromDate } = schedule.sessionDateRange
     const { startTime, endTime } = schedule.sessionTimeSlot
 
-    const time = `${prisonerTimePretty(`${selectedDate}T${startTime}`)} to ${prisonerTimePretty(`${selectedDate}T${endTime}`)}`
+    const time = formatStartToEndTime(startTime, endTime)
 
     const endDate = validToDate ? format(parseISO(validToDate), dateFormat) : 'Not entered'
 

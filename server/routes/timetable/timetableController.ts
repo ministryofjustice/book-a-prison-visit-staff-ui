@@ -22,7 +22,7 @@ export default class TimetableController {
         includeExcludedSessions: false,
       })
 
-      const timetableItems = timetableItemBuilder({ schedules, selectedDate })
+      const timetableItems = timetableItemBuilder(schedules)
 
       return res.render('pages/timetable', {
         schedules,
