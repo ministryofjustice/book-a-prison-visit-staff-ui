@@ -585,7 +585,7 @@ describe('GET /visits - Visits by date page', () => {
             'This date has been blocked for social visits. There are no existing bookings to cancel.',
           )
 
-          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
+          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01')
           expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })
@@ -607,7 +607,7 @@ describe('GET /visits - Visits by date page', () => {
           )
           expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
 
-          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
+          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01')
           expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
         })
     })

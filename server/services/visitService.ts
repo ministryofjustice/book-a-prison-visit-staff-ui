@@ -31,11 +31,9 @@ export default class VisitService {
     allowOverBooking: boolean
     visitors: VisitorListItem[]
   }): Promise<Visit> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
     const visitorDetails = this.buildVisitorDetails(visitors)
 
-    const visit = await orchestrationApiClient.bookVisit({
+    const visit = await this.orchestrationApiClient.bookVisit({
       applicationReference,
       applicationMethod,
       allowOverBooking,
@@ -58,11 +56,9 @@ export default class VisitService {
     allowOverBooking: boolean
     visitors: VisitorListItem[]
   }): Promise<Visit> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
     const visitorDetails = this.buildVisitorDetails(visitors)
 
-    const visit = await orchestrationApiClient.updateVisit({
+    const visit = await this.orchestrationApiClient.updateVisit({
       applicationReference,
       applicationMethod,
       allowOverBooking,
@@ -73,7 +69,6 @@ export default class VisitService {
   }
 
   async cancelVisit({
-    username,
     reference,
     cancelVisitDto,
   }: {
@@ -81,21 +76,16 @@ export default class VisitService {
     reference: string
     cancelVisitDto: CancelVisitOrchestrationDto
   }): Promise<Visit> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
+    return this.orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
   }
 
   async changeVisitApplication({
-    username,
     visitSessionData,
   }: {
     username: string
     visitSessionData: VisitSessionData
   }): Promise<ApplicationDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.changeVisitApplication(visitSessionData)
+    return this.orchestrationApiClient.changeVisitApplication(visitSessionData)
   }
 
   async createVisitApplicationFromVisit({
@@ -105,9 +95,7 @@ export default class VisitService {
     username: string
     visitSessionData: VisitSessionData
   }): Promise<ApplicationDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, username)
+    return this.orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, username)
   }
 
   async createVisitApplication({
@@ -117,13 +105,10 @@ export default class VisitService {
     username: string
     visitSessionData: VisitSessionData
   }): Promise<ApplicationDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.createVisitApplication(visitSessionData, username)
+    return this.orchestrationApiClient.createVisitApplication(visitSessionData, username)
   }
 
   async getVisit({
-    username,
     reference,
     prisonId,
   }: {
@@ -131,10 +116,8 @@ export default class VisitService {
     reference: string
     prisonId: string
   }): Promise<VisitInformation> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
     logger.info(`Get visit ${reference}`)
-    const visit = await orchestrationApiClient.getVisit(reference)
+    const visit = await this.orchestrationApiClient.getVisit(reference)
 
     if (visit.prisonId !== prisonId) {
       logger.info(`Visit ${reference} is not in prison '${prisonId}'`)
@@ -144,20 +127,11 @@ export default class VisitService {
     return this.buildVisitInformation(visit)
   }
 
-  async getVisitDetailed({
-    username,
-    reference,
-  }: {
-    username: string
-    reference: string
-  }): Promise<VisitBookingDetails> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitDetailed(reference)
+  async getVisitDetailed({ reference }: { username: string; reference: string }): Promise<VisitBookingDetails> {
+    return this.orchestrationApiClient.getVisitDetailed(reference)
   }
 
   async getVisitsBySessionTemplate({
-    username,
     prisonId,
     reference,
     sessionDate,
@@ -167,13 +141,10 @@ export default class VisitService {
     reference: string
     sessionDate: string
   }): Promise<VisitPreview[]> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, ['OPEN', 'CLOSED'])
+    return this.orchestrationApiClient.getVisitsBySessionTemplate(prisonId, reference, sessionDate, ['OPEN', 'CLOSED'])
   }
 
   async getVisitsWithoutSessionTemplate({
-    username,
     prisonId,
     sessionDate,
   }: {
@@ -181,13 +152,10 @@ export default class VisitService {
     prisonId: string
     sessionDate: string
   }): Promise<VisitPreview[]> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, undefined)
+    return this.orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, undefined)
   }
 
   async getBookedVisitCountByDate({
-    username,
     prisonId,
     date,
   }: {
@@ -195,9 +163,7 @@ export default class VisitService {
     prisonId: string
     date: string
   }): Promise<number> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getBookedVisitCountByDate(prisonId, date)
+    return this.orchestrationApiClient.getBookedVisitCountByDate(prisonId, date)
   }
 
   async getVisitPasses({
@@ -209,9 +175,7 @@ export default class VisitService {
     date: string
     username: string
   }): Promise<VisitPassDto[]> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitPasses({ prisonId, date, username })
+    return this.orchestrationApiClient.getVisitPasses({ prisonId, date, username })
   }
 
   async getVisitPass({
@@ -223,9 +187,7 @@ export default class VisitService {
     reference: string
     username: string
   }): Promise<VisitPassDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitPass({ prisonId, reference, username })
+    return this.orchestrationApiClient.getVisitPass({ prisonId, reference, username })
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {
@@ -246,8 +208,6 @@ export default class VisitService {
   private buildVisitorDetails(visitors: VisitorListItem[]): BookingRequestVisitorDetailsDto[] {
     const now = new Date()
     return visitors.map(visitor => {
-      const { personId: visitorId } = visitor
-
       let visitorAge: number
       try {
         const visitorDoB = parseISO(visitor.dateOfBirth)
@@ -262,7 +222,7 @@ export default class VisitService {
         visitorAge = null
       }
 
-      return { visitorId, visitorAge }
+      return { visitorId: visitor.personId, visitorAge }
     })
   }
 }

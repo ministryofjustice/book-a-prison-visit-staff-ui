@@ -5,26 +5,18 @@ export default class VisitRequestsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async rejectVisitRequest(username: string, reference: string): Promise<VisitRequestResponse> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.rejectVisitRequest({ reference, username })
+    return this.orchestrationApiClient.rejectVisitRequest({ reference, username })
   }
 
   async approveVisitRequest(username: string, reference: string): Promise<VisitRequestResponse> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.approveVisitRequest({ reference, username })
+    return this.orchestrationApiClient.approveVisitRequest({ reference, username })
   }
 
   async getVisitRequests(username: string, prisonId: string): Promise<VisitRequestSummary[]> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitRequests(prisonId)
+    return this.orchestrationApiClient.getVisitRequests(prisonId)
   }
 
   async getVisitRequestCount(username: string, prisonId: string): Promise<number> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitRequestCount(prisonId)
+    return this.orchestrationApiClient.getVisitRequestCount(prisonId)
   }
 }

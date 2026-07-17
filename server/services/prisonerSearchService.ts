@@ -21,7 +21,6 @@ export default class PrisonerSearchService {
   async getPrisoners(
     search: string,
     prisonId: string,
-    username: string,
     page: number,
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
@@ -30,9 +29,8 @@ export default class PrisonerSearchService {
     next: number
     previous: number
   }> {
-    const prisonerSearchClient = this.prisonerSearchClient
     this.currentPage = page - 1
-    const { totalPages, totalElements, content } = await prisonerSearchClient.getPrisoners(
+    const { totalPages, totalElements, content } = await this.prisonerSearchClient.getPrisoners(
       search,
       prisonId,
       this.currentPage,
@@ -69,22 +67,18 @@ export default class PrisonerSearchService {
     }
   }
 
-  async getPrisoner(search: string, prisonId: string, username: string): Promise<Prisoner> {
-    const prisonerSearchClient = this.prisonerSearchClient
-    const { content } = await prisonerSearchClient.getPrisoner(search, prisonId)
+  async getPrisoner(search: string, prisonId: string): Promise<Prisoner> {
+    const { content } = await this.prisonerSearchClient.getPrisoner(search, prisonId)
     return content.length === 1 ? content[0] : null
   }
 
-  async getPrisonerById(id: string, username: string): Promise<Prisoner> {
-    const prisonerSearchClient = this.prisonerSearchClient
-    return prisonerSearchClient.getPrisonerById(id)
+  async getPrisonerById(id: string): Promise<Prisoner> {
+    return this.prisonerSearchClient.getPrisonerById(id)
   }
 
-  async getPrisonerNotFoundMessage(id: string, prisonName: string, username: string): Promise<string> {
-    const prisonerSearchClient = this.prisonerSearchClient
-
+  async getPrisonerNotFoundMessage(id: string, prisonName: string): Promise<string> {
     try {
-      const prisoner = await prisonerSearchClient.getPrisonerById(id)
+      const prisoner = await this.prisonerSearchClient.getPrisonerById(id)
       if (prisoner.inOutStatus === 'OUT' || prisoner.inOutStatus === 'TRN') {
         return `This prisoner is not in ${prisonName}. They might be being moved to another establishment or have been released.`
       }

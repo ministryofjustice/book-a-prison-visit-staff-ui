@@ -5,26 +5,19 @@ export default class BlockDatesOrSessionsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async blockVisitDate(username: string, prisonId: string, date: string): Promise<void> {
-    const orchestrationApiClient = this.orchestrationApiClient
-    await orchestrationApiClient.blockVisitDate(prisonId, date, username)
+    await this.orchestrationApiClient.blockVisitDate(prisonId, date, username)
   }
 
   async unblockVisitDate(username: string, prisonId: string, date: string): Promise<void> {
-    const orchestrationApiClient = this.orchestrationApiClient
-    await orchestrationApiClient.unblockVisitDate(prisonId, date, username)
+    await this.orchestrationApiClient.unblockVisitDate(prisonId, date, username)
   }
 
-  async getFutureBlockedDates(prisonId: string, username: string): Promise<ExcludeDateDto[]> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-    return orchestrationApiClient.getFutureBlockedDates(prisonId)
+  async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
+    return this.orchestrationApiClient.getFutureBlockedDates(prisonId)
   }
 
-  async isBlockedDate(prisonId: string, excludedDate: string, username: string): Promise<boolean> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
+  async isBlockedDate(prisonId: string, excludedDate: string): Promise<boolean> {
+    return this.orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
   }
 
   async blockVisitSession({
@@ -36,8 +29,7 @@ export default class BlockDatesOrSessionsService {
     date: string
     username: string
   }): Promise<void> {
-    const orchestrationApiClient = this.orchestrationApiClient
-    await orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
+    await this.orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
   }
 
   async unblockVisitSession({
@@ -49,21 +41,17 @@ export default class BlockDatesOrSessionsService {
     date: string
     username: string
   }): Promise<void> {
-    const orchestrationApiClient = this.orchestrationApiClient
-    await orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
+    await this.orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
   }
 
   async getFutureBlockedDatesAndSessions({
     prisonId,
     includeSessions,
-    username,
   }: {
     prisonId: string
     includeSessions: boolean
-    username: string
+    username?: string
   }): Promise<PrisonAndSessionsExcludeDatesDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions })
+    return this.orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions })
   }
 }

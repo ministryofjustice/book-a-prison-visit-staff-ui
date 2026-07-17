@@ -3,6 +3,7 @@ import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService, { CalendarDay } from './visitSessionsService'
 import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
+
 const username = 'user1'
 
 describe('Visit sessions service', () => {
@@ -77,7 +78,6 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
 
       const results = await visitSessionsService.getVisitSessionCapacity(
-        'user1',
         prisonId,
         sessionDate,
         sessionStartTime,

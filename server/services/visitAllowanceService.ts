@@ -10,44 +10,33 @@ export default class VisitAllowanceService {
   ) {}
 
   async getPrisonIncentiveLevels({
-    username,
     prisonId,
   }: {
-    username: string
+    username?: string
     prisonId: string
   }): Promise<PrisonIncentiveLevel[]> {
-    void username
-    const incentivesApiClient = this.incentivesApiClient
-
-    return incentivesApiClient.getPrisonIncentiveLevels(prisonId)
+    return this.incentivesApiClient.getPrisonIncentiveLevels(prisonId)
   }
 
-  async getRemandConfig({ username, prisonId }: { username: string; prisonId: string }): Promise<PrisonRemandConfig> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    const prison = await orchestrationApiClient.getPrison(prisonId)
+  async getRemandConfig({ prisonId }: { username?: string; prisonId: string }): Promise<PrisonRemandConfig> {
+    const prison = await this.orchestrationApiClient.getPrison(prisonId)
 
     return { weekStartDay: prison.weekStartDay, remandVisitLimitPerWeek: prison.remandVisitLimitPerWeek }
   }
 
   async updateRemandConfig({
-    username,
     prisonId,
     weekStartDay,
     remandVisitLimitPerWeek,
   }: {
-    username: string
+    username?: string
     prisonId: string
     weekStartDay: VisitSchedulerUpdatePrisonDto['weekStartDay']
     remandVisitLimitPerWeek: VisitSchedulerUpdatePrisonDto['remandVisitLimitPerWeek']
   }): Promise<void> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
     const visitSchedulerUpdatePrisonDto = { weekStartDay, remandVisitLimitPerWeek }
 
-    await orchestrationApiClient.updatePrisonConfig({
+    await this.orchestrationApiClient.updatePrisonConfig({
       prisonId,
       visitSchedulerUpdatePrisonDto,
     })

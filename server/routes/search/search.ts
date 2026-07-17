@@ -47,7 +47,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
 
     const { results, numberOfPages, numberOfResults, next, previous } = hasValidationErrors
       ? { results: 0, numberOfPages: 0, numberOfResults: 0, next: 0, previous: 0 }
-      : await prisonerSearchService.getPrisoners(search, prisonId, res.locals.user.username, parsedPage)
+      : await prisonerSearchService.getPrisoners(search, prisonId, parsedPage)
 
     if (!hasValidationErrors) {
       await auditService.prisonerSearch({
@@ -75,7 +75,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       prisonerNotFoundMessage = await prisonerSearchService.getPrisonerNotFoundMessage(
         validPrisonerNumber,
         req.session.selectedEstablishment.prisonName,
-        res.locals.user.username,
       )
     } else {
       prisonerNotFoundMessage = `There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
@@ -147,10 +146,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
           username: res.locals.user.username,
           prisonId: req.session.selectedEstablishment.prisonId,
         })
-        const prisonerDetails = await prisonerSearchService.getPrisonerById(
-          visit.prisonNumber,
-          res.locals.user.username,
-        )
+        const prisonerDetails = await prisonerSearchService.getPrisonerById(visit.prisonNumber)
         visit.prisonerName = `${prisonerDetails.firstName} ${prisonerDetails.lastName}`
       } catch (e) {
         if (e?.status === 404) {

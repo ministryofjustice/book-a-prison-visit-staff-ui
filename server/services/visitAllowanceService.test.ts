@@ -1,8 +1,5 @@
 import TestData from '../routes/testutils/testData'
-import {
-  createMockIncentivesApiClient,
-  createMockOrchestrationApiClient,
-} from '../data/testutils/mocks'
+import { createMockIncentivesApiClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import VisitAllowanceService from './visitAllowanceService'
 
 describe('Visit allowance service', () => {

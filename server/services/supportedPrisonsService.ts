@@ -5,22 +5,20 @@ export default class SupportedPrisonsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getActiveAgencies(): Promise<string[]> {
-    return this.getSupportedPrisonIds(undefined)
+    return this.getSupportedPrisonIds()
   }
 
-  async getSupportedPrisonIds(username: string): Promise<string[]> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-    return orchestrationApiClient.getSupportedPrisonIds()
+  async getSupportedPrisonIds(): Promise<string[]> {
+    return this.orchestrationApiClient.getSupportedPrisonIds()
   }
 
-  async isSupportedPrison(username: string, prisonId: string): Promise<boolean> {
-    return (await this.getSupportedPrisonIds(username)).includes(prisonId)
+  async isSupportedPrison(usernameOrPrisonId: string, prisonIdMaybe?: string): Promise<boolean> {
+    const prisonId = prisonIdMaybe ?? usernameOrPrisonId
+    return (await this.getSupportedPrisonIds()).includes(prisonId)
   }
 
-  async getPrison(username: string, prisonId: string): Promise<Prison> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-    return orchestrationApiClient.getPrison(prisonId)
+  async getPrison(usernameOrPrisonId: string, prisonIdMaybe?: string): Promise<Prison> {
+    const prisonId = prisonIdMaybe ?? usernameOrPrisonId
+    return this.orchestrationApiClient.getPrison(prisonId)
   }
 }

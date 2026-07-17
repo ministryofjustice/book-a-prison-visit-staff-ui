@@ -19,11 +19,7 @@ export default class SelectVisitors {
     const { offenderNo } = visitSessionData.prisoner
     const { policyNoticeDaysMax } = req.session.selectedEstablishment
 
-    const visitorList = await this.prisonerVisitorsService.getVisitors(
-      offenderNo,
-      policyNoticeDaysMax,
-      res.locals.user.username,
-    )
+    const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax)
     if (!req.session.visitorList) {
       req.session.visitorList = { visitors: [] }
     }

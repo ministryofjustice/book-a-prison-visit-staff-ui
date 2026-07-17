@@ -25,7 +25,6 @@ export default class VisitOrdersService {
   ]
 
   async getVoBalance({
-    username,
     prisonId,
     prisonerId,
   }: {
@@ -33,13 +32,10 @@ export default class VisitOrdersService {
     prisonId: string
     prisonerId: string
   }): Promise<PrisonerBalanceDto> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
+    return this.orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
   }
 
   async changeVoBalance({
-    username,
     prisonId,
     prisonerId,
     prisonerBalanceAdjustmentDto,
@@ -49,13 +45,10 @@ export default class VisitOrdersService {
     prisonerId: string
     prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
   }): Promise<void> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    await orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
+    await this.orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
   }
 
   async getVoHistory({
-    username,
     prisonId,
     prisonerId,
   }: {
@@ -63,9 +56,7 @@ export default class VisitOrdersService {
     prisonId: string
     prisonerId: string
   }): Promise<VisitOrderHistoryPage> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    const voHistoryDetails = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
+    const voHistoryDetails = await this.orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
     const { visitOrderHistory, ...prisonerDetails } = voHistoryDetails
 
     const voHistoryRows = visitOrderHistory.map((historyItem, index): GOVUKTableRow => {

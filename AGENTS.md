@@ -10,6 +10,8 @@ Use this repo’s docs as the source of truth for setup and operational details:
 - Do not edit generated output in `dist/`, coverage artifacts, or test reports unless explicitly asked.
 - Keep changes consistent with the existing Express, Nunjucks, and TypeScript patterns in `server/`.
 - When adding behavior, update or add the nearest unit test or Playwright spec that exercises the change.
+- Ensure `npm run lint` is run after changes are made and any failures are corrected.
+- Ensure `npm run typecheck` is run after changes are made and any failures are correct.
 
 ## Build And Test Entry Points
 

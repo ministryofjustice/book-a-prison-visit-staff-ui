@@ -32,7 +32,7 @@ describe('Supported prisons service', () => {
     it('should return an array of supported prison IDs', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
-      const results = await supportedPrisonsService.getSupportedPrisonIds('user')
+      const results = await supportedPrisonsService.getSupportedPrisonIds()
 
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
@@ -42,13 +42,13 @@ describe('Supported prisons service', () => {
   describe('isSupportedPrison', () => {
     it('should return true if given prisonId is a supported prison', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
-      const result = await supportedPrisonsService.isSupportedPrison('user', 'HEI')
+      const result = await supportedPrisonsService.isSupportedPrison('HEI')
       expect(result).toBe(true)
     })
 
     it('should return false if given prisonId is not a supported prison', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
-      const result = await supportedPrisonsService.isSupportedPrison('user', 'XYZ')
+      const result = await supportedPrisonsService.isSupportedPrison('XYZ')
       expect(result).toBe(false)
     })
   })
@@ -59,7 +59,7 @@ describe('Supported prisons service', () => {
     it('should return a Prison for given prison ID', async () => {
       orchestrationApiClient.getPrison.mockResolvedValue(prison)
 
-      const results = await supportedPrisonsService.getPrison('user', 'HEI')
+      const results = await supportedPrisonsService.getPrison('HEI')
 
       expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
       expect(results).toStrictEqual(prison)

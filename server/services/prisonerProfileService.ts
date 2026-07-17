@@ -9,9 +9,8 @@ export default class PrisonerProfileService {
 
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
-  async getProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfilePage> {
-    const orchestrationApiClient = this.orchestrationApiClient
-    const prisonerProfile = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
+  async getProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfilePage> {
+    const prisonerProfile = await this.orchestrationApiClient.getPrisonerProfile(prisonId, prisonerId)
 
     const { alerts, prisonerRestrictions } = prisonerProfile
     const flaggedAlerts: Alert[] = alerts.filter(alert => this.alertCodesToFlag.includes(alert.alertCode))

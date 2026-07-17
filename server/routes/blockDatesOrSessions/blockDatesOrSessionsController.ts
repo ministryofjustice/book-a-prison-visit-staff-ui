@@ -16,7 +16,6 @@ export default class BlockDatesOrSessionsController {
     return async (req, res) => {
       const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
         req.session.selectedEstablishment.prisonId,
-        res.locals.user.username,
       )
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
@@ -106,7 +105,6 @@ export default class BlockDatesOrSessionsController {
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
           const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
             req.session.selectedEstablishment.prisonId,
-            req.user.username,
           )
           if (blockedDates.some(blockedDate => blockedDate.excludeDate === date)) {
             throw new Error('The full day is already blocked for the date entered')

@@ -4,46 +4,31 @@ import { IgnoreVisitNotificationsDto, Visit, VisitNotifications } from '../data/
 export default class VisitNotificationsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
-  async getNotificationCount(username: string, prisonId: string): Promise<number> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getNotificationCount(prisonId)
+  async getNotificationCount(usernameOrPrisonId: string, prisonIdMaybe?: string): Promise<number> {
+    const prisonId = prisonIdMaybe ?? usernameOrPrisonId
+    return this.orchestrationApiClient.getNotificationCount(prisonId)
   }
 
-  async getVisitNotifications({
-    username,
-    prisonId,
-  }: {
-    username: string
-    prisonId: string
-  }): Promise<VisitNotifications[]> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-    return orchestrationApiClient.getVisitNotifications(prisonId)
+  async getVisitNotifications({ prisonId }: { username?: string; prisonId: string }): Promise<VisitNotifications[]> {
+    return this.orchestrationApiClient.getVisitNotifications(prisonId)
   }
 
-  async dateHasNotifications(username: string, prisonId: string, date: string): Promise<boolean> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    const visitNotifications = await orchestrationApiClient.getVisitNotifications(prisonId)
+  async dateHasNotifications(usernameOrPrisonId: string, prisonIdOrDate: string, dateMaybe?: string): Promise<boolean> {
+    const prisonId = dateMaybe ? prisonIdOrDate : usernameOrPrisonId
+    const date = dateMaybe ?? prisonIdOrDate
+    const visitNotifications = await this.orchestrationApiClient.getVisitNotifications(prisonId)
 
     return visitNotifications.some(visitNotification => visitNotification.visitDate === date)
   }
 
   async ignoreNotifications({
-    username,
     reference,
     ignoreVisitNotificationsDto,
   }: {
-    username: string
+    username?: string
     reference: string
     ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
   }): Promise<Visit> {
-    void username
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
+    return this.orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
   }
 }

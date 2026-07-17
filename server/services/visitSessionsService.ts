@@ -57,44 +57,35 @@ export default class VisitSessionsService {
     prisonCode,
     sessionDate,
     sessionTemplateReference,
-    username,
   }: {
+    username?: string
     prisonCode: string
     sessionDate: string
     sessionTemplateReference: string
-    username: string
   }): Promise<VisitSession> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
+    return this.orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
   }
 
   async getSessionSchedule({
-    username,
     prisonId,
     date,
     includeExcludedSessions,
   }: {
-    username: string
+    username?: string
     prisonId: string
     date: string
     includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
+    return this.orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
   }
 
   async getVisitSessionCapacity(
-    username: string,
     prisonId: string,
     sessionDate: string,
     sessionStartTime: string,
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    return orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+    return this.orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
   }
 
   async getVisitSessionsAndScheduleCalendar({
@@ -114,14 +105,13 @@ export default class VisitSessionsService {
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
   }): Promise<{ calendar: CalendarDay[]; scheduledEventsAvailable: boolean }> {
-    const orchestrationApiClient = this.orchestrationApiClient
-
-    const { scheduledEventsAvailable, sessionsAndSchedule } = await orchestrationApiClient.getVisitSessionsAndSchedule({
-      prisonId,
-      prisonerId,
-      minNumberOfDays,
-      username,
-    })
+    const { scheduledEventsAvailable, sessionsAndSchedule } =
+      await this.orchestrationApiClient.getVisitSessionsAndSchedule({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+      })
 
     // map raw session/schedule data to format for calendar
     const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
