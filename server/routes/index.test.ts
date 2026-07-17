@@ -31,7 +31,6 @@ describe('GET /', () => {
   const visitRequestCount = 3
 
   beforeEach(() => {
-    populateCurrentUser()
     selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 
