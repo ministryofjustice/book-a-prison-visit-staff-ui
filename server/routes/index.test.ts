@@ -12,7 +12,6 @@ import {
 import TestData from './testutils/testData'
 import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
-import { setFeature } from '../data/testutils/mockFeature'
 
 let app: Express
 
@@ -33,8 +32,6 @@ describe('GET /', () => {
   const visitRequestCount = 3
 
   beforeEach(() => {
-    setFeature('sessionDateBlocks', true)
-
     populateCurrentUser()
     selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
@@ -83,23 +80,6 @@ describe('GET /', () => {
           'user1',
           selectedEstablishment.prisonId,
         )
-      })
-  })
-
-  it('should not render session date blocks content when feature is disabled', () => {
-    setFeature('sessionDateBlocks', false)
-
-    app = appWithAllRoutes({
-      services: { bookerService, visitNotificationsService, visitRequestsService },
-      sessionData,
-    })
-
-    return request(app)
-      .get('/')
-      .expect('Content-Type', /html/)
-      .expect(res => {
-        const $ = cheerio.load(res.text)
-        expect($('[data-test="block-dates-or-sessions"] .card__link').text()).toBe('Block visit dates')
       })
   })
 

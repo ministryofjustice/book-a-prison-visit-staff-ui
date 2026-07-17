@@ -26,7 +26,6 @@ generic-service:
     ENVIRONMENT_NAME: dev
 
     FEATURE_REMAND_LIMITS: "true"
-    FEATURE_SESSION_DATE_BLOCKS: "true"
 
   allowlist:
     groups:
