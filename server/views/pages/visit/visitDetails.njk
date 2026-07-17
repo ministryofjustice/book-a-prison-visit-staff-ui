@@ -26,7 +26,9 @@
           <li data-test="visit-date">{{ visitDetails.startTimestamp | formatDate("EEEE d MMMM yyyy") }}</li>
 
           <li>
-            <span data-test="visit-time">{{ visitDetails.startTimestamp | formatTime + " to " + visitDetails.endTimestamp | formatTime }}</span> –
+            <span data-test="visit-time">
+              {{- { startTime: visitDetails.startTimestamp, endTime: visitDetails.endTimestamp } | formatStartToEndTime -}}
+            </span>
             <span data-test="visit-room">{{ visitDetails.visitRoom }}</span>
           </li>
 

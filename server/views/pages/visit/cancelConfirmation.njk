@@ -16,7 +16,9 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
     {% if startTimestamp and endTimestamp %}
       <p>The visit booking for
-        <span data-test="visit-details">{{ startTimestamp | formatTime }} to {{ endTimestamp | formatTime }} on {{ startTimestamp | formatDate('EEEE d MMMM yyyy') }}</span>
+        <span data-test="visit-details">
+          {{- { startTime: startTimestamp, endTime: endTimestamp } | formatStartToEndTime }} on {{ startTimestamp | formatDate('EEEE d MMMM yyyy') -}}
+        </span>
         has been cancelled.</p>
     {% endif %}
     {% if hasEmailAddress or hasMobileNumber %}

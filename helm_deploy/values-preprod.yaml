@@ -26,8 +26,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-preprod"
     ENVIRONMENT_NAME: preprod
 
-    FEATURE_SESSION_DATE_BLOCKS: "true"
-
 generic-prometheus-alerts:
   alertSeverity: visits-alerts-nonprod
   businessHoursOnly: true

@@ -2,7 +2,6 @@ import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { format, parse, startOfYesterday } from 'date-fns'
 import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
-import config from '../../config'
 import buildBlockedDatesAndSessionsTable from './blockedDatesAndSessionsTableBuilder'
 
 export default class BlockDatesOrSessionsController {
@@ -10,25 +9,6 @@ export default class BlockDatesOrSessionsController {
     private readonly blockDatesOrSessionsService: BlockDatesOrSessionsService,
     private readonly visitSessionsService: VisitSessionsService,
   ) {}
-
-  // TODO remove this method once session blocks are fully implemented
-  public viewDateBlocksOnly(): RequestHandler {
-    return async (req, res) => {
-      const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
-        req.session.selectedEstablishment.prisonId,
-      )
-
-      const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
-
-      res.render('pages/blockDatesOrSessions/blockDates', {
-        errors: req.flash('errors'),
-        formValues: req.flash('formValues')?.[0],
-        message: req.flash('messages')?.[0],
-        blockedDates,
-        datePickerMinDate,
-      })
-    }
-  }
 
   public view(): RequestHandler {
     return async (req, res) => {
@@ -76,7 +56,7 @@ export default class BlockDatesOrSessionsController {
 
       const dateHasSessions = sessionSchedule.length > 0
 
-      if (dateHasSessions && config.features.sessionDateBlocks) {
+      if (dateHasSessions) {
         return res.redirect('/block-visit-dates-or-sessions/block-date-or-session')
       }
 

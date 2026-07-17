@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { SessionSchedule } from '../../data/orchestrationApiTypes'
-import { prisonerTimePretty } from '../../utils/utils'
+import { formatStartToEndTime } from '../../utils/utils'
 
 export type TimetableItem = {
   time: string
@@ -10,21 +10,22 @@ export type TimetableItem = {
   frequency: string
   endDate: string
 }
+
+// Formats as, e.g.  "A, B and C" (and handles cases of zero, one or two items)
+const listFormatter = new Intl.ListFormat('en-GB', {
+  style: 'long',
+  type: 'conjunction',
+})
+
 // Builds timetable rows, using all session schedules for the selected date
-export default ({
-  schedules,
-  selectedDate,
-}: {
-  schedules: SessionSchedule[]
-  selectedDate: string
-}): TimetableItem[] => {
+export default (schedules: SessionSchedule[]): TimetableItem[] => {
   const dateFormat = 'd MMMM yyyy'
   const timetableItems: TimetableItem[] = []
   schedules.forEach(schedule => {
     const { validToDate, validFromDate } = schedule.sessionDateRange
     const { startTime, endTime } = schedule.sessionTimeSlot
 
-    const time = `${prisonerTimePretty(`${selectedDate}T${startTime}`)} to ${prisonerTimePretty(`${selectedDate}T${endTime}`)}`
+    const time = formatStartToEndTime(startTime, endTime)
 
     const endDate = validToDate ? format(parseISO(validToDate), dateFormat) : 'Not entered'
 
@@ -58,21 +59,6 @@ export default ({
   return timetableItems
 }
 
-// Takes all group names for particular type, and joins together
-const mergeGroupNames = (groupNames: string[]): string => {
-  if (groupNames.length === 0) {
-    return ''
-  }
-  if (groupNames.length === 1) {
-    return groupNames[0]
-  }
-
-  const lastItem = groupNames.pop()
-  const joined = groupNames.join(', ')
-
-  return `${joined} and ${lastItem}`
-}
-
 // Function to build description of groups included/excluded from this particular session
 export const buildAttendeesText = ({
   prisonerCategoryGroupNames,
@@ -98,9 +84,9 @@ export const buildAttendeesText = ({
     return 'All prisoners'
   }
 
-  const categoryNames = mergeGroupNames(prisonerCategoryGroupNames)
-  const incentiveNames = mergeGroupNames(prisonerIncentiveLevelGroupNames)
-  const locationNames = mergeGroupNames(prisonerLocationGroupNames)
+  const categoryNames = listFormatter.format(prisonerCategoryGroupNames)
+  const incentiveNames = listFormatter.format(prisonerIncentiveLevelGroupNames)
+  const locationNames = listFormatter.format(prisonerLocationGroupNames)
 
   if (categoryNames && incentiveNames && locationNames) {
     if (areCategoryGroupsInclusive && areIncentiveGroupsInclusive && areLocationGroupsInclusive) {
