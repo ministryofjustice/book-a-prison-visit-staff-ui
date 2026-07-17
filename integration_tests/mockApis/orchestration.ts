@@ -1272,8 +1272,12 @@ export default {
       },
     })
   },
-  stubSupportedPrisonIds: (): SuperAgentRequest => {
+  stubSupportedPrisonIds: ({
+    prisonIds = TestData.supportedPrisonIds(),
+    priority,
+  }: { prisonIds?: string[]; priority?: number } = {}): SuperAgentRequest => {
     return stubFor({
+      ...(priority !== undefined ? { priority } : {}),
       request: {
         method: 'GET',
         url: '/orchestration/config/prisons/user-type/STAFF/supported',
@@ -1281,7 +1285,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: TestData.supportedPrisonIds(),
+        jsonBody: prisonIds,
       },
     })
   },
@@ -1297,8 +1301,12 @@ export default {
       },
     })
   },
-  stubGetPrison: (prison: PrisonDto = TestData.prisonDto()): SuperAgentRequest => {
+  stubGetPrison: (
+    prison: PrisonDto = TestData.prisonDto(),
+    { priority }: { priority?: number } = {},
+  ): SuperAgentRequest => {
     return stubFor({
+      ...(priority !== undefined ? { priority } : {}),
       request: {
         method: 'GET',
         url: `/orchestration/config/prisons/prison/${prison.code}`,
