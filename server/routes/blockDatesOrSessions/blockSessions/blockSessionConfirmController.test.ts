@@ -63,7 +63,7 @@ describe('Confirm session block', () => {
             'Are you sure you want to block visits for this session on Friday 6 September 2024?',
           )
 
-          expect($('[data-test=session-details]').text()).toBe('10am to 11am, All prisoners')
+          expect($('[data-test=session-details]').text()).toBe('10am to 11am (Visits hall), All prisoners')
 
           expect($('[data-test=no-existing-bookings]').length).toBe(1)
           expect($('[data-test=existing-bookings]').length).toBe(0)
@@ -166,7 +166,7 @@ describe('Confirm session block', () => {
           expect(flashProvider).toHaveBeenCalledWith('messages', {
             variant: 'success',
             title: 'Visit session blocked for date',
-            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am, <br>All prisoners',
+            html: 'Visits are blocked on Friday 6 September 2024 for 10am to 11am (Visits hall), <br>All prisoners',
           })
           expect(sessionData.blockDateOrSession).toBe(undefined)
         })

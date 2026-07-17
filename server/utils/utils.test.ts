@@ -197,7 +197,9 @@ describe('formatStartToEndTime', () => {
     ['13:00', '14:00', '1pm to 2pm'],
     ['13:15', '14:30', '1:15pm to 2:30pm'],
     ['23:00', '00:00', '11pm to 12am'],
+    ['2022-01-14T10:00:00', '2022-01-14T13:30:00', '10am to 1:30pm'],
     ['', '', ''],
+    ['123', 'abc', ''],
     [undefined, undefined, ''],
   ])('%s - %s - %s', (startTime: string, endTime: string, expected: string) => {
     expect(formatStartToEndTime(startTime, endTime)).toBe(expected)

@@ -5,6 +5,7 @@ import { buildAttendeesText } from '../timetable/timetableItemBuilder'
 export type BlockedDateOrSessionRow = {
   date: string // YYYY-MM-DD
   when: string
+  where?: string
   attendees: string
   actionedBy: string
   sessionTemplateReference?: string
@@ -33,6 +34,7 @@ const buildBlockedDatesAndSessionsTable = ({
         sessionExclusion.sessionTimeSlot?.endTime,
       ),
       attendees: buildAttendeesText({ ...sessionExclusion }),
+      where: sessionExclusion.visitRoom,
       actionedBy: sessionExclusion.excludeDate.actionedBy,
       sessionTemplateReference: sessionExclusion.sessionTemplateReference,
     })

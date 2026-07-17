@@ -41,7 +41,7 @@
       attributes: { "data-test": "blocked-date-" + loop.index }
     },
     {
-      text: blockedDateOrSession.when,
+      html: blockedDateOrSession.when + "<br>" + (blockedDateOrSession.where | escape),
       attributes: { "data-test": "blocked-when-" + loop.index }
     },
     {

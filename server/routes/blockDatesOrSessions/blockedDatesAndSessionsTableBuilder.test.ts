@@ -34,6 +34,7 @@ describe('buildBlockedDatesAndSessionsTable', () => {
       {
         date: '2026-07-01',
         when: '10am to 11:30am',
+        where: 'Visits hall',
         attendees: 'All prisoners',
         actionedBy: 'User Three',
         sessionTemplateReference: 'session-1',
@@ -42,6 +43,7 @@ describe('buildBlockedDatesAndSessionsTable', () => {
       {
         date: '2026-07-03',
         when: '1pm to 2:30pm',
+        where: 'Visits hall',
         attendees: 'Category A and Category B prisoners',
         actionedBy: 'User Four',
         sessionTemplateReference: 'session-2',

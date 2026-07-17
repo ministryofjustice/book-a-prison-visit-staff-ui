@@ -13,7 +13,7 @@ import {
 } from '../data/orchestrationApiTypes'
 import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
 import logger from '../../logger'
-import { prisonerDateTimePretty, prisonerTimePretty } from '../utils/utils'
+import { formatStartToEndTime, prisonerDateTimePretty } from '../utils/utils'
 
 export default class VisitService {
   constructor(
@@ -245,15 +245,13 @@ export default class VisitService {
   }
 
   private buildVisitInformation(visit: Visit): VisitInformation {
-    const visitTime = `${prisonerTimePretty(visit.startTimestamp)} to ${prisonerTimePretty(visit.endTimestamp)}`
-
     return {
       reference: visit.reference,
       prisonNumber: visit.prisonerId,
       prisonerName: '',
       mainContact: visit.visitContact?.name,
       visitDate: prisonerDateTimePretty(visit.startTimestamp),
-      visitTime,
+      visitTime: formatStartToEndTime(visit.startTimestamp, visit.endTimestamp),
       visitStatus: visit.visitStatus,
       visitSubStatus: visit.visitSubStatus,
     }
