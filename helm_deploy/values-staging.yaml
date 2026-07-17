@@ -26,8 +26,6 @@ generic-service:
     REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: staging
 
-    FEATURE_SESSION_DATE_BLOCKS: "true"
-
   allowlist:
     groups:
       - internal
