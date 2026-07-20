@@ -49,7 +49,6 @@ test.describe('Block visit dates and sessions', () => {
       await blockDatesOrSessionsPage.datePicker.selectDay(1)
 
       // Stub booked visits count and no scheduled sessions for the selected date
-      await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] }) // TODO this can be removed once this deprecated endpoint is replaced
       await orchestrationApi.stubGetBookedVisitCountByDate({
         date: firstOfNextMonthShort,
         count: 0,
@@ -160,7 +159,6 @@ test.describe('Block visit dates and sessions', () => {
       await blockDatesOrSessionsPage.datePicker.selectDay(1)
 
       // Stub booked visits count and no scheduled sessions for the selected date
-      await orchestrationApi.stubGetFutureBlockedDates({ blockedDates: [] }) // TODO this can be removed once this deprecated endpoint is replaced
       await orchestrationApi.stubGetBookedVisitCountByDate({ date: firstOfNextMonthShort, count: 0 })
       await orchestrationApi.stubSessionSchedule({
         date: firstOfNextMonthShort,

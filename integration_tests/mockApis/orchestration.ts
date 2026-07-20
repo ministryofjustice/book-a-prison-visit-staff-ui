@@ -809,26 +809,6 @@ export default {
     })
   },
 
-  stubGetFutureBlockedDates: ({
-    prisonId = 'HEI',
-    blockedDates = [],
-  }: {
-    prisonId?: string
-    blockedDates: ExcludeDateDto[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: blockedDates,
-      },
-    })
-  },
-
   stubIsBlockedDate: ({
     prisonId,
     excludeDate,

@@ -83,11 +83,12 @@ export default class BlockDatesOrSessionsController {
         .bail()
         // date cannot be an existing blocked date
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
-          const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDates(
-            req.session.selectedEstablishment.prisonId,
-            req.user.username,
-          )
-          if (blockedDates.some(blockedDate => blockedDate.excludeDate === date)) {
+          const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
+            prisonId: req.session.selectedEstablishment.prisonId,
+            includeSessions: false,
+            username: req.user.username,
+          })
+          if (blockedDates.fullDateExclusions.some(blockedDate => blockedDate.excludeDate === date)) {
             throw new Error('The full day is already blocked for the date entered')
           }
         }),
