@@ -6,6 +6,7 @@ import { convertToTitleCase } from '../../utils/utils'
 import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
 import { isValidPrisonerNumber } from '../validationChecks'
 import { extractVisitNavState, type VisitNavState } from './visitNavigationUtils'
+import { getErrorStatus } from '../../utils/errorHelpers'
 
 type RequestAction = 'approve' | 'reject'
 
@@ -33,7 +34,7 @@ export default class ProcessVisitRequestController {
         return res.redirect(redirectPath)
       } catch (error) {
         // HTTP 400 Bad Request means a visit not in REQUESTED state (i.e. already approved or rejected)
-        if (error.status === 400) {
+        if (getErrorStatus(error) === 400) {
           const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
           req.flash('messages', this.getFailureMessage(visitDetails))
 

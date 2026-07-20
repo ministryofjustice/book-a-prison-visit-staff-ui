@@ -4,6 +4,7 @@ import { AuditService, BookerService } from '../../../services'
 import { RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
 import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
 import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
+import { getErrorStatus } from '../../../utils/errorHelpers'
 
 export default class CheckLinkedVisitorsController {
   public constructor(
@@ -74,7 +75,7 @@ export default class CheckLinkedVisitorsController {
           operationId: res.locals.appInsightsOperationId,
         })
       } catch (error) {
-        if (error.status !== 400) {
+        if (getErrorStatus(error) !== 400) {
           return next(error)
         }
 
