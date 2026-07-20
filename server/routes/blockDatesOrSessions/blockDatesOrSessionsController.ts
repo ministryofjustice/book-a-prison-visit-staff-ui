@@ -68,6 +68,7 @@ export default class BlockDatesOrSessionsController {
     return [
       // store pre-sanitised user-entered value as rawDate to show in field validation error
       body('rawDate').customSanitizer((_value, { req }) => (typeof req.body?.date === 'string' ? req.body.date : '')),
+
       body('date', 'Enter a valid date')
         .trim()
         // reformat to year-month-day (used by API)
@@ -83,12 +84,13 @@ export default class BlockDatesOrSessionsController {
         .bail()
         // date cannot be an existing blocked date
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
-          const blockedDates = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
+          const { fullDateExclusions } = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
             prisonId: req.session.selectedEstablishment.prisonId,
             includeSessions: false,
             username: req.user.username,
           })
-          if (blockedDates.fullDateExclusions.some(blockedDate => blockedDate.excludeDate === date)) {
+
+          if (fullDateExclusions.some(blockedDate => blockedDate.excludeDate === date)) {
             throw new Error('The full day is already blocked for the date entered')
           }
         }),
