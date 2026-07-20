@@ -2,20 +2,17 @@ import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../../services'
 import { getDpsPrisonerAlertsUrl } from '../../../utils/utils'
 import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
-import {
-  getAvailableVisitActions,
-  getIdsToFlag,
-  getPrisonerLocation,
-  getVisitAlerts,
-  getHideAlertsInset,
-} from '../visitUtils'
+import { getIdsToFlag, getPrisonerLocation } from '../visitUtils'
 import {
   appendNavStateToPath,
   extractVisitNavState,
   getVisitDetailsBackLink,
   type VisitNavState,
 } from '../visitNavigationUtils'
-import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
+import buildVisitEventsTimeline from './buildVisitEventsTimeline'
+import getAlertsHiddenMessages from './getAlertsHiddenMessages'
+import getAvailableVisitActions from './getAvailableVisitActions'
+import getVisitAlerts from './getVisitAlerts'
 import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 
 export default class VisitDetailsController {
@@ -49,7 +46,7 @@ export default class VisitDetailsController {
         })
       }
 
-      const hideAlertsInset = getHideAlertsInset({
+      const hideAlertsInset = getAlertsHiddenMessages({
         skipAlertsAndRestrictionReason: visitDetails.skipAlertsAndRestrictionReason,
         prisonerNumber: visitDetails.prisoner.prisonerNumber,
       })
@@ -84,7 +81,7 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const eventsTimeline = visitEventsTimelineBuilder({
+      const eventsTimeline = buildVisitEventsTimeline({
         events: visitDetails.events,
         visitNotes: visitDetails.visitNotes,
       })

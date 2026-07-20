@@ -38,7 +38,7 @@ export default ({
         case 'BOOKED_VISIT':
         case 'UPDATED_VISIT':
         case 'MIGRATED_VISIT':
-          timelineItem.text = isPublicBooking(event)
+          timelineItem.text = isPublicServiceEvent(event)
             ? 'Method: GOV.UK booking'
             : (requestMethodDescriptions[event.applicationMethodType] ?? '')
           break
@@ -48,7 +48,7 @@ export default ({
           break
 
         case 'CANCELLED_VISIT':
-          timelineItem.text = isPublicBooking(event)
+          timelineItem.text = isPublicServiceEvent(event)
             ? 'Method: GOV.UK cancellation'
             : (getCancellationReason(visitNotes) ?? requestMethodDescriptions[event.applicationMethodType])
           break
@@ -76,8 +76,8 @@ export default ({
 // Type guard: needed because event types and notifications only have some overlap
 const isANotificationType = (type: string): type is keyof typeof notificationTypes => type in notificationTypes
 
-// Identify public bookings so text can be overridden
-const isPublicBooking = (event: EventAudit): boolean =>
+// Identify events made using public service so text can be overridden
+const isPublicServiceEvent = (event: EventAudit): boolean =>
   event.userType === 'PUBLIC' && event.applicationMethodType === 'WEBSITE'
 
 // Get user-entered cancellation reason, if set

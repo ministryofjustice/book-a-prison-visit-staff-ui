@@ -6,8 +6,8 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 import TestData from '../../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../../services/testutils/mocks'
-import { MojTimelineItem } from './visitEventsTimelineBuilder'
-import { AvailableVisitActions } from '../visitUtils'
+import { MojTimelineItem } from './buildVisitEventsTimeline'
+import { AvailableVisitActions } from './getAvailableVisitActions'
 import { GOVUKInsetText, MoJAlert } from '../../../@types/bapv'
 import config from '../../../config'
 
@@ -21,23 +21,18 @@ let availableVisitActions: AvailableVisitActions
 let visitAlerts: MoJAlert[]
 let visitEventsTimeline: MojTimelineItem[]
 let idsToFlag: jest.Mock
-let hideAlertsInset: { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null
+let alertsHiddenMessages: { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null
 
-jest.mock('./visitEventsTimelineBuilder', () => {
-  return {
-    __esModule: true,
-    default: jest.fn(() => visitEventsTimeline),
-  }
-})
+jest.mock('./buildVisitEventsTimeline', () => ({ __esModule: true, default: () => visitEventsTimeline }))
+jest.mock('./getAlertsHiddenMessages', () => ({ __esModule: true, default: () => alertsHiddenMessages }))
+jest.mock('./getAvailableVisitActions', () => ({ __esModule: true, default: () => availableVisitActions }))
+jest.mock('./getVisitAlerts', () => ({ __esModule: true, default: () => visitAlerts }))
 
 jest.mock('../visitUtils', () => {
   const visitUtils = jest.requireActual('../visitUtils')
   return {
     ...visitUtils,
-    getAvailableVisitActions: () => availableVisitActions,
-    getVisitAlerts: () => visitAlerts,
     getIdsToFlag: () => idsToFlag(),
-    getHideAlertsInset: () => hideAlertsInset,
   }
 })
 
@@ -72,7 +67,7 @@ describe('Visit details page', () => {
     }
     visitAlerts = []
     idsToFlag = jest.fn().mockReturnValue([])
-    hideAlertsInset = null
+    alertsHiddenMessages = null
 
     visitDetails = TestData.visitBookingDetails()
 
@@ -563,7 +558,7 @@ describe('Visit details page', () => {
 
     describe('Restriction and alert hidden text', () => {
       it('should display reason for restrictions/alerts hidden', () => {
-        hideAlertsInset = {
+        alertsHiddenMessages = {
           prisoner: {
             html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
             attributes: { 'data-test': 'prisoner-inset' },

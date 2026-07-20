@@ -5,8 +5,9 @@ import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
 import { clearSession } from '../../visitorUtils'
 import { VisitSessionData } from '../../../@types/bapv'
 import { convertToTitleCase } from '../../../utils/utils'
-import { getIdsToFlag, getPrisonerLocation, isPublicBooking } from '../visitUtils'
+import { getIdsToFlag, getPrisonerLocation } from '../visitUtils'
 import { appendNavStateToPath, extractVisitNavState } from '../visitNavigationUtils'
+import isPublicBooking from './isPublicBooking'
 
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
