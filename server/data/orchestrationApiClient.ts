@@ -1,6 +1,8 @@
 import { format, subMonths } from 'date-fns'
-import RestClient from './restClient'
+import { RestClient as HmppsRestClient, asUser } from '@ministryofjustice/hmpps-rest-client'
 import config, { ApiConfig } from '../config'
+import logger from '../../logger'
+import { getErrorStatus } from '../utils/errorHelpers'
 import {
   ApplicationDto,
   ApplicationMethodType,
@@ -61,7 +63,7 @@ import {
 import { Prison, VisitSessionData } from '../@types/bapv'
 
 export default class OrchestrationApiClient {
-  private restClient: RestClient
+  private readonly restClient: HmppsRestClient
 
   private enabledRawNotifications = config.features.notificationTypes.enabledRawNotifications
 
@@ -82,8 +84,8 @@ export default class OrchestrationApiClient {
     ...this.enabledRawNotifications,
   ]
 
-  constructor(token: string) {
-    this.restClient = new RestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, token)
+  constructor(private readonly token: string) {
+    this.restClient = new HmppsRestClient('orchestrationApiClient', config.apis.orchestration as ApiConfig, logger)
   }
 
   // orchestration-visits-controller
@@ -101,16 +103,19 @@ export default class OrchestrationApiClient {
     visitorDetails: BookingRequestVisitorDetailsDto[]
     username: string
   }): Promise<Visit> {
-    return this.restClient.put({
-      path: `/visits/${applicationReference}/book`,
-      data: <BookingOrchestrationRequestDto>{
-        applicationMethodType: applicationMethod,
-        allowOverBooking,
-        actionedBy: username,
-        userType: 'STAFF',
-        visitorDetails,
+    return this.restClient.put(
+      {
+        path: `/visits/${applicationReference}/book`,
+        data: <BookingOrchestrationRequestDto>{
+          applicationMethodType: applicationMethod,
+          allowOverBooking,
+          actionedBy: username,
+          userType: 'STAFF',
+          visitorDetails,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async updateVisit({
@@ -126,33 +131,42 @@ export default class OrchestrationApiClient {
     visitorDetails: BookingRequestVisitorDetailsDto[]
     username: string
   }): Promise<Visit> {
-    return this.restClient.put({
-      path: `/visits/${applicationReference}/update`,
-      data: <BookingOrchestrationRequestDto>{
-        applicationMethodType: applicationMethod,
-        allowOverBooking,
-        actionedBy: username,
-        userType: 'STAFF',
-        visitorDetails,
+    return this.restClient.put(
+      {
+        path: `/visits/${applicationReference}/update`,
+        data: <BookingOrchestrationRequestDto>{
+          applicationMethodType: applicationMethod,
+          allowOverBooking,
+          actionedBy: username,
+          userType: 'STAFF',
+          visitorDetails,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async cancelVisit(reference: string, cancelVisitDto: CancelVisitOrchestrationDto): Promise<Visit> {
-    return this.restClient.put({
-      path: `/visits/${reference}/cancel`,
-      data: cancelVisitDto,
-    })
+    return this.restClient.put(
+      {
+        path: `/visits/${reference}/cancel`,
+        data: cancelVisitDto,
+      },
+      asUser(this.token),
+    )
   }
 
   async getVisit(reference: string): Promise<Visit> {
-    return this.restClient.get({ path: `/visits/${reference}` })
+    return this.restClient.get({ path: `/visits/${reference}` }, asUser(this.token))
   }
 
   async getVisitDetailed(reference: string): Promise<VisitBookingDetails> {
-    const visitDetails = await this.restClient.get<VisitBookingDetailsRaw>({
-      path: `/visits/${reference}/detailed`,
-    })
+    const visitDetails = await this.restClient.get<VisitBookingDetailsRaw>(
+      {
+        path: `/visits/${reference}/detailed`,
+      },
+      asUser(this.token),
+    )
 
     // Remove unsupported event and notification types and standardise types
     return {
@@ -184,30 +198,36 @@ export default class OrchestrationApiClient {
     sessionDate: string,
     visitRestrictions: VisitRestriction[],
   ): Promise<VisitPreview[]> {
-    return this.restClient.get({
-      path: '/visits/session-template',
-      query: new URLSearchParams({
-        prisonCode: prisonId,
-        ...(reference && { sessionTemplateReference: reference }),
-        sessionDate,
-        visitStatus: 'BOOKED',
-        ...(visitRestrictions && { visitRestrictions }),
-      }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: '/visits/session-template',
+        query: new URLSearchParams({
+          prisonCode: prisonId,
+          ...(reference && { sessionTemplateReference: reference }),
+          sessionDate,
+          visitStatus: 'BOOKED',
+          ...(visitRestrictions && { visitRestrictions }),
+        }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   async getBookedVisitCountByDate(prisonId: string, date: string): Promise<number> {
-    const visits = await this.restClient.get<PageVisitDto>({
-      path: `/visits/search`,
-      query: new URLSearchParams({
-        prisonId,
-        visitStartDate: date,
-        visitEndDate: date,
-        visitStatus: 'BOOKED',
-        page: '0',
-        size: '1',
-      }).toString(),
-    })
+    const visits = await this.restClient.get<PageVisitDto>(
+      {
+        path: `/visits/search`,
+        query: new URLSearchParams({
+          prisonId,
+          visitStartDate: date,
+          visitEndDate: date,
+          visitStatus: 'BOOKED',
+          page: '0',
+          size: '1',
+        }).toString(),
+      },
+      asUser(this.token),
+    )
     return visits.totalElements ?? 0
   }
 
@@ -216,68 +236,77 @@ export default class OrchestrationApiClient {
   async changeVisitApplication(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
-    return this.restClient.put({
-      path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
-      data: <ChangeApplicationDto>{
-        applicationRestriction: visitSessionData.visitRestriction,
-        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
-        sessionDate: visitSessionData.selectedVisitSession.date,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-        allowOverBooking: true,
+    return this.restClient.put(
+      {
+        path: `/visits/application/${visitSessionData.applicationReference}/slot/change`,
+        data: <ChangeApplicationDto>{
+          applicationRestriction: visitSessionData.visitRestriction,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+          sessionDate: visitSessionData.selectedVisitSession.date,
+          visitContact,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: visitor.personId === mainContactId,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+          allowOverBooking: true,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async createVisitApplicationFromVisit(visitSessionData: VisitSessionData, username: string): Promise<ApplicationDto> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
-    return this.restClient.put({
-      path: `/visits/application/${visitSessionData.visitReference}/change`,
-      data: <CreateApplicationDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
-        sessionDate: visitSessionData.selectedVisitSession.date,
-        applicationRestriction: visitSessionData.visitRestriction,
-        visitContact,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-            visitContact: visitor.personId === mainContactId,
-          }
-        }),
-        visitorSupport: visitSessionData.visitorSupport,
-        userType: 'STAFF',
-        actionedBy: username,
-        allowOverBooking: true,
+    return this.restClient.put(
+      {
+        path: `/visits/application/${visitSessionData.visitReference}/change`,
+        data: <CreateApplicationDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+          sessionDate: visitSessionData.selectedVisitSession.date,
+          applicationRestriction: visitSessionData.visitRestriction,
+          visitContact,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+              visitContact: visitor.personId === mainContactId,
+            }
+          }),
+          visitorSupport: visitSessionData.visitorSupport,
+          userType: 'STAFF',
+          actionedBy: username,
+          allowOverBooking: true,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async createVisitApplication(visitSessionData: VisitSessionData, username: string): Promise<ApplicationDto> {
-    return this.restClient.post({
-      path: '/visits/application/slot/reserve',
-      data: <CreateApplicationDto>{
-        prisonerId: visitSessionData.prisoner.offenderNo,
-        sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
-        sessionDate: visitSessionData.selectedVisitSession.date,
-        applicationRestriction: visitSessionData.visitRestriction,
-        visitors: visitSessionData.visitors.map(visitor => {
-          return {
-            nomisPersonId: visitor.personId,
-          }
-        }),
-        userType: 'STAFF',
-        actionedBy: username,
-        allowOverBooking: true,
+    return this.restClient.post(
+      {
+        path: '/visits/application/slot/reserve',
+        data: <CreateApplicationDto>{
+          prisonerId: visitSessionData.prisoner.offenderNo,
+          sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
+          sessionDate: visitSessionData.selectedVisitSession.date,
+          applicationRestriction: visitSessionData.visitRestriction,
+          visitors: visitSessionData.visitors.map(visitor => {
+            return {
+              nomisPersonId: visitor.personId,
+            }
+          }),
+          userType: 'STAFF',
+          actionedBy: username,
+          allowOverBooking: true,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   // public-booker-controller
@@ -290,10 +319,13 @@ export default class OrchestrationApiClient {
     rejectionReason: RejectVisitorRequestDto['rejectionReason']
     username: string
   }): Promise<PrisonVisitorRequestDto> {
-    return this.restClient.put({
-      path: `/visitor-requests/${requestReference}/reject`,
-      data: <RejectVisitorRequestDto>{ rejectionReason, actionedBy: username },
-    })
+    return this.restClient.put(
+      {
+        path: `/visitor-requests/${requestReference}/reject`,
+        data: <RejectVisitorRequestDto>{ rejectionReason, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async approveVisitorRequest({
@@ -305,10 +337,13 @@ export default class OrchestrationApiClient {
     visitorId: number
     username: string
   }): Promise<PrisonVisitorRequestDto> {
-    return this.restClient.put({
-      path: `/visitor-requests/${requestReference}/approve`,
-      data: <ApproveVisitorRequestDto>{ visitorId, actionedBy: username },
-    })
+    return this.restClient.put(
+      {
+        path: `/visitor-requests/${requestReference}/approve`,
+        data: <ApproveVisitorRequestDto>{ visitorId, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async getLinkedVisitors({
@@ -318,19 +353,25 @@ export default class OrchestrationApiClient {
     bookerReference: string
     prisonerId: string
   }): Promise<VisitorInfoDto[]> {
-    return this.restClient.get({
-      path: `/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
-    })
+    return this.restClient.get(
+      {
+        path: `/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
+      },
+      asUser(this.token),
+    )
   }
 
   async getBookersByEmail(email: string): Promise<BookerSearchResultsDto[]> {
     try {
-      return await this.restClient.post({
-        path: '/public/booker/search',
-        data: <SearchBookerDto>{ email },
-      })
+      return await this.restClient.post(
+        {
+          path: '/public/booker/search',
+          data: <SearchBookerDto>{ email },
+        },
+        asUser(this.token),
+      )
     } catch (error) {
-      if (error.status === 404) {
+      if (getErrorStatus(error) === 404) {
         return []
       }
       throw error
@@ -338,11 +379,11 @@ export default class OrchestrationApiClient {
   }
 
   async getVisitorRequestForReview(requestReference: string): Promise<VisitorRequestForReviewDto> {
-    return this.restClient.get({ path: `/visitor-requests/${requestReference}` })
+    return this.restClient.get({ path: `/visitor-requests/${requestReference}` }, asUser(this.token))
   }
 
   async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {
-    return this.restClient.get({ path: `/public/booker/${reference}` })
+    return this.restClient.get({ path: `/public/booker/${reference}` }, asUser(this.token))
   }
 
   async getNonLinkedSocialContacts({
@@ -352,7 +393,10 @@ export default class OrchestrationApiClient {
     reference: string
     prisonerId: string
   }): Promise<SocialContactsDto[]> {
-    return this.restClient.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` })
+    return this.restClient.get(
+      { path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` },
+      asUser(this.token),
+    )
   }
 
   async linkBookerVisitor({
@@ -368,14 +412,17 @@ export default class OrchestrationApiClient {
     sendNotification: boolean
     username: string
   }): Promise<void> {
-    await this.restClient.post({
-      path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
-      data: <RegisterVisitorForBookerPrisonerDto>{
-        visitorId,
-        sendNotificationFlag: sendNotification,
-        actionedBy: username,
+    await this.restClient.post(
+      {
+        path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
+        data: <RegisterVisitorForBookerPrisonerDto>{
+          visitorId,
+          sendNotificationFlag: sendNotification,
+          actionedBy: username,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async unlinkBookerVisitor({
@@ -390,53 +437,68 @@ export default class OrchestrationApiClient {
     username: string
   }): Promise<void> {
     try {
-      await this.restClient.post({
-        path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`,
-        data: <StaffUsernameDto>{ username },
-      })
+      await this.restClient.post(
+        {
+          path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`,
+          data: <StaffUsernameDto>{ username },
+        },
+        asUser(this.token),
+      )
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
-      if (error.status !== 404) {
+      if (getErrorStatus(error) !== 404) {
         throw error
       }
     }
   }
 
   async getBookerVisitorRequests(bookerReference: string): Promise<BookerPrisonerVisitorRequestDto[]> {
-    return this.restClient.get({ path: `/public/booker/${bookerReference}/permitted/visitors/requests` })
+    return this.restClient.get(
+      { path: `/public/booker/${bookerReference}/permitted/visitors/requests` },
+      asUser(this.token),
+    )
   }
 
   async getVisitorRequests(prisonId: string): Promise<PrisonVisitorRequestListEntryDto[]> {
-    return this.restClient.get({ path: `/prison/${prisonId}/visitor-requests` })
+    return this.restClient.get({ path: `/prison/${prisonId}/visitor-requests` }, asUser(this.token))
   }
 
   async getVisitorRequestCount(prisonId: string): Promise<number> {
     return (
-      await this.restClient.get<VisitorRequestsCountByPrisonCodeDto>({
-        path: `/prison/${prisonId}/visitor-requests/count`,
-      })
+      await this.restClient.get<VisitorRequestsCountByPrisonCodeDto>(
+        {
+          path: `/prison/${prisonId}/visitor-requests/count`,
+        },
+        asUser(this.token),
+      )
     ).count
   }
 
   // visit notification controller
   async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
-    return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data })
+    return this.restClient.put({ path: `/visits/notification/visit/${reference}/ignore`, data }, asUser(this.token))
   }
 
   async getNotificationCount(prisonId: string): Promise<number> {
     return (
-      await this.restClient.get<NotificationCount>({
-        path: `/visits/notification/${prisonId}/count`,
-        query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
-      })
+      await this.restClient.get<NotificationCount>(
+        {
+          path: `/visits/notification/${prisonId}/count`,
+          query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+        },
+        asUser(this.token),
+      )
     ).count
   }
 
   async getVisitNotifications(prisonId: string): Promise<VisitNotifications[]> {
-    const visits = await this.restClient.get<VisitNotificationsRaw[]>({
-      path: `/visits/notification/${prisonId}/visits`,
-      query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
-    })
+    const visits = await this.restClient.get<VisitNotificationsRaw[]>(
+      {
+        path: `/visits/notification/${prisonId}/visits`,
+        query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+      },
+      asUser(this.token),
+    )
 
     // return visit notifications with 'type' standardised
     return visits.map(visit => {
@@ -454,17 +516,23 @@ export default class OrchestrationApiClient {
 
   // orchestration-prisons-exclude-date-controller
   async unblockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
-    await this.restClient.put({
-      path: `/config/prisons/prison/${prisonId}/exclude-date/remove`,
-      data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
-    })
+    await this.restClient.put(
+      {
+        path: `/config/prisons/prison/${prisonId}/exclude-date/remove`,
+        data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async blockVisitDate(prisonId: string, date: string, username: string): Promise<void> {
-    await this.restClient.put({
-      path: `/config/prisons/prison/${prisonId}/exclude-date/add`,
-      data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
-    })
+    await this.restClient.put(
+      {
+        path: `/config/prisons/prison/${prisonId}/exclude-date/add`,
+        data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async getFutureBlockedDatesAndSessions({
@@ -474,21 +542,27 @@ export default class OrchestrationApiClient {
     prisonId: string
     includeSessions: boolean
   }): Promise<PrisonAndSessionsExcludeDatesDto> {
-    return this.restClient.get({
-      path: `/v2/prisons/${prisonId}/config/exclude-dates/future`,
-      query: new URLSearchParams({ includeSessions: includeSessions.toString() }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: `/v2/prisons/${prisonId}/config/exclude-dates/future`,
+        query: new URLSearchParams({ includeSessions: includeSessions.toString() }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   // FIXME this endpoint is deprecated; remove this and wiremock stub and use call above with includeSessions=false instead
   async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
-    return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
+    return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` }, asUser(this.token))
   }
 
   async isBlockedDate(prisonCode: string, excludeDate: string): Promise<boolean> {
-    const { isExcluded } = await this.restClient.get<IsExcludeDateDto>({
-      path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
-    })
+    const { isExcluded } = await this.restClient.get<IsExcludeDateDto>(
+      {
+        path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
+      },
+      asUser(this.token),
+    )
     return isExcluded
   }
 
@@ -503,10 +577,13 @@ export default class OrchestrationApiClient {
     date: string
     username: string
   }): Promise<VisitPassDto[]> {
-    return this.restClient.post({
-      path: `/prison/${prisonId}/visit-passes`,
-      data: <VisitPassRequestDto>{ date, actionedBy: username },
-    })
+    return this.restClient.post(
+      {
+        path: `/prison/${prisonId}/visit-passes`,
+        data: <VisitPassRequestDto>{ date, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async getVisitPass({
@@ -518,10 +595,13 @@ export default class OrchestrationApiClient {
     reference: string
     username: string
   }): Promise<VisitPassDto> {
-    return this.restClient.post({
-      path: `/prison/${prisonId}/visit-passes/visit/${reference}`,
-      data: <StaffUsernameDto>{ username },
-    })
+    return this.restClient.post(
+      {
+        path: `/prison/${prisonId}/visit-passes/visit/${reference}`,
+        data: <StaffUsernameDto>{ username },
+      },
+      asUser(this.token),
+    )
   }
 
   // visit requests controller
@@ -533,10 +613,13 @@ export default class OrchestrationApiClient {
     reference: string
     username: string
   }): Promise<VisitRequestResponse> {
-    return this.restClient.put({
-      path: `/visits/requests/${reference}/reject`,
-      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
-    })
+    return this.restClient.put(
+      {
+        path: `/visits/requests/${reference}/reject`,
+        data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async approveVisitRequest({
@@ -546,18 +629,26 @@ export default class OrchestrationApiClient {
     reference: string
     username: string
   }): Promise<VisitRequestResponse> {
-    return this.restClient.put({
-      path: `/visits/requests/${reference}/approve`,
-      data: <ApproveVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
-    })
+    return this.restClient.put(
+      {
+        path: `/visits/requests/${reference}/approve`,
+        data: <ApproveVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+      },
+      asUser(this.token),
+    )
   }
 
   async getVisitRequests(prisonCode: string): Promise<VisitRequestSummary[]> {
-    return this.restClient.get({ path: `/visits/requests/${prisonCode}` })
+    return this.restClient.get({ path: `/visits/requests/${prisonCode}` }, asUser(this.token))
   }
 
   async getVisitRequestCount(prisonCode: string): Promise<number> {
-    return (await this.restClient.get<VisitRequestsCountDto>({ path: `/visits/requests/${prisonCode}/count` })).count
+    return (
+      await this.restClient.get<VisitRequestsCountDto>(
+        { path: `/visits/requests/${prisonCode}/count` },
+        asUser(this.token),
+      )
+    ).count
   }
 
   // orchestration-sessions-controller
@@ -567,14 +658,17 @@ export default class OrchestrationApiClient {
     sessionDate: string,
     sessionTemplateReference: string,
   ): Promise<VisitSession> {
-    return this.restClient.get({
-      path: '/visit-sessions/session',
-      query: new URLSearchParams({
-        prisonCode,
-        sessionDate,
-        sessionTemplateReference,
-      }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: '/visit-sessions/session',
+        query: new URLSearchParams({
+          prisonCode,
+          sessionDate,
+          sessionTemplateReference,
+        }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   async getSessionSchedule({
@@ -586,14 +680,17 @@ export default class OrchestrationApiClient {
     date: string
     includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
-    return this.restClient.get({
-      path: '/visit-sessions/schedule',
-      query: new URLSearchParams({
-        prisonId,
-        date,
-        includeExcludedSessions: includeExcludedSessions.toString(),
-      }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: '/visit-sessions/schedule',
+        query: new URLSearchParams({
+          prisonId,
+          date,
+          includeExcludedSessions: includeExcludedSessions.toString(),
+        }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   async getVisitSessionCapacity(
@@ -603,10 +700,13 @@ export default class OrchestrationApiClient {
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
     try {
-      return await this.restClient.get({
-        path: '/visit-sessions/capacity',
-        query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
-      })
+      return await this.restClient.get(
+        {
+          path: '/visit-sessions/capacity',
+          query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
+        },
+        asUser(this.token),
+      )
     } catch {
       return null
     }
@@ -623,22 +723,28 @@ export default class OrchestrationApiClient {
     minNumberOfDays: number
     username: string
   }): Promise<VisitSessionsAndScheduleDto> {
-    return this.restClient.get({
-      path: '/visit-sessions-and-schedule',
-      query: new URLSearchParams({
-        prisonId,
-        prisonerId,
-        min: minNumberOfDays.toString(),
-        username,
-      }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: '/visit-sessions-and-schedule',
+        query: new URLSearchParams({
+          prisonId,
+          prisonerId,
+          min: minNumberOfDays.toString(),
+          username,
+        }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   // visit-orders-controller
   async getVoBalance({ prisonId, prisonerId }: { prisonId: string; prisonerId: string }): Promise<PrisonerBalanceDto> {
-    return this.restClient.get({
-      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
-    })
+    return this.restClient.get(
+      {
+        path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+      },
+      asUser(this.token),
+    )
   }
 
   async changeVoBalance({
@@ -650,10 +756,13 @@ export default class OrchestrationApiClient {
     prisonerId: string
     prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
   }): Promise<void> {
-    await this.restClient.put({
-      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
-      data: prisonerBalanceAdjustmentDto,
-    })
+    await this.restClient.put(
+      {
+        path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
+        data: prisonerBalanceAdjustmentDto,
+      },
+      asUser(this.token),
+    )
   }
 
   async getVoHistory({
@@ -667,13 +776,16 @@ export default class OrchestrationApiClient {
     const date3MonthsAgo = subMonths(new Date(), 3)
     const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
 
-    return this.restClient.get({
-      path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`,
-      query: new URLSearchParams({
-        fromDate,
-        maxResults: '30',
-      }).toString(),
-    })
+    return this.restClient.get(
+      {
+        path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`,
+        query: new URLSearchParams({
+          fromDate,
+          maxResults: '30',
+        }).toString(),
+      },
+      asUser(this.token),
+    )
   }
 
   // orchestration-sessions-exclude-date-controller
@@ -687,13 +799,16 @@ export default class OrchestrationApiClient {
     date: string
     username: string
   }): Promise<void> {
-    await this.restClient.put({
-      path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
-      data: <ExcludeDateDto>{
-        excludeDate: date,
-        actionedBy: username,
+    await this.restClient.put(
+      {
+        path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
+        data: <ExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: username,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   async unblockVisitSession({
@@ -705,36 +820,48 @@ export default class OrchestrationApiClient {
     date: string
     username: string
   }): Promise<void> {
-    await this.restClient.put({
-      path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
-      data: <ExcludeDateDto>{
-        excludeDate: date,
-        actionedBy: username,
+    await this.restClient.put(
+      {
+        path: `/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
+        data: <ExcludeDateDto>{
+          excludeDate: date,
+          actionedBy: username,
+        },
       },
-    })
+      asUser(this.token),
+    )
   }
 
   // prisoner-profile-controller
 
   async getPrisonerProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfileDto> {
-    return this.restClient.get({
-      path: `/prisoner/${prisonId}/${prisonerId}/profile`,
-    })
+    return this.restClient.get(
+      {
+        path: `/prisoner/${prisonId}/${prisonerId}/profile`,
+      },
+      asUser(this.token),
+    )
   }
 
   // orchestration-prisons-config-controller
 
   async getSupportedPrisonIds(): Promise<string[]> {
-    return this.restClient.get({
-      path: '/config/prisons/user-type/STAFF/supported',
-    })
+    return this.restClient.get(
+      {
+        path: '/config/prisons/user-type/STAFF/supported',
+      },
+      asUser(this.token),
+    )
   }
 
   async getPrison(id: string): Promise<Prison> {
     // rename 'code' to 'prisonId' for consistency
-    const { code: prisonId, ...prisonDto } = await this.restClient.get<PrisonDto>({
-      path: `/config/prisons/prison/${id}`,
-    })
+    const { code: prisonId, ...prisonDto } = await this.restClient.get<PrisonDto>(
+      {
+        path: `/config/prisons/prison/${id}`,
+      },
+      asUser(this.token),
+    )
     return { prisonId, ...prisonDto }
   }
 
@@ -745,10 +872,13 @@ export default class OrchestrationApiClient {
     prisonId: string
     visitSchedulerUpdatePrisonDto: VisitSchedulerUpdatePrisonDto
   }): Promise<void> {
-    await this.restClient.put({
-      path: `/config/prisons/prison/${prisonId}`,
-      data: visitSchedulerUpdatePrisonDto,
-    })
+    await this.restClient.put(
+      {
+        path: `/config/prisons/prison/${prisonId}`,
+        data: visitSchedulerUpdatePrisonDto,
+      },
+      asUser(this.token),
+    )
   }
 
   private convertMainContactToVisitContact(mainContact: VisitSessionData['mainContact']): {

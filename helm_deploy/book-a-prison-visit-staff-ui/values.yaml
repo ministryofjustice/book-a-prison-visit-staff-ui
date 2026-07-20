@@ -37,6 +37,9 @@ generic-service:
     FEATURE_FEEDBACK_BANNER_ENABLED: "false"
     FEATURE_FEEDBACK_BANNER_URL: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2AYNZK8DJCZBgXxIreDRN5tUQTIwNlJCU1IzSFVMU1JPMUdUVklRUTdNMS4u"
 
+    NODE_USE_ENV_PROXY: "1"
+    APPLICATION_INSIGHTS_NO_STATSBEAT: "true"
+
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
   #   [name of kubernetes secret]:
@@ -52,6 +55,13 @@ generic-service:
       SESSION_SECRET: "SESSION_SECRET"
     sqs-hmpps-audit-secret:
       AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
+    hmpps-envoy-https-proxy-env:
+      HTTP_PROXY: "HTTP_PROXY"
+      HTTPS_PROXY: "HTTPS_PROXY"
+      NO_PROXY: "NO_PROXY"
+      http_proxy: "HTTP_PROXY"
+      https_proxy: "HTTPS_PROXY"
+      no_proxy: "NO_PROXY"
     elasticache-redis-staff:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"

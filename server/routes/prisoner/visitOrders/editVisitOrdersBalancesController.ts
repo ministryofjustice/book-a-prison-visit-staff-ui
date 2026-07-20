@@ -12,6 +12,7 @@ import {
 import { SanitisedError } from '../../../sanitisedError'
 import { apiValidationErrorToFieldValidationError, transformErrorCodesToMessage } from './visitOrdersUtils'
 import { TEXT_INPUT_SINGLE_LINE_REGEX } from '../../validationChecks'
+import { getErrorStatus } from '../../../utils/errorHelpers'
 
 const balanceChangeActions = ['NO_CHANGE', 'ADD', 'REMOVE'] as const
 type BalanceChangeActions = (typeof balanceChangeActions)[number]
@@ -102,7 +103,7 @@ export default class EditVisitOrdersBalancesController {
 
         return res.redirect(`/prisoner/${prisonerId}#visiting-orders`)
       } catch (error) {
-        if (error.status === 422) {
+        if (getErrorStatus(error) === 422) {
           const validationErrors =
             (error as SanitisedError<PrisonerBalanceAdjustmentValidationErrorResponse>)?.data?.validationErrors ?? []
 

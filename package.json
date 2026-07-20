@@ -38,6 +38,7 @@
     "@aws-sdk/client-sqs": "^3.1080.0",
     "@axe-core/playwright": "4.12.1",
     "@ministryofjustice/frontend": "^9.0.0",
+    "@ministryofjustice/hmpps-auth-clients": "^3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.0.2",
     "@ministryofjustice/hmpps-connect-dps-components": "^6.2.1",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",

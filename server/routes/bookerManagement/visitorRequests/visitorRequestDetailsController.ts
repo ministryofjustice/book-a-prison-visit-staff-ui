@@ -3,6 +3,7 @@ import { body, matchedData, Meta, ValidationChain, validationResult } from 'expr
 import { AuditService, BookerService } from '../../../services'
 import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
 import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
+import { getErrorStatus } from '../../../utils/errorHelpers'
 
 export default class VisitorRequestDetailsController {
   public constructor(
@@ -126,7 +127,7 @@ export default class VisitorRequestDetailsController {
           })
         }
       } catch (error) {
-        if (error.status !== 400) {
+        if (getErrorStatus(error) !== 400) {
           return next(error)
         }
 

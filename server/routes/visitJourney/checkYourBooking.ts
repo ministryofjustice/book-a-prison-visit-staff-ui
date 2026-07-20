@@ -7,6 +7,7 @@ import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
 import { SanitisedError } from '../../sanitisedError'
 import { BookOrUpdate } from '../../@types/bapv'
+import { getErrorStatus } from '../../utils/errorHelpers'
 
 export default class CheckYourBooking {
   constructor(
@@ -97,7 +98,7 @@ export default class CheckYourBooking {
         operationId: res.locals.appInsightsOperationId,
       })
     } catch (error) {
-      if (error.status === 422) {
+      if (getErrorStatus(error) === 422) {
         const validationErrors =
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 

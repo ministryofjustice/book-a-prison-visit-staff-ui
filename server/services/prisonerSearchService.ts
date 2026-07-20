@@ -1,4 +1,5 @@
 import { properCaseFullName, prisonerDatePretty } from '../utils/utils'
+import { getErrorStatus } from '../utils/errorHelpers'
 import { Prisoner } from '../data/prisonerOffenderSearchTypes'
 import { PrisonerDetailsItem } from '../@types/bapv'
 import { HmppsAuthClient, PrisonerSearchClient, RestClientBuilder } from '../data'
@@ -99,7 +100,7 @@ export default class PrisonerSearchService {
         return 'This prisoner is located at another establishment. The visitor should contact the prisoner to find out their location.'
       }
     } catch (error) {
-      if (error.status !== 404) {
+      if (getErrorStatus(error) !== 404) {
         throw error
       }
     }
