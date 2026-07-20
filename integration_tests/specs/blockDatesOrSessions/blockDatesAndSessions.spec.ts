@@ -33,6 +33,8 @@ test.describe('Block visit dates and sessions', () => {
   test.describe('Block visit dates', () => {
     test('should block a new date - where date has no sessions to block', async ({ page }) => {
       await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: true })
+      await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: false })
+
       await login(page)
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.blockDatesTile.click()
@@ -143,6 +145,8 @@ test.describe('Block visit dates and sessions', () => {
 
     test('should block a visit session', async ({ page }) => {
       await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: true })
+      await orchestrationApi.stubGetFutureBlockedDatesAndSessions({ includeSessions: false })
+
       await login(page)
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.blockDatesTile.click()
