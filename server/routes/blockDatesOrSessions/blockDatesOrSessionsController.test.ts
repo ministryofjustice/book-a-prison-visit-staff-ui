@@ -169,7 +169,10 @@ describe('Block visit dates and sessions listing page', () => {
       flashData = { errors: [], formValues: [] }
 
       sessionData = {} as SessionData
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([])
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue({
+        fullDateExclusions: [],
+        sessionExclusions: [],
+      })
       visitSessionsService.getSessionSchedule.mockResolvedValue([])
 
       app = appWithAllRoutes({ services: { blockDatesOrSessionsService, visitSessionsService }, sessionData })
@@ -185,7 +188,11 @@ describe('Block visit dates and sessions listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates-or-sessions/block-new-date')
         .expect(() => {
-          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
+            prisonId: 'HEI',
+            includeSessions: false,
+            username: 'user1',
+          })
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId: 'HEI',
@@ -212,7 +219,11 @@ describe('Block visit dates and sessions listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates-or-sessions/block-date-or-session')
         .expect(() => {
-          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
+            prisonId: 'HEI',
+            includeSessions: false,
+            username: 'user1',
+          })
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
             username: 'user1',
             prisonId: 'HEI',
@@ -251,7 +262,7 @@ describe('Block visit dates and sessions listing page', () => {
           .expect(302)
           .expect('location', '/block-visit-dates-or-sessions')
           .expect(() => {
-            expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
+            expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).not.toHaveBeenCalled()
             expect(sessionData.blockDateOrSession).toBe(undefined)
             expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
             expect(flashProvider).toHaveBeenCalledWith('formValues', { date: expected })
@@ -278,7 +289,7 @@ describe('Block visit dates and sessions listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
-          expect(blockDatesOrSessionsService.getFutureBlockedDates).not.toHaveBeenCalled()
+          expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).not.toHaveBeenCalled()
           expect(sessionData.blockDateOrSession).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })
@@ -289,9 +300,10 @@ describe('Block visit dates and sessions listing page', () => {
       const inputDate = format(today, datePickerDateFormat)
       const expectedOutputDate = format(today, expectedDateFormat)
 
-      blockDatesOrSessionsService.getFutureBlockedDates.mockResolvedValue([
-        TestData.excludeDateDto({ excludeDate: expectedOutputDate }),
-      ])
+      blockDatesOrSessionsService.getFutureBlockedDatesAndSessions.mockResolvedValue({
+        fullDateExclusions: [TestData.excludeDateDto({ excludeDate: expectedOutputDate })],
+        sessionExclusions: [],
+      })
 
       const expectedValidationError: FieldValidationError = {
         location: 'body',
@@ -307,7 +319,11 @@ describe('Block visit dates and sessions listing page', () => {
         .expect(302)
         .expect('location', '/block-visit-dates-or-sessions')
         .expect(() => {
-          expect(blockDatesOrSessionsService.getFutureBlockedDates).toHaveBeenCalledWith('HEI', 'user1')
+          expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
+            prisonId: 'HEI',
+            includeSessions: false,
+            username: 'user1',
+          })
           expect(sessionData.blockDateOrSession).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])
           expect(flashProvider).toHaveBeenCalledWith('formValues', { date: inputDate })

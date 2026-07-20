@@ -47,18 +47,6 @@ describe('Blocked dates or sessions service', () => {
     })
   })
 
-  describe('getFutureBlockedDates', () => {
-    it('should return future blocked dates for given prison', async () => {
-      const excludeDateDto = TestData.excludeDateDto()
-      orchestrationApiClient.getFutureBlockedDates.mockResolvedValue([excludeDateDto])
-
-      const result = await blockDatesOrSessionsService.getFutureBlockedDates(prisonId, username)
-
-      expect(orchestrationApiClient.getFutureBlockedDates).toHaveBeenCalledWith(prisonId)
-      expect(result).toStrictEqual([excludeDateDto])
-    })
-  })
-
   describe('isBlockedDate', () => {
     it('should return boolean indicating whether given date is a blocked date', async () => {
       const date = '2000-02-01'
