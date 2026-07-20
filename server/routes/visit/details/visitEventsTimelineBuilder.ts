@@ -1,7 +1,7 @@
-import eventAuditTypes from '../../constants/eventAudit'
-import { notificationTypes } from '../../constants/notifications'
-import { requestMethodDescriptions } from '../../constants/requestMethods'
-import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import eventAuditTypes from '../../../constants/eventAudit'
+import { notificationTypes } from '../../../constants/notifications'
+import { requestMethodDescriptions } from '../../../constants/requestMethods'
+import { EventAudit, VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 
 export type MojTimelineItem = {
   label: { text: string }

@@ -3,11 +3,11 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { FieldValidationError } from 'express-validator'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import { CancelVisitOrchestrationDto, Visit } from '../../data/orchestrationApiTypes'
-import { CancelledVisitInfo } from '../../@types/bapv'
-import TestData from '../testutils/testData'
-import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
+import { CancelVisitOrchestrationDto, Visit } from '../../../data/orchestrationApiTypes'
+import { CancelledVisitInfo } from '../../../@types/bapv'
+import TestData from '../../testutils/testData'
+import { createMockAuditService, createMockVisitService } from '../../../services/testutils/mocks'
 
 let app: Express
 let flashData: FlashData

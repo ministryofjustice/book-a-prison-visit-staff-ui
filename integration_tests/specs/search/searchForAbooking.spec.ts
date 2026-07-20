@@ -7,7 +7,7 @@ import SearchForBookingByReferencePage from '../../pages/search/searchForBooking
 import SearchForBookingByReferenceResultsPage from '../../pages/search/searchForBookingByReferenceResultsPage'
 import SearchForBookingByPrisonerPage from '../../pages/search/searchForBookingByPrisonerPage'
 import SearchForBookingByPrisonerResultsPage from '../../pages/search/searchForBookingByPrisonerResultsPage'
-import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
+import VisitDetailsPage from '../../pages/visit/details/visitDetailsPage'
 import PrisonerProfilePage from '../../pages/prisoner/prisonerProfilePage'
 import prisonerSearch from '../../mockApis/prisonerSearch'
 

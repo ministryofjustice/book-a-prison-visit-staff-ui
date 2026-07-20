@@ -1,22 +1,22 @@
 import { RequestHandler } from 'express'
-import { AuditService, VisitService } from '../../services'
-import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
+import { AuditService, VisitService } from '../../../services'
+import { getDpsPrisonerAlertsUrl } from '../../../utils/utils'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
 import {
   getAvailableVisitActions,
   getIdsToFlag,
   getPrisonerLocation,
   getVisitAlerts,
   getHideAlertsInset,
-} from './visitUtils'
+} from '../visitUtils'
 import {
   appendNavStateToPath,
   extractVisitNavState,
   getVisitDetailsBackLink,
   type VisitNavState,
-} from './visitNavigationUtils'
+} from '../visitNavigationUtils'
 import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
-import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 
 export default class VisitDetailsController {
   public constructor(
@@ -42,7 +42,11 @@ export default class VisitDetailsController {
       })
 
       if (selectedEstablishment.prisonId !== prison.prisonId) {
-        return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
+        return res.render('pages/visit/details/visitDetailsWrongEstablishment', {
+          prison,
+          reference,
+          selectedEstablishment,
+        })
       }
 
       const hideAlertsInset = getHideAlertsInset({
@@ -102,7 +106,7 @@ export default class VisitDetailsController {
       const prisonerDpsAlertsUrl = getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber)
       const prisonerLocation = getPrisonerLocation(prisoner)
 
-      return res.render('pages/visit/visitDetails', {
+      return res.render('pages/visit/details/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
         backLinkHref,
         hideAlertsInset,

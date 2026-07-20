@@ -2,14 +2,14 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
-import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
-import TestData from '../testutils/testData'
-import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
+import TestData from '../../testutils/testData'
+import { createMockAuditService, createMockVisitService } from '../../../services/testutils/mocks'
 import { MojTimelineItem } from './visitEventsTimelineBuilder'
-import { AvailableVisitActions } from './visitUtils'
-import { GOVUKInsetText, MoJAlert } from '../../@types/bapv'
-import config from '../../config'
+import { AvailableVisitActions } from '../visitUtils'
+import { GOVUKInsetText, MoJAlert } from '../../../@types/bapv'
+import config from '../../../config'
 
 let app: Express
 let flashData: FlashData
@@ -30,8 +30,8 @@ jest.mock('./visitEventsTimelineBuilder', () => {
   }
 })
 
-jest.mock('./visitUtils', () => {
-  const visitUtils = jest.requireActual('./visitUtils')
+jest.mock('../visitUtils', () => {
+  const visitUtils = jest.requireActual('../visitUtils')
   return {
     ...visitUtils,
     getAvailableVisitActions: () => availableVisitActions,

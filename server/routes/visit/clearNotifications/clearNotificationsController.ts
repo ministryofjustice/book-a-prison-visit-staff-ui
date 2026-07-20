@@ -1,10 +1,10 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { AuditService, VisitNotificationsService } from '../../services'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import { IgnoreVisitNotificationsDto } from '../../data/orchestrationApiTypes'
-import { getFlashFormValues } from '../visitorUtils'
-import { extractVisitNavState, appendNavStateToPath } from './visitNavigationUtils'
+import { AuditService, VisitNotificationsService } from '../../../services'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { IgnoreVisitNotificationsDto } from '../../../data/orchestrationApiTypes'
+import { getFlashFormValues } from '../../visitorUtils'
+import { extractVisitNavState, appendNavStateToPath } from '../visitNavigationUtils'
 
 export default class ClearNotificationsController {
   public constructor(
@@ -20,7 +20,7 @@ export default class ClearNotificationsController {
       const backLinkHref = appendNavStateToPath(`/visit/${reference}`, navState)
       const formAction = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
 
-      return res.render('pages/visit/clearNotifications', {
+      return res.render('pages/visit/clearNotifications/clearNotifications', {
         errors: req.flash('errors'),
         formValues: getFlashFormValues(req),
         backLinkHref,
