@@ -5,6 +5,7 @@ import VisitRequestsListingPage from '../../pages/request/visitRequestsListingPa
 import VisitDetailsPage from '../../pages/visit/details/visitDetailsPage'
 import orchestrationApi from '../../mockApis/orchestration'
 import { resetStubs, login } from '../../testUtils'
+import VisitRequestRejectionReasonPage from '../../pages/visit/visitRequests/visitRequestRejectionReasonPage'
 
 test.describe('Process a visit Request', () => {
   const prisonStaffAndPublic = TestData.prisonDto({
@@ -33,10 +34,7 @@ test.describe('Process a visit Request', () => {
     await expect(homePage.visitRequestsBadgeCount).toContainText('1')
 
     // Stub visit requests and navigate
-    await orchestrationApi.stubGetVisitRequests({
-      prisonId: 'HEI',
-      visitRequests: [visitRequest],
-    })
+    await orchestrationApi.stubGetVisitRequests({ visitRequests: [visitRequest] })
     await homePage.visitRequestsTile.click()
 
     const visitRequestsListingPage = await VisitRequestsListingPage.verifyOnPage(page)
@@ -71,14 +69,10 @@ test.describe('Process a visit Request', () => {
     await expect(visitDetailsPage.eventHeader(0)).toContainText('Requested')
 
     // Approve visit request
-    await orchestrationApi.stubGetVisitRequests({
-      prisonId: 'HEI',
-      visitRequests: [],
-    })
+    await orchestrationApi.stubGetVisitRequests({ visitRequests: [] })
     const visitRequestResponse = TestData.visitRequestResponse()
     await orchestrationApi.stubApproveVisitRequest({
       reference: visitRequest.visitReference,
-      username: 'USER1',
       visitRequestResponse,
     })
     await visitDetailsPage.approveRequest.click()
@@ -97,7 +91,6 @@ test.describe('Process a visit Request', () => {
     await expect(homePage.visitRequestsBadgeCount).toContainText('1')
 
     await orchestrationApi.stubGetVisitRequests({
-      prisonId: 'HEI',
       visitRequests: [visitRequest],
     })
     await homePage.visitRequestsTile.click()
@@ -122,28 +115,31 @@ test.describe('Process a visit Request', () => {
     const visitDetailsPage = await VisitDetailsPage.verifyOnPage(page, 'Visit request details')
     await expect(visitDetailsPage.messages.first()).toContainText('This request needs to be reviewed')
 
-    // Stub reject API call
-    const visitRequestResponse = TestData.visitRequestResponse({
-      visitReference: visitRequest.visitReference,
-    })
-    await orchestrationApi.stubRejectVisitRequest({
-      reference: visitRequest.visitReference,
-      username: 'USER1',
-      visitRequestResponse,
-    })
-
-    await orchestrationApi.stubGetVisitRequests({
-      prisonId: 'HEI',
-      visitRequests: [],
-    })
-
+    // Select 'Reject'
     await visitDetailsPage.rejectRequest.click()
 
-    const refreshedListingPage = await VisitRequestsListingPage.verifyOnPage(page)
+    // Rejection reason page
+    const visitRequestRejectionReasonPage = await VisitRequestRejectionReasonPage.verifyOnPage(page)
+    await visitRequestRejectionReasonPage.selectSingleSession()
 
-    await expect(refreshedListingPage.messages.first()).toContainText('You rejected the request to visit John Smith')
+    // Confirm rejection
+    await orchestrationApi.stubRejectVisitRequest({
+      reference: visitRequest.visitReference,
+      visitRequestRejectionReason: 'NO_VISIT_ALLOWANCE',
+    })
+
+    await orchestrationApi.stubGetVisitRequests({ visitRequests: [] })
+    await visitRequestRejectionReasonPage.confirmRejection()
+
+    // Returned to requested visits page
+    await VisitRequestsListingPage.verifyOnPage(page)
+
+    // Success message
+    await expect(visitRequestsListingPage.messages.first()).toContainText(
+      'You rejected the request to visit John Smith',
+    )
 
     //  Assert that table is empty (no requests message)
-    await expect(refreshedListingPage.getNoRequestsMessage()).toContainText('no visit requests')
+    await expect(visitRequestsListingPage.getNoRequestsMessage()).toContainText('no visit requests')
   })
 })
