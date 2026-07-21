@@ -1,7 +1,7 @@
-import visitEventsTimelineBuilder, { MojTimelineItem } from './visitEventsTimelineBuilder'
+import buildVisitEventsTimeline, { MojTimelineItem } from './buildVisitEventsTimeline'
 
-describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event history', () => {
-  let params: Parameters<typeof visitEventsTimelineBuilder>[0]
+describe('buildVisitEventsTimeline - Build MoJ Timeline items from visit event history', () => {
+  let params: Parameters<typeof buildVisitEventsTimeline>[0]
 
   beforeEach(() => {
     params = {
@@ -12,7 +12,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
 
   it('should return an empty array of timeline items if no event audit items found', () => {
     const expectedTimeline: MojTimelineItem[] = []
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
     expect(timeline).toStrictEqual(expectedTimeline)
   })
 
@@ -57,7 +57,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -83,7 +83,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -108,7 +108,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -134,7 +134,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -159,7 +159,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -192,7 +192,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -218,7 +218,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -244,7 +244,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -269,7 +269,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -295,7 +295,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -321,7 +321,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -346,7 +346,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -373,7 +373,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -398,7 +398,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })
@@ -423,7 +423,7 @@ describe('visitEventsTimelineBuilder - Build MoJ Timeline items from visit event
       },
     ]
 
-    const timeline = visitEventsTimelineBuilder(params)
+    const timeline = buildVisitEventsTimeline(params)
 
     expect(timeline).toStrictEqual(expectedTimeline)
   })

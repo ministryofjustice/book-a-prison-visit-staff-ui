@@ -2,9 +2,9 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import { VisitSessionData } from '../../@types/bapv'
-import TestData from '../testutils/testData'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
+import { VisitSessionData } from '../../../@types/bapv'
+import TestData from '../../testutils/testData'
 
 let app: Express
 let flashData: FlashData
