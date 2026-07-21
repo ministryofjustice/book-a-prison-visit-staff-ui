@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express'
-import { VisitRequestsService, VisitService } from '../../services'
-import { MoJAlert } from '../../@types/bapv'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import { convertToTitleCase } from '../../utils/utils'
-import { VisitBookingDetails, VisitRequestResponse } from '../../data/orchestrationApiTypes'
-import { isValidPrisonerNumber } from '../validationChecks'
-import { extractVisitNavState, type VisitNavState } from './visitNavigationUtils'
+import { VisitRequestsService, VisitService } from '../../../services'
+import { MoJAlert } from '../../../@types/bapv'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { convertToTitleCase } from '../../../utils/utils'
+import { VisitBookingDetails, VisitRequestResponse } from '../../../data/orchestrationApiTypes'
+import { isValidPrisonerNumber } from '../../validationChecks'
+import { extractVisitNavState, type VisitNavState } from '../visitNavigationUtils'
 
 type RequestAction = 'approve' | 'reject'
 

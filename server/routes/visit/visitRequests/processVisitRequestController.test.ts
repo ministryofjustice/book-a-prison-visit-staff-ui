@@ -1,10 +1,10 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { BadRequest, InternalServerError } from 'http-errors'
-import { appWithAllRoutes, flashProvider } from '../testutils/appSetup'
-import TestData from '../testutils/testData'
-import { createMockVisitRequestsService, createMockVisitService } from '../../services/testutils/mocks'
-import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import { appWithAllRoutes, flashProvider } from '../../testutils/appSetup'
+import TestData from '../../testutils/testData'
+import { createMockVisitRequestsService, createMockVisitService } from '../../../services/testutils/mocks'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 
 let app: Express
 

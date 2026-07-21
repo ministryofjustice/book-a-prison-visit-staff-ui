@@ -480,11 +480,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  // FIXME this endpoint is deprecated; remove this and wiremock stub and use call above with includeSessions=false instead
-  async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
-    return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
-  }
-
   async isBlockedDate(prisonCode: string, excludeDate: string): Promise<boolean> {
     const { isExcluded } = await this.restClient.get<IsExcludeDateDto>({
       path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,

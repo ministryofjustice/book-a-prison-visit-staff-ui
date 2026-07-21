@@ -2,9 +2,9 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { FieldValidationError } from 'express-validator'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import TestData from '../testutils/testData'
-import { createMockAuditService, createMockVisitNotificationsService } from '../../services/testutils/mocks'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
+import TestData from '../../testutils/testData'
+import { createMockAuditService, createMockVisitNotificationsService } from '../../../services/testutils/mocks'
 
 let app: Express
 let flashData: FlashData

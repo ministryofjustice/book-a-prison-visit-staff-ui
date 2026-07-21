@@ -28,7 +28,6 @@
   {% set contactRows = (contactRows.push([
     {
       html: selectContactInputHtml,
-      classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6" if not contact.dateOfBirth,
       attributes: { "data-test": "visitor-" + loop.index + "-select" }
     },
     {

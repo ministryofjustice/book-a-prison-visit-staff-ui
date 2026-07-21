@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
-import { AuditService, VisitService } from '../../services'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import { CancelVisitOrchestrationDto } from '../../data/orchestrationApiTypes'
-import { requestMethodsCancellation } from '../../constants/requestMethods'
-import { getFlashFormValues } from '../visitorUtils'
-import { visitCancellationReasons } from '../../constants/visitCancellation'
-import { isMobilePhoneNumber } from '../../utils/utils'
-import { appendNavStateToPath, extractVisitNavState } from './visitNavigationUtils'
+import { AuditService, VisitService } from '../../../services'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { CancelVisitOrchestrationDto } from '../../../data/orchestrationApiTypes'
+import { requestMethodsCancellation } from '../../../constants/requestMethods'
+import { getFlashFormValues } from '../../visitorUtils'
+import { visitCancellationReasons } from '../../../constants/visitCancellation'
+import { isMobilePhoneNumber } from '../../../utils/utils'
+import { appendNavStateToPath, extractVisitNavState } from '../visitNavigationUtils'
 
 export default class CancelVisitController {
   public constructor(
@@ -23,7 +23,7 @@ export default class CancelVisitController {
         return res.redirect('/back-to-start')
       }
 
-      return res.render('pages/visit/cancelConfirmation', { ...cancelledVisitInfo })
+      return res.render('pages/visit/cancel/cancelConfirmation', { ...cancelledVisitInfo })
     }
   }
 
@@ -32,7 +32,7 @@ export default class CancelVisitController {
       const { reference } = req.params
       const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
-      return res.render('pages/visit/cancel', {
+      return res.render('pages/visit/cancel/cancel', {
         errors: req.flash('errors'),
         backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
         formAction: appendNavStateToPath(`/visit/${reference}/cancel`, navState),
