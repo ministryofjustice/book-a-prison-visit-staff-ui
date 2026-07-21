@@ -530,7 +530,7 @@ describe('Update journey specific warning messages', () => {
         expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
 
         expect($('.moj-alert').eq(1).text()).toContain('open to closed')
-        expect($('.moj-alert').eq(1).text()).toContain('Select a new visit time.')
+        expect($('.moj-alert').eq(1).text()).toContain('You may need to select a new visit time.')
 
         expect($('input:checked').length).toBe(0)
       })
@@ -552,7 +552,7 @@ describe('Update journey specific warning messages', () => {
         expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
 
         expect($('.moj-alert').eq(1).text()).toContain('closed to open')
-        expect($('.moj-alert').eq(1).text()).toContain('Select a new visit time.')
+        expect($('.moj-alert').eq(1).text()).toContain('You may need to select a new visit time.')
 
         expect($('input:checked').length).toBe(0)
       })
