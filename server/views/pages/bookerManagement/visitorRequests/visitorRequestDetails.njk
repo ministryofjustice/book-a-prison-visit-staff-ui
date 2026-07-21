@@ -9,7 +9,7 @@
 {% set contactRows = [] %}
 {% for contact in visitorRequest.socialContacts %}
 
-  {% set contactName %}{{ contact.firstName }} {{ contact.lastName }}{% endset %}
+  {% set contactName = contact.firstName + " " + contact.lastName %}
 
   {% set contactDetailsUrl = dpsContacts + '/prisoner/' + visitorRequest.prisonerId
                                          + '/contacts/manage/' + contact.visitorId
@@ -49,7 +49,7 @@
     },
     {
       html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer">
-        View contact <span class="govuk-visually-hidden">details for ' + contactName + ' (opens in a new tab)</span>
+        View contact <span class="govuk-visually-hidden">details for ' + (contactName | escape) + ' (opens in a new tab)</span>
       </a>',
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }

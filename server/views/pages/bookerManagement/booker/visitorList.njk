@@ -9,7 +9,7 @@
 {% set contactRows = [] %}
 {% for contact in nonLinkedContacts %}
 
-  {% set contactName %}{{ contact.firstName }} {{ contact.lastName }}{% endset %}
+  {% set contactName = contact.firstName + " " + contact.lastName %}
 
   {% set contactDetailsUrl = dpsContacts + '/prisoner/' + prisoner.prisonerNumber
                                          + '/contacts/manage/' + contact.visitorId
