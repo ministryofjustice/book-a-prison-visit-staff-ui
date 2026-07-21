@@ -8,12 +8,19 @@
 
 {% set contactRows = [] %}
 {% for contact in visitorRequest.socialContacts %}
+
+  {% set contactName %}{{ contact.firstName }} {{ contact.lastName }}{% endset %}
+
+  {% set contactDetailsUrl = dpsContacts + '/prisoner/' + visitorRequest.prisonerId
+                                         + '/contacts/manage/' + contact.visitorId
+                                         + '/relationship/' + contact.relationshipId %}
+
   {# Radio input markup or blank for contacts with no DoB #}
   {% set selectContactInputHtml %}
     <div class="govuk-radios__item">
       <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}" {{"disabled" if not contact.dateOfBirth}}>
       <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
-        <span class="govuk-visually-hidden">Select {{ contact.firstName }} {{ contact.lastName }}</span>
+        <span class="govuk-visually-hidden">Select {{ contactName }}</span>
       </label>
     </div>
   {% endset %}
@@ -24,7 +31,7 @@
       attributes: { "data-test": "visitor-" + loop.index + "-select" }
     },
     {
-      text: contact.firstName + " " + contact.lastName,
+      text: contactName,
       classes: "govuk-!-font-weight-bold bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-name" }
     },
@@ -39,6 +46,13 @@
       text: contact.lastApprovedForVisitDate | formatDate if contact.lastApprovedForVisitDate else "None",
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-last-visit" }
+    },
+    {
+      html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer">
+        View contact <span class="govuk-visually-hidden">details for ' + contactName + ' (opens in a new tab)</span>
+      </a>',
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }
     }
   ]), contactRows)%}
 {% endfor %}
@@ -110,6 +124,9 @@
                 },
                 {
                   text: "Last visit approved on"
+                },
+                {
+                  html: 'Contact information<div class="govuk-caption-m">(opens in a new tab)</div>'
                 }
               ],
               rows: contactRows

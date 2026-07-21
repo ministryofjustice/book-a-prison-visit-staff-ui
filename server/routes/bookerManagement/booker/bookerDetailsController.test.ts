@@ -6,6 +6,7 @@ import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutil
 import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
+import testScreenReaderAndVisibleOnlyText from '../../testutils/testScreenReaderAndVisibleOnlyText'
 
 let app: Express
 let flashData: FlashData
@@ -79,7 +80,22 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
           expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
-          expect($('[data-test=prisoner-1-visitor-1-unlink]').text().trim()).toBe('Unlink Jeanette Smith')
+
+          const $linkElement = $('[data-test="visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement,
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'View contact',
+          )
+          expect($linkElement.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
+          )
+
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-1-visitor-1-unlink]'),
+            'Unlink Jeanette Smith',
+            'Unlink',
+          )
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )

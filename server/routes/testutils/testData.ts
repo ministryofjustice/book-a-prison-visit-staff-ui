@@ -198,6 +198,7 @@ export default class TestData {
     firstName = 'Jeanette',
     lastName = 'Smith',
     dateOfBirth = '1986-07-28',
+    relationshipId = 12345678,
     relationshipDescription = 'Wife',
   }: Partial<
     BookerDetailedInfoDto['permittedPrisoners'][0]['permittedVisitors'][0]
@@ -206,6 +207,7 @@ export default class TestData {
     firstName,
     lastName,
     dateOfBirth,
+    relationshipId,
     relationshipDescription,
   })
 
@@ -559,6 +561,7 @@ export default class TestData {
     dateOfBirth = '1986-07-28',
     approvedVisitor = true,
     lastApprovedForVisitDate = '2025-10-11',
+    relationshipId = 12345678,
   }: Partial<SocialContactsDto> = {}): SocialContactsDto => ({
     visitorId,
     firstName,
@@ -566,6 +569,7 @@ export default class TestData {
     dateOfBirth,
     approvedVisitor,
     lastApprovedForVisitDate,
+    relationshipId,
   })
 
   static supportedPrisonIds = ({ prisonIds = ['HEI', 'BLI'] } = {}): string[] => prisonIds
@@ -621,7 +625,7 @@ export default class TestData {
     maxChildVisitors = 4,
     adultAgeYears = 18,
     webAddress = 'https://www.example.com/hewell',
-    clients = [{ userType: 'STAFF', active: true }],
+    clients = [{ userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 }],
     weekStartDay = 'MONDAY',
     remandVisitLimitPerWeek = 3,
   }: Partial<PrisonDto> = {}): PrisonDto =>

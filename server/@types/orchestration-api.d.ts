@@ -2140,6 +2140,18 @@ export interface components {
        */
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /**
+       * Format: int32
+       * @description minimum number of days notice from the current date to book a visit
+       * @example 2
+       */
+      policyNoticeDaysMin: number
+      /**
+       * Format: int32
+       * @description maximum number of days notice from the current date to book a visit
+       * @example 28
+       */
+      policyNoticeDaysMax: number
+      /**
        * @description is prison user client active
        * @example true
        */
@@ -2562,6 +2574,7 @@ export interface components {
         | 'PRISONER_ALERTS_UPDATED_EVENT'
         | 'PRISONER_ALERT_CREATED_EVENT'
         | 'PRISONER_ALERT_UPDATED_EVENT'
+        | 'PRISONER_ALERT_DELETED_EVENT'
         | 'PRISON_VISITS_BLOCKED_FOR_DATE'
         | 'SESSION_VISITS_BLOCKED_FOR_DATE'
         | 'IGNORE_VISIT_NOTIFICATIONS_EVENT'
@@ -2573,6 +2586,7 @@ export interface components {
         | 'IGNORED_NON_ASSOCIATION_VISIT_NOTIFICATIONS_EVENT'
         | 'PAIRED_VISIT_CANCELLED_IGNORED_OR_UPDATED_EVENT'
         | 'COURT_VIDEO_APPOINTMENT_CREATED_OR_UPDATED_EVENT'
+        | 'PRISONER_MERGED'
       /**
        * @description What was the application method for this event
        * @enum {string}
@@ -3028,33 +3042,33 @@ export interface components {
       /** Format: int32 */
       totalPages?: number
       /** Format: int32 */
+      numberOfElements?: number
+      first?: boolean
+      last?: boolean
+      sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
+      /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
-      first?: boolean
-      last?: boolean
-      sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
       empty?: boolean
     }
     PageableObject: {
-      /** Format: int64 */
-      offset?: number
       sort?: components['schemas']['SortObject']
+      paged?: boolean
+      unpaged?: boolean
       /** Format: int32 */
       pageSize?: number
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
-      unpaged?: boolean
+      /** Format: int64 */
+      offset?: number
     }
     SortObject: {
-      empty?: boolean
       sorted?: boolean
       unsorted?: boolean
+      empty?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -3227,6 +3241,12 @@ export interface components {
        * @example 5871791
        */
       visitorId: number
+      /**
+       * Format: int64
+       * @description Key of specific relationship
+       * @example 1234567
+       */
+      relationshipId: number
       /**
        * @description First name
        * @example John
@@ -3658,6 +3678,12 @@ export interface components {
        * @example 2000-01-31
        */
       dateOfBirth?: string | null
+      /**
+       * Format: int64
+       * @description Relationship ID
+       * @example 2000-01-31
+       */
+      relationshipId?: number | null
       /**
        * @description Description of relationship to Prisoner
        * @example Mother
