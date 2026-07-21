@@ -569,7 +569,7 @@ describe('Update journey specific warning messages', () => {
         const $ = cheerio.load(res.text)
         expect($('.moj-alert').length).toBe(1)
         expect($('.moj-alert').eq(0).text()).toContain('open to closed')
-        expect($('.moj-alert').eq(0).text()).toContain('Select a new visit time.')
+        expect($('.moj-alert').eq(0).text()).toContain('You may need to select a new visit time.')
         expect($('input[value=2025-08-31_a]').prop('checked')).toBe(true)
       })
   })
