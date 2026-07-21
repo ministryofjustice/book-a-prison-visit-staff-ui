@@ -120,7 +120,7 @@ test.describe('Process a visit Request', () => {
 
     // Rejection reason page
     const visitRequestRejectionReasonPage = await VisitRequestRejectionReasonPage.verifyOnPage(page)
-    await visitRequestRejectionReasonPage.selectSingleSession()
+    await visitRequestRejectionReasonPage.selectNoVisitAllowanceReason()
 
     // Confirm rejection
     await orchestrationApi.stubRejectVisitRequest({

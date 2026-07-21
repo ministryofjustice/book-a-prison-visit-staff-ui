@@ -54,7 +54,11 @@ export default function routes(services: Services): Router {
 
   router.post('/:reference/request/approve', processVisitRequest.processRequest('approve'))
   router.get('/:reference/request/reject/reason', visitRequestRejectionReason.view())
-  router.post('/:reference/request/reject', processVisitRequest.processRequest('reject'))
+  router.post(
+    '/:reference/request/reject',
+    processVisitRequest.validate(),
+    processVisitRequest.processRequest('reject'),
+  )
 
   return router
 }

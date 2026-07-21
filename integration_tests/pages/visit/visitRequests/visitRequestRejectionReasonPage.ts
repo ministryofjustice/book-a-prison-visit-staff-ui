@@ -13,7 +13,7 @@ export default class VisitRequestRejectionReasonPage extends AbstractPage {
     this.rejectButton = page.getByRole('button', { name: 'Confirm rejection' })
   }
 
-  async selectSingleSession(): Promise<void> {
+  async selectNoVisitAllowanceReason(): Promise<void> {
     await this.noAllowanceRadio.check()
   }
 

@@ -46,10 +46,11 @@ const getVisitRequestAlert = ({
 
   if (visitStatus === 'CANCELLED' && visitSubStatus === 'REJECTED') {
     const rejectionEvent = events.find(event => event.type === 'REQUESTED_VISIT_REJECTED')
+    const rejectionReason = rejectionEvent?.text
 
     const title =
-      rejectionEvent?.text in visitRequestRejectionAlerts
-        ? visitRequestRejectionAlerts[rejectionEvent.text as VisitRequestRejectionReason]
+      typeof rejectionReason === 'string' && rejectionReason in visitRequestRejectionAlerts
+        ? visitRequestRejectionAlerts[rejectionReason as VisitRequestRejectionReason]
         : visitRequestRejectionAlerts.default
 
     return {

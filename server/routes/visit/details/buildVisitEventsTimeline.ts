@@ -59,12 +59,14 @@ export default ({
           timelineItem.text = 'Method: GOV.UK'
           break
 
-        case 'REQUESTED_VISIT_REJECTED':
+        case 'REQUESTED_VISIT_REJECTED': {
+          const rejectionReason = event.text
           timelineItem.text =
-            event.text in visitRequestRejectionAuditEvents
-              ? visitRequestRejectionAuditEvents[event.text as VisitRequestRejectionReason]
+            typeof rejectionReason === 'string' && rejectionReason in visitRequestRejectionAuditEvents
+              ? visitRequestRejectionAuditEvents[rejectionReason as VisitRequestRejectionReason]
               : ''
           break
+        }
 
         default:
           timelineItem.text = isANotificationType(event.type) ? `Reason: ${notificationTypes[event.type]}` : ''

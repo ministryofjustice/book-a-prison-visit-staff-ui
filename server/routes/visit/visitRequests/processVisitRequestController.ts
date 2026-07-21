@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitRequestsService, VisitService } from '../../../services'
 import { MoJAlert } from '../../../@types/bapv'
 import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
@@ -14,15 +15,7 @@ import { visitRequestRejectionReasons } from '../../../constants/visitRequestRej
 
 type RequestAction = 'approve' | 'reject'
 type RejectVisitRequestBody = {
-  rejectionReason?: unknown
-}
-
-function getVisitRequestRejectionReason(rejectionReason: unknown): VisitRequestRejectionReason {
-  if (typeof rejectionReason === 'string' && rejectionReason in visitRequestRejectionReasons) {
-    return rejectionReason as VisitRequestRejectionReason
-  }
-
-  return null
+  rejectionReason?: VisitRequestRejectionReason
 }
 
 export default class ProcessVisitRequestController {
@@ -51,7 +44,9 @@ export default class ProcessVisitRequestController {
             username,
           })
         } else {
-          const visitRequestRejectionReason = getVisitRequestRejectionReason(req.body?.rejectionReason)
+          validationResult(req)
+          const { rejectionReason } = matchedData<RejectVisitRequestBody>(req)
+          const visitRequestRejectionReason = rejectionReason ?? null
 
           visitRequestResponse = await this.visitRequestsService.rejectVisitRequest({
             username,
@@ -82,6 +77,10 @@ export default class ProcessVisitRequestController {
         return next(error)
       }
     }
+  }
+
+  public validate(): ValidationChain[] {
+    return [body('rejectionReason').optional().isIn(Object.keys(visitRequestRejectionReasons))]
   }
 
   private getRedirectPath(navState: VisitNavState, prisonerIdParam: unknown): string {
@@ -140,7 +139,6 @@ export default class ProcessVisitRequestController {
       return message
     }
 
-    // TODO may be more cases to handle here when request withdrawal, etc implemented
     return null
   }
 }
