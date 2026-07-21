@@ -196,8 +196,8 @@ describe('Visit details page', () => {
           expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
             '/visit/ab-cd-ef-gh/request/approve?from=visits',
           )
-          expect($('[data-test="reject-visit-request"]').parent('form').attr('action')).toBe(
-            '/visit/ab-cd-ef-gh/request/reject?from=visits',
+          expect($('[data-test="reject-visit-request"]').attr('href')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject/reason?from=visits',
           )
         })
     })
@@ -221,8 +221,8 @@ describe('Visit details page', () => {
           expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
             '/visit/ab-cd-ef-gh/request/approve?from=prisoner&prisonerId=A1234BC',
           )
-          expect($('[data-test="reject-visit-request"]').parent('form').attr('action')).toBe(
-            '/visit/ab-cd-ef-gh/request/reject?from=prisoner&prisonerId=A1234BC',
+          expect($('[data-test="reject-visit-request"]').attr('href')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject/reason?from=prisoner&prisonerId=A1234BC',
           )
         })
     })
@@ -459,9 +459,7 @@ describe('Visit details page', () => {
             )
 
             expect($('[data-test=reject-visit-request]').text().trim()).toBe('Reject request')
-            expect($('[data-test=reject-visit-request]').parent('form').attr('action')).toBe(
-              '/visit/ab-cd-ef-gh/request/reject',
-            )
+            expect($('[data-test=reject-visit-request]').attr('href')).toBe('/visit/ab-cd-ef-gh/request/reject/reason')
           })
       })
     })

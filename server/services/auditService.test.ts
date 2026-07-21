@@ -500,6 +500,53 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends an approved visit request audit message', async () => {
+    await auditService.approvedVisitRequest({
+      visitReference: 'ab-cd-ef-gh',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'APPROVED_VISIT_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a rejected visit request audit message', async () => {
+    await auditService.rejectedVisitRequest({
+      visitReference: 'ab-cd-ef-gh',
+      rejectionReason: 'ALERT_OR_RESTRICTION',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'REJECTED_VISIT_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh","rejectionReason":"ALERT_OR_RESTRICTION"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends an approved visitor request audit message', async () => {
     await auditService.approvedVisitorRequest({
       requestReference: 'cccc-dddd-eeee',

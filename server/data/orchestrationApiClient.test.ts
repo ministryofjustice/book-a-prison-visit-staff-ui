@@ -940,13 +940,18 @@ describe('orchestrationApiClient', () => {
         .put(`/visits/requests/${reference}/reject`, <RejectVisitRequestBodyDto>{
           visitReference: reference,
           actionedBy: 'user1',
+          visitRequestRejectionReason: null,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitRequestResponse)
 
-      expect(await orchestrationApiClient.rejectVisitRequest({ reference, username: 'user1' })).toStrictEqual(
-        visitRequestResponse,
-      )
+      expect(
+        await orchestrationApiClient.rejectVisitRequest({
+          reference,
+          username: 'user1',
+          visitRequestRejectionReason: null,
+        }),
+      ).toStrictEqual(visitRequestResponse)
     })
   })
 

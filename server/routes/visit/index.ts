@@ -9,6 +9,7 @@ import ConfirmUpdateController from './update/confirmUpdateController'
 import UpdateVisitController from './update/updateVisitController'
 import ProcessVisitRequestController from './visitRequests/processVisitRequestController'
 import VisitPassesController from '../visitPasses/visitPassesController'
+import VisitRequestRejectionReasonController from './visitRequests/visitRequestRejectionReasonController'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -18,7 +19,12 @@ export default function routes(services: Services): Router {
   const clearNotifications = new ClearNotificationsController(services.auditService, services.visitNotificationsService)
   const confirmUpdate = new ConfirmUpdateController()
   const updateVisit = new UpdateVisitController(services.visitService)
-  const processVisitRequest = new ProcessVisitRequestController(services.visitRequestsService, services.visitService)
+  const processVisitRequest = new ProcessVisitRequestController(
+    services.auditService,
+    services.visitRequestsService,
+    services.visitService,
+  )
+  const visitRequestRejectionReason = new VisitRequestRejectionReasonController()
   const visitPassesController = new VisitPassesController(services.auditService, services.visitService)
 
   // middleware to ensure valid visit reference for all /visit/:reference routes
@@ -47,6 +53,7 @@ export default function routes(services: Services): Router {
   router.post('/:reference/confirm-update', confirmUpdate.submitConfirmUpdate())
 
   router.post('/:reference/request/approve', processVisitRequest.processRequest('approve'))
+  router.get('/:reference/request/reject/reason', visitRequestRejectionReason.view())
   router.post('/:reference/request/reject', processVisitRequest.processRequest('reject'))
 
   return router

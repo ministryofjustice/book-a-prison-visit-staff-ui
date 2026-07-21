@@ -1,7 +1,12 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { PrisonerBalanceAdjustmentReason, RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
+import {
+  PrisonerBalanceAdjustmentReason,
+  RejectVisitorRequestDto,
+  Visit,
+  VisitRequestRejectionReason,
+} from '../data/orchestrationApiTypes'
 import { PrisonRemandConfig } from '../@types/bapv'
 
 export default class AuditService {
@@ -456,6 +461,42 @@ export default class AuditService {
       who: username,
       operationId,
       details: { reference, prisonerId, visitorId },
+    })
+  }
+
+  async approvedVisitRequest({
+    visitReference,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'APPROVED_VISIT_REQUEST',
+      who: username,
+      operationId,
+      details: { visitReference },
+    })
+  }
+
+  async rejectedVisitRequest({
+    visitReference,
+    rejectionReason,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    rejectionReason: VisitRequestRejectionReason
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'REJECTED_VISIT_REQUEST',
+      who: username,
+      operationId,
+      details: { visitReference, rejectionReason },
     })
   }
 

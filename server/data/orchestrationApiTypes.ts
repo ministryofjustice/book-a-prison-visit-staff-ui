@@ -102,6 +102,8 @@ export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
 
 export type ApproveVisitRequestBodyDto = components['schemas']['ApproveVisitRequestBodyDto']
 export type RejectVisitRequestBodyDto = components['schemas']['RejectVisitRequestBodyDto']
+export type VisitRequestRejectionReason =
+  components['schemas']['RejectVisitRequestBodyDto']['visitRequestRejectionReason']
 export type VisitRequestResponse = components['schemas']['OrchestrationApproveRejectVisitRequestResponseDto']
 export type VisitRequestSummary = components['schemas']['OrchestrationVisitRequestSummaryDto']
 export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']
