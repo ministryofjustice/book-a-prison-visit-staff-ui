@@ -44,7 +44,7 @@ describe('getVisitAlerts', () => {
   })
 
   describe('Visit request REJECTED', () => {
-    it('should return an alert if visit request is REJECTED', () => {
+    it('should return an alert if visit request is REJECTED (with no rejection reason)', () => {
       const visitDetails = TestData.visitBookingDetails({
         visitStatus: 'CANCELLED',
         visitSubStatus: 'REJECTED',
@@ -64,6 +64,33 @@ describe('getVisitAlerts', () => {
         {
           variant: 'information',
           title: 'Request rejected',
+          showTitleAsHeading: true,
+          text: 'This visit request was rejected by User One',
+        },
+      ])
+    })
+
+    it('should return an alert if visit request is REJECTED (with a rejection reason)', () => {
+      const visitDetails = TestData.visitBookingDetails({
+        visitStatus: 'CANCELLED',
+        visitSubStatus: 'REJECTED',
+        outcomeStatus: 'ESTABLISHMENT_CANCELLED',
+        events: [
+          {
+            type: 'REQUESTED_VISIT_REJECTED',
+            applicationMethodType: 'WEBSITE',
+            actionedByFullName: 'User One',
+            userType: 'STAFF',
+            text: 'NO_VISIT_ALLOWANCE',
+            createTimestamp: '',
+          },
+        ],
+      })
+
+      expect(getVisitAlerts(visitDetails)).toStrictEqual<MoJAlert[]>([
+        {
+          variant: 'information',
+          title: 'Request rejected as the prisoner had used up their entitlement',
           showTitleAsHeading: true,
           text: 'This visit request was rejected by User One',
         },

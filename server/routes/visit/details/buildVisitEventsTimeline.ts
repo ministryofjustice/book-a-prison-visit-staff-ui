@@ -1,7 +1,8 @@
 import eventAuditTypes from '../../../constants/eventAudit'
 import { notificationTypes } from '../../../constants/notifications'
 import { requestMethodDescriptions } from '../../../constants/requestMethods'
-import { EventAudit, VisitBookingDetails } from '../../../data/orchestrationApiTypes'
+import { visitRequestRejectionAuditEvents } from '../../../constants/visitRequestRejection'
+import { EventAudit, VisitBookingDetails, VisitRequestRejectionReason } from '../../../data/orchestrationApiTypes'
 
 export type MojTimelineItem = {
   label: { text: string }
@@ -56,6 +57,13 @@ export default ({
         case 'REQUESTED_VISIT':
         case 'REQUESTED_VISIT_WITHDRAWN':
           timelineItem.text = 'Method: GOV.UK'
+          break
+
+        case 'REQUESTED_VISIT_REJECTED':
+          timelineItem.text =
+            event.text in visitRequestRejectionAuditEvents
+              ? visitRequestRejectionAuditEvents[event.text as VisitRequestRejectionReason]
+              : ''
           break
 
         default:
