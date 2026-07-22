@@ -902,7 +902,7 @@ export default {
     visitRequestResponse = TestData.visitRequestResponse(),
   }: {
     reference: string
-    visitRequestRejectionReason: VisitRequestRejectionReason
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
     username?: string
     visitRequestResponse?: VisitRequestResponse
   }): SuperAgentRequest => {

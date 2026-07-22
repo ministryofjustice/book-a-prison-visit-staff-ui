@@ -528,7 +528,7 @@ export default class OrchestrationApiClient {
     username,
   }: {
     reference: string
-    visitRequestRejectionReason: VisitRequestRejectionReason
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
     username: string
   }): Promise<VisitRequestResponse> {
     return this.restClient.put({

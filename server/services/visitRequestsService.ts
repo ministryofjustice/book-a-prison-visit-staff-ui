@@ -14,7 +14,7 @@ export default class VisitRequestsService {
   }: {
     username: string
     reference: string
-    visitRequestRejectionReason: VisitRequestRejectionReason
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
   }): Promise<VisitRequestResponse> {
     const token = await this.hmppsAuthClient.getSystemClientToken(username)
     const orchestrationApiClient = this.orchestrationApiClientFactory(token)

@@ -488,7 +488,7 @@ export default class AuditService {
     operationId,
   }: {
     visitReference: string
-    rejectionReason: VisitRequestRejectionReason
+    rejectionReason: VisitRequestRejectionReason | null
     username: string
     operationId: string
   }) {
