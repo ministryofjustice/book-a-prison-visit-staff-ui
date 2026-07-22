@@ -146,7 +146,7 @@ export default class VisitDetailsController {
     processRequestRejectAction: string
   } {
     const approveAction = appendNavStateToPath(`/visit/${reference}/request/approve`, navState)
-    const rejectAction = appendNavStateToPath(`/visit/${reference}/request/reject`, navState)
+    const rejectAction = appendNavStateToPath(`/visit/${reference}/request/reject/reason`, navState)
 
     if (prisonerNumber) {
       const separator = (url: string) => (url.includes('?') ? '&' : '?')

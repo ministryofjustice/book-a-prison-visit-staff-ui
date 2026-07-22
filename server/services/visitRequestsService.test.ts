@@ -30,9 +30,17 @@ describe('Visit requests service', () => {
       const visitRequestResponse = TestData.visitRequestResponse()
       orchestrationApiClient.rejectVisitRequest.mockResolvedValue(visitRequestResponse)
 
-      const result = await visitRequestsService.rejectVisitRequest('user', reference)
+      const result = await visitRequestsService.rejectVisitRequest({
+        username: 'user',
+        reference,
+        visitRequestRejectionReason: null,
+      })
 
-      expect(orchestrationApiClient.rejectVisitRequest).toHaveBeenCalledWith({ username: 'user', reference })
+      expect(orchestrationApiClient.rejectVisitRequest).toHaveBeenCalledWith({
+        username: 'user',
+        reference,
+        visitRequestRejectionReason: null,
+      })
       expect(result).toStrictEqual(visitRequestResponse)
     })
   })
@@ -43,7 +51,7 @@ describe('Visit requests service', () => {
       const visitRequestResponse = TestData.visitRequestResponse()
       orchestrationApiClient.approveVisitRequest.mockResolvedValue(visitRequestResponse)
 
-      const result = await visitRequestsService.approveVisitRequest('user', reference)
+      const result = await visitRequestsService.approveVisitRequest({ username: 'user', reference })
 
       expect(orchestrationApiClient.approveVisitRequest).toHaveBeenCalledWith({ username: 'user', reference })
       expect(result).toStrictEqual(visitRequestResponse)

@@ -1,32 +1,66 @@
 import { RequestHandler } from 'express'
-import { VisitRequestsService, VisitService } from '../../../services'
+import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
+import { AuditService, VisitRequestsService, VisitService } from '../../../services'
 import { MoJAlert } from '../../../@types/bapv'
 import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
 import { convertToTitleCase } from '../../../utils/utils'
-import { VisitBookingDetails, VisitRequestResponse } from '../../../data/orchestrationApiTypes'
+import {
+  VisitBookingDetails,
+  VisitRequestRejectionReason,
+  VisitRequestResponse,
+} from '../../../data/orchestrationApiTypes'
 import { isValidPrisonerNumber } from '../../validationChecks'
 import { extractVisitNavState, type VisitNavState } from '../visitNavigationUtils'
+import { visitRequestRejectionReasons } from '../../../constants/visitRequestRejection'
 
 type RequestAction = 'approve' | 'reject'
+type RejectVisitRequestBody = {
+  rejectionReason?: VisitRequestRejectionReason
+}
 
 export default class ProcessVisitRequestController {
   public constructor(
+    private readonly auditService: AuditService,
     private readonly visitRequestsService: VisitRequestsService,
     private readonly visitService: VisitService,
   ) {}
 
-  public processRequest(action: RequestAction): RequestHandler<VisitReferenceParams> {
+  public processRequest(action: RequestAction): RequestHandler<VisitReferenceParams, unknown, RejectVisitRequestBody> {
     return async (req, res, next) => {
       const { reference } = req.params
       const { username } = res.locals.user
+
       const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
       const redirectPath = this.getRedirectPath(navState, req.query?.prisonerId)
 
       try {
-        const visitRequestResponse =
-          action === 'approve'
-            ? await this.visitRequestsService.approveVisitRequest(username, reference)
-            : await this.visitRequestsService.rejectVisitRequest(username, reference)
+        let visitRequestResponse
+        if (action === 'approve') {
+          visitRequestResponse = await this.visitRequestsService.approveVisitRequest({ username, reference })
+
+          await this.auditService.approvedVisitRequest({
+            visitReference: reference,
+            operationId: res.locals.appInsightsOperationId,
+            username,
+          })
+        } else {
+          validationResult(req)
+          const { rejectionReason } = matchedData<RejectVisitRequestBody>(req)
+          const visitRequestRejectionReason = rejectionReason ?? null
+
+          visitRequestResponse = await this.visitRequestsService.rejectVisitRequest({
+            username,
+            reference,
+            visitRequestRejectionReason,
+          })
+
+          await this.auditService.rejectedVisitRequest({
+            visitReference: reference,
+            rejectionReason: visitRequestRejectionReason,
+            operationId: res.locals.appInsightsOperationId,
+            username,
+          })
+        }
 
         req.flash('messages', this.getSuccessMessage(action, visitRequestResponse))
 
@@ -43,6 +77,10 @@ export default class ProcessVisitRequestController {
         return next(error)
       }
     }
+  }
+
+  public validate(): ValidationChain[] {
+    return [body('rejectionReason').optional().isIn(Object.keys(visitRequestRejectionReasons))]
   }
 
   private getRedirectPath(navState: VisitNavState, prisonerIdParam: unknown): string {
@@ -101,7 +139,6 @@ export default class ProcessVisitRequestController {
       return message
     }
 
-    // TODO may be more cases to handle here when request withdrawal, etc implemented
     return null
   }
 }

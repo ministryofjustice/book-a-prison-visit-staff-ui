@@ -326,6 +326,33 @@ describe('buildVisitEventsTimeline - Build MoJ Timeline items from visit event h
     expect(timeline).toStrictEqual(expectedTimeline)
   })
 
+  it('should return a timeline with an event for Request "Rejected" - with a rejection reason', () => {
+    params.events = [
+      {
+        type: 'REQUESTED_VISIT_REJECTED',
+        applicationMethodType: 'WEBSITE',
+        actionedByFullName: 'User One',
+        userType: 'STAFF',
+        text: 'ALERT_OR_RESTRICTION',
+        createTimestamp: '2022-01-01T09:00:00',
+      },
+    ]
+
+    const expectedTimeline: MojTimelineItem[] = [
+      {
+        label: { text: 'Rejected' },
+        text: 'Reason: A restriction or an alert prevented this visit',
+        datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+        byline: { text: 'User One' },
+        attributes: { 'data-test': 'timeline-entry-0' },
+      },
+    ]
+
+    const timeline = buildVisitEventsTimeline(params)
+
+    expect(timeline).toStrictEqual(expectedTimeline)
+  })
+
   it('should return a timeline with an event for "Withdrawn - Method: GOV.UK"', () => {
     params.events = [
       {

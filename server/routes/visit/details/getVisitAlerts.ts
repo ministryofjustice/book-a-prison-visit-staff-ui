@@ -1,7 +1,8 @@
 import type { MoJAlert } from '../../../@types/bapv'
 import { notificationTypeAlerts } from '../../../constants/notifications'
 import { visitCancellationAlerts } from '../../../constants/visitCancellation'
-import type { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
+import { visitRequestRejectionAlerts } from '../../../constants/visitRequestRejection'
+import type { VisitBookingDetails, VisitRequestRejectionReason } from '../../../data/orchestrationApiTypes'
 import { getIdsToFlag } from '../visitUtils'
 
 const getVisitCancelledAlert = ({
@@ -44,13 +45,21 @@ const getVisitRequestAlert = ({
   }
 
   if (visitStatus === 'CANCELLED' && visitSubStatus === 'REJECTED') {
-    const username = events.find(event => event.type === 'REQUESTED_VISIT_REJECTED')?.actionedByFullName
+    const rejectionEvent = events.find(event => event.type === 'REQUESTED_VISIT_REJECTED')
+    const rejectionReason = rejectionEvent?.text
+
+    const title =
+      typeof rejectionReason === 'string' && rejectionReason in visitRequestRejectionAlerts
+        ? visitRequestRejectionAlerts[rejectionReason as VisitRequestRejectionReason]
+        : visitRequestRejectionAlerts.default
 
     return {
       variant: 'information',
-      title: 'Request rejected',
+      title,
       showTitleAsHeading: true,
-      text: `This visit request was rejected by ${username}`,
+      text: rejectionEvent?.actionedByFullName
+        ? `This visit request was rejected by ${rejectionEvent.actionedByFullName}`
+        : 'This visit request was rejected',
     }
   }
 

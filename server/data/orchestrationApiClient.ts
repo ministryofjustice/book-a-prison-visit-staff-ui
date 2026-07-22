@@ -50,6 +50,7 @@ import {
   VisitPassDto,
   VisitPassRequestDto,
   VisitPreview,
+  VisitRequestRejectionReason,
   VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
@@ -523,14 +524,16 @@ export default class OrchestrationApiClient {
 
   async rejectVisitRequest({
     reference,
+    visitRequestRejectionReason,
     username,
   }: {
     reference: string
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
     username: string
   }): Promise<VisitRequestResponse> {
     return this.restClient.put({
       path: `/visits/requests/${reference}/reject`,
-      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username, visitRequestRejectionReason },
     })
   }
 
