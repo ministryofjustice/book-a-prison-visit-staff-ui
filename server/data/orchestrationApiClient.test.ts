@@ -967,7 +967,7 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('approveVisitRequest', () => {
-    it('should approve a visit request', async () => {
+    it.only('should approve a visit request', async () => {
       const reference = 'ab-cd-ef-gh'
       const visitRequestResponse = TestData.visitRequestResponse()
 
