@@ -97,7 +97,7 @@ export default class CheckYourBooking {
         operationId: res.locals.appInsightsOperationId,
       })
     } catch (error) {
-      if (error.status === 422) {
+      if (error.responseStatus === 422) {
         const validationErrors =
           (error as SanitisedError<ApplicationValidationErrorResponse>)?.data?.validationErrors ?? []
 

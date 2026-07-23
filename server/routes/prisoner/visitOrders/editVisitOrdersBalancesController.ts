@@ -102,7 +102,7 @@ export default class EditVisitOrdersBalancesController {
 
         return res.redirect(`/prisoner/${prisonerId}#visiting-orders`)
       } catch (error) {
-        if (error.status === 422) {
+        if (error.responseStatus === 422) {
           const validationErrors =
             (error as SanitisedError<PrisonerBalanceAdjustmentValidationErrorResponse>)?.data?.validationErrors ?? []
 

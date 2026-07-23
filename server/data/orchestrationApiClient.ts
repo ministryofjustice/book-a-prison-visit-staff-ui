@@ -373,7 +373,7 @@ export default class OrchestrationApiClient extends RestClient {
         asSystem(username),
       )
     } catch (error) {
-      if (error.status === 404) {
+      if (error.responseStatus === 404) {
         return []
       }
       throw error
@@ -447,7 +447,7 @@ export default class OrchestrationApiClient extends RestClient {
       )
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
-      if (error.status !== 404) {
+      if (error.responseStatus !== 404) {
         throw error
       }
     }

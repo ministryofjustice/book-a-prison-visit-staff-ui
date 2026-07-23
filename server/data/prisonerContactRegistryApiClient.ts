@@ -25,7 +25,7 @@ export default class PrisonerContactRegistryApiClient extends RestClient {
 
       return contacts
     } catch (error) {
-      if (error.status !== 404) {
+      if (error.responseStatus !== 404) {
         throw error
       }
 
