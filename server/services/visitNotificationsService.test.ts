@@ -36,7 +36,7 @@ describe('Visit notifications service', () => {
       const visitNotifications = [TestData.visitNotifications()]
       orchestrationApiClient.getVisitNotifications.mockResolvedValue(visitNotifications)
 
-      const result = await visitNotificationsService.getVisitNotifications({ username: username, prisonId })
+      const result = await visitNotificationsService.getVisitNotifications({ username, prisonId })
 
       expect(result).toStrictEqual(visitNotifications)
     })
