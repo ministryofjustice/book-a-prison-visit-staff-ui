@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { AuditService, VisitOrdersService } from '../../../services'
 import { PVO_MAX, visitBalanceAdjustmentReasons, VO_MAX } from '../../../constants/visitOrders'
 import { PrisonerParams } from '../../../@types/requestParameterTypes'
@@ -9,7 +10,6 @@ import {
   PrisonerBalanceAdjustmentValidationError,
   PrisonerBalanceAdjustmentValidationErrorResponse,
 } from '../../../data/orchestrationApiTypes'
-import { SanitisedError } from '../../../sanitisedError'
 import { apiValidationErrorToFieldValidationError, transformErrorCodesToMessage } from './visitOrdersUtils'
 import { TEXT_INPUT_SINGLE_LINE_REGEX } from '../../validationChecks'
 

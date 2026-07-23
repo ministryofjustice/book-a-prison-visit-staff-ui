@@ -1,24 +1,17 @@
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BookerService from './bookerService'
 import { BookerSearchResultsDto, RejectVisitorRequestDto } from '../data/orchestrationApiTypes'
 
-const token = 'some token'
 const username = 'user1'
 
 describe('Booker service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let bookerService: BookerService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    bookerService = new BookerService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    bookerService = new BookerService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -42,7 +35,7 @@ describe('Booker service', () => {
       const result = await bookerService.getSortedBookersByEmail({ username, email })
 
       expect(result).toStrictEqual([activeBookerAccount, bookerWithEarlierCreatedDate])
-      expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
+      expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email, username)
     })
   })
 
@@ -56,7 +49,7 @@ describe('Booker service', () => {
       const result = await bookerService.getBookerDetails({ username, reference })
 
       expect(result).toStrictEqual(booker)
-      expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference)
+      expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference, username)
     })
   })
 
@@ -71,7 +64,7 @@ describe('Booker service', () => {
       const result = await bookerService.getLinkedVisitors({ username, bookerReference, prisonerId })
 
       expect(result).toStrictEqual(visitors)
-      expect(orchestrationApiClient.getLinkedVisitors).toHaveBeenCalledWith({ bookerReference, prisonerId })
+      expect(orchestrationApiClient.getLinkedVisitors).toHaveBeenCalledWith({ bookerReference, prisonerId, username })
     })
   })
 
@@ -87,7 +80,11 @@ describe('Booker service', () => {
       const result = await bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
 
       expect(result).toStrictEqual(socialContacts)
-      expect(orchestrationApiClient.getNonLinkedSocialContacts).toHaveBeenCalledWith({ reference, prisonerId })
+      expect(orchestrationApiClient.getNonLinkedSocialContacts).toHaveBeenCalledWith({
+        reference,
+        prisonerId,
+        username,
+      })
     })
   })
 
@@ -116,7 +113,7 @@ describe('Booker service', () => {
         const result = await bookerService.getBookerStatus({ username: 'user1', email, reference })
 
         expect(result).toStrictEqual({ active: expectedActive, emailHasMultipleAccounts: expectedMultipleAccounts })
-        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
+        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email, username)
       },
     )
   })
@@ -177,7 +174,7 @@ describe('Booker service', () => {
         P1: [visitorRequests[0]],
         P2: [visitorRequests[1]],
       })
-      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(reference)
+      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(reference, username)
     })
   })
 
@@ -190,7 +187,7 @@ describe('Booker service', () => {
       const result = await bookerService.getVisitorRequests({ username, prisonId })
 
       expect(result).toStrictEqual(visitorRequestListEntries)
-      expect(orchestrationApiClient.getVisitorRequests).toHaveBeenCalledWith(prisonId)
+      expect(orchestrationApiClient.getVisitorRequests).toHaveBeenCalledWith(prisonId, username)
     })
   })
 
@@ -203,7 +200,7 @@ describe('Booker service', () => {
       const result = await bookerService.getVisitorRequestCount({ username, prisonId })
 
       expect(result).toBe(count)
-      expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId)
+      expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId, username)
     })
   })
 
@@ -218,7 +215,10 @@ describe('Booker service', () => {
       })
 
       expect(result).toStrictEqual(visitorRequestForReview)
-      expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(visitorRequestForReview.reference)
+      expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(
+        visitorRequestForReview.reference,
+        username,
+      )
     })
   })
 

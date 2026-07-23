@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express'
 import { validationResult } from 'express-validator'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { requestMethodsBooking } from '../../constants/requestMethods'
 import AuditService from '../../services/auditService'
 import { getUrlPrefix, validationErrorsToMoJAlert } from './visitJourneyUtils'
 import { VisitService } from '../../services'
 import { ApplicationValidationErrorResponse } from '../../data/orchestrationApiTypes'
-import { SanitisedError } from '../../sanitisedError'
 import { BookOrUpdate } from '../../@types/bapv'
 
 export default class CheckYourBooking {

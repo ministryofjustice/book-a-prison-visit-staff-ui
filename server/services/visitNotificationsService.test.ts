@@ -1,24 +1,18 @@
 import TestData from '../routes/testutils/testData'
 import VisitNotificationsService from './visitNotificationsService'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { Visit } from '../data/orchestrationApiTypes'
 
-const token = 'some token'
 const prisonId = 'HEI'
+const username = 'user'
 
 describe('Visit notifications service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitNotificationsService: VisitNotificationsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitNotificationsService = new VisitNotificationsService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitNotificationsService = new VisitNotificationsService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -30,9 +24,9 @@ describe('Visit notifications service', () => {
       const notificationCount = 3
       orchestrationApiClient.getNotificationCount.mockResolvedValue(notificationCount)
 
-      const result = await visitNotificationsService.getNotificationCount('user', prisonId)
+      const result = await visitNotificationsService.getNotificationCount(username, prisonId)
 
-      expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledWith(prisonId)
+      expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledWith(prisonId, username)
       expect(result).toBe(notificationCount)
     })
   })
@@ -42,7 +36,7 @@ describe('Visit notifications service', () => {
       const visitNotifications = [TestData.visitNotifications()]
       orchestrationApiClient.getVisitNotifications.mockResolvedValue(visitNotifications)
 
-      const result = await visitNotificationsService.getVisitNotifications({ username: 'user', prisonId })
+      const result = await visitNotificationsService.getVisitNotifications({ username: username, prisonId })
 
       expect(result).toStrictEqual(visitNotifications)
     })
@@ -62,14 +56,14 @@ describe('Visit notifications service', () => {
     })
 
     it('should return true if a given date has any visit notifications', async () => {
-      const result = await visitNotificationsService.dateHasNotifications('user', prisonId, date)
-      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId)
+      const result = await visitNotificationsService.dateHasNotifications(username, prisonId, date)
+      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId, username)
       expect(result).toBe(true)
     })
 
     it('should return false if a given date has no visit notifications', async () => {
-      const result = await visitNotificationsService.dateHasNotifications('user', prisonId, '2024-04-01')
-      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId)
+      const result = await visitNotificationsService.dateHasNotifications(username, prisonId, '2024-04-01')
+      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId, username)
       expect(result).toBe(false)
     })
   })
@@ -85,12 +79,16 @@ describe('Visit notifications service', () => {
       orchestrationApiClient.ignoreNotifications.mockResolvedValue(visit)
 
       const result = await visitNotificationsService.ignoreNotifications({
-        username: 'user',
+        username,
         reference,
         ignoreVisitNotificationsDto,
       })
 
-      expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(reference, ignoreVisitNotificationsDto)
+      expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(
+        reference,
+        ignoreVisitNotificationsDto,
+        username,
+      )
       expect(result).toStrictEqual(visit)
     })
   })

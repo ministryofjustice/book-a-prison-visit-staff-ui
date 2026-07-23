@@ -1,24 +1,18 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
-const token = 'some token'
+const username = 'user'
 
 describe('Supported prisons service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let supportedPrisonsService: SupportedPrisonsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    supportedPrisonsService = new SupportedPrisonsService(OrchestrationApiClientFactory, hmppsAuthClient)
-
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -31,7 +25,6 @@ describe('Supported prisons service', () => {
 
       const results = await supportedPrisonsService.getActiveAgencies()
 
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(undefined)
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })
@@ -41,9 +34,8 @@ describe('Supported prisons service', () => {
     it('should return an array of supported prison IDs', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
-      const results = await supportedPrisonsService.getSupportedPrisonIds('user')
+      const results = await supportedPrisonsService.getSupportedPrisonIds(username)
 
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)
     })
@@ -52,13 +44,13 @@ describe('Supported prisons service', () => {
   describe('isSupportedPrison', () => {
     it('should return true if given prisonId is a supported prison', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
-      const result = await supportedPrisonsService.isSupportedPrison('user', 'HEI')
+      const result = await supportedPrisonsService.isSupportedPrison(username, 'HEI')
       expect(result).toBe(true)
     })
 
     it('should return false if given prisonId is not a supported prison', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
-      const result = await supportedPrisonsService.isSupportedPrison('user', 'XYZ')
+      const result = await supportedPrisonsService.isSupportedPrison(username, 'XYZ')
       expect(result).toBe(false)
     })
   })
@@ -69,9 +61,9 @@ describe('Supported prisons service', () => {
     it('should return a Prison for given prison ID', async () => {
       orchestrationApiClient.getPrison.mockResolvedValue(prison)
 
-      const results = await supportedPrisonsService.getPrison('user', 'HEI')
+      const results = await supportedPrisonsService.getPrison(username, 'HEI')
 
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
+      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI', username)
       expect(results).toStrictEqual(prison)
     })
   })

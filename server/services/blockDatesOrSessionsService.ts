@@ -1,29 +1,19 @@
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 import { PrisonAndSessionsExcludeDatesDto } from '../data/orchestrationApiTypes'
 
 export default class BlockDatesOrSessionsService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async blockVisitDate(username: string, prisonId: string, date: string): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    await orchestrationApiClient.blockVisitDate(prisonId, date, username)
+    await this.orchestrationApiClient.blockVisitDate(prisonId, date, username)
   }
 
   async unblockVisitDate(username: string, prisonId: string, date: string): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    await orchestrationApiClient.unblockVisitDate(prisonId, date, username)
+    await this.orchestrationApiClient.unblockVisitDate(prisonId, date, username)
   }
 
   async isBlockedDate(prisonId: string, excludedDate: string, username: string): Promise<boolean> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
+    return this.orchestrationApiClient.isBlockedDate(prisonId, excludedDate, username)
   }
 
   async blockVisitSession({
@@ -35,9 +25,7 @@ export default class BlockDatesOrSessionsService {
     date: string
     username: string
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    await orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
+    await this.orchestrationApiClient.blockVisitSession({ sessionTemplateReference, date, username })
   }
 
   async unblockVisitSession({
@@ -49,9 +37,7 @@ export default class BlockDatesOrSessionsService {
     date: string
     username: string
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    await orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
+    await this.orchestrationApiClient.unblockVisitSession({ sessionTemplateReference, date, username })
   }
 
   async getFutureBlockedDatesAndSessions({
@@ -63,9 +49,6 @@ export default class BlockDatesOrSessionsService {
     includeSessions: boolean
     username: string
   }): Promise<PrisonAndSessionsExcludeDatesDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions })
+    return this.orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions, username })
   }
 }

@@ -1,17 +1,11 @@
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { OrchestrationApiClient } from '../data'
 import { IgnoreVisitNotificationsDto, Visit, VisitNotifications } from '../data/orchestrationApiTypes'
 
 export default class VisitNotificationsService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getNotificationCount(username: string, prisonId: string): Promise<number> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getNotificationCount(prisonId)
+    return this.orchestrationApiClient.getNotificationCount(prisonId, username)
   }
 
   async getVisitNotifications({
@@ -21,16 +15,11 @@ export default class VisitNotificationsService {
     username: string
     prisonId: string
   }): Promise<VisitNotifications[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-    return orchestrationApiClient.getVisitNotifications(prisonId)
+    return this.orchestrationApiClient.getVisitNotifications(prisonId, username)
   }
 
   async dateHasNotifications(username: string, prisonId: string, date: string): Promise<boolean> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    const visitNotifications = await orchestrationApiClient.getVisitNotifications(prisonId)
+    const visitNotifications = await this.orchestrationApiClient.getVisitNotifications(prisonId, username)
 
     return visitNotifications.some(visitNotification => visitNotification.visitDate === date)
   }
@@ -44,9 +33,6 @@ export default class VisitNotificationsService {
     reference: string
     ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto
   }): Promise<Visit> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
+    return this.orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto, username)
   }
 }
