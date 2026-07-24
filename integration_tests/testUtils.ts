@@ -9,7 +9,7 @@ import TestData from '../server/routes/testutils/testData'
 
 export { resetStubs }
 
-const DEFAULT_ROLES = [bapvUserRoles.STAFF_USER]
+const DEFAULT_ROLES = [`ROLE_${bapvUserRoles.STAFF_USER}`]
 
 export const attemptHmppsAuthLogin = async (page: Page) => {
   await page.goto('/')
