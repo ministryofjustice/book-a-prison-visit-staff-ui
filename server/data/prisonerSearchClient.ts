@@ -1,44 +1,54 @@
 import { URLSearchParams } from 'url'
-import RestClient from './restClient'
+import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
+import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import config from '../config'
+import logger from '../../logger'
 import { Prisoner } from './prisonerOffenderSearchTypes'
-import config, { ApiConfig } from '../config'
 
-export default class PrisonerSearchClient {
-  private restClient: RestClient
-
+export default class PrisonerSearchClient extends RestClient {
   private pageSize = config.apis.prisonerSearch.pageSize
 
-  constructor(token: string) {
-    this.restClient = new RestClient('prisonerSearchApiClient', config.apis.prisonerSearch as ApiConfig, token)
+  constructor(authenticationClient: AuthenticationClient) {
+    super('prisonerSearchApiClient', config.apis.prisonerSearch, logger, authenticationClient)
   }
 
   async getPrisoners(
     search: string,
     prisonId: string,
+    username: string,
     page = 0,
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
-    return this.restClient.get({
-      path: `/prison/${prisonId}/prisoners`,
-      query: new URLSearchParams({
-        term: search,
-        page: page.toString(),
-        size: this.pageSize.toString(),
-      }).toString(),
-    })
+    return this.get(
+      {
+        path: `/prison/${prisonId}/prisoners`,
+        query: new URLSearchParams({
+          term: search,
+          page: page.toString(),
+          size: this.pageSize.toString(),
+        }).toString(),
+      },
+      asSystem(username),
+    )
   }
 
-  async getPrisoner(search: string, prisonId: string): Promise<{ content: Prisoner[] }> {
-    return this.restClient.get({
-      path: `/prison/${prisonId}/prisoners`,
-      query: new URLSearchParams({
-        term: search,
-      }).toString(),
-    })
+  async getPrisoner(search: string, prisonId: string, username: string): Promise<{ content: Prisoner[] }> {
+    return this.get(
+      {
+        path: `/prison/${prisonId}/prisoners`,
+        query: new URLSearchParams({
+          term: search,
+        }).toString(),
+      },
+      asSystem(username),
+    )
   }
 
-  async getPrisonerById(id: string): Promise<Prisoner> {
-    return this.restClient.get({
-      path: `/prisoner/${id}`,
-    })
+  async getPrisonerById(id: string, username: string): Promise<Prisoner> {
+    return this.get(
+      {
+        path: `/prisoner/${id}`,
+      },
+      asSystem(username),
+    )
   }
 }

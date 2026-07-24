@@ -160,7 +160,7 @@ export default {
               actionedBy: cancelVisitDto.actionedBy,
               userType: cancelVisitDto.userType,
             },
-            ignoreArrayOrder: true,
+            // ignoreArrayOrder: true,
           },
         ],
       },
@@ -330,10 +330,10 @@ export default {
         urlPath: '/orchestration/visits/session-template',
         queryParameters: {
           prisonCode: { equalTo: prisonId },
-          sessionTemplateReference: { absent: true },
+          // sessionTemplateReference: { absent: true },
           sessionDate: { equalTo: sessionDate },
           visitStatus: { equalTo: 'BOOKED' },
-          visitRestrictions: { absent: true },
+          // visitRestrictions: { absent: true },
         },
       },
       response: {
@@ -1290,7 +1290,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: prison,
+        jsonBody: { ...prison, isEnabledForPublic: true },
       },
     })
   },

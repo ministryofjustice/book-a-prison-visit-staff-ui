@@ -25,7 +25,7 @@ generic-service:
     DPS_INCENTIVES_URL: "https://incentives-ui-preprod.hmpps.service.justice.gov.uk/"
     REDIS_KEY: "bapv-staff-preprod"
     ENVIRONMENT_NAME: preprod
+    NODE_USE_ENV_PROXY: "0"
+    APPLICATION_INSIGHTS_NO_STATSBEAT: "false"
 
-generic-prometheus-alerts:
-  alertSeverity: visits-alerts-nonprod
   businessHoursOnly: true

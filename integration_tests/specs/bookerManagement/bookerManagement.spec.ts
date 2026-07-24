@@ -37,7 +37,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
     const bookerDetails = TestData.bookerDetailedInfo({ email })
 
     test.beforeEach(async ({ page }) => {
-      await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
+      await login(page, { roles: [`ROLE_${bapvUserRoles.STAFF_USER}`, `ROLE_${bapvUserRoles.BOOKER_ADMIN}`] })
 
       await orchestrationApi.stubGetBookersByEmail({ email, bookers: [bookerSearchResult] })
       await orchestrationApi.stubGetBookerDetails({ reference: bookerDetails.reference, booker: bookerDetails })

@@ -1,16 +1,22 @@
 import nock from 'nock'
+import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import TestData from '../routes/testutils/testData'
 
 describe('prisonerContactRegistryApiClient', () => {
+  let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakePrisonerContactRegistryApi: nock.Scope
   let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   const token = 'token-1'
+  const username = 'user'
 
   beforeEach(() => {
+    mockAuthenticationClient = {
+      getToken: jest.fn().mockResolvedValue(token),
+    } as unknown as jest.Mocked<AuthenticationClient>
     fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
-    prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(token)
+    prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(mockAuthenticationClient)
   })
 
   afterEach(() => {
@@ -36,7 +42,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, contact)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo, username)
 
       expect(output).toStrictEqual(contact)
     })
@@ -53,7 +59,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
+      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo, username)
 
       expect(output).toStrictEqual([])
     })

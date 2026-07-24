@@ -16,7 +16,7 @@ test.describe('Booker management - visitor requests', () => {
     await orchestrationApi.stubGetNotificationCount()
     await orchestrationApi.stubGetVisitorRequests()
 
-    await login(page, { roles: [bapvUserRoles.STAFF_USER, bapvUserRoles.BOOKER_ADMIN] })
+    await login(page, { roles: [`ROLE_${bapvUserRoles.STAFF_USER}`, `ROLE_${bapvUserRoles.BOOKER_ADMIN}`] })
   })
 
   test.afterEach(async () => {
