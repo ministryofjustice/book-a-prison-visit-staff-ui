@@ -320,7 +320,7 @@ export default class DateAndTime {
           variant: 'error',
           title: `The visit type has changed from ${restrictionChange}`,
           showTitleAsHeading: true,
-          text: 'Select a new visit time.',
+          text: 'You may need to select a new visit time.',
         })
       }
     }

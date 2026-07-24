@@ -51,6 +51,7 @@ import {
   VisitPassDto,
   VisitPassRequestDto,
   VisitPreview,
+  VisitRequestRejectionReason,
   VisitRequestResponse,
   VisitRequestsCountDto,
   VisitRequestSummary,
@@ -486,11 +487,6 @@ export default class OrchestrationApiClient {
     })
   }
 
-  // FIXME this endpoint is deprecated; remove this and wiremock stub and use call above with includeSessions=false instead
-  async getFutureBlockedDates(prisonId: string): Promise<ExcludeDateDto[]> {
-    return this.restClient.get({ path: `/config/prisons/prison/${prisonId}/exclude-date/future` })
-  }
-
   async isBlockedDate(prisonCode: string, excludeDate: string): Promise<boolean> {
     const { isExcluded } = await this.restClient.get<IsExcludeDateDto>({
       path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
@@ -534,14 +530,16 @@ export default class OrchestrationApiClient {
 
   async rejectVisitRequest({
     reference,
+    visitRequestRejectionReason,
     username,
   }: {
     reference: string
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
     username: string
   }): Promise<VisitRequestResponse> {
     return this.restClient.put({
       path: `/visits/requests/${reference}/reject`,
-      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
+      data: <RejectVisitRequestBodyDto>{ visitReference: reference, actionedBy: username, visitRequestRejectionReason },
     })
   }
 

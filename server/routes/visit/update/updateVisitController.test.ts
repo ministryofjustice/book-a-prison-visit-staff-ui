@@ -1,12 +1,12 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider, user } from '../testutils/appSetup'
-import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
-import { MoJAlert, VisitSessionData } from '../../@types/bapv'
-import { clearSession } from '../visitorUtils'
-import TestData from '../testutils/testData'
-import { createMockVisitService } from '../../services/testutils/mocks'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
+import { MoJAlert, VisitSessionData } from '../../../@types/bapv'
+import { clearSession } from '../../visitorUtils'
+import TestData from '../../testutils/testData'
+import { createMockVisitService } from '../../../services/testutils/mocks'
 
 let app: Express
 let flashData: FlashData
@@ -16,8 +16,8 @@ const visitService = createMockVisitService()
 let visitDetails: VisitBookingDetails
 let visitSessionData: VisitSessionData
 
-jest.mock('../visitorUtils', () => {
-  const visitorUtils = jest.requireActual('../visitorUtils')
+jest.mock('../../visitorUtils', () => {
+  const visitorUtils = jest.requireActual('../../visitorUtils')
   return {
     ...visitorUtils,
     clearSession: jest.fn((req: Express.Request) => {

@@ -1,7 +1,8 @@
-import eventAuditTypes from '../../constants/eventAudit'
-import { notificationTypes } from '../../constants/notifications'
-import { requestMethodDescriptions } from '../../constants/requestMethods'
-import { EventAudit, VisitBookingDetails } from '../../data/orchestrationApiTypes'
+import eventAuditTypes from '../../../constants/eventAudit'
+import { notificationTypes } from '../../../constants/notifications'
+import { requestMethodDescriptions } from '../../../constants/requestMethods'
+import { visitRequestRejectionAuditEvents } from '../../../constants/visitRequestRejection'
+import { EventAudit, VisitBookingDetails, VisitRequestRejectionReason } from '../../../data/orchestrationApiTypes'
 
 export type MojTimelineItem = {
   label: { text: string }
@@ -38,7 +39,7 @@ export default ({
         case 'BOOKED_VISIT':
         case 'UPDATED_VISIT':
         case 'MIGRATED_VISIT':
-          timelineItem.text = isPublicBooking(event)
+          timelineItem.text = isPublicServiceEvent(event)
             ? 'Method: GOV.UK booking'
             : (requestMethodDescriptions[event.applicationMethodType] ?? '')
           break
@@ -48,7 +49,7 @@ export default ({
           break
 
         case 'CANCELLED_VISIT':
-          timelineItem.text = isPublicBooking(event)
+          timelineItem.text = isPublicServiceEvent(event)
             ? 'Method: GOV.UK cancellation'
             : (getCancellationReason(visitNotes) ?? requestMethodDescriptions[event.applicationMethodType])
           break
@@ -57,6 +58,15 @@ export default ({
         case 'REQUESTED_VISIT_WITHDRAWN':
           timelineItem.text = 'Method: GOV.UK'
           break
+
+        case 'REQUESTED_VISIT_REJECTED': {
+          const rejectionReason = event.text
+          timelineItem.text =
+            typeof rejectionReason === 'string' && rejectionReason in visitRequestRejectionAuditEvents
+              ? visitRequestRejectionAuditEvents[rejectionReason as VisitRequestRejectionReason]
+              : ''
+          break
+        }
 
         default:
           timelineItem.text = isANotificationType(event.type) ? `Reason: ${notificationTypes[event.type]}` : ''
@@ -76,8 +86,8 @@ export default ({
 // Type guard: needed because event types and notifications only have some overlap
 const isANotificationType = (type: string): type is keyof typeof notificationTypes => type in notificationTypes
 
-// Identify public bookings so text can be overridden
-const isPublicBooking = (event: EventAudit): boolean =>
+// Identify events made using public service so text can be overridden
+const isPublicServiceEvent = (event: EventAudit): boolean =>
   event.userType === 'PUBLIC' && event.applicationMethodType === 'WEBSITE'
 
 // Get user-entered cancellation reason, if set

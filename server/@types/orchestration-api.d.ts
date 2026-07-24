@@ -2140,6 +2140,18 @@ export interface components {
        */
       userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
       /**
+       * Format: int32
+       * @description minimum number of days notice from the current date to book a visit
+       * @example 2
+       */
+      policyNoticeDaysMin: number
+      /**
+       * Format: int32
+       * @description maximum number of days notice from the current date to book a visit
+       * @example 28
+       */
+      policyNoticeDaysMax: number
+      /**
        * @description is prison user client active
        * @example true
        */
@@ -3230,6 +3242,12 @@ export interface components {
        */
       visitorId: number
       /**
+       * Format: int64
+       * @description Key of specific relationship
+       * @example 1234567
+       */
+      relationshipId: number
+      /**
        * @description First name
        * @example John
        */
@@ -3694,6 +3712,12 @@ export interface components {
        * @example 2000-01-31
        */
       dateOfBirth?: string | null
+      /**
+       * Format: int64
+       * @description Relationship ID
+       * @example 2000-01-31
+       */
+      relationshipId?: number | null
       /**
        * @description Description of relationship to Prisoner
        * @example Mother

@@ -121,15 +121,15 @@
           }) }}
         </form>
 
-        <form action="{{ processRequestRejectAction }}" method="POST" novalidate>
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <div>
           {{ govukButton({
             text: "Reject request",
             classes: "govuk-!-margin-top-5 govuk-!-margin-left-6 govuk-button--secondary",
+            href: processRequestRejectAction,
             attributes: { "data-test": "reject-visit-request" },
             preventDoubleClick: true
           }) }}
-        </form>
+        </div>
       </div>
     {% endif %}
 

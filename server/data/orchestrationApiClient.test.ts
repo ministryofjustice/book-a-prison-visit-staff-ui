@@ -884,21 +884,6 @@ describe('orchestrationApiClient', () => {
     })
   })
 
-  describe('getFutureBlockedDates', () => {
-    it('should return future blocked dates for given prison', async () => {
-      const results = [TestData.excludeDateDto()]
-
-      fakeOrchestrationApi
-        .get(`/config/prisons/prison/${prisonId}/exclude-date/future`)
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await orchestrationApiClient.getFutureBlockedDates(prisonId)
-
-      expect(output).toStrictEqual(results)
-    })
-  })
-
   describe('isBlockedDate', () => {
     it('should return boolean indicating whether given date is a blocked', async () => {
       const results = { isExcluded: true }
@@ -956,13 +941,18 @@ describe('orchestrationApiClient', () => {
         .put(`/visits/requests/${reference}/reject`, <RejectVisitRequestBodyDto>{
           visitReference: reference,
           actionedBy: 'user1',
+          visitRequestRejectionReason: null,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitRequestResponse)
 
-      expect(await orchestrationApiClient.rejectVisitRequest({ reference, username: 'user1' })).toStrictEqual(
-        visitRequestResponse,
-      )
+      expect(
+        await orchestrationApiClient.rejectVisitRequest({
+          reference,
+          username: 'user1',
+          visitRequestRejectionReason: null,
+        }),
+      ).toStrictEqual(visitRequestResponse)
     })
   })
 

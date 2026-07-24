@@ -6,7 +6,7 @@ import HomePage from '../../pages/homePage'
 import VisitsByDatePage from '../../pages/visitsByDate/visitsByDatePage'
 import VisitPassesPage from '../../pages/visitPasses/visitPassesPage'
 import TestData from '../../../server/routes/testutils/testData'
-import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
+import VisitDetailsPage from '../../pages/visit/details/visitDetailsPage'
 
 const shortDateFormat = 'yyyy-MM-dd'
 const longDateFormat = 'EEEE d MMMM yyyy'

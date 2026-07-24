@@ -33,6 +33,7 @@ import {
   VisitPassDto,
   VisitPassRequestDto,
   VisitPreview,
+  VisitRequestRejectionReason,
   VisitRequestResponse,
   VisitRequestSummary,
   VisitSessionsAndScheduleDto,
@@ -809,26 +810,6 @@ export default {
     })
   },
 
-  stubGetFutureBlockedDates: ({
-    prisonId = 'HEI',
-    blockedDates = [],
-  }: {
-    prisonId?: string
-    blockedDates: ExcludeDateDto[]
-  }): SuperAgentRequest => {
-    return stubFor({
-      request: {
-        method: 'GET',
-        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
-      },
-      response: {
-        status: 200,
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: blockedDates,
-      },
-    })
-  },
-
   stubIsBlockedDate: ({
     prisonId,
     excludeDate,
@@ -916,12 +897,14 @@ export default {
 
   stubRejectVisitRequest: ({
     reference,
-    username,
-    visitRequestResponse,
+    visitRequestRejectionReason = null,
+    username = 'USER1',
+    visitRequestResponse = TestData.visitRequestResponse(),
   }: {
     reference: string
-    username: string
-    visitRequestResponse: VisitRequestResponse
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
+    username?: string
+    visitRequestResponse?: VisitRequestResponse
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -932,6 +915,7 @@ export default {
             equalToJson: {
               visitReference: reference,
               actionedBy: username,
+              visitRequestRejectionReason,
             },
           },
         ],
@@ -946,12 +930,12 @@ export default {
 
   stubApproveVisitRequest: ({
     reference,
-    username,
-    visitRequestResponse,
+    username = 'USER1',
+    visitRequestResponse = TestData.visitRequestResponse(),
   }: {
     reference: string
-    username: string
-    visitRequestResponse: VisitRequestResponse
+    username?: string
+    visitRequestResponse?: VisitRequestResponse
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -978,7 +962,7 @@ export default {
     prisonId = 'HEI',
     visitRequests = [TestData.visitRequestSummary()],
   }: {
-    prisonId: string
+    prisonId?: string
     visitRequests: VisitRequestSummary[]
   }): SuperAgentRequest => {
     return stubFor({

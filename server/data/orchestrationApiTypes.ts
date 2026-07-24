@@ -103,6 +103,10 @@ export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
 
 export type ApproveVisitRequestBodyDto = components['schemas']['ApproveVisitRequestBodyDto']
 export type RejectVisitRequestBodyDto = components['schemas']['RejectVisitRequestBodyDto']
+export type VisitRequestRejectionReason = Exclude<
+  components['schemas']['RejectVisitRequestBodyDto']['visitRequestRejectionReason'],
+  undefined | null
+> // Exclude undefined/null as this type is used as a key in constants/visitRequestRejection.ts
 export type VisitRequestResponse = components['schemas']['OrchestrationApproveRejectVisitRequestResponseDto']
 export type VisitRequestSummary = components['schemas']['OrchestrationVisitRequestSummaryDto']
 export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']

@@ -1,22 +1,19 @@
 import { RequestHandler } from 'express'
-import { AuditService, VisitService } from '../../services'
-import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
-import {
-  getAvailableVisitActions,
-  getIdsToFlag,
-  getPrisonerLocation,
-  getVisitAlerts,
-  getHideAlertsInset,
-} from './visitUtils'
+import { AuditService, VisitService } from '../../../services'
+import { getDpsPrisonerAlertsUrl } from '../../../utils/utils'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { getIdsToFlag, getPrisonerLocation } from '../visitUtils'
 import {
   appendNavStateToPath,
   extractVisitNavState,
   getVisitDetailsBackLink,
   type VisitNavState,
-} from './visitNavigationUtils'
-import visitEventsTimelineBuilder from './visitEventsTimelineBuilder'
-import { VisitBookingDetails } from '../../data/orchestrationApiTypes'
+} from '../visitNavigationUtils'
+import buildVisitEventsTimeline from './buildVisitEventsTimeline'
+import getAlertsHiddenMessages from './getAlertsHiddenMessages'
+import getAvailableVisitActions from './getAvailableVisitActions'
+import getVisitAlerts from './getVisitAlerts'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 
 export default class VisitDetailsController {
   public constructor(
@@ -42,10 +39,14 @@ export default class VisitDetailsController {
       })
 
       if (selectedEstablishment.prisonId !== prison.prisonId) {
-        return res.render('pages/visit/visitDetailsWrongEstablishment', { prison, reference, selectedEstablishment })
+        return res.render('pages/visit/details/visitDetailsWrongEstablishment', {
+          prison,
+          reference,
+          selectedEstablishment,
+        })
       }
 
-      const hideAlertsInset = getHideAlertsInset({
+      const hideAlertsInset = getAlertsHiddenMessages({
         skipAlertsAndRestrictionReason: visitDetails.skipAlertsAndRestrictionReason,
         prisonerNumber: visitDetails.prisoner.prisonerNumber,
       })
@@ -80,7 +81,7 @@ export default class VisitDetailsController {
         notifications: visitDetails.notifications,
       })
 
-      const eventsTimeline = visitEventsTimelineBuilder({
+      const eventsTimeline = buildVisitEventsTimeline({
         events: visitDetails.events,
         visitNotes: visitDetails.visitNotes,
       })
@@ -102,7 +103,7 @@ export default class VisitDetailsController {
       const prisonerDpsAlertsUrl = getDpsPrisonerAlertsUrl(visitDetails.prisoner.prisonerNumber)
       const prisonerLocation = getPrisonerLocation(prisoner)
 
-      return res.render('pages/visit/visitDetails', {
+      return res.render('pages/visit/details/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
         backLinkHref,
         hideAlertsInset,
@@ -145,7 +146,7 @@ export default class VisitDetailsController {
     processRequestRejectAction: string
   } {
     const approveAction = appendNavStateToPath(`/visit/${reference}/request/approve`, navState)
-    const rejectAction = appendNavStateToPath(`/visit/${reference}/request/reject`, navState)
+    const rejectAction = appendNavStateToPath(`/visit/${reference}/request/reject/reason`, navState)
 
     if (prisonerNumber) {
       const separator = (url: string) => (url.includes('?') ? '&' : '?')

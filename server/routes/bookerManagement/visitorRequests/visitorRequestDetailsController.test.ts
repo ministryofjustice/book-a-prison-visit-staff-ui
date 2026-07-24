@@ -10,6 +10,7 @@ import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
 import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
 import { VisitorRequestForReviewDto } from '../../../data/orchestrationApiTypes'
+import testScreenReaderAndVisibleOnlyText from '../../testutils/testScreenReaderAndVisibleOnlyText'
 
 let app: Express
 let flashData: FlashData
@@ -180,6 +181,7 @@ describe('Booker management - visitor requests - link a visitor', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Visitor list
+
           expect($('[data-test=no-dob-warning]').text()).toContain('must have a date of birth')
           expect($('[data-test=no-visitors-warning]').length).toBe(0)
           expect($('[data-test=visitor-1-select] input').length).toBe(1)
@@ -188,6 +190,15 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect($('[data-test=visitor-1-dob]').text()).toBe('Not entered')
           expect($('[data-test=visitor-1-last-visit]').text()).toBe('None')
 
+          const $linkElement = $('[data-test="visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement,
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'View contact',
+          )
+          expect($linkElement.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
+          )
           expect($('[data-test=link-visitor]').length).toBe(0)
           expect($('[data-test=check-linked-visitors]').attr('href')).toBe(
             `/manage-bookers/visitor-request/${visitorRequestForReview.reference}/check-linked-visitors`,
