@@ -3272,6 +3272,27 @@ export interface components {
        */
       lastApprovedForVisitDate?: string | null
     }
+    AdditionalConflictInfoDto: {
+      /** @description Attribute Name */
+      attributeName: string
+      /** @description Attribute value */
+      attributeValue: string
+    }
+    SessionConflictDto: {
+      /**
+       * @description Session Conflict
+       * @example NON_ASSOCIATION
+       * @enum {string}
+       */
+      sessionConflict:
+        | 'NON_ASSOCIATION'
+        | 'DOUBLE_BOOKING_OR_RESERVATION'
+        | 'SESSION_DATE_BLOCKED'
+        | 'PRISON_DATE_BLOCKED'
+        | 'REMAND_VISITS_LIMIT_REACHED'
+      /** @description Session Conflict attributes */
+      additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
+    }
     /** @description Visit Session */
     VisitSessionDto: {
       /**
@@ -3337,7 +3358,7 @@ export interface components {
        */
       endTimestamp: string
       /** @description Session conflicts */
-      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION' | 'REMAND_VISITS_LIMIT_REACHED')[] | null
+      sessionConflicts: components['schemas']['SessionConflictDto'][]
     }
     /** @description Session Capacity */
     SessionCapacityDto: {
@@ -3488,6 +3509,17 @@ export interface components {
        */
       endTime?: string | null
     }
+    SessionDateConflictDto: {
+      /**
+       * @description Session Date Conflict
+       * @example NON_ASSOCIATION
+       * @enum {string}
+       */
+      sessionDateConflict:
+        'NON_ASSOCIATION' | 'PRISON_DATE_BLOCKED' | 'OUTSIDE_BOOKING_WINDOW' | 'REMAND_VISITS_LIMIT_REACHED'
+      /** @description Session Conflict attributes */
+      additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
+    }
     SessionsAndScheduleDto: {
       /**
        * Format: date
@@ -3497,8 +3529,10 @@ export interface components {
       date: string
       /** @description Visit sessions */
       visitSessions: components['schemas']['VisitSessionV2Dto'][]
-      /** @description Visit sessions */
+      /** @description Prisoner's scheduled events (appointments etc.) */
       scheduledEvents: components['schemas']['PrisonerScheduledEventDto'][]
+      /** @description Conflicts for session date */
+      sessionDateConflicts: components['schemas']['SessionDateConflictDto'][]
     }
     VisitSessionV2Dto: {
       /**
@@ -3548,7 +3582,7 @@ export interface components {
        */
       endTime: string
       /** @description Session conflicts */
-      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION' | 'REMAND_VISITS_LIMIT_REACHED')[] | null
+      sessionConflicts: components['schemas']['SessionConflictDto'][]
       /**
        * @description Session vo restriction
        * @enum {string}
@@ -7699,6 +7733,14 @@ export interface operations {
          * @example user-1
          */
         username?: string
+        /** @description Comma-separated list of session conflicts to include only specific sessions with no session conflicts or sessions with these included session conflicts. If omitted or empty, all sessions and their session conflicts are returned. */
+        includedSessionConflicts?: (
+          | 'NON_ASSOCIATION'
+          | 'DOUBLE_BOOKING_OR_RESERVATION'
+          | 'SESSION_DATE_BLOCKED'
+          | 'PRISON_DATE_BLOCKED'
+          | 'REMAND_VISITS_LIMIT_REACHED'
+        )[]
       }
       header?: never
       path?: never

@@ -7,6 +7,7 @@ import {
   SessionSchedule,
   VisitSessionV2Dto,
   PrisonerScheduledEventDto,
+  SessionConflict,
 } from '../data/orchestrationApiTypes'
 
 // Single day on calendar with info for grid day and any visit sessions/events
@@ -230,7 +231,10 @@ export default class VisitSessionsService {
     }
 
     // otherwise disabled if existing booking
-    return visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION')
+    return this.sessionHasConflictOfType({
+      sessionConflicts: visitSession.sessionConflicts,
+      conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+    })
   }
 
   private getVisitSessionTag(
@@ -260,7 +264,12 @@ export default class VisitSessionsService {
       }
     }
 
-    if (visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION')) {
+    if (
+      this.sessionHasConflictOfType({
+        sessionConflicts: visitSession.sessionConflicts,
+        conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+      })
+    ) {
       return {
         text: 'Prisoner has a visit',
         classes: 'govuk-tag--red',
@@ -321,14 +330,23 @@ export default class VisitSessionsService {
     }
 
     const allSessionsHaveExistingVisit = calendarVisitSessions.every(visitSession =>
-      visitSession.sessionConflicts.includes('DOUBLE_BOOKING_OR_RESERVATION'),
+      this.sessionHasConflictOfType({
+        sessionConflicts: visitSession.sessionConflicts,
+        conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+      }),
     )
     if (allSessionsHaveExistingVisit) {
       return 'red'
     }
 
     const allAvailableSessionsFull = calendarVisitSessions
-      .filter(visitSession => visitSession.sessionConflicts.length === 0)
+      .filter(
+        visitSession =>
+          this.sessionConflictCount({
+            sessionConflicts: visitSession.sessionConflicts,
+            excludeConflictTypes: ['REMAND_VISITS_LIMIT_REACHED'], // ignore remand visits limit reached for now until 'overrides' feature implemented
+          }) === 0,
+      )
       .every(visitSession => visitSession.availableTables <= 0)
     if (allAvailableSessionsFull) {
       return 'orange'
@@ -361,5 +379,33 @@ export default class VisitSessionsService {
     }
 
     return `Activity - ${event.eventSourceDesc}`
+  }
+
+  private sessionHasConflictOfType({
+    sessionConflicts,
+    conflictType,
+  }: {
+    sessionConflicts: VisitSessionV2Dto['sessionConflicts']
+    conflictType: SessionConflict
+  }): boolean {
+    return sessionConflicts.some(
+      conflict =>
+        (conflict as unknown as string) === conflictType || // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
+        conflict.sessionConflict === conflictType,
+    )
+  }
+
+  private sessionConflictCount({
+    sessionConflicts,
+    excludeConflictTypes,
+  }: {
+    sessionConflicts: VisitSessionV2Dto['sessionConflicts']
+    excludeConflictTypes: SessionConflict[]
+  }): number {
+    return sessionConflicts.filter(conflict =>
+      typeof conflict === 'string'
+        ? true // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
+        : !excludeConflictTypes.includes(conflict.sessionConflict),
+    ).length
   }
 }

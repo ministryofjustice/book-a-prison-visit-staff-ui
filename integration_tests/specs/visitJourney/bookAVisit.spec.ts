@@ -98,6 +98,7 @@ test.describe('Book a visit', () => {
         date: format(date, shortDateFormat),
         visitSessions: [],
         scheduledEvents: [],
+        sessionDateConflicts: [],
       }
     })
     sessionsAndSchedule.at(7).visitSessions = [TestData.visitSessionV2({ startTime: '10:00', endTime: '11:00' })]
