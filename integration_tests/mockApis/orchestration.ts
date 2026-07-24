@@ -1290,7 +1290,7 @@ export default {
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: prison,
+        jsonBody: { ...prison, isEnabledForPublic: true },
       },
     })
   },
