@@ -11,7 +11,7 @@ export default function authorisationMiddleware(authorisedRoles: string[] = []):
     if (res.locals?.user?.token) {
       const { authorities: roles = [] } = jwtDecode(res.locals.user.token) as { authorities?: string[] }
 
-      logger.error(roles)
+      logger.error(authorisedAuthorities, roles)
 
       if (authorisedAuthorities.length && !roles.some(role => authorisedAuthorities.includes(role))) {
         logger.error('User is not authorised to access this')
