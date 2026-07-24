@@ -63,7 +63,7 @@ describe('orchestrationApiClient', () => {
     it('should return a BOOKED visit, given an application reference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
-        actionedBy: 'user1',
+        actionedBy: username,
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
@@ -86,7 +86,7 @@ describe('orchestrationApiClient', () => {
         applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
         allowOverBooking: false,
         visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
-        username: 'user1',
+        username,
       })
 
       expect(output).toStrictEqual(result)
@@ -97,7 +97,7 @@ describe('orchestrationApiClient', () => {
     it('should return a BOOKED visit, given an application reference', async () => {
       const applicationReference = 'aaa-bbb-ccc'
       const bookingOrchestrationRequestDto: BookingOrchestrationRequestDto = {
-        actionedBy: 'user1',
+        actionedBy: username,
         applicationMethodType: 'NOT_KNOWN',
         allowOverBooking: false,
         userType: 'STAFF',
@@ -120,7 +120,7 @@ describe('orchestrationApiClient', () => {
         applicationMethod: bookingOrchestrationRequestDto.applicationMethodType,
         allowOverBooking: false,
         visitorDetails: [{ visitorId: 1, visitorAge: 18 }],
-        username: 'user1',
+        username,
       })
 
       expect(output).toStrictEqual(result)
@@ -137,7 +137,7 @@ describe('orchestrationApiClient', () => {
           text: 'cancellation reason',
         },
         applicationMethodType: 'NOT_KNOWN',
-        actionedBy: 'user1',
+        actionedBy: username,
         userType: 'STAFF',
       }
 
@@ -411,13 +411,13 @@ describe('orchestrationApiClient', () => {
           }),
           visitorSupport: visitSessionData.visitorSupport,
           userType: 'STAFF',
-          actionedBy: 'user1',
+          actionedBy: username,
           allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, 'user1')
+      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, username)
 
       expect(output).toStrictEqual(result)
     })
@@ -445,13 +445,13 @@ describe('orchestrationApiClient', () => {
           }),
           visitorSupport: visitSessionData.visitorSupport,
           userType: 'STAFF',
-          actionedBy: 'user1',
+          actionedBy: username,
           allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, 'user1')
+      const output = await orchestrationApiClient.createVisitApplicationFromVisit(visitSessionData, username)
 
       expect(output).toStrictEqual(result)
     })
@@ -494,7 +494,7 @@ describe('orchestrationApiClient', () => {
             }
           }),
           userType: 'STAFF',
-          actionedBy: 'user1',
+          actionedBy: username,
           allowOverBooking: true,
         })
         .matchHeader('authorization', `Bearer ${token}`)
@@ -765,7 +765,7 @@ describe('orchestrationApiClient', () => {
 
       const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
         reason: 'adjustments will be made to seating',
-        actionedBy: 'user1',
+        actionedBy: username,
       }
 
       const visit = { reference } as Visit
@@ -950,7 +950,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .put(`/visits/requests/${reference}/reject`, <RejectVisitRequestBodyDto>{
           visitReference: reference,
-          actionedBy: 'user1',
+          actionedBy: username,
           visitRequestRejectionReason: null,
         })
         .matchHeader('authorization', `Bearer ${token}`)
@@ -959,7 +959,7 @@ describe('orchestrationApiClient', () => {
       expect(
         await orchestrationApiClient.rejectVisitRequest({
           reference,
-          username: 'user1',
+          username,
           visitRequestRejectionReason: null,
         }),
       ).toStrictEqual(visitRequestResponse)
@@ -967,14 +967,14 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('approveVisitRequest', () => {
-    it.only('should approve a visit request', async () => {
+    it('should approve a visit request', async () => {
       const reference = 'ab-cd-ef-gh'
       const visitRequestResponse = TestData.visitRequestResponse()
 
       fakeOrchestrationApi
         .put(`/visits/requests/${reference}/approve`, <ApproveVisitRequestBodyDto>{
           visitReference: reference,
-          actionedBy: 'user1',
+          actionedBy: username,
         })
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitRequestResponse)

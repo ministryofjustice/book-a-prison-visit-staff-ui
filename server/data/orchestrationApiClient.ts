@@ -62,6 +62,7 @@ import {
   VisitSessionsAndScheduleDto,
 } from './orchestrationApiTypes'
 import { Prison, VisitSessionData } from '../@types/bapv'
+import { getErrorStatus } from '../utils/errorHelpers'
 
 export default class OrchestrationApiClient extends RestClient {
   private enabledRawNotifications = config.features.notificationTypes.enabledRawNotifications
@@ -373,7 +374,7 @@ export default class OrchestrationApiClient extends RestClient {
         asSystem(username),
       )
     } catch (error) {
-      if (error.responseStatus === 404) {
+      if (getErrorStatus(error) === 404) {
         return []
       }
       throw error
@@ -447,7 +448,7 @@ export default class OrchestrationApiClient extends RestClient {
       )
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
-      if (error.responseStatus !== 404) {
+      if (getErrorStatus(error) !== 404) {
         throw error
       }
     }
