@@ -160,7 +160,7 @@ export default {
               actionedBy: cancelVisitDto.actionedBy,
               userType: cancelVisitDto.userType,
             },
-            // ignoreArrayOrder: true,
+            ignoreArrayOrder: true,
           },
         ],
       },
