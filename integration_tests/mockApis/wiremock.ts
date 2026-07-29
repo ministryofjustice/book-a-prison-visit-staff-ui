@@ -6,15 +6,10 @@ const url = 'http://localhost:9091/__admin'
  * Incomplete definition of options used for creating a new stub mapping
  * https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings/operation/createNewStubMapping
  */
-type QueryParameter =
-  | { equalTo: string }
-  | { matches: string }
-  | { contains: string }
-  | { absent: boolean }
+type QueryParameter = { equalTo: string } | { matches: string } | { contains: string } | { absent: boolean }
 
 type BodyPattern =
-  | { contains: string }
-  | { equalToJson: unknown; ignoreArrayOrder?: boolean; ignoreExtraElements?: boolean }
+  { contains: string } | { equalToJson: unknown; ignoreArrayOrder?: boolean; ignoreExtraElements?: boolean }
 
 interface Mapping {
   request?: {
