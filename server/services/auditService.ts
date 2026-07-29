@@ -14,7 +14,7 @@ export default class AuditService {
 
   constructor(private readonly queueUrl = config.apis.audit.queueUrl) {
     this.sqsClient = new SQSClient({
-      useQueueUrlAsEndpoint: true,
+      useQueueUrlAsEndpoint: false,
     })
   }
 
