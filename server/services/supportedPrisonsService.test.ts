@@ -23,7 +23,7 @@ describe('Supported prisons service', () => {
     it('should return an array of supported prison IDs (without requiring a username)', async () => {
       orchestrationApiClient.getSupportedPrisonIds.mockResolvedValue(supportedPrisonIds)
 
-      const results = await supportedPrisonsService.getActiveAgencies()
+      const results = await supportedPrisonsService.getActiveAgencies(username)
 
       expect(orchestrationApiClient.getSupportedPrisonIds).toHaveBeenCalledTimes(1)
       expect(results).toStrictEqual(supportedPrisonIds)

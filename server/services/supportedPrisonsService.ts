@@ -4,8 +4,8 @@ import { OrchestrationApiClient } from '../data'
 export default class SupportedPrisonsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
-  async getActiveAgencies(): Promise<string[]> {
-    return this.getSupportedPrisonIds(undefined)
+  async getActiveAgencies(username: string): Promise<string[]> {
+    return this.getSupportedPrisonIds(username)
   }
 
   async getSupportedPrisonIds(username: string): Promise<string[]> {
