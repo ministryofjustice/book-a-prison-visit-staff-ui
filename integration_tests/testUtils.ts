@@ -9,7 +9,7 @@ import TestData from '../server/routes/testutils/testData'
 
 export { resetStubs }
 
-const DEFAULT_ROLES = [`ROLE_${bapvUserRoles.STAFF_USER}`]
+const DEFAULT_ROLES = [bapvUserRoles.STAFF_USER]
 
 export const attemptHmppsAuthLogin = async (page: Page) => {
   await page.goto('/')
@@ -28,11 +28,12 @@ export const login = async (
     caseLoad = TestData.caseLoad(),
   }: UserToken & { active?: boolean; caseLoad?: CaseLoad } = {},
 ) => {
+  const newRoles = roles.map(role => (!role.startsWith('ROLE_') ? `ROLE_${role}` : role))
   await Promise.all([
     hmppsAuth.favicon(),
     hmppsAuth.stubSignInPage(),
     hmppsAuth.stubSignOutPage(),
-    hmppsAuth.token({ name, roles, authSource }),
+    hmppsAuth.token({ name, roles: newRoles, authSource }),
     tokenVerification.stubVerifyToken(active),
     stubComponents({ name, caseLoad }),
   ])
