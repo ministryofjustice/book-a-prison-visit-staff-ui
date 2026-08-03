@@ -1,24 +1,17 @@
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import BlockDatesOrSessionsService from './blockDatesOrSessionsService'
 
-const token = 'some token'
 const prisonId = 'HEI'
 const username = 'user1'
 
 describe('Blocked dates or sessions service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let blockDatesOrSessionsService: BlockDatesOrSessionsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    blockDatesOrSessionsService = new BlockDatesOrSessionsService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    blockDatesOrSessionsService = new BlockDatesOrSessionsService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -52,7 +45,7 @@ describe('Blocked dates or sessions service', () => {
       const date = '2000-02-01'
       orchestrationApiClient.isBlockedDate.mockResolvedValue(true)
       const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
-      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date, username)
       expect(result).toBe(true)
     })
 
@@ -62,7 +55,7 @@ describe('Blocked dates or sessions service', () => {
 
       const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
 
-      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date, username)
       expect(result).toStrictEqual(false)
     })
   })
@@ -113,6 +106,7 @@ describe('Blocked dates or sessions service', () => {
       expect(orchestrationApiClient.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
         prisonId,
         includeSessions: true,
+        username,
       })
       expect(result).toStrictEqual(prisonAndSessionsExcludeDatesDto)
     })

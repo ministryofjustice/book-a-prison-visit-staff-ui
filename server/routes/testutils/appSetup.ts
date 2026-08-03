@@ -39,7 +39,6 @@ import visitsRoutes from '../visitsByDate/visitsByDate'
 
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
-import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 import { FlashFormValues, MoJAlert } from '../../@types/bapv'
@@ -145,6 +144,5 @@ export function appWithAllRoutes({
     sharedData?: SharedData
   }
 }): Express {
-  auth.default.authenticationMiddleware = () => (req, res, next) => next()
   return appSetup(services as Services, production, userSupplier, sessionData, feComponents)
 }
