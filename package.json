@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.1091.0",
-    "@axe-core/playwright": "4.12.1",
     "@ministryofjustice/frontend": "^9.0.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.0.2",
@@ -68,6 +67,7 @@
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.974.2",
+    "@axe-core/playwright": "4.12.1",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.1",
@@ -101,14 +101,14 @@
     "nodemon": "^3.1.14",
     "prettier": "^3.9.6",
     "prettier-plugin-jinja-template": "^2.2.0",
-    "sass": "^1.101.3",
+    "sass": "^1.102.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.11",
     "typescript": "^6.0.3"
   },
   "overrides": {
     "@opentelemetry/core": "2.10.0",
-    "brace-expansion": "5.0.8",
+    "brace-expansion": "5.0.9",
     "shell-quote": "1.10.0"
   }
 }
