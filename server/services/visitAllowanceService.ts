@@ -1,13 +1,12 @@
 import { PrisonRemandConfig } from '../@types/bapv'
-import { HmppsAuthClient, IncentivesApiClient, OrchestrationApiClient, RestClientBuilder } from '../data'
+import { IncentivesApiClient, OrchestrationApiClient } from '../data'
 import { PrisonIncentiveLevel } from '../data/incentivesApiTypes'
 import { VisitSchedulerUpdatePrisonDto } from '../data/orchestrationApiTypes'
 
 export default class VisitAllowanceService {
   constructor(
-    private readonly incentivesApiClientFactory: RestClientBuilder<IncentivesApiClient>,
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
+    private readonly incentivesApiClient: IncentivesApiClient,
+    private readonly orchestrationApiClient: OrchestrationApiClient,
   ) {}
 
   async getPrisonIncentiveLevels({
@@ -17,17 +16,11 @@ export default class VisitAllowanceService {
     username: string
     prisonId: string
   }): Promise<PrisonIncentiveLevel[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const incentivesApiClient = this.incentivesApiClientFactory(token)
-
-    return incentivesApiClient.getPrisonIncentiveLevels(prisonId)
+    return this.incentivesApiClient.getPrisonIncentiveLevels(prisonId, username)
   }
 
   async getRemandConfig({ username, prisonId }: { username: string; prisonId: string }): Promise<PrisonRemandConfig> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    const prison = await orchestrationApiClient.getPrison(prisonId)
+    const prison = await this.orchestrationApiClient.getPrison(prisonId, username)
 
     return { weekStartDay: prison.weekStartDay, remandVisitLimitPerWeek: prison.remandVisitLimitPerWeek }
   }
@@ -43,14 +36,12 @@ export default class VisitAllowanceService {
     weekStartDay: VisitSchedulerUpdatePrisonDto['weekStartDay']
     remandVisitLimitPerWeek: VisitSchedulerUpdatePrisonDto['remandVisitLimitPerWeek']
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
     const visitSchedulerUpdatePrisonDto = { weekStartDay, remandVisitLimitPerWeek }
 
-    await orchestrationApiClient.updatePrisonConfig({
+    await this.orchestrationApiClient.updatePrisonConfig({
       prisonId,
       visitSchedulerUpdatePrisonDto,
+      username,
     })
   }
 }

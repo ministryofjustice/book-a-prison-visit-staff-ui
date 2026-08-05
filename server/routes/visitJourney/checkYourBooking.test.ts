@@ -2,11 +2,11 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
 import { ApplicationValidationErrorResponse, Visit } from '../../data/orchestrationApiTypes'
 import { createMockAuditService, createMockVisitService } from '../../services/testutils/mocks'
-import { SanitisedError } from '../../sanitisedError'
 import { Restriction } from '../../data/prisonerContactRegistryApiTypes'
 
 let sessionApp: Express
@@ -268,7 +268,7 @@ testJourneys.forEach(journey => {
           it('should redirect to confirm overbooking page if no_slot_capacity 422 received', () => {
             const error: SanitisedError<ApplicationValidationErrorResponse> = {
               name: 'Error',
-              status: 422,
+              responseStatus: 422,
               message: 'Unprocessable Entity',
               stack: 'Error: Unprocessable Entity',
               data: { status: 422, validationErrors: ['APPLICATION_INVALID_NO_SLOT_CAPACITY'] },

@@ -28,11 +28,12 @@ export const login = async (
     caseLoad = TestData.caseLoad(),
   }: UserToken & { active?: boolean; caseLoad?: CaseLoad } = {},
 ) => {
+  const newRoles = roles.map(role => (!role.startsWith('ROLE_') ? `ROLE_${role}` : role))
   await Promise.all([
     hmppsAuth.favicon(),
     hmppsAuth.stubSignInPage(),
     hmppsAuth.stubSignOutPage(),
-    hmppsAuth.token({ name, roles, authSource }),
+    hmppsAuth.token({ name, roles: newRoles, authSource }),
     tokenVerification.stubVerifyToken(active),
     stubComponents({ name, caseLoad }),
   ])
