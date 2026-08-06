@@ -8,24 +8,30 @@
 
 {% set contactRows = [] %}
 {% for contact in visitorRequest.socialContacts %}
+
+  {% set contactName = contact.firstName + " " + contact.lastName %}
+
+  {% set contactDetailsUrl = dpsContacts + '/prisoner/' + visitorRequest.prisonerId
+                                         + '/contacts/manage/' + contact.visitorId
+                                         + '/relationship/' + contact.relationshipId %}
+
   {# Radio input markup or blank for contacts with no DoB #}
   {% set selectContactInputHtml %}
     <div class="govuk-radios__item">
-      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}">
+      <input class="govuk-radios__input" id="visitor-{{ loop.index }}" name="visitorId" type="radio" value="{{ contact.visitorId }}" {{"disabled" if not contact.dateOfBirth}}>
       <label class="govuk-label govuk-radios__label" for="visitor-{{ loop.index }}">
-        <span class="govuk-visually-hidden">Select {{ contact.firstName }} {{ contact.lastName }}</span>
+        <span class="govuk-visually-hidden">Select {{ contactName }}</span>
       </label>
     </div>
   {% endset %}
 
   {% set contactRows = (contactRows.push([
     {
-      html: selectContactInputHtml if contact.dateOfBirth,
-      classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6" if not contact.dateOfBirth,
+      html: selectContactInputHtml,
       attributes: { "data-test": "visitor-" + loop.index + "-select" }
     },
     {
-      text: contact.firstName + " " + contact.lastName,
+      text: contactName,
       classes: "govuk-!-font-weight-bold bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-name" }
     },
@@ -40,6 +46,13 @@
       text: contact.lastApprovedForVisitDate | formatDate if contact.lastApprovedForVisitDate else "None",
       classes: "bapv-vertical-align-middle",
       attributes: { "data-test": "visitor-" + loop.index + "-last-visit" }
+    },
+    {
+      html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer">
+        View contact <span class="govuk-visually-hidden">details for ' + (contactName | escape) + ' (opens in a new tab)</span>
+      </a>',
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }
     }
   ]), contactRows)%}
 {% endfor %}
@@ -65,7 +78,9 @@
         <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>’s visitors
       </h2>
 
-      <p>Visitors already linked to this prisoner are not shown.</p>
+      {% if hasLinkedVisitors %}
+        <p>Visitors already linked to this prisoner are not shown.</p>
+      {% endif %}
 
       {{ govukWarningText({
         text: "Contacts must have a date of birth before they can be added as a visitor.",
@@ -73,8 +88,12 @@
         attributes: { "data-test": "no-dob-warning" }
       }) if showNoDobWarning }}
 
+      {% set extraText %}
+         {{ "that are not already " if hasLinkedVisitors else "" }}
+      {% endset %}
+
       {{ govukWarningText({
-        text: "The prisoner does not have any visitors that are not already linked to the booker’s account. " +
+        text: "The prisoner does not have any visitors " + extraText + "linked to the booker’s account. " +
           "Any new visitors will need to be added as social contacts before they can be linked.",
         iconFallbackText: "Warning",
         classes: "govuk-!-width-two-thirds",
@@ -105,6 +124,9 @@
                 },
                 {
                   text: "Last visit approved on"
+                },
+                {
+                  html: 'Contact information<div class="govuk-caption-m">(opens in a new tab)</div>'
                 }
               ],
               rows: contactRows
@@ -135,11 +157,19 @@
             classes: "govuk-!-margin-top-3",
             preventDoubleClick: true
           }) }}
-        {% else %}
+        {% elif hasLinkedVisitors %}
           {{ govukButton({
             text: "Check linked visitors",
             href: "/manage-bookers/visitor-request/" + visitorRequest.reference + "/check-linked-visitors",
             attributes: { "data-test": "check-linked-visitors" },
+            classes: "govuk-!-margin-top-3",
+            preventDoubleClick: true
+          }) }}
+         {% else %}
+          <input id="visitor-none" name="visitorId" type="hidden" value="reject">
+          {{ govukButton({
+            text: "Reject the request",
+            attributes: { "data-test": "reject-visitor" },
             classes: "govuk-!-margin-top-3",
             preventDoubleClick: true
           }) }}

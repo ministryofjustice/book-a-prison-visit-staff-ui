@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { format, sub, addDays, eachDayOfInterval } from 'date-fns'
 import TestData from '../../../server/routes/testutils/testData'
-import VisitDetailsPage from '../../pages/visit/visitDetailsPage'
+import VisitDetailsPage from '../../pages/visit/details/visitDetailsPage'
 import SelectVisitorsPage from '../../pages/visitJourney/selectVisitorsPage'
-import ConfirmUpdatePage from '../../pages/visit/confirmUpdatePage'
+import ConfirmUpdatePage from '../../pages/visit/update/confirmUpdatePage'
 import SelectVisitDateAndTimePage from '../../pages/visitJourney/selectVisitDateAndTimePage'
 import AdditionalSupportPage from '../../pages/visitJourney/additionalSupportPage'
 import MainContactPage from '../../pages/visitJourney/mainContactPage'
@@ -117,7 +117,12 @@ test.describe('Update a visit', () => {
     const updatedApplication = TestData.application({
       startTimestamp: session8Start,
       endTimestamp: session8End,
-      visitContact: { telephone: '01234 567890', email: 'visitor@example.com', name: 'Jeanette Smith' },
+      visitContact: {
+        telephone: '01234 567890',
+        email: 'visitor@example.com',
+        name: 'Jeanette Smith',
+        languagePreference: 'en',
+      },
       visitors: [
         { nomisPersonId: 4321, visitContact: true },
         { nomisPersonId: 4322, visitContact: false },
@@ -155,6 +160,7 @@ test.describe('Update a visit', () => {
         visitContact: {
           name: 'Jeanette Smith',
           telephone: '09876 543 321',
+          languagePreference: 'en',
         },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },

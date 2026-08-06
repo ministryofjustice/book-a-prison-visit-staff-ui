@@ -1,0 +1,42 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "components/contactMethodText.njk" import contactMethodText %}
+
+{% set pageHeaderTitle = "Booking cancelled" %}
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {{ govukPanel({
+      titleText: pageHeaderTitle,
+      classes: "bapv-info-panel govuk-!-padding-top-9 govuk-!-padding-bottom-9"
+    }) }}
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+    {% if startTimestamp and endTimestamp %}
+      <p>The visit booking for
+        <span data-test="visit-details">
+          {{- { startTime: startTimestamp, endTime: endTimestamp } | formatStartToEndTime }} on {{ startTimestamp | formatDate('EEEE d MMMM yyyy') -}}
+        </span>
+        has been cancelled.</p>
+    {% endif %}
+    {% if hasEmailAddress or hasMobileNumber %}
+      <p data-test="contact-method-text">The main contact for this visit will get {{ contactMethodText(hasEmailAddress, hasMobileNumber) }} to confirm it has been cancelled.</p>
+    {% endif %}
+
+    <div>
+      {% include "partials/backToStartButton.njk" %}
+    </div>
+    <div>
+      {{ govukButton({
+        classes: "govuk-!-margin-bottom-6 govuk-button--secondary",
+        text: "View this prisoner’s profile",
+        attributes: { "data-test": "go-to-prisoner" },
+        href: "/prisoner/" + prisonerId,
+        preventDoubleClick: true
+      }) }}
+    </div>
+  </div>
+</div>
+{% endblock %}

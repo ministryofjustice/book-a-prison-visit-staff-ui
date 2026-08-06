@@ -10,25 +10,19 @@ import {
 } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitService from './visitService'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
-const token = 'some token'
+const username = 'user'
 
 const prisonId = 'HEI'
 
 describe('Visit service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitService: VisitService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitService = new VisitService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitService = new VisitService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -76,7 +70,7 @@ describe('Visit service', () => {
       it('should book a visit including visitor age data', async () => {
         orchestrationApiClient.bookVisit.mockResolvedValue(visit as Visit)
         const result = await visitService.bookVisit({
-          username: 'user1',
+          username,
           applicationReference,
           applicationMethod,
           visitors,
@@ -88,7 +82,7 @@ describe('Visit service', () => {
           applicationMethod,
           allowOverBooking: false,
           visitorDetails: expectedVisitorDetails,
-          username: 'user1',
+          username,
         })
         expect(result).toStrictEqual(visit)
       })
@@ -96,7 +90,7 @@ describe('Visit service', () => {
       it('should update a visit including visitor age data', async () => {
         orchestrationApiClient.updateVisit.mockResolvedValue(visit as Visit)
         const result = await visitService.updateVisit({
-          username: 'user1',
+          username,
           applicationReference,
           applicationMethod,
           visitors,
@@ -108,7 +102,7 @@ describe('Visit service', () => {
           applicationMethod,
           allowOverBooking: false,
           visitorDetails: expectedVisitorDetails,
-          username: 'user1',
+          username,
         })
         expect(result).toStrictEqual(visit)
       })
@@ -161,13 +155,17 @@ describe('Visit service', () => {
 
         orchestrationApiClient.cancelVisit.mockResolvedValue(expectedResult)
         const result = await visitService.cancelVisit({
-          username: 'user',
+          username,
           reference: expectedResult.reference,
           cancelVisitDto,
         })
 
         expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledTimes(1)
-        expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledWith(expectedResult.reference, cancelVisitDto)
+        expect(orchestrationApiClient.cancelVisit).toHaveBeenCalledWith(
+          expectedResult.reference,
+          cancelVisitDto,
+          username,
+        )
         expect(result).toStrictEqual(expectedResult)
       })
     })
@@ -185,11 +183,11 @@ describe('Visit service', () => {
         orchestrationApiClient.changeVisitApplication.mockResolvedValue(application)
 
         const result = await visitService.changeVisitApplication({
-          username: 'user',
+          username,
           visitSessionData,
         })
 
-        expect(orchestrationApiClient.changeVisitApplication).toHaveBeenCalledWith(visitSessionData)
+        expect(orchestrationApiClient.changeVisitApplication).toHaveBeenCalledWith(visitSessionData, username)
         expect(result).toStrictEqual(application)
       })
     })
@@ -205,9 +203,9 @@ describe('Visit service', () => {
         }
 
         orchestrationApiClient.createVisitApplicationFromVisit.mockResolvedValue(application)
-        const result = await visitService.createVisitApplicationFromVisit({ username: 'user', visitSessionData })
+        const result = await visitService.createVisitApplicationFromVisit({ username, visitSessionData })
 
-        expect(orchestrationApiClient.createVisitApplicationFromVisit).toHaveBeenCalledWith(visitSessionData, 'user')
+        expect(orchestrationApiClient.createVisitApplicationFromVisit).toHaveBeenCalledWith(visitSessionData, username)
         expect(result).toStrictEqual(application)
       })
     })
@@ -223,9 +221,9 @@ describe('Visit service', () => {
         }
 
         orchestrationApiClient.createVisitApplication.mockResolvedValue(application)
-        const result = await visitService.createVisitApplication({ username: 'user', visitSessionData })
+        const result = await visitService.createVisitApplication({ username, visitSessionData })
 
-        expect(orchestrationApiClient.createVisitApplication).toHaveBeenCalledWith(visitSessionData, 'user')
+        expect(orchestrationApiClient.createVisitApplication).toHaveBeenCalledWith(visitSessionData, username)
         expect(result).toStrictEqual(application)
       })
     })
@@ -237,7 +235,7 @@ describe('Visit service', () => {
     describe('getVisit', () => {
       it('should return VisitInformation given a visit reference and matching prisonId', async () => {
         orchestrationApiClient.getVisit.mockResolvedValue(visit)
-        const result = await visitService.getVisit({ username: 'user', reference: 'ab-cd-ef-gh', prisonId })
+        const result = await visitService.getVisit({ username, reference: 'ab-cd-ef-gh', prisonId })
 
         expect(orchestrationApiClient.getVisit).toHaveBeenCalledTimes(1)
         expect(result).toEqual(<VisitInformation>{
@@ -256,7 +254,7 @@ describe('Visit service', () => {
 
         await expect(async () => {
           await visitService.getVisit({
-            username: 'user',
+            username,
             reference: 'ab-cd-ef-gh',
             prisonId: 'BLI',
           })
@@ -271,9 +269,9 @@ describe('Visit service', () => {
         const visitDetails = TestData.visitBookingDetails()
         orchestrationApiClient.getVisitDetailed.mockResolvedValue(visitDetails)
 
-        const result = await visitService.getVisitDetailed({ username: 'user', reference: 'ab-cd-ef-gh' })
+        const result = await visitService.getVisitDetailed({ username, reference: 'ab-cd-ef-gh' })
 
-        expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh')
+        expect(orchestrationApiClient.getVisitDetailed).toHaveBeenCalledWith('ab-cd-ef-gh', username)
         expect(result).toStrictEqual(visitDetails)
       })
     })
@@ -288,7 +286,7 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
 
         const result = await visitService.getVisitsBySessionTemplate({
-          username: 'user',
+          username,
           prisonId,
           reference,
           sessionDate,
@@ -299,6 +297,7 @@ describe('Visit service', () => {
           reference,
           sessionDate,
           visitRestrictions,
+          username,
         )
         expect(result).toStrictEqual(visitPreviews)
       })
@@ -312,7 +311,7 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitsBySessionTemplate.mockResolvedValue(visitPreviews)
 
         const result = await visitService.getVisitsWithoutSessionTemplate({
-          username: 'user',
+          username,
           prisonId,
           sessionDate,
         })
@@ -322,6 +321,7 @@ describe('Visit service', () => {
           undefined,
           sessionDate,
           undefined,
+          username,
         )
         expect(result).toStrictEqual(visitPreviews)
       })
@@ -334,12 +334,12 @@ describe('Visit service', () => {
         orchestrationApiClient.getBookedVisitCountByDate.mockResolvedValue(2)
 
         const result = await visitService.getBookedVisitCountByDate({
-          username: 'user',
+          username,
           prisonId,
           date,
         })
 
-        expect(orchestrationApiClient.getBookedVisitCountByDate).toHaveBeenCalledWith(prisonId, date)
+        expect(orchestrationApiClient.getBookedVisitCountByDate).toHaveBeenCalledWith(prisonId, date, username)
         expect(result).toBe(2)
       })
     })
@@ -352,12 +352,12 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitPasses.mockResolvedValue(visitPassDtos)
 
         const result = await visitService.getVisitPasses({
-          username: 'user',
+          username,
           prisonId,
           date,
         })
 
-        expect(orchestrationApiClient.getVisitPasses).toHaveBeenCalledWith({ prisonId, date, username: 'user' })
+        expect(orchestrationApiClient.getVisitPasses).toHaveBeenCalledWith({ prisonId, date, username })
         expect(result).toStrictEqual(visitPassDtos)
       })
     })
@@ -370,12 +370,12 @@ describe('Visit service', () => {
         orchestrationApiClient.getVisitPass.mockResolvedValue(visitPassDto)
 
         const result = await visitService.getVisitPass({
-          username: 'user',
+          username,
           prisonId,
           reference,
         })
 
-        expect(orchestrationApiClient.getVisitPass).toHaveBeenCalledWith({ prisonId, reference, username: 'user' })
+        expect(orchestrationApiClient.getVisitPass).toHaveBeenCalledWith({ prisonId, reference, username })
         expect(result).toStrictEqual(visitPassDto)
       })
     })

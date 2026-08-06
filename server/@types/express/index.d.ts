@@ -4,6 +4,7 @@ import { PrisonUser } from '../../interfaces/hmppsUser'
 import { CancelledVisitInfo, FlashFormValues, MoJAlert, Prison, VisitorListItem, VisitSessionData } from '../bapv'
 import {
   BookerSearchResultsDto,
+  SessionSchedule,
   SocialContactsDto,
   VisitorInfoDto,
   VisitorRequestForReviewDto,
@@ -18,8 +19,15 @@ export declare module 'express-session' {
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
     visitSessionData: VisitSessionData
     selectedEstablishment: Prison & { isEnabledForPublic: boolean }
-    visitBlockDate?: string // format YYYY-MM-DD
     cancelledVisitInfo?: CancelledVisitInfo
+
+    // Block visit date or session journey
+    blockDateOrSession?: {
+      backLinkHref: string
+      date: string // format YYYY-MM-DD
+      sessions?: SessionSchedule[]
+      selectedSession?: SessionSchedule
+    }
 
     // Booker management
     // matched booker accounts from an email search (sorted, most recent 'active' account first)

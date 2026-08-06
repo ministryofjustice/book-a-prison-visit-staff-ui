@@ -1,5 +1,5 @@
-import { format } from 'date-fns'
-import { HmppsAuthClient, RestClientBuilder, OrchestrationApiClient } from '../data'
+import { format, parseISO } from 'date-fns'
+import { OrchestrationApiClient } from '../data'
 import { GOVUKTag, VisitSessionData } from '../@types/bapv'
 import {
   VisitSession,
@@ -51,10 +51,7 @@ export type CalendarScheduledEvent = {
 export default class VisitSessionsService {
   private morningCutOff = 12
 
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   async getSingleVisitSession({
     prisonCode,
@@ -67,25 +64,26 @@ export default class VisitSessionsService {
     sessionTemplateReference: string
     username: string
   }): Promise<VisitSession> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
+    return this.orchestrationApiClient.getSingleVisitSession(
+      prisonCode,
+      sessionDate,
+      sessionTemplateReference,
+      username,
+    )
   }
 
   async getSessionSchedule({
     username,
     prisonId,
     date,
+    includeExcludedSessions,
   }: {
     username: string
     prisonId: string
     date: string
+    includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getSessionSchedule(prisonId, date)
+    return this.orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions, username })
   }
 
   async getVisitSessionCapacity(
@@ -95,10 +93,13 @@ export default class VisitSessionsService {
     sessionStartTime: string,
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
+    return this.orchestrationApiClient.getVisitSessionCapacity(
+      prisonId,
+      sessionDate,
+      sessionStartTime,
+      sessionEndTime,
+      username,
+    )
   }
 
   async getVisitSessionsAndScheduleCalendar({
@@ -118,15 +119,13 @@ export default class VisitSessionsService {
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
   }): Promise<{ calendar: CalendarDay[]; scheduledEventsAvailable: boolean }> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    const { scheduledEventsAvailable, sessionsAndSchedule } = await orchestrationApiClient.getVisitSessionsAndSchedule({
-      prisonId,
-      prisonerId,
-      minNumberOfDays,
-      username,
-    })
+    const { scheduledEventsAvailable, sessionsAndSchedule } =
+      await this.orchestrationApiClient.getVisitSessionsAndSchedule({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+      })
 
     // map raw session/schedule data to format for calendar
     const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
@@ -147,7 +146,7 @@ export default class VisitSessionsService {
 
       return {
         date,
-        monthHeading: format(date, 'MMMM'),
+        monthHeading: format(parseISO(date), 'MMMM'),
         ...(colour && { colour }),
         selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,

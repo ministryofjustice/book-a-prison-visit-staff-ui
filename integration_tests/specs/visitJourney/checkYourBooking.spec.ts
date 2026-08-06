@@ -124,7 +124,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890', languagePreference: 'en' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
         sessionTemplateReference: sessionIn7DaysTemplateReference,
@@ -159,7 +159,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
         endTimestamp: sessionIn8DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890', languagePreference: 'en' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
         sessionTemplateReference: sessionIn8DaysTemplateReference,
@@ -185,7 +185,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
         endTimestamp: sessionIn8DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890', languagePreference: 'en' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -213,7 +213,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
         endTimestamp: sessionIn8DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890', languagePreference: 'en' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -233,7 +233,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn8DaysStartTimestamp,
         endTimestamp: sessionIn8DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321' },
+        visitContact: { name: 'Jeanette Smith', telephone: '09876 543 321', languagePreference: 'en' },
         visitors: [
           { nomisPersonId: contacts[0].personId, visitContact: true },
           { nomisPersonId: contacts[1].personId, visitContact: false },
@@ -339,7 +339,7 @@ test.describe('Check visit details page', () => {
       TestData.application({
         startTimestamp: sessionIn7DaysStartTimestamp,
         endTimestamp: sessionIn7DaysEndTimestamp,
-        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890' },
+        visitContact: { name: 'Jeanette Smith', telephone: '01234 567890', languagePreference: 'en' },
         visitors: [{ nomisPersonId: contacts[0].personId, visitContact: true }],
         visitorSupport: { description: '' },
         sessionTemplateReference: sessionIn7DaysTemplateReference,

@@ -37,6 +37,9 @@ export type ApplicationMethodType = components['schemas']['BookingOrchestrationR
 export type BookingOrchestrationRequestDto = components['schemas']['BookingOrchestrationRequestDto']
 export type BookingRequestVisitorDetailsDto = components['schemas']['BookingRequestVisitorDetailsDto']
 
+export type SessionExcludeDateDto = components['schemas']['SessionExcludeDateDto']
+export type PrisonAndSessionsExcludeDatesDto = components['schemas']['PrisonAndSessionsExcludeDatesDto']
+
 export type SessionCapacity = components['schemas']['SessionCapacityDto']
 export type SessionSchedule = components['schemas']['SessionScheduleDto']
 
@@ -44,6 +47,8 @@ export type VisitSession = components['schemas']['VisitSessionDto']
 
 export type Alert = components['schemas']['AlertDto']
 export type OffenderRestriction = components['schemas']['OffenderRestrictionDto']
+
+export type VisitSchedulerUpdatePrisonDto = components['schemas']['VisitSchedulerUpdatePrisonDto']
 
 // Visit orders
 export type PrisonerBalanceDto = components['schemas']['PrisonerBalanceDto']
@@ -97,6 +102,10 @@ export type IsExcludeDateDto = components['schemas']['IsExcludeDateDto']
 
 export type ApproveVisitRequestBodyDto = components['schemas']['ApproveVisitRequestBodyDto']
 export type RejectVisitRequestBodyDto = components['schemas']['RejectVisitRequestBodyDto']
+export type VisitRequestRejectionReason = Exclude<
+  components['schemas']['RejectVisitRequestBodyDto']['visitRequestRejectionReason'],
+  undefined | null
+> // Exclude undefined/null as this type is used as a key in constants/visitRequestRejection.ts
 export type VisitRequestResponse = components['schemas']['OrchestrationApproveRejectVisitRequestResponseDto']
 export type VisitRequestSummary = components['schemas']['OrchestrationVisitRequestSummaryDto']
 export type VisitRequestsCountDto = components['schemas']['VisitRequestsCountDto']

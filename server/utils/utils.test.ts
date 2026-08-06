@@ -13,6 +13,7 @@ import {
   isMobilePhoneNumber,
   formatStartToEndTime,
   pluralise,
+  escapeHtml,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
 
@@ -196,7 +197,9 @@ describe('formatStartToEndTime', () => {
     ['13:00', '14:00', '1pm to 2pm'],
     ['13:15', '14:30', '1:15pm to 2:30pm'],
     ['23:00', '00:00', '11pm to 12am'],
+    ['2022-01-14T10:00:00', '2022-01-14T13:30:00', '10am to 1:30pm'],
     ['', '', ''],
+    ['123', 'abc', ''],
     [undefined, undefined, ''],
   ])('%s - %s - %s', (startTime: string, endTime: string, expected: string) => {
     expect(formatStartToEndTime(startTime, endTime)).toBe(expected)
@@ -221,5 +224,16 @@ describe('pluralise', () => {
     ])('%s pluralise(%s, %s) = %s', (_: string, word: string, count: string, plural: string, expected: string) => {
       expect(pluralise(word, count, plural)).toBe(expected)
     })
+  })
+})
+
+describe('escapeHtml', () => {
+  it('should escape HTML characters', () => {
+    expect(escapeHtml('Escape <this> & "that" !')).toBe('Escape &lt;this&gt; &amp; &quot;that&quot; !')
+  })
+
+  it('should handle undefined and null', () => {
+    expect(escapeHtml(null)).toBe('')
+    expect(escapeHtml(undefined)).toBe('')
   })
 })

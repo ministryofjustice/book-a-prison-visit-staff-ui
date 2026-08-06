@@ -11,6 +11,7 @@ import {
 } from '../data/orchestrationApiTypes'
 import type { CalendarVisitSession } from '../services/visitSessionsService'
 import type { Restriction } from '../data/prisonerContactRegistryApiTypes'
+import { DAYS_OF_WEEK } from '../constants/daysOfWeek'
 
 export type TextOrHtml = { text: string; html?: never } | { text?: never; html: string }
 
@@ -92,6 +93,7 @@ export type VisitSessionData = {
     phoneNumber?: string
     email?: string
     contactName?: string
+    languagePreference?: Visit['visitContact']['languagePreference']
   }
   applicationReference?: string
   visitReference?: string // only set during an update journey; during initial booking it's unknown
@@ -141,6 +143,11 @@ export type VisitsReviewListItem = {
 
 export interface Prison extends Omit<PrisonDto, 'code'> {
   prisonId: string
+}
+
+export type PrisonRemandConfig = {
+  weekStartDay: DAYS_OF_WEEK
+  remandVisitLimitPerWeek: PrisonDto['remandVisitLimitPerWeek']
 }
 
 export type FilterField = {

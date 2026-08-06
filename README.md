@@ -6,20 +6,20 @@
 Staff UI for Social visits.
 
 ## Running the app
-The easiest way to run the app is to use docker compose to create the service and all dependencies. 
+The easiest way to run the app is to use docker compose to create the service and all dependencies.
 
 `docker-compose pull`
 
 `docker-compose up`
 
 ### Dependencies
-The app requires: 
+The app requires:
 * hmpps-auth - for authentication
 * redis - session store and token caching
 
 ### Running the app for development
 
-To start the main services excluding the app itself: 
+To start the main services excluding the app itself:
 
 `docker-compose up --scale=app=0`
 
@@ -29,25 +29,10 @@ Or, to start just Redis if using HMPPS Auth dev:
 
 Install dependencies using `npm run setup`, ensuring you are using >= `Node v24.x`
 
-Using credentials from the dev namespace, create a `.env` local settings file
+Using credentials from the dev namespace, create a [`.env` local settings file](./.env):
+
 ```bash
-REDIS_HOST=localhost
-HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-HMPPS_AUTH_EXTERNAL_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-NODE_ENV=development
-
-# Use credentials from the dev namespace for API and SYSTEM client
-API_CLIENT_ID=clientid
-API_CLIENT_SECRET=clientsecret
-SYSTEM_CLIENT_ID=clientid
-SYSTEM_CLIENT_SECRET=clientsecret
-
-COMPONENT_API_URL="https://frontend-components-dev.hmpps.service.justice.gov.uk"
-ORCHESTRATION_API_URL="https://hmpps-manage-prison-visits-orchestration-dev.prison.service.justice.gov.uk"
-PRISONER_SEARCH_API_URL="https://prisoner-search-dev.prison.service.justice.gov.uk"
-PRISONER_CONTACT_REGISTRY_API_URL="https://prisoner-contact-registry-dev.prison.service.justice.gov.uk"
-INCENTIVES_API_URL="https://incentives-api-dev.hmpps.service.justice.gov.uk"
-
+  cp example.env .env
 ```
 
 And then, to build the assets and start the app with nodemon:
@@ -72,7 +57,7 @@ Then run the server in test mode by:
 
 `npm run start-feature` (or `npm run start-feature:dev` to run with auto-restart on changes)
 
-After first install ensure Playwright is initialised: 
+After first install ensure Playwright is initialised:
 
 `npm run int-test-init:ci`
 
@@ -152,7 +137,7 @@ To download and update all the API types and tidy up the files, run:
 The application has a maintenance page with a service unavailable message. It can also optionally show a date when the service will be available again. The maintenance page is served for all requests except:
 * the 'health check' ones (`/health, /info, /ping`) (`/info` will return an `HTTP 503` if orchestration and/or visit scheduler services are unavailable)
 * HMPPS Auth related ones (e.g. `/sign-in`)
-Logged in users will still see the DPS header and footer. 
+Logged in users will still see the DPS header and footer.
 
 This behaviour is controlled by two environment variables. Default values are in Helm config:
 ```
@@ -232,7 +217,7 @@ The `operation_Id` from these can be looked up in Application Insights' 'Transac
 ```
 customEvents
 | where cloud_RoleName == "hmpps-audit-api"
-| where customDimensions.service == "book-a-prison-visit-staff-ui" 
+| where customDimensions.service == "book-a-prison-visit-staff-ui"
 ```
 
 * To see failures - e.g. messages that will end up on DLQ:

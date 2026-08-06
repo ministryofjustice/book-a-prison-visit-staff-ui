@@ -255,7 +255,10 @@ describe('Booker management - visitor requests - check linked visitors', () => {
             rejectionReason: 'REJECT',
           })
 
-          expect(flashProvider).toHaveBeenCalledWith('messages', requestAlreadyReviewedMessage())
+          expect(flashProvider).toHaveBeenCalledWith(
+            'messages',
+            requestAlreadyReviewedMessage(visitorRequestForReview.bookerReference),
+          )
           expect(auditService.rejectedVisitorRequest).not.toHaveBeenCalled()
           expect(sessionData.visitorRequestJourney).toBeUndefined()
         })

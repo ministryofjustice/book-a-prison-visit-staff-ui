@@ -963,9 +963,9 @@ export interface components {
       sort?: components['schemas']['SortObject']
       /** Format: int32 */
       pageSize?: number
+      paged?: boolean
       /** Format: int32 */
       pageNumber?: number
-      paged?: boolean
       unpaged?: boolean
     }
     PersonalCareNeed: {
@@ -1142,6 +1142,12 @@ export interface components {
        * @example CA
        */
       lastMovementReasonCode?: string
+      /**
+       * Format: date
+       * @description Date of the last movement of the prisoner
+       * @example 2023-05-01
+       */
+      lastMovementDate?: string
       /**
        * @description In/Out Status
        * @example IN

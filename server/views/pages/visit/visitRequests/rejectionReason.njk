@@ -1,0 +1,47 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeaderTitle = "Rejection reason (optional)" %}
+
+{% set rejectionReasonRadios = [] %}
+{% for key, text in visitRequestRejectionReasons %}
+  {% set rejectionReasonRadios = (rejectionReasonRadios.push(
+    {
+      value: key,
+      text: text
+    }
+  ), rejectionReasonRadios) %}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      <form action="{{ formAction }}" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukRadios({
+          name: "rejectionReason",
+          fieldset: {
+            legend: {
+              text: pageHeaderTitle,
+              isPageHeading: true,
+              classes: "govuk-fieldset__legend--l"
+            }
+          },
+          hint: {
+            text: "Select the reason for rejecting this visit request."
+          },
+          items: rejectionReasonRadios
+        }) }}
+
+        {{ govukButton({
+          text: "Confirm rejection",
+          attributes: { "data-test": "submit" },
+          preventDoubleClick: true
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

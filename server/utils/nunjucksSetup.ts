@@ -19,6 +19,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   app.locals.applicationName = config.applicationName
   app.locals.environmentName = config.environmentName
   app.locals.dpsHome = config.dpsHome
+  app.locals.dpsContacts = config.dpsContacts
   app.locals.dpsPrisoner = config.dpsPrisoner
   app.locals.dpsIncentives = config.dpsIncentives
   app.locals.features = config.features

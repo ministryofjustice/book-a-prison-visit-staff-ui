@@ -355,6 +355,54 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends a visit session blocked message', async () => {
+    await auditService.blockedVisitSession({
+      date: '2024-09-06',
+      sessionReference: 'session-ref',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'BLOCKED_VISIT_SESSION',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"date":"2024-09-06","sessionReference":"session-ref"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a visit session unblocked message', async () => {
+    await auditService.unblockedVisitSession({
+      date: '2024-09-06',
+      sessionReference: 'session-ref',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UNBLOCKED_VISIT_SESSION',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"date":"2024-09-06","sessionReference":"session-ref"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends a booker search audit message', async () => {
     await auditService.bookerSearch({
       search: 'booker@example.com',
@@ -452,6 +500,53 @@ describe('Audit service', () => {
     })
   })
 
+  it('sends an approved visit request audit message', async () => {
+    await auditService.approvedVisitRequest({
+      visitReference: 'ab-cd-ef-gh',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'APPROVED_VISIT_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a rejected visit request audit message', async () => {
+    await auditService.rejectedVisitRequest({
+      visitReference: 'ab-cd-ef-gh',
+      rejectionReason: 'ALERT_OR_RESTRICTION',
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'REJECTED_VISIT_REQUEST',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"visitReference":"ab-cd-ef-gh","rejectionReason":"ALERT_OR_RESTRICTION"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
   it('sends an approved visitor request audit message', async () => {
     await auditService.approvedVisitorRequest({
       requestReference: 'cccc-dddd-eeee',
@@ -522,6 +617,31 @@ describe('Audit service', () => {
           service: 'book-a-prison-visit-staff-ui',
           details:
             '{"prisonerId":"A1234BC","voChange":2,"pvoChange":-1,"reason":"GOVERNOR_ADJUSTMENT","reasonDetails":"comment text"}',
+        }),
+        QueueUrl,
+      },
+    })
+  })
+
+  it('sends a update prison allowances audit message', async () => {
+    await auditService.updatedPrisonAllowances({
+      prisonId: 'HEI',
+      weekStartDay: 'MONDAY',
+      remandVisitLimitPerWeek: 3,
+      username: 'username',
+      operationId: 'operation-id',
+    })
+
+    expect(sqsClientInstance.send).toHaveBeenCalledTimes(1)
+    expect(sqsClientInstance.send.mock.lastCall[0]).toMatchObject({
+      input: {
+        MessageBody: JSON.stringify({
+          what: 'UPDATED_VISIT_ALLOWANCES',
+          when: fakeDate,
+          operationId: 'operation-id',
+          who: 'username',
+          service: 'book-a-prison-visit-staff-ui',
+          details: '{"weekStartDay":"MONDAY","remandVisitLimitPerWeek":3,"prisonId":"HEI"}',
         }),
         QueueUrl,
       },

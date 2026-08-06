@@ -26,9 +26,14 @@ export const getVisitNotificationFilters = ({
   const types = new Map<NotificationType, string>()
   visitNotifications.forEach(visitNotification => {
     usernames.set(visitNotification.bookedByUserName, visitNotification.bookedByName)
-    visitNotification.notifications.forEach(notification =>
-      types.set(notification.type, notificationTypes[notification.type]),
-    )
+
+    visitNotification.notifications.forEach(notification => {
+      // map SESSION_VISITS_BLOCKED_FOR_DATE to PRISON_VISITS_BLOCKED_FOR_DATE to avoid duplicate filter labels
+      const type =
+        notification.type === 'SESSION_VISITS_BLOCKED_FOR_DATE' ? 'PRISON_VISITS_BLOCKED_FOR_DATE' : notification.type
+
+      types.set(type, notificationTypes[type])
+    })
   })
 
   // build filter field items from unique values
@@ -62,11 +67,15 @@ export const filterVisitNotifications = ({
   appliedFilters: AppliedFilters
   visitNotifications: VisitNotifications[]
 }): VisitNotifications[] => {
-  const { bookedBy, type } = appliedFilters
+  const { bookedBy, type: rawType } = appliedFilters
 
-  if (!bookedBy.length && !type.length) {
+  if (!bookedBy.length && !rawType.length) {
     return visitNotifications
   }
+
+  const type = [...rawType]
+  // if PRISON_VISITS_BLOCKED_FOR_DATE is selected, also include SESSION_VISITS_BLOCKED_FOR_DATE in the filter
+  if (type.includes('PRISON_VISITS_BLOCKED_FOR_DATE')) type.push('SESSION_VISITS_BLOCKED_FOR_DATE')
 
   return visitNotifications.filter(visitNotification => {
     const isUserNameMatch = bookedBy.includes(visitNotification.bookedByUserName)

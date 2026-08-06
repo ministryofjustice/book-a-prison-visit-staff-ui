@@ -23,7 +23,7 @@ import type SharedData from '@ministryofjustice/hmpps-connect-dps-components/dis
 
 import indexRoutes from '../index'
 import visitJourneyRoutes from '../visitJourney'
-import blockVisitDatesRoutes from '../blockVisitDates'
+import blockVisitDatesRoutes from '../blockDatesOrSessions'
 import bookerManagementRoutes from '../bookerManagement'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import maintenancePageRoute from '../maintenancePageRoute'
@@ -39,7 +39,6 @@ import visitsRoutes from '../visitsByDate/visitsByDate'
 
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
-import * as auth from '../../authentication/auth'
 import populateSelectedEstablishment from '../../middleware/populateSelectedEstablishment'
 import type { Services } from '../../services'
 import { FlashFormValues, MoJAlert } from '../../@types/bapv'
@@ -110,7 +109,7 @@ function appSetup(
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
   app.use('/update-a-visit', visitJourneyRoutes(services, 'update'))
-  app.use('/block-visit-dates', blockVisitDatesRoutes(services))
+  app.use('/block-visit-dates-or-sessions', blockVisitDatesRoutes(services))
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
@@ -145,6 +144,5 @@ export function appWithAllRoutes({
     sharedData?: SharedData
   }
 }): Express {
-  auth.default.authenticationMiddleware = () => (req, res, next) => next()
   return appSetup(services as Services, production, userSupplier, sessionData, feComponents)
 }

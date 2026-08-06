@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { GOVUKTableRow } from '../../@types/bapv'
-import { HmppsAuthClient, OrchestrationApiClient, RestClientBuilder } from '../../data'
+import { OrchestrationApiClient } from '../../data'
 import {
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceDto,
@@ -15,10 +15,7 @@ export type VisitOrderHistoryPage = Pick<
 > & { voHistoryRows: GOVUKTableRow[] }
 
 export default class VisitOrdersService {
-  constructor(
-    private readonly orchestrationApiClientFactory: RestClientBuilder<OrchestrationApiClient>,
-    private readonly hmppsAuthClient: HmppsAuthClient,
-  ) {}
+  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   // VO history entries that will be rendered in default style; others will be secondary text style
   private readonly VO_HISTORY_TYPES_DEFAULT_STYLE: VisitOrderHistoryDto['visitOrderHistoryType'][] = [
@@ -36,10 +33,7 @@ export default class VisitOrdersService {
     prisonId: string
     prisonerId: string
   }): Promise<PrisonerBalanceDto> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    return orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
+    return this.orchestrationApiClient.getVoBalance({ prisonId, prisonerId, username })
   }
 
   async changeVoBalance({
@@ -53,10 +47,7 @@ export default class VisitOrdersService {
     prisonerId: string
     prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
   }): Promise<void> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    await orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
+    await this.orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto, username })
   }
 
   async getVoHistory({
@@ -68,10 +59,7 @@ export default class VisitOrdersService {
     prisonId: string
     prisonerId: string
   }): Promise<VisitOrderHistoryPage> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
-    const orchestrationApiClient = this.orchestrationApiClientFactory(token)
-
-    const voHistoryDetails = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
+    const voHistoryDetails = await this.orchestrationApiClient.getVoHistory({ prisonId, prisonerId, username })
     const { visitOrderHistory, ...prisonerDetails } = voHistoryDetails
 
     const voHistoryRows = visitOrderHistory.map((historyItem, index): GOVUKTableRow => {

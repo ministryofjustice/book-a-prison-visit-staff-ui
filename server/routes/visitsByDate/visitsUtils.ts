@@ -1,6 +1,6 @@
 import { format, parse, add } from 'date-fns'
 import { VisitsPageSideNav, VisitsPageSideNavItem } from '../../@types/bapv'
-import { getParsedDateFromQueryString, prisonerTimePretty } from '../../utils/utils'
+import { getParsedDateFromQueryString, formatStartToEndTime } from '../../utils/utils'
 import { SessionSchedule, VisitPreview } from '../../data/orchestrationApiTypes'
 
 export const getDateTabs = (
@@ -69,7 +69,7 @@ export function getSessionsSideNav(
     }
     const sideNavForRoom = sessionsSideNav.get(session.visitRoom)
 
-    const times = sessionTimeSlotToString(session.sessionTimeSlot)
+    const times = formatStartToEndTime(session.sessionTimeSlot.startTime, session.sessionTimeSlot.endTime)
 
     const queryParams = new URLSearchParams({
       sessionReference: session.sessionTemplateReference,
@@ -108,7 +108,7 @@ export function getSessionsSideNav(
 
       unknownVisitsNavItems.push({
         reference: timeSlotReference,
-        times: sessionTimeSlotToString(visit.visitTimeSlot),
+        times: formatStartToEndTime(visit.visitTimeSlot.startTime, visit.visitTimeSlot.endTime),
         queryParams,
         active: selectedReference === timeSlotReference,
       })
@@ -127,10 +127,4 @@ export function getSessionsSideNav(
   sessionsSideNav.set('All visits', unknownVisitsNavItems)
 
   return sessionsSideNav
-}
-
-function sessionTimeSlotToString(sessionTimeSlot: SessionSchedule['sessionTimeSlot']): string {
-  const startTime = prisonerTimePretty(parse(sessionTimeSlot.startTime, 'HH:mm', new Date()).toISOString())
-  const endTime = prisonerTimePretty(parse(sessionTimeSlot.endTime, 'HH:mm', new Date()).toISOString())
-  return `${startTime} to ${endTime}`
 }

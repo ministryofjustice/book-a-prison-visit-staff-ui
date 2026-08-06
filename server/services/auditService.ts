@@ -1,13 +1,21 @@
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
 import logger from '../../logger'
 import config from '../config'
-import { PrisonerBalanceAdjustmentReason, RejectVisitorRequestDto, Visit } from '../data/orchestrationApiTypes'
+import {
+  PrisonerBalanceAdjustmentReason,
+  RejectVisitorRequestDto,
+  Visit,
+  VisitRequestRejectionReason,
+} from '../data/orchestrationApiTypes'
+import { PrisonRemandConfig } from '../@types/bapv'
 
 export default class AuditService {
   private sqsClient: SQSClient
 
   constructor(private readonly queueUrl = config.apis.audit.queueUrl) {
-    this.sqsClient = new SQSClient({})
+    this.sqsClient = new SQSClient({
+      useQueueUrlAsEndpoint: false,
+    })
   }
 
   async prisonerSearch({
@@ -344,6 +352,50 @@ export default class AuditService {
     })
   }
 
+  async blockedVisitSession({
+    date,
+    sessionReference,
+    username,
+    operationId,
+  }: {
+    date: string
+    sessionReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'BLOCKED_VISIT_SESSION',
+      who: username,
+      operationId,
+      details: {
+        date,
+        sessionReference,
+      },
+    })
+  }
+
+  async unblockedVisitSession({
+    date,
+    sessionReference,
+    username,
+    operationId,
+  }: {
+    date: string
+    sessionReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'UNBLOCKED_VISIT_SESSION',
+      who: username,
+      operationId,
+      details: {
+        date,
+        sessionReference,
+      },
+    })
+  }
+
   async bookerSearch({ search, username, operationId }: { search: string; username: string; operationId: string }) {
     return this.sendAuditMessage({
       action: 'SEARCHED_BOOKERS',
@@ -414,6 +466,42 @@ export default class AuditService {
     })
   }
 
+  async approvedVisitRequest({
+    visitReference,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'APPROVED_VISIT_REQUEST',
+      who: username,
+      operationId,
+      details: { visitReference },
+    })
+  }
+
+  async rejectedVisitRequest({
+    visitReference,
+    rejectionReason,
+    username,
+    operationId,
+  }: {
+    visitReference: string
+    rejectionReason: VisitRequestRejectionReason | null
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'REJECTED_VISIT_REQUEST',
+      who: username,
+      operationId,
+      details: { visitReference, rejectionReason },
+    })
+  }
+
   async approvedVisitorRequest({
     requestReference,
     visitorId,
@@ -474,6 +562,27 @@ export default class AuditService {
       who: username,
       operationId,
       details: { prisonerId, voChange, pvoChange, reason, reasonDetails },
+    })
+  }
+
+  async updatedPrisonAllowances({
+    prisonId,
+    weekStartDay,
+    remandVisitLimitPerWeek,
+    username,
+    operationId,
+  }: {
+    prisonId: string
+    weekStartDay: PrisonRemandConfig['weekStartDay']
+    remandVisitLimitPerWeek: PrisonRemandConfig['remandVisitLimitPerWeek']
+    username: string
+    operationId: string
+  }) {
+    return this.sendAuditMessage({
+      action: 'UPDATED_VISIT_ALLOWANCES',
+      who: username,
+      operationId,
+      details: { weekStartDay, remandVisitLimitPerWeek, prisonId },
     })
   }
 

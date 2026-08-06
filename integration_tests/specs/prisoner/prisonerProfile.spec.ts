@@ -100,7 +100,7 @@ test.describe('Prisoner profile page', () => {
     )
     await expect(prisonerProfilePage.visitTabType.nth(0)).toContainText('Social')
     await expect(prisonerProfilePage.visitTabLocation.nth(0)).toContainText('Hewell (HMP)')
-    await expect(prisonerProfilePage.visitTabDateAndTime.nth(0)).toContainText(/(Friday 14 January 2022)(10am - 11am)/)
+    await expect(prisonerProfilePage.visitTabDateAndTime.nth(0)).toContainText(/(Friday 14 January 2022)(10am to 11am)/)
     await expect(prisonerProfilePage.visitTabVisitors.nth(0)).toContainText(/(Jeanette Smith)(Bob Smith)/)
     await expect(prisonerProfilePage.visitTabVisitStatus.nth(0)).toContainText('Booked')
     await expect(prisonerProfilePage.visitTabViewFullHistory).toHaveAttribute(

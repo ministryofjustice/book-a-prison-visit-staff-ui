@@ -11,6 +11,7 @@ import {
   CancelVisitOrchestrationDto,
   ExcludeDateDto,
   IgnoreVisitNotificationsDto,
+  PrisonAndSessionsExcludeDatesDto,
   PrisonDto,
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceAdjustmentValidationError,
@@ -32,6 +33,7 @@ import {
   VisitPassDto,
   VisitPassRequestDto,
   VisitPreview,
+  VisitRequestRejectionReason,
   VisitRequestResponse,
   VisitRequestSummary,
   VisitSessionsAndScheduleDto,
@@ -284,12 +286,12 @@ export default {
     })
   },
   stubGetVisitsBySessionTemplate: ({
-    prisonId,
+    prisonId = 'HEI',
     reference,
     sessionDate,
     visits,
   }: {
-    prisonId: string
+    prisonId?: string
     reference: string
     sessionDate: string
     visits: VisitPreview[]
@@ -347,7 +349,7 @@ export default {
     date,
     count = 0,
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
     count: number
   }): SuperAgentRequest => {
@@ -731,9 +733,9 @@ export default {
     date,
     username = 'USER1',
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -761,9 +763,9 @@ export default {
     date,
     username = 'USER1',
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
-    username: string
+    username?: string
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -786,22 +788,24 @@ export default {
     })
   },
 
-  stubGetFutureBlockedDates: ({
+  stubGetFutureBlockedDatesAndSessions: ({
     prisonId = 'HEI',
-    blockedDates = [],
+    includeSessions = false,
+    blockedDatesAndSessions = { fullDateExclusions: [], sessionExclusions: [] },
   }: {
     prisonId?: string
-    blockedDates: ExcludeDateDto[]
+    includeSessions?: boolean
+    blockedDatesAndSessions?: PrisonAndSessionsExcludeDatesDto
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/config/prisons/prison/${prisonId}/exclude-date/future`,
+        url: `/orchestration/v2/prisons/${prisonId}/config/exclude-dates/future?includeSessions=${includeSessions}`,
       },
       response: {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        jsonBody: blockedDates,
+        jsonBody: blockedDatesAndSessions,
       },
     })
   },
@@ -893,12 +897,14 @@ export default {
 
   stubRejectVisitRequest: ({
     reference,
-    username,
-    visitRequestResponse,
+    visitRequestRejectionReason = null,
+    username = 'USER1',
+    visitRequestResponse = TestData.visitRequestResponse(),
   }: {
     reference: string
-    username: string
-    visitRequestResponse: VisitRequestResponse
+    visitRequestRejectionReason: VisitRequestRejectionReason | null
+    username?: string
+    visitRequestResponse?: VisitRequestResponse
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -909,6 +915,7 @@ export default {
             equalToJson: {
               visitReference: reference,
               actionedBy: username,
+              visitRequestRejectionReason,
             },
           },
         ],
@@ -923,12 +930,12 @@ export default {
 
   stubApproveVisitRequest: ({
     reference,
-    username,
-    visitRequestResponse,
+    username = 'USER1',
+    visitRequestResponse = TestData.visitRequestResponse(),
   }: {
     reference: string
-    username: string
-    visitRequestResponse: VisitRequestResponse
+    username?: string
+    visitRequestResponse?: VisitRequestResponse
   }): SuperAgentRequest => {
     return stubFor({
       request: {
@@ -955,7 +962,7 @@ export default {
     prisonId = 'HEI',
     visitRequests = [TestData.visitRequestSummary()],
   }: {
-    prisonId: string
+    prisonId?: string
     visitRequests: VisitRequestSummary[]
   }): SuperAgentRequest => {
     return stubFor({
@@ -992,18 +999,20 @@ export default {
   },
 
   stubSessionSchedule: ({
-    prisonId,
+    prisonId = 'HEI',
     date,
+    includeExcludedSessions,
     sessionSchedule,
   }: {
-    prisonId: string
+    prisonId?: string
     date: string
+    includeExcludedSessions: boolean
     sessionSchedule: SessionSchedule[]
   }): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',
-        url: `/orchestration/visit-sessions/schedule?prisonId=${prisonId}&date=${date}`,
+        url: `/orchestration/visit-sessions/schedule?prisonId=${prisonId}&date=${date}&includeExcludedSessions=${includeExcludedSessions}`,
       },
       response: {
         status: 200,
@@ -1170,6 +1179,66 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: voHistoryDetails,
+      },
+    })
+  },
+
+  stubBlockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/add`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
+      },
+    })
+  },
+
+  stubUnblockVisitSession: ({
+    sessionTemplateReference,
+    date,
+    username = 'USER1',
+  }: {
+    sessionTemplateReference: string
+    date: string
+    username?: string
+  }): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/sessions/session/${sessionTemplateReference}/exclude-date/remove`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              excludeDate: date,
+              actionedBy: username,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: [],
       },
     })
   },

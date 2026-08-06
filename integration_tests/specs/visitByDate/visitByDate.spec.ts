@@ -56,7 +56,12 @@ test.describe('View visits by date', () => {
 
   test('should show visits by date, view another session and change date to tomorrow', async ({ page }) => {
     // --- Stub sessions & visits ---
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: todayShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule,
+    })
     await orchestrationApi.stubGetVisitsBySessionTemplate({
       prisonId,
       reference: sessionSchedule[0].sessionTemplateReference,
@@ -109,7 +114,12 @@ test.describe('View visits by date', () => {
     await expect(visitsByDatePage.visitorsTotalCount('closed')).toHaveCount(0)
 
     // --- Switch to tomorrow ---
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: tomorrowShortFormat, sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: tomorrowShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({
       prisonId,
       sessionDate: tomorrowShortFormat,
@@ -129,7 +139,12 @@ test.describe('View visits by date', () => {
   })
 
   test('should show visits by date for migrated visits with no session templates', async ({ page }) => {
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: todayShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
     const anotherVisit = TestData.visitPreview({ visitTimeSlot: { startTime: '09:00', endTime: '10:00' } })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({
       prisonId,
@@ -174,7 +189,12 @@ test.describe('View visits by date', () => {
   })
 
   test('should show visits by date, and change date using the date picker', async ({ page }) => {
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: todayShortFormat, sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: todayShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({ prisonId, sessionDate: todayShortFormat, visits: [] })
     await orchestrationApi.stubIsBlockedDate({ prisonId, excludeDate: todayShortFormat, excludeDates: null })
 
@@ -189,7 +209,12 @@ test.describe('View visits by date', () => {
     const firstOfNextMonthShortFormat = format(firstOfNextMonth, shortDateFormat)
     const firstOfNextMonthLongFormat = format(firstOfNextMonth, longDateFormat)
 
-    await orchestrationApi.stubSessionSchedule({ prisonId, date: firstOfNextMonthShortFormat, sessionSchedule: [] })
+    await orchestrationApi.stubSessionSchedule({
+      prisonId,
+      date: firstOfNextMonthShortFormat,
+      includeExcludedSessions: false,
+      sessionSchedule: [],
+    })
     await orchestrationApi.stubGetVisitsWithoutSessionTemplate({
       prisonId,
       sessionDate: firstOfNextMonthShortFormat,

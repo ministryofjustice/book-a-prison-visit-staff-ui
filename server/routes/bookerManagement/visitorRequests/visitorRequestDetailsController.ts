@@ -19,7 +19,7 @@ export default class VisitorRequestDetailsController {
       const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
 
       if (visitorRequest.status !== 'REQUESTED') {
-        req.flash('messages', requestAlreadyReviewedMessage())
+        req.flash('messages', requestAlreadyReviewedMessage(visitorRequest.bookerReference))
         return res.redirect('/manage-bookers')
       }
 
@@ -74,6 +74,7 @@ export default class VisitorRequestDetailsController {
       }
 
       const { returnTo } = visitorRequestJourney
+      const { bookerReference } = visitorRequestJourney.visitorRequest
       const includeBookerDetailsLink = returnTo === 'manage-bookers'
 
       try {
@@ -129,10 +130,9 @@ export default class VisitorRequestDetailsController {
           return next(error)
         }
 
-        req.flash('messages', requestAlreadyReviewedMessage())
+        req.flash('messages', requestAlreadyReviewedMessage(bookerReference))
       }
 
-      const { bookerReference } = visitorRequestJourney.visitorRequest
       delete req.session.visitorRequestJourney
 
       return returnTo === 'manage-bookers'

@@ -1,0 +1,91 @@
+import { RequestHandler } from 'express'
+import { body, ValidationChain, validationResult } from 'express-validator'
+import { AuditService, VisitNotificationsService } from '../../../services'
+import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { IgnoreVisitNotificationsDto } from '../../../data/orchestrationApiTypes'
+import { getFlashFormValues } from '../../visitorUtils'
+import { extractVisitNavState, appendNavStateToPath } from '../visitNavigationUtils'
+
+export default class ClearNotificationsController {
+  public constructor(
+    private readonly auditService: AuditService,
+    private readonly visitNotificationsService: VisitNotificationsService,
+  ) {}
+
+  public view(): RequestHandler<VisitReferenceParams> {
+    return async (req, res) => {
+      const { reference } = req.params
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
+
+      const backLinkHref = appendNavStateToPath(`/visit/${reference}`, navState)
+      const formAction = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
+
+      return res.render('pages/visit/clearNotifications/clearNotifications', {
+        errors: req.flash('errors'),
+        formValues: getFlashFormValues(req),
+        backLinkHref,
+        formAction,
+      })
+    }
+  }
+
+  public clearNotifications(): RequestHandler<VisitReferenceParams> {
+    return async (req, res) => {
+      const errors = validationResult(req)
+      const { reference } = req.params
+      const { username } = res.locals.user
+      const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
+
+      if (!errors.isEmpty()) {
+        req.flash('errors', errors.array() as [])
+        req.flash('formValues', req.body)
+        const redirectUrl = appendNavStateToPath(`/visit/${reference}/clear-notifications`, navState)
+        return res.redirect(redirectUrl)
+      }
+
+      if (req.body.clearNotifications === 'yes') {
+        const ignoreVisitNotificationsDto: IgnoreVisitNotificationsDto = {
+          reason: req.body.clearReason,
+          actionedBy: username,
+        }
+
+        const visit = await this.visitNotificationsService.ignoreNotifications({
+          username,
+          reference,
+          ignoreVisitNotificationsDto,
+        })
+
+        req.flash('messages', {
+          variant: 'success',
+          title: 'The visit has not been changed',
+          text: 'You confirmed the visit does not need to change',
+        })
+
+        await this.auditService.dismissedNotifications({
+          visitReference: reference,
+          prisonerId: visit.prisonerId.toString(),
+          prisonId: visit.prisonId,
+          reason: ignoreVisitNotificationsDto.reason,
+          username: ignoreVisitNotificationsDto.actionedBy,
+          operationId: res.locals.appInsightsOperationId,
+        })
+      }
+
+      const redirectUrl = appendNavStateToPath(`/visit/${reference}`, navState)
+      return res.redirect(redirectUrl)
+    }
+  }
+
+  public validate(): ValidationChain[] {
+    return [
+      body('clearNotifications', 'No answer selected').isIn(['yes', 'no']),
+      body('clearReason')
+        .if(body('clearNotifications').equals('yes'))
+        .trim()
+        .notEmpty()
+        .withMessage('Enter a reason for not changing the booking')
+        .isLength({ max: 512 })
+        .withMessage('Reason must be 512 characters or less'),
+    ]
+  }
+}

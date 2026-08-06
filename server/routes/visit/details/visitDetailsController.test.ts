@@ -1,0 +1,587 @@
+import type { Express } from 'express'
+import request from 'supertest'
+import * as cheerio from 'cheerio'
+import { SessionData } from 'express-session'
+import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
+import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
+import TestData from '../../testutils/testData'
+import { createMockAuditService, createMockVisitService } from '../../../services/testutils/mocks'
+import { MojTimelineItem } from './buildVisitEventsTimeline'
+import { AvailableVisitActions } from './getAvailableVisitActions'
+import { GOVUKInsetText, MoJAlert } from '../../../@types/bapv'
+import config from '../../../config'
+
+let app: Express
+let flashData: FlashData
+
+const auditService = createMockAuditService()
+const visitService = createMockVisitService()
+
+let availableVisitActions: AvailableVisitActions
+let visitAlerts: MoJAlert[]
+let visitEventsTimeline: MojTimelineItem[]
+let idsToFlag: jest.Mock
+let alertsHiddenMessages: { prisoner: GOVUKInsetText; visitor: GOVUKInsetText } | null
+
+jest.mock('./buildVisitEventsTimeline', () => ({ __esModule: true, default: () => visitEventsTimeline }))
+jest.mock('./getAlertsHiddenMessages', () => ({ __esModule: true, default: () => alertsHiddenMessages }))
+jest.mock('./getAvailableVisitActions', () => ({ __esModule: true, default: () => availableVisitActions }))
+jest.mock('./getVisitAlerts', () => ({ __esModule: true, default: () => visitAlerts }))
+
+jest.mock('../visitUtils', () => {
+  const visitUtils = jest.requireActual('../visitUtils')
+  return {
+    ...visitUtils,
+    getIdsToFlag: () => idsToFlag(),
+  }
+})
+
+afterEach(() => {
+  jest.resetAllMocks()
+  jest.useRealTimers()
+})
+
+describe('Visit details page', () => {
+  let visitDetails: VisitBookingDetails
+
+  visitEventsTimeline = [
+    {
+      label: { text: 'Booked' },
+      text: `Method: Phone booking`,
+      datetime: { timestamp: '2022-01-01T09:00:00', type: 'datetime' },
+      byline: { text: 'User One' },
+      attributes: { 'data-test': 'timeline-entry-0' },
+    },
+  ]
+
+  beforeEach(() => {
+    flashData = { messages: [] }
+    flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
+    availableVisitActions = {
+      update: false,
+      cancel: false,
+      clearNotifications: false,
+      print: false,
+      processRequest: false,
+    }
+    visitAlerts = []
+    idsToFlag = jest.fn().mockReturnValue([])
+    alertsHiddenMessages = null
+
+    visitDetails = TestData.visitBookingDetails()
+
+    const fakeDate = new Date('2022-01-01')
+    jest.useFakeTimers({ advanceTimers: true, now: new Date(fakeDate) })
+
+    visitService.getVisitDetailed.mockResolvedValue(visitDetails)
+
+    app = appWithAllRoutes({ services: { auditService, visitService } })
+  })
+
+  describe('GET /visit/:reference', () => {
+    it('should render full visit booking summary page', () => {
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
+          // messages
+          expect($('.moj-alert').length).toBe(0)
+          // visit details
+          expect($('[data-test="visit-date"]').text()).toContain('Friday 14 January 2022')
+          expect($('[data-test="visit-time"]').text()).toContain('10am to 11am')
+          expect($('[data-test="visit-room"]').text()).toContain('Visit room 1')
+          expect($('[data-test="visit-type"]').text()).toBe('Open visit')
+          expect($('[data-test="visit-contact"]').text()).toBe('Jeanette Smith')
+          expect($('[data-test="visit-phone"]').text()).toBe('01234 567890')
+          expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+          expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp')
+          // actions forms
+          expect($('[data-test=visit-actions]').length).toBe(0)
+          expect($('[data-test=visit-request-actions]').length).toBe(0)
+          // prisoner details
+          expect($('[data-test="prisoner-name"]').text()).toBe('John Smith')
+          expect($('[data-test="prisoner-number"]').text()).toBe('A1234BC')
+          expect($('[data-test="prisoner-location"]').text()).toBe('1-1-C-028, Hewell (HMP)')
+          expect($('[data-test="prisoner-dob"]').text()).toBe('2 April 1975')
+          expect($('[data-test="prisoner-age"]').text()).toBe('46 years old')
+          expect($('[data-test="prisoner-restriction-1"]').text()).toContain('Restricted')
+          expect($('[data-test="prisoner-restriction-1-start"]').text()).toContain('15/3/2022')
+          expect($('[data-test="prisoner-restriction-1-end"]').text()).toContain('No end date')
+          expect($('[data-test="prisoner-restriction-1-comment"]').text()).toContain('Details about this restriction')
+          expect($('[data-test="all-alerts-link"]').attr('href')).toBe(
+            'https://prisoner-dev.digital.prison.service.justice.gov.uk/prisoner/A1234BC/alerts/active',
+          )
+          expect($(`[data-test="prisoner-alert-1"]`).text()).toContain('Protective Isolation Unit')
+          expect($(`[data-test="prisoner-alert-1-updated"]`).text()).toContain('1/3/2023')
+          expect($(`[data-test="prisoner-alert-1-start"]`).text()).toContain('2/1/2023')
+          expect($(`[data-test="prisoner-alert-1-end"]`).text()).toContain('No end date')
+          expect($(`[data-test="prisoner-alert-1-comment"]`).text()).toContain('Alert comment')
+          // visitor details
+          expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
+          expect($('[data-test="visitor-relation-1"]').text()).toBe('wife')
+          expect($('[data-test="visitor-dob-1"]').text()).toMatch(/28 July 1986\s+\(35 years old\)/)
+          expect($('[data-test="visitor-address-1"]').text()).toBe('123 The Street,\nCoventry')
+          expect($('[data-test="visitor-1-restriction-1"]').text()).toContain('Closed')
+          expect($('[data-test="visitor-1-restriction-1-start"]').text()).toContain('11/1/2022')
+          expect($('[data-test="visitor-1-restriction-1-end"]').text()).toContain('13/2/2023')
+          expect($('[data-test="visitor-1-restriction-1-comment"]').text()).toContain('closed comment text')
+
+          // booking history
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__title').text()).toBe('Booked')
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__byline').text().trim().replace(/\s+/g, ' ')).toBe(
+            'by User One',
+          )
+          expect($('[data-test="timeline-entry-0"] time').text()).toBe('Saturday 1 January 2022 at 9am')
+          expect($('[data-test="timeline-entry-0"] .moj-timeline__description').text()).toBe('Method: Phone booking')
+
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
+    it('should handle a deleted visitor relationship', () => {
+      visitDetails.visitors[0].relationshipDescription = null
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visitor-name-1"]').text()).toBe('Jeanette Smith')
+          expect($('[data-test="visitor-relation-1"]').text()).toBe('Relationship deleted')
+        })
+    })
+
+    it('should render visit request title for a visit request', () => {
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit request details')
+        })
+    })
+
+    it('should render process request action URLs with navigation state when coming from visits page', () => {
+      availableVisitActions = {
+        update: false,
+        cancel: false,
+        clearNotifications: false,
+        print: false,
+        processRequest: true,
+      }
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?from=visits')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/approve?from=visits',
+          )
+          expect($('[data-test="reject-visit-request"]').attr('href')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject/reason?from=visits',
+          )
+        })
+    })
+
+    it('should render process request action URLs with prisonerId when coming from prisoner profile page', () => {
+      availableVisitActions = {
+        update: false,
+        cancel: false,
+        clearNotifications: false,
+        print: false,
+        processRequest: true,
+      }
+      visitDetails.visitSubStatus = 'REQUESTED'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh?from=prisoner')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="approve-visit-request"]').parent('form').attr('action')).toBe(
+            '/visit/ab-cd-ef-gh/request/approve?from=prisoner&prisonerId=A1234BC',
+          )
+          expect($('[data-test="reject-visit-request"]').attr('href')).toBe(
+            '/visit/ab-cd-ef-gh/request/reject/reason?from=prisoner&prisonerId=A1234BC',
+          )
+        })
+    })
+
+    it('should handle no visit contact details', () => {
+      visitDetails.visitContact.telephone = undefined
+      visitDetails.visitContact.email = undefined
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="visit-phone"]').length).toBe(0)
+          expect($('[data-test="visit-email"]').length).toBe(0)
+          expect($('[data-test="visit-no-contact-details"]').text()).toBe('No contact details provided')
+        })
+    })
+
+    it('should show location as "Unknown" if prisoner is being transferred', () => {
+      visitDetails.prisoner.prisonId = 'TRN'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('[data-test="prisoner-location"]').text()).toBe('Unknown')
+        })
+    })
+
+    it('should show the correct location for a prisoner who has been released', () => {
+      visitDetails.prisoner.prisonId = 'OUT'
+      visitDetails.prisoner.locationDescription = 'Outside - released from Hewell (HMP)'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('[data-test="prisoner-location"]').text()).toBe(visitDetails.prisoner.locationDescription)
+        })
+    })
+
+    it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
+      const otherPrison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
+
+      app = appWithAllRoutes({
+        userSupplier: () => ({ ...user, activeCaseLoadId: otherPrison.prisonId }),
+        services: { auditService, visitService },
+        sessionData: {
+          selectedEstablishment: otherPrison,
+        } as SessionData,
+      })
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
+
+          expect(res.text).toContain(`This booking is not for ${otherPrison.prisonName}`)
+          expect(res.text).toContain(`change the establishment to ${visitDetails.prison.prisonName}`)
+        })
+    })
+
+    it('should render 400 Bad Request error for invalid visit reference', () => {
+      return request(app)
+        .get('/visit/12-34-56-78')
+        .expect(400)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          expect(res.text).toContain('BadRequestError: Bad Request')
+        })
+    })
+
+    describe('Back links', () => {
+      it.each([
+        [
+          'upcoming visits search listing page',
+          '/visit/ab-cd-ef-gh?from=visit-search&query=searchBlock1%3Dab%26searchBlock2%3Dcd%26searchBlock3%3Def%26searchBlock4%3Dgh',
+          '/search/visit/results?searchBlock1=ab&searchBlock2=cd&searchBlock3=ef&searchBlock4=gh',
+        ],
+
+        [
+          'view visits by date page',
+          '/visit/ab-cd-ef-gh?query=type%3DOPEN%26sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
+          '/visits?type=OPEN&sessionReference=-afe.dcc.0f&selectedDate=2024-02-01&firstTabDate=2024-02-01',
+        ],
+
+        ['visit requests listing page', '/visit/ab-cd-ef-gh?from=request', '/requested-visits'],
+
+        ['visits for review listing page', '/visit/ab-cd-ef-gh?from=review', '/review'],
+
+        [
+          'visiting orders history page',
+          '/visit/ab-cd-ef-gh?from=vo-history',
+          '/prisoner/A1234BC/visiting-orders-history',
+        ],
+      ])('should set correct back link when arriving from %s', (_fromPage: string, url: string, backLink: string) => {
+        return request(app)
+          .get(url)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text()).toBe('Visit booking details')
+            expect($('.govuk-back-link').attr('href')).toBe(backLink)
+          })
+      })
+    })
+
+    describe('Visit alert messages', () => {
+      it('should render visit alert messages', () => {
+        flashData.messages = [TestData.mojAlert({ title: 'flash alert title', text: 'flash alert text' })]
+        visitAlerts = [TestData.mojAlert({ title: 'visit alert title', text: 'visit alert text' })]
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.moj-alert').length).toBe(2)
+
+            expect($('.moj-alert').eq(0).text()).toContain('flash alert title')
+            expect($('.moj-alert').eq(0).text()).toContain('flash alert text')
+            expect($('.moj-alert').eq(1).text()).toContain('visit alert title')
+            expect($('.moj-alert').eq(1).text()).toContain('visit alert text')
+          })
+      })
+    })
+
+    describe('Visit action buttons', () => {
+      it('should render no buttons if no available actions', () => {
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=update-visit]').length).toBe(0)
+            expect($('[data-test=cancel-visit]').length).toBe(0)
+            expect($('[data-test=clear-notifications]').length).toBe(0)
+            expect($('[data-test=print-visit-pass]').length).toBe(0)
+          })
+      })
+
+      it('should render all buttons if all visit actions available', () => {
+        availableVisitActions = {
+          update: true,
+          cancel: true,
+          clearNotifications: true,
+          print: true,
+          processRequest: false,
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=visit-actions] form').attr('action')).toBe('/visit/ab-cd-ef-gh/update')
+
+            expect($('[data-test=update-visit]').text().trim()).toBe('Update booking')
+
+            expect($('[data-test=cancel-visit]').text().trim()).toBe('Cancel booking')
+            expect($('[data-test=cancel-visit]').attr('href')).toBe('/visit/ab-cd-ef-gh/cancel')
+
+            expect($('[data-test=clear-notifications]').text().trim()).toBe('Do not change')
+            expect($('[data-test=clear-notifications]').attr('href')).toBe('/visit/ab-cd-ef-gh/clear-notifications')
+
+            expect($('[data-test=print-visit-pass]').text().trim()).toBe('Print visit pass')
+            expect($('[data-test=print-visit-pass]').attr('href')).toBe('/visit/ab-cd-ef-gh/visit-pass?from=visit')
+          })
+      })
+
+      it('should preserve navigation state in update and cancel actions', () => {
+        availableVisitActions = {
+          update: true,
+          cancel: true,
+          clearNotifications: true,
+          print: true,
+          processRequest: false,
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh?from=visits&query=type%3DOPEN')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=visit-actions] form').attr('action')).toBe(
+              '/visit/ab-cd-ef-gh/update?from=visits&query=type%3DOPEN',
+            )
+            expect($('[data-test=cancel-visit]').attr('href')).toBe(
+              '/visit/ab-cd-ef-gh/cancel?from=visits&query=type%3DOPEN',
+            )
+          })
+      })
+
+      it('should render approve and reject buttons when all visit request actions disabled', () => {
+        availableVisitActions = {
+          update: false,
+          cancel: false,
+          clearNotifications: false,
+          print: false,
+          processRequest: true,
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=update-visit]').length).toBe(0)
+            expect($('[data-test=cancel-visit]').length).toBe(0)
+            expect($('[data-test=clear-notifications]').length).toBe(0)
+            expect($('[data-test=print-visit-pass]').length).toBe(0)
+
+            expect($('[data-test=approve-visit-request]').text().trim()).toBe('Approve request')
+            expect($('[data-test=approve-visit-request]').parent('form').attr('action')).toBe(
+              '/visit/ab-cd-ef-gh/request/approve',
+            )
+
+            expect($('[data-test=reject-visit-request]').text().trim()).toBe('Reject request')
+            expect($('[data-test=reject-visit-request]').attr('href')).toBe('/visit/ab-cd-ef-gh/request/reject/reason')
+          })
+      })
+    })
+
+    describe('Flag visitor restriction changes', () => {
+      it('should flag a visitor restriction', () => {
+        visitDetails.visitors[0].restrictions = [
+          TestData.restriction({ restrictionId: 1 }),
+          TestData.restriction({ restrictionId: 2 }),
+        ]
+
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce(['2']) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=visitor-1-restriction-1]').length).toBe(1)
+            expect($('[data-test=visitor-1-restriction-2]').length).toBe(1)
+
+            expect($('.bapv-visit-details__restriction--flagged').length).toBe(1)
+            expect($('.bapv-visit-details__restriction--flagged').text()).toBe(
+              'This restriction has been added or updated',
+            )
+          })
+      })
+    })
+
+    describe('Flag visitor unapproved', () => {
+      it('should flag a visitor', () => {
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce(['4321']) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__visitor--flagged #visitor-4321').length).toBe(1)
+            expect($('.bapv-visit-details__visitor--flagged').text()).toContain('Visitor has been unapproved')
+          })
+      })
+    })
+
+    describe('Flag alert added / changed', () => {
+      it('should flag a new alert', () => {
+        const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([alertUuid]) //  alert added returned results
+          .mockReturnValueOnce([]) //  alert updated returned results
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__alert--flagged').text()).toContain('This new alert has been added')
+          })
+      })
+      it('should flag an updated alert', () => {
+        const { alertUuid } = visitDetails.prisoner.prisonerAlerts[0]
+        idsToFlag = jest
+          .fn<string[], []>()
+          .mockReturnValueOnce([]) // restrictions returned results
+          .mockReturnValueOnce([]) //  unapproved returned results
+          .mockReturnValueOnce([]) //  alert added returned results
+          .mockReturnValueOnce([alertUuid]) //  alert updated returned results
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.bapv-visit-details__alert--flagged').text()).toContain('This alert has been updated')
+          })
+      })
+    })
+
+    describe('Restriction and alert hidden text', () => {
+      it('should display reason for restrictions/alerts hidden', () => {
+        alertsHiddenMessages = {
+          prisoner: {
+            html: `<p>Alerts and restrictions are not shown for past visits.</p><p>You can view alerts and restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            attributes: { 'data-test': 'prisoner-inset' },
+            classes: 'inset-text-prisoner',
+          },
+          visitor: {
+            html: `<p>Visitor restrictions are not shown for past visits.</p><p>You can view restrictions in the <a href="${config.dpsContacts}">contacts service</a>.</p>`,
+            attributes: { 'data-test': 'visitor-inset' },
+          },
+        }
+
+        return request(app)
+          .get('/visit/ab-cd-ef-gh')
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('[data-test=prisoner-inset]').text()).toContain(
+              'Alerts and restrictions are not shown for past visits.You can view alerts and restrictions in the contacts service.',
+            )
+            expect($('[data-test=visitor-inset]').text()).toContain(
+              'Visitor restrictions are not shown for past visits.You can view restrictions in the contacts service.',
+            )
+          })
+      })
+    })
+  })
+})

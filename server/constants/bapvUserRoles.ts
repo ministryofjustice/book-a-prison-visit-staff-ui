@@ -1,6 +1,7 @@
 const bapvUserRoles = {
   STAFF_USER: 'MANAGE_PRISON_VISITS',
   BOOKER_ADMIN: 'VISITS_BOOKER_ADMIN',
+  PRISON_IEP_ADMIN: 'MAINTAIN_PRISON_IEP_LEVELS',
 } as const
 
 export default bapvUserRoles

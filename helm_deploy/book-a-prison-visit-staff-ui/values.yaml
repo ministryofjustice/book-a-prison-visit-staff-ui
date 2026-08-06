@@ -26,6 +26,7 @@ generic-service:
   # Environment variables to load into the deployment
   env:
     NODE_ENV: "production"
+    REDIS_ENABLED: "true"
     REDIS_TLS_ENABLED: "true"
     TOKEN_VERIFICATION_ENABLED: "true"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
@@ -34,7 +35,7 @@ generic-service:
     # Optional maintenance end date (in ISO format, YYYY-MM-DDTHH:MM)
     MAINTENANCE_MODE_END_DATE_TIME: ""
 
-    FEATURE_FEEDBACK_BANNER_ENABLED: "true"
+    FEATURE_FEEDBACK_BANNER_ENABLED: "false"
     FEATURE_FEEDBACK_BANNER_URL: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2AYNZK8DJCZBgXxIreDRN5tUQTIwNlJCU1IzSFVMU1JPMUdUVklRUTdNMS4u"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.

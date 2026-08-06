@@ -1,22 +1,17 @@
 import TestData from '../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockIncentivesApiClient } from '../data/testutils/mocks'
+import { createMockIncentivesApiClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import VisitAllowanceService from './visitAllowanceService'
 
-const token = 'some token'
+const username = 'user'
 
 describe('Visit allowance service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const incentivesApiClient = createMockIncentivesApiClient()
+  const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitAllowanceService: VisitAllowanceService
 
-  const IncentivesApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    IncentivesApiClientFactory.mockReturnValue(incentivesApiClient)
-    visitAllowanceService = new VisitAllowanceService(IncentivesApiClientFactory, hmppsAuthClient)
-
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitAllowanceService = new VisitAllowanceService(incentivesApiClient, orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -29,10 +24,43 @@ describe('Visit allowance service', () => {
     it('should return a list of prison incentive levels', async () => {
       incentivesApiClient.getPrisonIncentiveLevels.mockResolvedValue(prisonIncentiveLevels)
 
-      const results = await visitAllowanceService.getPrisonIncentiveLevels({ username: 'user', prisonId: 'HEI' })
+      const results = await visitAllowanceService.getPrisonIncentiveLevels({ username, prisonId: 'HEI' })
 
-      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI')
+      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI', username)
       expect(results).toStrictEqual(prisonIncentiveLevels)
+    })
+  })
+
+  describe('getRemandConfig', () => {
+    const prison = TestData.prison()
+    const remandConfig = TestData.prisonRemandConfig()
+
+    it('should return remand config for current prison', async () => {
+      orchestrationApiClient.getPrison.mockResolvedValue(prison)
+
+      const results = await visitAllowanceService.getRemandConfig({ username, prisonId: 'HEI' })
+
+      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI', username)
+      expect(results).toStrictEqual(remandConfig)
+    })
+  })
+
+  describe('updateRemandConfig', () => {
+    it('should update remand config for current prison', async () => {
+      orchestrationApiClient.updatePrisonConfig.mockResolvedValue()
+
+      await visitAllowanceService.updateRemandConfig({
+        username,
+        prisonId: 'HEI',
+        remandVisitLimitPerWeek: 5,
+        weekStartDay: 'SUNDAY',
+      })
+
+      expect(orchestrationApiClient.updatePrisonConfig).toHaveBeenCalledWith({
+        prisonId: 'HEI',
+        visitSchedulerUpdatePrisonDto: { weekStartDay: 'SUNDAY', remandVisitLimitPerWeek: 5 },
+        username,
+      })
     })
   })
 })

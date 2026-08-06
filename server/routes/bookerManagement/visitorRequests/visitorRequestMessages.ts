@@ -2,16 +2,16 @@ import { MoJAlert } from '../../../@types/bapv'
 import { PrisonVisitorRequestDto, RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
 
 const bookerNotifiedHtml = (bookerReference: string, includeBookerDetailsLink: boolean): string =>
-  `The booker has been notified by email. ${
-    includeBookerDetailsLink
-      ? `You can <a href="/manage-bookers/${bookerReference}/booker-details">view the booker’s account</a>.`
-      : ''
-  }`
+  `The booker has been notified by email. ${includeBookerDetailsLink ? bookerDetailsLink(bookerReference) : ''}`
 
-export const requestAlreadyReviewedMessage = (): MoJAlert => ({
+const bookerDetailsLink = (bookerReference: string): string =>
+  `You can <a href="/manage-bookers/${bookerReference}/booker-details">view the booker’s account</a>.`
+
+export const requestAlreadyReviewedMessage = (bookerReference: string): MoJAlert => ({
   variant: 'information',
-  title: 'Request already reviewed',
-  text: 'The selected request has already been reviewed.',
+  title: 'This request has already been reviewed',
+  showTitleAsHeading: true,
+  html: bookerDetailsLink(bookerReference),
 })
 
 export const requestApprovedMessage = ({

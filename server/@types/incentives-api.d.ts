@@ -349,8 +349,9 @@ export interface paths {
       cookie?: never
     }
     /**
-     * Returns a history of incentive reviews for a prisoner, Requires INCENTIVE_REVIEWS role and read scope
-     * @description Booking ID is an internal ID for a prisoner in NOMIS
+     * Deprecated: Please use `/incentive-reviews/prisoner/{prisonerNumber}` instead.
+     * @deprecated
+     * @description Returns a history of incentive reviews for a prisoner, Requires INCENTIVE_REVIEWS role and read scope.
      */
     get: operations['getPrisonerIncentiveLevelHistory']
     put?: never
