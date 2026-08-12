@@ -99,6 +99,12 @@ testJourneys.forEach(journey => {
         applicationReference: 'aaa-bbb-ccc',
         // visit reference only known on update journey
         visitReference: journey.isUpdate ? 'ab-cd-ef-gh' : undefined,
+        mainContact: journey.isUpdate
+          ? {
+              contactId: 123,
+              languagePreference: 'cy',
+            }
+          : undefined,
       }
 
       selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: true }
@@ -114,23 +120,25 @@ testJourneys.forEach(journey => {
     })
 
     describe(`GET ${journey.urlPrefix}/select-main-contact`, () => {
-      it('should render the main contact page with all fields empty', () => {
-        return request(sessionApp)
-          .get(`${journey.urlPrefix}/select-main-contact`)
-          .expect(200)
-          .expect('Content-Type', /html/)
-          .expect(res => {
-            const $ = cheerio.load(res.text)
-            expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
-            expect($('input[name="contact"]').length).toBe(2)
-            expect($('input[name="contact"]:checked').length).toBe(0)
-            expect($('input[name="contact"]').eq(0).prop('value')).toBe('123')
-            expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
-            expect($('#someoneElseName').prop('value')).toBeFalsy()
-            expect($('#phoneNumberInput').prop('value')).toBeFalsy()
-            expect($('#email').prop('value')).toBeFalsy()
-          })
-      })
+      if (journey.isUpdate === false) {
+        it('should render the main contact page with all fields empty', () => {
+          return request(sessionApp)
+            .get(`${journey.urlPrefix}/select-main-contact`)
+            .expect(200)
+            .expect('Content-Type', /html/)
+            .expect(res => {
+              const $ = cheerio.load(res.text)
+              expect($('h1').text().trim()).toBe('Who is the main contact for this booking?')
+              expect($('input[name="contact"]').length).toBe(2)
+              expect($('input[name="contact"]:checked').length).toBe(0)
+              expect($('input[name="contact"]').eq(0).prop('value')).toBe('123')
+              expect($('input[name="contact"]').eq(1).prop('value')).toBe('someoneElse')
+              expect($('#someoneElseName').prop('value')).toBeFalsy()
+              expect($('#phoneNumberInput').prop('value')).toBeFalsy()
+              expect($('#email').prop('value')).toBeFalsy()
+            })
+        })
+      }
 
       it('should render the main contact page, pre-populated with session data for contact choice, phone number and email', () => {
         visitSessionData.mainContact = {
@@ -293,6 +301,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 1234 567')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.contactName).toBe('name last')
+            expect(visitSessionData.mainContact.languagePreference).toBe(journey.isUpdate ? 'cy' : 'en')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
@@ -315,6 +324,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
+            expect(visitSessionData.mainContact.languagePreference).toBe(journey.isUpdate ? 'cy' : 'en')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })
@@ -327,6 +337,7 @@ testJourneys.forEach(journey => {
           phoneNumber: '0114 1234 567',
           email: 'visitor@example.com',
           contactName: undefined,
+          languagePreference: 'en',
         }
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
@@ -345,6 +356,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
             expect(visitSessionData.mainContact.email).toBe('visitor@example.com')
+            expect(visitSessionData.mainContact.languagePreference).toBe('en')
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })

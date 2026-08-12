@@ -1,26 +1,19 @@
 import TestData from '../../routes/testutils/testData'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../../data/testutils/mocks'
 import VisitOrdersService, { VisitOrderHistoryPage } from './visitOrdersService'
 
-const token = 'some token'
 const username = 'user1'
 
 const prisonId = 'HEI'
 const prisonerId = 'A1234BC'
 
 describe('Visit orders service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitOrdersService: VisitOrdersService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitOrdersService = new VisitOrdersService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitOrdersService = new VisitOrdersService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -35,7 +28,7 @@ describe('Visit orders service', () => {
       const result = await visitOrdersService.getVoBalance({ username, prisonId, prisonerId })
 
       expect(result).toStrictEqual(prisonerVoBalance)
-      expect(orchestrationApiClient.getVoBalance).toHaveBeenCalledWith({ prisonId, prisonerId })
+      expect(orchestrationApiClient.getVoBalance).toHaveBeenCalledWith({ prisonId, prisonerId, username })
     })
   })
 
@@ -50,6 +43,7 @@ describe('Visit orders service', () => {
         prisonId,
         prisonerId,
         prisonerBalanceAdjustmentDto,
+        username,
       })
     })
   })
@@ -91,7 +85,7 @@ describe('Visit orders service', () => {
         ],
       })
 
-      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonId, prisonerId })
+      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonId, prisonerId, username })
     })
 
     it('should return visit order history page data with rows styled depending on history item type', async () => {

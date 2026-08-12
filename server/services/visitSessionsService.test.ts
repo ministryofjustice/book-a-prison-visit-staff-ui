@@ -2,26 +2,19 @@ import { GOVUKTag } from '../@types/bapv'
 import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService, { CalendarDay } from './visitSessionsService'
-import { createMockHmppsAuthClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
-const token = 'some token'
 const username = 'user1'
 
 describe('Visit sessions service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
   let visitSessionsService: VisitSessionsService
 
-  const OrchestrationApiClientFactory = jest.fn()
-
   const prisonId = 'HEI'
 
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-
-    visitSessionsService = new VisitSessionsService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    visitSessionsService = new VisitSessionsService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -46,6 +39,7 @@ describe('Visit sessions service', () => {
         'HEI',
         sessionDate,
         visitSession.sessionTemplateReference,
+        username,
       )
       expect(results).toEqual(visitSession)
     })
@@ -70,6 +64,7 @@ describe('Visit sessions service', () => {
         prisonId,
         date,
         includeExcludedSessions,
+        username,
       })
       expect(results).toEqual(sessionSchedule)
     })
@@ -97,6 +92,7 @@ describe('Visit sessions service', () => {
         sessionDate,
         sessionStartTime,
         sessionEndTime,
+        username,
       )
       expect(results).toEqual(sessionCapacity)
     })

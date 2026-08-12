@@ -2,33 +2,20 @@ import { addMonths, format, subMonths } from 'date-fns'
 import PrisonerProfileService from './prisonerProfileService'
 import { PrisonerProfilePage } from '../@types/bapv'
 import TestData from '../routes/testutils/testData'
-import {
-  createMockHmppsAuthClient,
-  createMockOrchestrationApiClient,
-  createMockPrisonerSearchClient,
-} from '../data/testutils/mocks'
+import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
-const token = 'some token'
+const username = 'user'
 
 describe('Prisoner profile service', () => {
-  const hmppsAuthClient = createMockHmppsAuthClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
-  const prisonerSearchClient = createMockPrisonerSearchClient()
 
   let prisonerProfileService: PrisonerProfileService
-
-  const OrchestrationApiClientFactory = jest.fn()
-  const PrisonerSearchClientFactory = jest.fn()
 
   const prisonerId = 'A1234BC'
   const prisonId = 'HEI'
 
   beforeEach(() => {
-    OrchestrationApiClientFactory.mockReturnValue(orchestrationApiClient)
-    PrisonerSearchClientFactory.mockReturnValue(prisonerSearchClient)
-
-    prisonerProfileService = new PrisonerProfileService(OrchestrationApiClientFactory, hmppsAuthClient)
-    hmppsAuthClient.getSystemClientToken.mockResolvedValue(token)
+    prisonerProfileService = new PrisonerProfileService(orchestrationApiClient)
   })
 
   afterEach(() => {
@@ -66,11 +53,9 @@ describe('Prisoner profile service', () => {
         },
       }
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
 
-      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
       expect(results).toStrictEqual(prisonerProfilePage)
     })
 
@@ -78,11 +63,9 @@ describe('Prisoner profile service', () => {
       const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
 
-      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
       expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
@@ -112,7 +95,7 @@ describe('Prisoner profile service', () => {
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
 
       expect(results.visitsByMonth).toEqual(
         new Map([
@@ -138,11 +121,9 @@ describe('Prisoner profile service', () => {
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, 'user')
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
 
-      expect(OrchestrationApiClientFactory).toHaveBeenCalledWith(token)
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user')
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
 
       expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)

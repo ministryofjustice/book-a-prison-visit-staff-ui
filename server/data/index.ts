@@ -1,34 +1,36 @@
-import HmppsAuthClient from './hmppsAuthClient'
+import { AuthenticationClient, InMemoryTokenStore, RedisTokenStore } from '@ministryofjustice/hmpps-auth-clients'
 import IncentivesApiClient from './incentivesApiClient'
 import OrchestrationApiClient from './orchestrationApiClient'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import PrisonerSearchClient from './prisonerSearchClient'
 import { createRedisClient } from './redisClient'
-import TokenStore from './tokenStore'
 import applicationInfoSupplier from '../applicationInfo'
+import logger from '../../logger'
+import config from '../config'
 
 const applicationInfo = applicationInfoSupplier()
 
-export type RestClientBuilder<T> = (token: string) => T
+const redisClient = config.redis.enabled ? createRedisClient() : null
+const hmppsAuthClient = new AuthenticationClient(
+  config.apis.hmppsAuth,
+  logger,
+  config.redis.enabled ? new RedisTokenStore(redisClient!) : new InMemoryTokenStore(),
+)
 
 export const dataAccess = () => ({
   applicationInfo,
-  hmppsAuthClient: new HmppsAuthClient(new TokenStore(createRedisClient())),
+  hmppsAuthClient,
 
-  incentivesApiClientBuilder: ((token: string) =>
-    new IncentivesApiClient(token)) as RestClientBuilder<IncentivesApiClient>,
-  orchestrationApiClientBuilder: ((token: string) =>
-    new OrchestrationApiClient(token)) as RestClientBuilder<OrchestrationApiClient>,
-  prisonerContactRegistryApiClientBuilder: ((token: string) =>
-    new PrisonerContactRegistryApiClient(token)) as RestClientBuilder<PrisonerContactRegistryApiClient>,
-  prisonerSearchClientBuilder: ((token: string) =>
-    new PrisonerSearchClient(token)) as RestClientBuilder<PrisonerSearchClient>,
+  incentivesApiClient: new IncentivesApiClient(hmppsAuthClient),
+  orchestrationApiClient: new OrchestrationApiClient(hmppsAuthClient),
+  prisonerContactRegistryApiClient: new PrisonerContactRegistryApiClient(hmppsAuthClient),
+  prisonerSearchClient: new PrisonerSearchClient(hmppsAuthClient),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
 export {
-  HmppsAuthClient,
+  AuthenticationClient,
   IncentivesApiClient,
   OrchestrationApiClient,
   PrisonerContactRegistryApiClient,

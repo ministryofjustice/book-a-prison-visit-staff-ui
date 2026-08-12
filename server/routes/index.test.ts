@@ -10,7 +10,6 @@ import {
   createMockVisitRequestsService,
 } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
-import populateCurrentUser from '../middleware/populateCurrentUser'
 import bapvUserRoles from '../constants/bapvUserRoles'
 
 let app: Express
@@ -32,7 +31,6 @@ describe('GET /', () => {
   const visitRequestCount = 3
 
   beforeEach(() => {
-    populateCurrentUser()
     selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
     sessionData = { selectedEstablishment } as SessionData
 

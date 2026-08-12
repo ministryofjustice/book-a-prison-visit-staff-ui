@@ -3,12 +3,12 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { FieldValidationError } from 'express-validator'
 import { InternalServerError } from 'http-errors'
+import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import { createMockAuditService, createMockVisitOrdersService } from '../../../services/testutils/mocks'
 import TestData from '../../testutils/testData'
 import { PVO_MAX, VO_MAX } from '../../../constants/visitOrders'
 import { PrisonerBalanceAdjustmentValidationErrorResponse } from '../../../data/orchestrationApiTypes'
-import { SanitisedError } from '../../../sanitisedError'
 
 let app: Express
 let flashData: FlashData
@@ -454,7 +454,7 @@ describe('Edit visit order balances', () => {
       it('should handle API 422 validation errors', () => {
         const error: SanitisedError<PrisonerBalanceAdjustmentValidationErrorResponse> = {
           name: 'Error',
-          status: 422,
+          responseStatus: 422,
           message: 'Unprocessable Entity',
           stack: 'Error: Unprocessable Entity',
           data: {
