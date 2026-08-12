@@ -121,7 +121,9 @@ export default {
         'http://localhost:4566/000000000000/audit_event_queue',
         requiredInProduction,
       ),
+      region: get('AUDIT_SQS_REGION', 'eu-west-2'),
       serviceName: get('AUDIT_SERVICE_NAME', 'book-a-prison-visit-staff-ui', requiredInProduction),
+      enabled: get('AUDIT_ENABLED', 'true') === 'true',
     },
     orchestration: {
       url: get('ORCHESTRATION_API_URL', 'http://localhost:8080', requiredInProduction),
