@@ -1,4 +1,4 @@
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs'
+import { AuditClient } from '@ministryofjustice/hmpps-audit-client'
 import logger from '../../logger'
 import config from '../config'
 import {
@@ -10,13 +10,17 @@ import {
 import { PrisonRemandConfig } from '../@types/bapv'
 
 export default class AuditService {
-  private sqsClient: SQSClient
-
-  constructor(private readonly queueUrl = config.apis.audit.queueUrl) {
-    this.sqsClient = new SQSClient({
-      useQueueUrlAsEndpoint: false,
-    })
-  }
+  constructor(
+    private readonly auditClient = new AuditClient(
+      {
+        queueUrl: config.apis.audit.queueUrl,
+        region: config.apis.audit.region,
+        serviceName: config.apis.audit.serviceName,
+        enabled: config.apis.audit.enabled,
+      },
+      logger,
+    ),
+  ) {}
 
   async prisonerSearch({
     searchTerms,
@@ -629,37 +633,28 @@ export default class AuditService {
   private async sendAuditMessage({
     action,
     who,
-    timestamp = new Date(),
     operationId,
     details,
   }: {
     action: string
     who: string
-    timestamp?: Date
     operationId: string
     details: object
   }) {
-    const message = JSON.stringify({
-      what: action,
-      when: timestamp,
-      operationId,
-      who,
-      service: config.apis.audit.serviceName,
-      details: JSON.stringify(details, this.replaceUndefinedWithNull),
-    })
-
-    try {
-      const messageResponse = await this.sqsClient.send(
-        new SendMessageCommand({
-          MessageBody: message,
-          QueueUrl: this.queueUrl,
-        }),
-      )
-      logger.info(`SQS message sent (MessageId: ${messageResponse.MessageId}, message: ${message})`)
-    } catch (error) {
-      logger.error(`Problem sending message to SQS queue (message: ${message})`)
-      logger.error(error)
-    }
+    // subjectType is required by AuditEvent but this service doesn't currently track a specific
+    // audited subject (prisoner, CRN, etc.) per action, so every event is sent as NOT_APPLICABLE.
+    // Pre-resolve undefined -> null (matching the previous local SQS message behaviour) before
+    // handing off, since the audit client JSON.stringifies `details` itself.
+    await this.auditClient.sendMessage(
+      {
+        action,
+        who,
+        correlationId: operationId,
+        subjectType: 'NOT_APPLICABLE',
+        details: JSON.parse(JSON.stringify(details, this.replaceUndefinedWithNull)),
+      },
+      { logOnError: true, throwOnError: false },
+    )
   }
 
   private replaceUndefinedWithNull(_key: string, value: unknown) {
