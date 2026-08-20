@@ -91,6 +91,7 @@ export type VisitNotificationEventAttributeNames =
 // Visit sessions and scheduled events (calendar)
 export type VisitSessionsAndScheduleDto = components['schemas']['VisitSessionsAndScheduleDto']
 export type SessionsAndScheduleDto = components['schemas']['SessionsAndScheduleDto']
+export type SessionConflict = components['schemas']['SessionConflictDto']['sessionConflict']
 export type VisitSessionV2Dto = components['schemas']['VisitSessionV2Dto']
 export type PrisonerScheduledEventDto = components['schemas']['PrisonerScheduledEventDto']
 

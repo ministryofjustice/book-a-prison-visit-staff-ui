@@ -20,6 +20,7 @@ import {
   RejectVisitorRequestDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
+  SessionConflict,
   SessionSchedule,
   StaffUsernameDto,
   Visit,
@@ -1135,7 +1136,18 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get('/visit-sessions-and-schedule')
-        .query({ prisonId, prisonerId, min: minNumberOfDays, username })
+        .query(
+          new URLSearchParams({
+            prisonId,
+            prisonerId,
+            min: minNumberOfDays.toString(),
+            username,
+            includedSessionConflicts: <SessionConflict[]>[
+              'DOUBLE_BOOKING_OR_RESERVATION',
+              'REMAND_VISITS_LIMIT_REACHED',
+            ],
+          }).toString(),
+        )
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitSessionsAndScheduleDto)
 
