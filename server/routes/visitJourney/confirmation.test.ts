@@ -205,8 +205,29 @@ testJourneys.forEach(journey => {
             expect($('.test-main-contact-name').text()).toContain('abc')
             expect($('.test-main-contact-number').text()).toContain('No phone number provided')
             expect($('.test-main-contact-email').text()).toContain('test@test.net')
+            expect($('.test-main-contact-language-preference').text()).toBe(' Updates in English')
             expect($('.test-booking-reference').text()).toContain('ab-cd-ef-gh')
             expect($('[data-test=contact-method-text]').text()).toContain('an email')
+
+            expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
+          })
+      })
+
+      it('should render welsh language preference', () => {
+        visitSessionData.mainContact.languagePreference = 'cy'
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/confirmation`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('h1').text().trim()).toBe(journey.isUpdate ? 'Visit updated' : 'Visit confirmed')
+            expect($('main h2').first().text()).toBe(journey.isUpdate ? 'What happens next' : 'What to do next')
+            expect($('.govuk-button--secondary').attr('href')).toBe('/prisoner/A1234BC')
+            expect($('.test-visit-prisoner-name').text()).toContain('prisoner name')
+
+            expect($('.test-main-contact-language-preference').text()).toBe(' Updates in Welsh and English')
 
             expect(visitorUtils.clearSession).toHaveBeenCalledTimes(1)
           })

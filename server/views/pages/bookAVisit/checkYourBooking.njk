@@ -34,6 +34,8 @@
         {%- if mainContact.relationshipDescription %} ({{ mainContact.relationshipDescription | lower}} of the prisoner){% endif %}
       {%- endset %}
 
+      {% set contactLanguageNote %} Updates in {{ "Welsh and " if mainContact.languagePreference == "cy" -}} English {%- endset %}
+
       {% set displayRows = [
         {
           key: {
@@ -138,9 +140,10 @@
             text: "Main contact"
           },
           value: {
-            html: '<p><span class="test-main-contact-name">' + contactName + '</span><br><span class="test-main-contact-number">' +
-              mainContact.phoneNumber | d("No phone number provided", true) | escape + '</span><br><span class="test-main-contact-email">' +
-              mainContact.email | escape + '</span></p>'
+            html: '<p><span class="test-main-contact-name">' + contactName + '</span><br>' +
+              '<span class="test-main-contact-number">' + mainContact.phoneNumber | d("No phone number provided", true) | escape + '</span><br>' +
+              '<span class="test-main-contact-email">' + mainContact.email | escape + '</span><br>' +
+              '<span class="test-main-contact-language-preference">' + contactLanguageNote + '</span></p>'
           },
           actions: {
             items: [

@@ -55,6 +55,11 @@
             {%- endif -%}
           </dd>
 
+          <dt>Language for updates</dt>
+          <dd data-test="visit-language-preference">
+            {%- if visitDetails.visitContact.languagePreference == "cy" %} Welsh and {% endif %} English
+          </dd>
+
           <dt>Booking reference</dt>
           <dd data-test="reference">{{ visitDetails.reference }}</dd>
 

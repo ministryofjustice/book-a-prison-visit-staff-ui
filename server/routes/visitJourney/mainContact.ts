@@ -27,6 +27,7 @@ export default class MainContact {
         ? undefined
         : visitSessionData.mainContact.contactName
       formValues.email = visitSessionData.mainContact.email ?? ''
+      formValues.languagePreference = visitSessionData.mainContact.languagePreference ?? 'en'
     }
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),

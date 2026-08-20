@@ -121,8 +121,25 @@ testJourneys.forEach(journey => {
             expect($('.test-main-contact-name').text()).toBe('abc (wife of the prisoner)')
             expect($('.test-main-contact-number').text()).toContain('0123 456 7890')
             expect($('.test-main-contact-email').text()).toContain('test@example.com')
+            expect($('.test-main-contact-language-preference').text()).toBe(' Updates in English')
             expect($('[data-test="change-main-contact"]').attr('href')).toBe(`${journey.urlPrefix}/select-main-contact`)
             expect($('form').prop('action')).toBe(`${journey.urlPrefix}/check-your-booking`)
+          })
+      })
+
+      it('should render welsh language preference', () => {
+        visitSessionData.mainContact.languagePreference = 'cy'
+
+        return request(sessionApp)
+          .get(`${journey.urlPrefix}/check-your-booking`)
+          .expect(200)
+          .expect('Content-Type', /html/)
+          .expect(res => {
+            const $ = cheerio.load(res.text)
+            expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/request-method`)
+            expect($('h1').text().trim()).toBe('Check the visit details before booking')
+            expect($('.test-prisoner-name').text()).toContain('prisoner name')
+            expect($('.test-main-contact-language-preference').text()).toBe(' Updates in Welsh and English')
           })
       })
 
