@@ -27,6 +27,7 @@ export default class MainContact {
         ? undefined
         : visitSessionData.mainContact.contactName
       formValues.email = visitSessionData.mainContact.email ?? ''
+      formValues.languagePreference = visitSessionData.mainContact.languagePreference ?? 'en'
     }
     res.render('pages/bookAVisit/mainContact', {
       errors: req.flash('errors'),
@@ -61,7 +62,7 @@ export default class MainContact {
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       email: req.body.email,
       contactName: selectedContact?.name ?? req.body.someoneElseName,
-      languagePreference: visitSessionData.mainContact?.languagePreference ?? 'en',
+      languagePreference: req.body.languagePreference === 'cy' ? 'cy' : 'en',
     }
 
     // update visit application to have the latest data
