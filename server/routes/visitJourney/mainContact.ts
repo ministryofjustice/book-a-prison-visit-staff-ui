@@ -62,7 +62,7 @@ export default class MainContact {
       phoneNumber: req.body.phoneNumber === 'hasPhoneNumber' ? req.body.phoneNumberInput : undefined,
       email: req.body.email,
       contactName: selectedContact?.name ?? req.body.someoneElseName,
-      languagePreference: visitSessionData.mainContact?.languagePreference ?? 'en',
+      languagePreference: req.body.languagePreference === 'cy' ? 'cy' : 'en',
     }
 
     // update visit application to have the latest data

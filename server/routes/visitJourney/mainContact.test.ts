@@ -16,8 +16,8 @@ let selectedEstablishment: SessionData['selectedEstablishment']
 
 // run tests for booking and update journeys
 const testJourneys = [
-  { urlPrefix: '/book-a-visit', isUpdate: false },
-  { urlPrefix: '/update-a-visit', isUpdate: true },
+  { urlPrefix: '/book-a-visit', isUpdate: false, languagePreference: 'en' },
+  { urlPrefix: '/update-a-visit', isUpdate: true, languagePreference: 'cy' },
 ]
 
 beforeEach(() => {
@@ -292,7 +292,12 @@ testJourneys.forEach(journey => {
       it('should store contact data in session (named contact & phone number) and update the application then redirect to request method page', () => {
         return request(sessionApp)
           .post(`${journey.urlPrefix}/select-main-contact`)
-          .send({ contact: '123', phoneNumber: 'hasPhoneNumber', phoneNumberInput: ' 0114 1234 567 ' })
+          .send({
+            contact: '123',
+            phoneNumber: 'hasPhoneNumber',
+            phoneNumberInput: ' 0114 1234 567 ',
+            languagePreference: journey.languagePreference,
+          })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
           .expect(() => {
@@ -315,6 +320,7 @@ testJourneys.forEach(journey => {
             someoneElseName: '  another person  ',
             phoneNumber: 'hasPhoneNumber',
             phoneNumberInput: '0114 7654 321',
+            languagePreference: journey.languagePreference,
           })
           .expect(302)
           .expect('location', `${journey.urlPrefix}/request-method`)
@@ -324,7 +330,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contactName).toBe('another person')
             expect(visitSessionData.mainContact.email).toBeUndefined()
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
-            expect(visitSessionData.mainContact.languagePreference).toBe(journey.isUpdate ? 'cy' : 'en')
+            expect(visitSessionData.mainContact.languagePreference).toBe(journey.languagePreference)
 
             expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
           })

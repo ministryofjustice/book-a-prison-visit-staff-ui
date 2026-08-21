@@ -139,7 +139,7 @@ testJourneys.forEach(journey => {
             expect($('.govuk-back-link').attr('href')).toBe(`${journey.urlPrefix}/request-method`)
             expect($('h1').text().trim()).toBe('Check the visit details before booking')
             expect($('.test-prisoner-name').text()).toContain('prisoner name')
-            expect($('.test-main-contact-language-preference').text()).toBe(' Updates in Welsh and English')
+            expect($('.test-main-contact-language-preference').text().trim()).toBe('Updates in Welsh and English')
           })
       })
 
