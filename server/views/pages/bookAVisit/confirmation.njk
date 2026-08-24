@@ -140,7 +140,9 @@
           text: "Visitor " + loop.index
         },
         value: {
-          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | escape + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | escape | replace("\n", " ") + "</span>"
+          html:
+            '<p class="test-visitor-name' + loop.index + '">' + (visitor.name | escape) + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</p>' +
+            '<p class="test-visitor-address' + loop.index + '">' + (visitor.address | escape | replace("\n", " ")) + "</p>"
         }
       }
     ), displayRows) %}
@@ -176,9 +178,10 @@
         text: "Main contact"
       },
       value: {
-        html: '<p class="test-main-contact-name">' + contactName + '</p>' +
-          '<p class="test-main-contact-number">' + mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p>' +
-          '<p class="test-main-contact-email">' + mainContact.email | escape + '</p>' +
+        html:
+          '<p class="test-main-contact-name">' + contactName + '</p>' +
+          '<p class="test-main-contact-number">' + (mainContact.phoneNumber | d("No phone number provided", true) | escape) + '</p>' +
+          '<p class="test-main-contact-email">' + (mainContact.email | escape) + '</p>' +
           '<p class="test-main-contact-language-preference">' + contactLanguageNote + '</p>'
       }
     }
