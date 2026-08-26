@@ -2,6 +2,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% set pageHeaderTitle = "Who is the main contact for this booking?" %}
 
@@ -39,7 +40,7 @@
             errorMessage: errors | findError('someoneElseName')
           }) }}
         {% endset -%}
-          
+
         {% set visitors = (visitors.push(
           {
             value: "someoneElse",
@@ -64,7 +65,7 @@
           items: visitors,
           errorMessage: errors | findError('contact')
         }) }}
-        
+
         {% set inputPhoneNumberHtml %}
           {{ govukInput({
             classes: "govuk-!-width-one-third",
@@ -135,11 +136,32 @@
           }) }}
         {% endif %}
 
+        {{ govukCheckboxes({
+          name: "languagePreference",
+          fieldset: {
+            legend: {
+              text: 'Welsh language',
+              isPageHeading: false,
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          items: [
+            {
+              value: "cy",
+              checked: formValues.languagePreference == "cy",
+              text: "Tick for updates to be sent in Welsh",
+              hint: {
+                text: "They will also be sent in English."
+              }
+            }
+          ]
+        }) }}
+
         {{ govukButton({
           text: "Continue",
           attributes: { "data-test": "submit" },
           preventDoubleClick: true
-        }) }} 
+        }) }}
       </form>
     </div>
   </div>
