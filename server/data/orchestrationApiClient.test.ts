@@ -148,7 +148,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.cancelVisit(reference, cancelVisitDto, username)
+      const output = await orchestrationApiClient.cancelVisit(reference, cancelVisitDto)
 
       expect(output).toEqual(result)
     })
@@ -163,7 +163,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visit)
 
-      const output = await orchestrationApiClient.getVisit(visit.reference, username)
+      const output = await orchestrationApiClient.getVisit(visit.reference)
 
       expect(output).toEqual(visit)
     })
@@ -211,7 +211,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitBookingDetailsRaw)
 
-      const result = await orchestrationApiClient.getVisitDetailed(visitBookingDetailsRaw.reference, username)
+      const result = await orchestrationApiClient.getVisitDetailed(visitBookingDetailsRaw.reference)
 
       expect(result.events).toStrictEqual([
         { type: 'PRISONER_RELEASED_EVENT' },
@@ -251,7 +251,6 @@ describe('orchestrationApiClient', () => {
         sessionTemplateReference,
         sessionDate,
         visitRestrictions,
-        username,
       )
 
       expect(output).toStrictEqual(visitPreviews)
@@ -276,7 +275,6 @@ describe('orchestrationApiClient', () => {
         undefined,
         sessionDate,
         undefined,
-        username,
       )
 
       expect(output).toStrictEqual(visitPreviews)
@@ -302,7 +300,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getBookedVisitCountByDate('HEI', '2022-05-23', username)
+      const output = await orchestrationApiClient.getBookedVisitCountByDate('HEI', '2022-05-23')
 
       expect(output).toBe(2)
     })
@@ -354,7 +352,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, result)
 
-      const output = await orchestrationApiClient.changeVisitApplication(visitSessionData, username)
+      const output = await orchestrationApiClient.changeVisitApplication(visitSessionData)
 
       expect(output).toStrictEqual(result)
     })
@@ -560,7 +558,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitors)
 
-      const output = await orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId, username })
+      const output = await orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId })
 
       expect(output).toStrictEqual(visitors)
     })
@@ -577,7 +575,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, bookers)
 
-      const output = await orchestrationApiClient.getBookersByEmail(email, username)
+      const output = await orchestrationApiClient.getBookersByEmail(email)
 
       expect(output).toStrictEqual(bookers)
     })
@@ -588,7 +586,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      const output = await orchestrationApiClient.getBookersByEmail(email, username)
+      const output = await orchestrationApiClient.getBookersByEmail(email)
 
       expect(output).toStrictEqual([])
     })
@@ -599,7 +597,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(500)
 
-      await expect(orchestrationApiClient.getBookersByEmail(email, username)).rejects.toThrow('Internal Server Error')
+      await expect(orchestrationApiClient.getBookersByEmail(email)).rejects.toThrow('Internal Server Error')
     })
   })
 
@@ -612,10 +610,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequestForReview)
 
-      const output = await orchestrationApiClient.getVisitorRequestForReview(
-        visitorRequestForReview.reference,
-        username,
-      )
+      const output = await orchestrationApiClient.getVisitorRequestForReview(visitorRequestForReview.reference)
 
       expect(output).toStrictEqual(visitorRequestForReview)
     })
@@ -631,7 +626,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, booker)
 
-      const output = await orchestrationApiClient.getBookerDetails(reference, username)
+      const output = await orchestrationApiClient.getBookerDetails(reference)
 
       expect(output).toStrictEqual(booker)
     })
@@ -647,7 +642,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, socialContacts)
 
-      const output = await orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId, username })
+      const output = await orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
 
       expect(output).toStrictEqual(socialContacts)
     })
@@ -726,7 +721,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, bookerVisitorRequests)
 
-      const result = await orchestrationApiClient.getBookerVisitorRequests(bookerReference, username)
+      const result = await orchestrationApiClient.getBookerVisitorRequests(bookerReference)
       expect(result).toStrictEqual(bookerVisitorRequests)
     })
   })
@@ -740,7 +735,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequestListEntries)
 
-      const result = await orchestrationApiClient.getVisitorRequests(prisonId, username)
+      const result = await orchestrationApiClient.getVisitorRequests(prisonId)
       expect(result).toStrictEqual(visitorRequestListEntries)
     })
   })
@@ -754,7 +749,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
-      const result = await orchestrationApiClient.getVisitorRequestCount(prisonId, username)
+      const result = await orchestrationApiClient.getVisitorRequestCount(prisonId)
       expect(result).toBe(2)
     })
   })
@@ -775,7 +770,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visit)
 
-      const result = await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto, username)
+      const result = await orchestrationApiClient.ignoreNotifications(reference, ignoreVisitNotificationsDto)
 
       expect(result).toStrictEqual(visit)
     })
@@ -792,7 +787,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
-      const output = await orchestrationApiClient.getNotificationCount(prisonId, username)
+      const output = await orchestrationApiClient.getNotificationCount(prisonId)
 
       expect(output).toBe(count)
     })
@@ -830,7 +825,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitNotificationsRaw)
 
-      const result = await orchestrationApiClient.getVisitNotifications(prisonId, username)
+      const result = await orchestrationApiClient.getVisitNotifications(prisonId)
 
       expect(result).toStrictEqual(expectedVisitNotifications)
     })
@@ -887,7 +882,6 @@ describe('orchestrationApiClient', () => {
       const output = await orchestrationApiClient.getFutureBlockedDatesAndSessions({
         prisonId,
         includeSessions: true,
-        username,
       })
 
       expect(output).toStrictEqual(results)
@@ -904,7 +898,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate, username)
+      const output = await orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
 
       expect(output).toStrictEqual(true)
     })
@@ -994,7 +988,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitRequests)
 
-      const output = await orchestrationApiClient.getVisitRequests(prisonId, username)
+      const output = await orchestrationApiClient.getVisitRequests(prisonId)
 
       expect(output).toStrictEqual(visitRequests)
     })
@@ -1009,7 +1003,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
-      const output = await orchestrationApiClient.getVisitRequestCount(prisonId, username)
+      const output = await orchestrationApiClient.getVisitRequestCount(prisonId)
 
       expect(output).toBe(count)
     })
@@ -1034,7 +1028,6 @@ describe('orchestrationApiClient', () => {
         results.prisonId,
         sessionDate,
         results.sessionTemplateReference,
-        username,
       )
 
       expect(output).toEqual(results)
@@ -1057,7 +1050,6 @@ describe('orchestrationApiClient', () => {
         prisonId,
         date,
         includeExcludedSessions,
-        username,
       })
 
       expect(output).toEqual(sessionSchedule)
@@ -1083,7 +1075,6 @@ describe('orchestrationApiClient', () => {
         sessionDate,
         sessionStartTime,
         sessionEndTime,
-        username,
       )
 
       expect(output).toEqual(sessionCapacity)
@@ -1101,7 +1092,6 @@ describe('orchestrationApiClient', () => {
         sessionDate,
         sessionStartTime,
         sessionEndTime,
-        username,
       )
 
       expect(output).toBeNull()
@@ -1121,7 +1111,6 @@ describe('orchestrationApiClient', () => {
         sessionDate,
         sessionStartTime,
         sessionEndTime,
-        username,
       )
 
       expect(output).toBeNull()
@@ -1159,7 +1148,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisonerVoBalance)
 
-      const output = await orchestrationApiClient.getVoBalance({ prisonId, prisonerId, username })
+      const output = await orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
 
       expect(output).toStrictEqual(prisonerVoBalance)
     })
@@ -1174,7 +1163,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200)
 
-      await orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto, username })
+      await orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
 
       expect(fakeOrchestrationApi.isDone()).toBe(true)
     })
@@ -1199,7 +1188,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitOrderHistoryDetailsDto)
 
-      const output = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId, username })
+      const output = await orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
 
       expect(output).toStrictEqual(visitOrderHistoryDetailsDto)
 
@@ -1254,7 +1243,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisonerProfile)
 
-      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerProfile.prisonerId, username)
+      const output = await orchestrationApiClient.getPrisonerProfile(prisonId, prisonerProfile.prisonerId)
 
       expect(output).toStrictEqual(prisonerProfile)
     })
@@ -1269,7 +1258,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await orchestrationApiClient.getSupportedPrisonIds(username)
+      const output = await orchestrationApiClient.getSupportedPrisonIds()
 
       expect(output).toEqual(results)
     })
@@ -1285,7 +1274,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, receivedPrisonDto)
 
-      const output = await orchestrationApiClient.getPrison(prisonId, username)
+      const output = await orchestrationApiClient.getPrison(prisonId)
 
       expect(output).toStrictEqual(expectedPrison)
     })
@@ -1301,7 +1290,6 @@ describe('orchestrationApiClient', () => {
       await orchestrationApiClient.updatePrisonConfig({
         prisonId: 'HEI',
         visitSchedulerUpdatePrisonDto: { weekStartDay: 'SUNDAY', remandVisitLimitPerWeek: 4 },
-        username,
       })
 
       expect(fakeOrchestrationApi.isDone()).toBe(true)

@@ -48,7 +48,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
 
         expect($('[data-test=no-visit-requests]').length).toBe(0)
 
-        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('user1', 'HEI')
+        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('HEI')
       })
   })
 
@@ -78,7 +78,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
 
         expect($('[data-test=no-visit-requests]').length).toBe(0)
 
-        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('user1', 'HEI')
+        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('HEI')
       })
   })
 
@@ -96,7 +96,7 @@ describe('GET /requested-visits - Requested visits listing', () => {
         expect($('[data-test=visit-requests] tbody tr').length).toBe(0)
         expect($('[data-test=no-visit-requests]').length).toBe(1)
 
-        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('user1', 'HEI')
+        expect(visitRequestsService.getVisitRequests).toHaveBeenCalledWith('HEI')
       })
   })
 

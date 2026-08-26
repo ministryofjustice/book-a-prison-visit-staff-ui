@@ -12,8 +12,8 @@ export default class BlockDatesOrSessionsService {
     await this.orchestrationApiClient.unblockVisitDate(prisonId, date, username)
   }
 
-  async isBlockedDate(prisonId: string, excludedDate: string, username: string): Promise<boolean> {
-    return this.orchestrationApiClient.isBlockedDate(prisonId, excludedDate, username)
+  async isBlockedDate(prisonId: string, excludedDate: string): Promise<boolean> {
+    return this.orchestrationApiClient.isBlockedDate(prisonId, excludedDate)
   }
 
   async blockVisitSession({
@@ -43,12 +43,10 @@ export default class BlockDatesOrSessionsService {
   async getFutureBlockedDatesAndSessions({
     prisonId,
     includeSessions,
-    username,
   }: {
     prisonId: string
     includeSessions: boolean
-    username: string
   }): Promise<PrisonAndSessionsExcludeDatesDto> {
-    return this.orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions, username })
+    return this.orchestrationApiClient.getFutureBlockedDatesAndSessions({ prisonId, includeSessions })
   }
 }

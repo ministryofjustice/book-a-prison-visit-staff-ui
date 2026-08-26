@@ -11,10 +11,7 @@ export default class ViewAllowancesController {
       const { username, userRoles } = res.locals.user
 
       const [prisonConfig, incentiveLevels] = await Promise.all([
-        this.visitAllowanceService.getRemandConfig({
-          username,
-          prisonId,
-        }),
+        this.visitAllowanceService.getRemandConfig({ prisonId }),
         this.visitAllowanceService.getPrisonIncentiveLevels({
           username,
           prisonId,

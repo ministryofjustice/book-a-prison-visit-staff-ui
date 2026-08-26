@@ -144,7 +144,6 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       try {
         visit = await visitService.getVisit({
           reference: search,
-          username: res.locals.user.username,
           prisonId: req.session.selectedEstablishment.prisonId,
         })
         const prisonerDetails = await prisonerSearchService.getPrisonerById(

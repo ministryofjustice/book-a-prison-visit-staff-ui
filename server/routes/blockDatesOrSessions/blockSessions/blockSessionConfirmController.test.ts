@@ -82,7 +82,6 @@ describe('Confirm session block', () => {
           )
 
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             reference: selectedSession.sessionTemplateReference,
             sessionDate: date,

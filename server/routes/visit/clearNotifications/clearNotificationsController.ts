@@ -50,7 +50,6 @@ export default class ClearNotificationsController {
         }
 
         const visit = await this.visitNotificationsService.ignoreNotifications({
-          username,
           reference,
           ignoreVisitNotificationsDto,
         })

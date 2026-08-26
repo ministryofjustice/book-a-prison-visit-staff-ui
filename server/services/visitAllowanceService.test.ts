@@ -38,9 +38,9 @@ describe('Visit allowance service', () => {
     it('should return remand config for current prison', async () => {
       orchestrationApiClient.getPrison.mockResolvedValue(prison)
 
-      const results = await visitAllowanceService.getRemandConfig({ username, prisonId: 'HEI' })
+      const results = await visitAllowanceService.getRemandConfig({ prisonId: 'HEI' })
 
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI', username)
+      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
       expect(results).toStrictEqual(remandConfig)
     })
   })
@@ -50,7 +50,6 @@ describe('Visit allowance service', () => {
       orchestrationApiClient.updatePrisonConfig.mockResolvedValue()
 
       await visitAllowanceService.updateRemandConfig({
-        username,
         prisonId: 'HEI',
         remandVisitLimitPerWeek: 5,
         weekStartDay: 'SUNDAY',
@@ -59,7 +58,6 @@ describe('Visit allowance service', () => {
       expect(orchestrationApiClient.updatePrisonConfig).toHaveBeenCalledWith({
         prisonId: 'HEI',
         visitSchedulerUpdatePrisonDto: { weekStartDay: 'SUNDAY', remandVisitLimitPerWeek: 5 },
-        username,
       })
     })
   })

@@ -21,7 +21,6 @@ export default class VisitsReviewListingController {
       const { bookedBy = [], type = [] } = matchedData<AppliedFilters>(req, { locations: ['query'] })
 
       const visitNotifications = await this.visitNotificationsService.getVisitNotifications({
-        username,
         prisonId: selectedEstablishment.prisonId,
       })
 

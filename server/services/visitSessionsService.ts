@@ -57,33 +57,24 @@ export default class VisitSessionsService {
     prisonCode,
     sessionDate,
     sessionTemplateReference,
-    username,
   }: {
     prisonCode: string
     sessionDate: string
     sessionTemplateReference: string
-    username: string
   }): Promise<VisitSession> {
-    return this.orchestrationApiClient.getSingleVisitSession(
-      prisonCode,
-      sessionDate,
-      sessionTemplateReference,
-      username,
-    )
+    return this.orchestrationApiClient.getSingleVisitSession(prisonCode, sessionDate, sessionTemplateReference)
   }
 
   async getSessionSchedule({
-    username,
     prisonId,
     date,
     includeExcludedSessions,
   }: {
-    username: string
     prisonId: string
     date: string
     includeExcludedSessions: boolean
   }): Promise<SessionSchedule[]> {
-    return this.orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions, username })
+    return this.orchestrationApiClient.getSessionSchedule({ prisonId, date, includeExcludedSessions })
   }
 
   async getVisitSessionCapacity(
@@ -93,13 +84,7 @@ export default class VisitSessionsService {
     sessionStartTime: string,
     sessionEndTime: string,
   ): Promise<SessionCapacity> {
-    return this.orchestrationApiClient.getVisitSessionCapacity(
-      prisonId,
-      sessionDate,
-      sessionStartTime,
-      sessionEndTime,
-      username,
-    )
+    return this.orchestrationApiClient.getVisitSessionCapacity(prisonId, sessionDate, sessionStartTime, sessionEndTime)
   }
 
   async getVisitSessionsAndScheduleCalendar({

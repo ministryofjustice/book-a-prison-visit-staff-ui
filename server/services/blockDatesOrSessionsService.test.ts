@@ -44,8 +44,8 @@ describe('Blocked dates or sessions service', () => {
     it('should return boolean indicating whether given date is a blocked date', async () => {
       const date = '2000-02-01'
       orchestrationApiClient.isBlockedDate.mockResolvedValue(true)
-      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
-      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date, username)
+      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
       expect(result).toBe(true)
     })
 
@@ -53,9 +53,9 @@ describe('Blocked dates or sessions service', () => {
       const date = '2000-02-01'
       orchestrationApiClient.isBlockedDate.mockResolvedValue(false)
 
-      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date, username)
+      const result = await blockDatesOrSessionsService.isBlockedDate(prisonId, date)
 
-      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date, username)
+      expect(orchestrationApiClient.isBlockedDate).toHaveBeenCalledWith(prisonId, date)
       expect(result).toStrictEqual(false)
     })
   })
@@ -100,13 +100,11 @@ describe('Blocked dates or sessions service', () => {
       const result = await blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
         prisonId,
         includeSessions: true,
-        username,
       })
 
       expect(orchestrationApiClient.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
         prisonId,
         includeSessions: true,
-        username,
       })
       expect(result).toStrictEqual(prisonAndSessionsExcludeDatesDto)
     })

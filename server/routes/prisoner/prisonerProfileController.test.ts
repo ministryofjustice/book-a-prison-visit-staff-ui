@@ -420,7 +420,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect('location', '/book-a-visit/select-visitors')
         .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(clearSession).toHaveBeenCalledTimes(1)
           expect(sessionData.visitSessionData).toStrictEqual(<VisitSessionData>{
@@ -448,7 +448,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect('location', '/book-a-visit/select-visitors')
         .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC')
           expect(auditService.overrodeZeroVO).toHaveBeenCalledTimes(1)
           expect(auditService.overrodeZeroVO).toHaveBeenCalledWith({
             prisonerId: 'A1234BC',
@@ -487,7 +487,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect('location', '/book-a-visit/select-visitors')
         .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(sessionData.visitSessionData).toStrictEqual(<VisitSessionData>{
             allowOverBooking: false,
@@ -513,7 +513,7 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect('location', '/prisoner/A1234BC')
         .expect(() => {
           expect(prisonerProfileService.getProfile).toHaveBeenCalledTimes(1)
-          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC', 'user1')
+          expect(prisonerProfileService.getProfile).toHaveBeenCalledWith(prisonId, 'A1234BC')
           expect(auditService.overrodeZeroVO).not.toHaveBeenCalled()
           expect(sessionData.visitSessionData).toBeUndefined()
           expect(flashProvider).toHaveBeenCalledWith('errors', [

@@ -39,7 +39,7 @@ describe('Establishment not supported page', () => {
         const $ = cheerio.load(res.text)
         expect($('h1').text()).toBe('XYZ (HMP) does not use this service')
         expect($('.govuk-back-link').length).toBeFalsy()
-        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', 'XYZ')
+        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('XYZ')
       })
   })
 
@@ -77,7 +77,7 @@ describe('Establishment not supported page', () => {
       .expect(302)
       .expect('location', '/')
       .expect(() => {
-        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', 'HEI')
+        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('HEI')
       })
   })
 })

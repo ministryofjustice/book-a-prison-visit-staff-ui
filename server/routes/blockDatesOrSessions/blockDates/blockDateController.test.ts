@@ -58,7 +58,6 @@ describe('Block new visit date', () => {
           expect($('[data-test=submit]').text().trim()).toBe('Continue')
 
           expect(visitService.getBookedVisitCountByDate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             date: sessionData.blockDateOrSession.date,
           })

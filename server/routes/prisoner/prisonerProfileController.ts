@@ -19,11 +19,7 @@ export default class PrisonerProfileController {
       const search = (req.query?.search as string) ?? ''
       const queryParamsForBackLink = search !== '' ? new URLSearchParams({ search }).toString() : ''
 
-      const prisonerProfile = await this.prisonerProfileService.getProfile(
-        prisonId,
-        prisonerId,
-        res.locals.user.username,
-      )
+      const prisonerProfile = await this.prisonerProfileService.getProfile(prisonId, prisonerId)
 
       await this.auditService.viewPrisoner({
         prisonerId,
@@ -47,12 +43,10 @@ export default class PrisonerProfileController {
     return async (req, res) => {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment
-      const { username } = res.locals.user
 
       const { prisonerDetails, alerts, restrictions } = await this.prisonerProfileService.getProfile(
         prisonId,
         prisonerId,
-        username,
       )
 
       if (prisonerDetails.visitBalances?.remainingVo <= 0 && prisonerDetails.visitBalances?.remainingPvo <= 0) {

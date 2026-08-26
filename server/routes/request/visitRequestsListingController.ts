@@ -8,10 +8,7 @@ export default class VisitRequestsListingController {
     return async (req, res) => {
       const { selectedEstablishment } = req.session
 
-      const visitRequests = await this.visitRequestsService.getVisitRequests(
-        res.locals.user.username,
-        selectedEstablishment.prisonId,
-      )
+      const visitRequests = await this.visitRequestsService.getVisitRequests(selectedEstablishment.prisonId)
 
       return res.render('pages/request/visitRequestsListing', {
         messages: req.flash('messages'),

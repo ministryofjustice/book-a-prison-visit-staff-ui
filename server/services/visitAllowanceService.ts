@@ -19,19 +19,17 @@ export default class VisitAllowanceService {
     return this.incentivesApiClient.getPrisonIncentiveLevels(prisonId, username)
   }
 
-  async getRemandConfig({ username, prisonId }: { username: string; prisonId: string }): Promise<PrisonRemandConfig> {
-    const prison = await this.orchestrationApiClient.getPrison(prisonId, username)
+  async getRemandConfig({ prisonId }: { prisonId: string }): Promise<PrisonRemandConfig> {
+    const prison = await this.orchestrationApiClient.getPrison(prisonId)
 
     return { weekStartDay: prison.weekStartDay, remandVisitLimitPerWeek: prison.remandVisitLimitPerWeek }
   }
 
   async updateRemandConfig({
-    username,
     prisonId,
     weekStartDay,
     remandVisitLimitPerWeek,
   }: {
-    username: string
     prisonId: string
     weekStartDay: VisitSchedulerUpdatePrisonDto['weekStartDay']
     remandVisitLimitPerWeek: VisitSchedulerUpdatePrisonDto['remandVisitLimitPerWeek']
@@ -41,7 +39,6 @@ export default class VisitAllowanceService {
     await this.orchestrationApiClient.updatePrisonConfig({
       prisonId,
       visitSchedulerUpdatePrisonDto,
-      username,
     })
   }
 }
