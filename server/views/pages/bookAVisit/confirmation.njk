@@ -35,7 +35,7 @@
           {% endif %}
           <li>the booking reference is needed to <a href="/search/visit">cancel or update the booking</a></li>
           <li>
-            changes can be made up to 
+            changes can be made up to
             <span data-test="booking-changes-days">{{ selectedEstablishment.policyNoticeDaysMin }} {{ "day" | pluralise(selectedEstablishment.policyNoticeDaysMin) }}</span>
             before the visit
           </li>
@@ -140,7 +140,9 @@
           text: "Visitor " + loop.index
         },
         value: {
-          html: '<p><span class="test-visitor-name' + loop.index + '">' + visitor.name | escape + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</span><br><span class="test-visitor-address' + loop.index + '">' + visitor.address | escape | replace("\n", " ") + "</span>"
+          html:
+            '<p class="test-visitor-name' + loop.index + '">' + (visitor.name | escape) + " (" + (visitor.relationshipDescription | lower) + ' of the prisoner)</p>' +
+            '<p class="test-visitor-address' + loop.index + '">' + (visitor.address | escape | replace("\n", " ")) + "</p>"
         }
       }
     ), displayRows) %}
@@ -168,18 +170,23 @@
     {%- if mainContact.relationshipDescription %} ({{ mainContact.relationshipDescription | lower}} of the prisoner){% endif %}
   {%- endset %}
 
+  {% set contactLanguageNote %} Updates in {{ "Welsh and " if mainContact.languagePreference == "cy" -}} English {%- endset %}
+
   {% set displayRows = (displayRows.push(
     {
       key: {
         text: "Main contact"
       },
       value: {
-        html: '<p class="test-main-contact-name">' + contactName + '</p><p class="test-main-contact-number">' +
-          mainContact.phoneNumber | d("No phone number provided", true) | escape + '</p><p class="test-main-contact-email">' + mainContact.email | escape + '</p>'
+        html:
+          '<p class="test-main-contact-name">' + contactName + '</p>' +
+          '<p class="test-main-contact-number">' + (mainContact.phoneNumber | d("No phone number provided", true) | escape) + '</p>' +
+          '<p class="test-main-contact-email">' + (mainContact.email | escape) + '</p>' +
+          '<p class="test-main-contact-language-preference">' + contactLanguageNote + '</p>'
       }
     }
   ), displayRows) %}
-     
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h2 class="govuk-heading-m">Visit details</h2>

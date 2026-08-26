@@ -101,6 +101,7 @@ describe('Visit details page', () => {
           expect($('[data-test="visit-email"]').text()).toBe('visitor@example.com')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
           expect($('[data-test="additional-support"]').text()).toContain('Wheelchair ramp')
+          expect($('[data-test="visit-language-preference"]').text().trim()).toBe('English')
           // actions forms
           expect($('[data-test=visit-actions]').length).toBe(0)
           expect($('[data-test=visit-request-actions]').length).toBe(0)
@@ -140,6 +141,28 @@ describe('Visit details page', () => {
           expect($('[data-test="timeline-entry-0"] time').text()).toBe('Saturday 1 January 2022 at 9am')
           expect($('[data-test="timeline-entry-0"] .moj-timeline__description').text()).toBe('Method: Phone booking')
 
+          expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
+            visitReference: 'ab-cd-ef-gh',
+            prisonerId: 'A1234BC',
+            prisonId: 'HEI',
+            username: 'user1',
+            operationId: undefined,
+          })
+        })
+    })
+
+    it('should render visit booking summary page with welsh language option', () => {
+      visitDetails.visitContact.languagePreference = 'cy'
+
+      return request(app)
+        .get('/visit/ab-cd-ef-gh')
+        .expect(200)
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('h1').text()).toBe('Visit booking details')
+          expect($('.govuk-back-link').attr('href')).toBe('/prisoner/A1234BC')
+          expect($('[data-test="visit-language-preference"]').text().trim()).toBe('Welsh and English')
           expect(auditService.viewedVisitDetails).toHaveBeenCalledWith({
             visitReference: 'ab-cd-ef-gh',
             prisonerId: 'A1234BC',
