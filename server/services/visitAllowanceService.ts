@@ -9,14 +9,8 @@ export default class VisitAllowanceService {
     private readonly orchestrationApiClient: OrchestrationApiClient,
   ) {}
 
-  async getPrisonIncentiveLevels({
-    username,
-    prisonId,
-  }: {
-    username: string
-    prisonId: string
-  }): Promise<PrisonIncentiveLevel[]> {
-    return this.incentivesApiClient.getPrisonIncentiveLevels(prisonId, username)
+  async getPrisonIncentiveLevels({ prisonId }: { prisonId: string }): Promise<PrisonIncentiveLevel[]> {
+    return this.incentivesApiClient.getPrisonIncentiveLevels(prisonId)
   }
 
   async getRemandConfig({ prisonId }: { prisonId: string }): Promise<PrisonRemandConfig> {

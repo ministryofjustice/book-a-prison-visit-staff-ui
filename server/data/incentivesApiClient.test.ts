@@ -11,7 +11,6 @@ describe('incentivesApiClient', () => {
 
   const prisonId = 'HEI'
   const token = 'token-1'
-  const username = 'user'
 
   beforeEach(() => {
     mockAuthenticationClient = {
@@ -30,7 +29,7 @@ describe('incentivesApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getPrisonIncentivesLevels', () => {
+  describe('getPrisonIncentiveLevels', () => {
     it('should return data from api', async () => {
       const results = [TestData.prisonIncentiveLevel()]
       fakeIncentivesApi
@@ -38,7 +37,7 @@ describe('incentivesApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await incentivesApiClient.getPrisonIncentiveLevels(prisonId, username)
+      const output = await incentivesApiClient.getPrisonIncentiveLevels(prisonId)
 
       expect(output).toEqual(results)
     })

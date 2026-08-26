@@ -8,14 +8,11 @@ export default class ViewAllowancesController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { prisonId } = req.session.selectedEstablishment
-      const { username, userRoles } = res.locals.user
+      const { userRoles } = res.locals.user
 
       const [prisonConfig, incentiveLevels] = await Promise.all([
         this.visitAllowanceService.getRemandConfig({ prisonId }),
-        this.visitAllowanceService.getPrisonIncentiveLevels({
-          username,
-          prisonId,
-        }),
+        this.visitAllowanceService.getPrisonIncentiveLevels({ prisonId }),
       ])
 
       const userHasIepManagementRole = userRoles.includes(bapvUserRoles.PRISON_IEP_ADMIN)

@@ -9,12 +9,12 @@ export default class IncentivesApiClient extends RestClient {
     super('incentivesApiClient', config.apis.incentives, logger, authenticationClient)
   }
 
-  async getPrisonIncentiveLevels(prisonId: string, username: string): Promise<PrisonIncentiveLevel[]> {
+  async getPrisonIncentiveLevels(prisonId: string): Promise<PrisonIncentiveLevel[]> {
     return this.get(
       {
         path: `/incentive/prison-levels/${prisonId}`,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 }

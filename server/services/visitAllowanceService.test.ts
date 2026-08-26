@@ -2,8 +2,6 @@ import TestData from '../routes/testutils/testData'
 import { createMockIncentivesApiClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import VisitAllowanceService from './visitAllowanceService'
 
-const username = 'user'
-
 describe('Visit allowance service', () => {
   const incentivesApiClient = createMockIncentivesApiClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
@@ -24,9 +22,9 @@ describe('Visit allowance service', () => {
     it('should return a list of prison incentive levels', async () => {
       incentivesApiClient.getPrisonIncentiveLevels.mockResolvedValue(prisonIncentiveLevels)
 
-      const results = await visitAllowanceService.getPrisonIncentiveLevels({ username, prisonId: 'HEI' })
+      const results = await visitAllowanceService.getPrisonIncentiveLevels({ prisonId: 'HEI' })
 
-      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI', username)
+      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI')
       expect(results).toStrictEqual(prisonIncentiveLevels)
     })
   })
