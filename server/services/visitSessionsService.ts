@@ -341,7 +341,13 @@ export default class VisitSessionsService {
         visitSession =>
           this.sessionConflictCount({
             sessionConflicts: visitSession.sessionConflicts,
-            excludeConflictTypes: ['REMAND_VISITS_LIMIT_REACHED'], // ignore remand visits limit reached for now until 'overrides' feature implemented
+            // ignore until 'overrides' feature implemented
+            excludeConflictTypes: [
+              'REMAND_VISITS_LIMIT_REACHED',
+              'NO_VO_BALANCE',
+              'NO_PVO_BALANCE',
+              'NO_VO_OR_PVO_BALANCE',
+            ],
           }) === 0,
       )
       .every(visitSession => visitSession.availableTables <= 0)
@@ -399,10 +405,13 @@ export default class VisitSessionsService {
     sessionConflicts: VisitSessionV2Dto['sessionConflicts']
     excludeConflictTypes: SessionConflict[]
   }): number {
-    return sessionConflicts.filter(conflict =>
-      typeof conflict === 'string'
-        ? true // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
-        : !excludeConflictTypes.includes(conflict.sessionConflict),
-    ).length
+    return sessionConflicts.filter(conflict => {
+      // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
+      if (typeof conflict === 'string') {
+        return conflict !== 'REMAND_VISITS_LIMIT_REACHED'
+      }
+
+      return !excludeConflictTypes.includes(conflict.sessionConflict)
+    }).length
   }
 }

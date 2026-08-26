@@ -1145,6 +1145,9 @@ describe('orchestrationApiClient', () => {
             includedSessionConflicts: <SessionConflict[]>[
               'DOUBLE_BOOKING_OR_RESERVATION',
               'REMAND_VISITS_LIMIT_REACHED',
+              'NO_VO_BALANCE',
+              'NO_PVO_BALANCE',
+              'NO_VO_OR_PVO_BALANCE',
             ],
           }).toString(),
         )
