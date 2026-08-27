@@ -76,7 +76,6 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
 
       const results = await visitSessionsService.getVisitSessionCapacity(
-        'user1',
         prisonId,
         sessionDate,
         sessionStartTime,

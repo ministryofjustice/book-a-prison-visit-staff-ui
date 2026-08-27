@@ -78,7 +78,6 @@ export default class VisitSessionsService {
   }
 
   async getVisitSessionCapacity(
-    username: string,
     prisonId: string,
     sessionDate: string,
     sessionStartTime: string,
