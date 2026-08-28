@@ -18,6 +18,8 @@
   {% set backLinkHref = "/search/prisoner" %}
 {% endif %}
 
+{% set notProvided = "Not provided" %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -50,7 +52,7 @@
         </li>
         <li>
           <strong>Date of birth</strong>
-          <span data-test="dob">{{ prisonerDetails.dateOfBirth }}</span>
+          <span data-test="dob">{{ prisonerDetails.dateOfBirth or notProvided }}</span>
         </li>
         <li>
           <strong>Location</strong>
@@ -58,15 +60,15 @@
         </li>
         <li>
           <strong>Category</strong>
-          <span data-test="category">{{ prisonerDetails.category }}</span>
+          <span data-test="category">{{ prisonerDetails.category or notProvided}}</span>
         </li>
         <li>
           <strong>Conviction status</strong>
-          <span data-test="convicted-status">{{ prisonerDetails.convictedStatus }}</span>
+          <span data-test="convicted-status">{{ prisonerDetails.convictedStatus or notProvided }}</span>
         </li>
         <li>
           <strong>Incentive level</strong>
-          <span data-test="iep-level">{{ prisonerDetails.incentiveLevel }}</span>
+          <span data-test="iep-level">{{ prisonerDetails.incentiveLevel or notProvided }}</span>
         </li>
         <li>
           <strong>Alerts</strong>
