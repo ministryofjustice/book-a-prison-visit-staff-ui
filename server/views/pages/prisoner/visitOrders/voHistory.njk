@@ -3,7 +3,10 @@
 
 {% set pageHeaderTitle = "Visiting orders history" %}
 
+{% set prisonerFullName =  (prisonerDetails.firstName + " " + prisonerDetails.lastName) | properCaseFullName %}
 {% set backLinkHref = "/prisoner/" + prisonerDetails.prisonerId + "#visiting-orders" %}
+{% set backLinkPageTitle = "profile for " + prisonerFullName %}
+
 
 {% set notEntered = "Not entered" %}
 
@@ -16,7 +19,7 @@
       <ul class="vo-history-prisoner-details">
         <li>
           <strong>Prisoner name</strong>
-          <span data-test="prisoner-name">{{ (prisonerDetails.firstName + " " + prisonerDetails.lastName) | properCaseFullName }}</span>
+          <span data-test="prisoner-name">{{ prisonerFullName }}</span>
         </li>
         <li>
           <strong>Category</strong>

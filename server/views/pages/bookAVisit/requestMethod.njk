@@ -6,12 +6,13 @@
 {% set pageHeaderTitle = "How was this booking requested?" %}
 
 {% set backLinkHref = urlPrefix + "/select-main-contact" %}
+{% set backLinkPageTitle = "select main contact" %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% include "partials/errorSummary.njk" %}
-    
+
       {% set requestMethods = [] %}
       {% for key, text in requestMethodsBooking %}
         {% set requestMethods = (requestMethods.push(
@@ -44,7 +45,7 @@
           text: "Continue",
           attributes: { "data-test": "submit" },
           preventDoubleClick: true
-        }) }} 
+        }) }}
       </form>
     </div>
   </div>

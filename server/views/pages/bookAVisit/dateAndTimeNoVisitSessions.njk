@@ -6,6 +6,7 @@
 {% set pageHeaderTitle = "A visit cannot be booked" %}
 
 {% set backLinkHref = urlPrefix + "/select-visitors" %}
+{% set backLinkPageTitle = "select visitors for booking" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -17,7 +18,7 @@
       {% endfor %}
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
-      
+
       {% include "partials/dateAndTimePrisonerInfo.njk" %}
 
       {{ govukWarningText({
