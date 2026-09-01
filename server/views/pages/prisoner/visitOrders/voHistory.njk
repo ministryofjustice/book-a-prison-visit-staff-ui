@@ -5,6 +5,8 @@
 
 {% set backLinkHref = "/prisoner/" + prisonerDetails.prisonerId + "#visiting-orders" %}
 
+{% set notEntered = "Not entered" %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -18,15 +20,15 @@
         </li>
         <li>
           <strong>Category</strong>
-          <span data-test="prisoner-category">{{ prisonerDetails.category }}</span>
+          <span data-test="prisoner-category">{{ prisonerDetails.category or notEntered }}</span>
         </li>
         <li>
           <strong>Conviction status</strong>
-          <span data-test="prisoner-convicted-status">{{ prisonerDetails.convictedStatus }}</span>
+          <span data-test="prisoner-convicted-status">{{ prisonerDetails.convictedStatus or notEntered }}</span>
         </li>
         <li>
           <strong>Incentive level</strong>
-          <span data-test="prisoner-incentive-level">{{ prisonerDetails.incentiveLevel }}</span>
+          <span data-test="prisoner-incentive-level">{{ prisonerDetails.incentiveLevel or notEntered }}</span>
         </li>
       </ul>
 
