@@ -18,7 +18,7 @@
   {% set backLinkHref = "/search/prisoner" %}
 {% endif %}
 
-{% set notProvided = "Not provided" %}
+{% set notEntered = "Not entered" %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -52,7 +52,7 @@
         </li>
         <li>
           <strong>Date of birth</strong>
-          <span data-test="dob">{{ prisonerDetails.dateOfBirth or notProvided }}</span>
+          <span data-test="dob">{{ prisonerDetails.dateOfBirth or notEntered }}</span>
         </li>
         <li>
           <strong>Location</strong>
@@ -60,15 +60,15 @@
         </li>
         <li>
           <strong>Category</strong>
-          <span data-test="category">{{ prisonerDetails.category or notProvided}}</span>
+          <span data-test="category">{{ prisonerDetails.category or notEntered}}</span>
         </li>
         <li>
           <strong>Conviction status</strong>
-          <span data-test="convicted-status">{{ prisonerDetails.convictedStatus or notProvided }}</span>
+          <span data-test="convicted-status">{{ prisonerDetails.convictedStatus or notEntered }}</span>
         </li>
         <li>
           <strong>Incentive level</strong>
-          <span data-test="iep-level">{{ prisonerDetails.incentiveLevel or notProvided }}</span>
+          <span data-test="iep-level">{{ prisonerDetails.incentiveLevel or notEntered }}</span>
         </li>
         <li>
           <strong>Alerts</strong>
@@ -250,11 +250,11 @@
               attributes: { "data-test": "tab-alerts-comment" }
             },
             {
-              html: alert.startDate | formatDate("d'&nbsp;'MMMM yyyy") if alert.startDate else "Not entered",
+              html: alert.startDate | formatDate("d'&nbsp;'MMMM yyyy") if alert.startDate else notEntered,
               attributes: { "data-test": "tab-alerts-start" }
             },
             {
-              text: alert.expiryDate | formatDate if alert.expiryDate else "Not entered",
+              text: alert.expiryDate | formatDate if alert.expiryDate else notEntered,
               attributes: { "data-test": "tab-alerts-end" }
             }
           ]), alertRows) %}
