@@ -121,42 +121,49 @@ describe('visitNavigationUtils', () => {
         navState: { fromPage: 'visit-search', fromPageQuery: 'a=1' },
         expected: {
           backLinkHref: '/search/visit/results?a=1',
+          backLinkPageTitle: 'visits search results',
         },
       },
       {
         navState: { fromPage: 'visits', fromPageQuery: 'type=OPEN' },
         expected: {
           backLinkHref: '/visits?type=OPEN',
+          backLinkPageTitle: 'upcoming visits list',
         },
       },
       {
         navState: { fromPage: 'request' },
         expected: {
           backLinkHref: '/requested-visits',
+          backLinkPageTitle: 'requested visits list',
         },
       },
       {
         navState: { fromPage: 'review' },
         expected: {
           backLinkHref: '/review',
+          backLinkPageTitle: 'visits that need review',
         },
       },
       {
         navState: { fromPage: 'vo-history' },
         expected: {
           backLinkHref: `/prisoner/${prisonerNumber}/visiting-orders-history`,
+          backLinkPageTitle: 'prisoner visit order history',
         },
       },
       {
         navState: { fromPage: 'prisoner' },
         expected: {
           backLinkHref: `/prisoner/${prisonerNumber}`,
+          backLinkPageTitle: 'prisoner profile',
         },
       },
       {
         navState: {},
         expected: {
           backLinkHref: `/prisoner/${prisonerNumber}`,
+          backLinkPageTitle: 'prisoner profile',
         },
       },
     ])('should resolve backlink for $navState.fromPage', ({ navState, expected }) => {
@@ -171,6 +178,7 @@ describe('visitNavigationUtils', () => {
         }),
       ).toStrictEqual({
         backLinkHref: '/search/visit/results',
+        backLinkPageTitle: 'visits search results',
       })
 
       expect(
@@ -180,6 +188,7 @@ describe('visitNavigationUtils', () => {
         }),
       ).toStrictEqual({
         backLinkHref: '/visits',
+        backLinkPageTitle: 'upcoming visits list',
       })
     })
   })

@@ -24,6 +24,7 @@ export default class ClearNotificationsController {
         errors: req.flash('errors'),
         formValues: getFlashFormValues(req),
         backLinkHref,
+        backLinkPageTitle: '', // ?
         formAction,
       })
     }

@@ -33,8 +33,11 @@ export default class VisitPassesController {
           operationId: res.locals.appInsightsOperationId,
         })
 
+        const { backLinkHref, backLinkPageTitle } = this.getBacklinkHref(req.query)
+
         return res.render('pages/visitPasses/visitPasses', {
-          backLinkHref: this.getBacklinkHref(req.query),
+          backLinkHref,
+          backLinkPageTitle,
           prisonName,
           singlePass: false,
           visitPasses,
@@ -72,8 +75,11 @@ export default class VisitPassesController {
           operationId: res.locals.appInsightsOperationId,
         })
 
+        const { backLinkHref, backLinkPageTitle } = this.getBacklinkHref(req.query, reference)
+
         return res.render('pages/visitPasses/visitPasses', {
-          backLinkHref: this.getBacklinkHref(req.query, reference),
+          backLinkHref,
+          backLinkPageTitle,
           prisonName,
           singlePass: true,
           visitPasses: [visitPass],
@@ -92,16 +98,19 @@ export default class VisitPassesController {
     return format(new Date(), "EEEE d MMMM yyyy 'at' h:mmaaa")
   }
 
-  private getBacklinkHref({ from, query }: Request['query'], reference?: string): string {
+  private getBacklinkHref(
+    { from, query }: Request['query'],
+    reference?: string,
+  ): { backLinkHref: string; backLinkPageTitle: string } {
     switch (from) {
       case 'visit':
-        return `/visit/${reference}`
+        return { backLinkHref: `/visit/${reference}`, backLinkPageTitle: 'visit overview' }
 
       case 'visits':
-        return `/visits?${query}`
+        return { backLinkHref: `/visits?${query}`, backLinkPageTitle: 'visits search results' }
 
       default:
-        return '/'
+        return { backLinkHref: '/', backLinkPageTitle: 'social visits home' }
     }
   }
 }

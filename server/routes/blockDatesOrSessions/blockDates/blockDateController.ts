@@ -14,7 +14,7 @@ export default class BlockDateController {
   public view(): RequestHandler {
     return async (req, res) => {
       const { blockDateOrSession } = req.session
-      const { backLinkHref, date } = blockDateOrSession
+      const { backLinkHref, backLinkPageTitle, date } = blockDateOrSession
 
       const { prisonId } = req.session.selectedEstablishment
       const visitCount = await this.visitService.getBookedVisitCountByDate({
@@ -25,6 +25,7 @@ export default class BlockDateController {
 
       return res.render('pages/blockDatesOrSessions/blockDates/blockDate', {
         backLinkHref,
+        backLinkPageTitle,
         errors: req.flash('errors'),
         date,
         visitCount,

@@ -12,6 +12,7 @@ export default class VisitorListController {
       const { reference, prisonerId } = req.params
       const { username } = res.locals.user
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
+      const backLinkPageTitle = 'booker details'
 
       if (!isValidPrisonerNumber(prisonerId)) {
         return res.redirect(bookerDetailsPageUrl)
@@ -32,6 +33,7 @@ export default class VisitorListController {
 
       return res.render('pages/bookerManagement/booker/visitorList', {
         backLinkHref: bookerDetailsPageUrl,
+        backLinkPageTitle,
         errors: req.flash('errors'),
         nonLinkedContacts,
         prisoner,

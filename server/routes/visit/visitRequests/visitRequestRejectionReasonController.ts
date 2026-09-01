@@ -13,6 +13,7 @@ export default class VisitRequestRejectionReasonController {
 
       return res.render('pages/visit/visitRequests/rejectionReason', {
         backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
+        backLinkPageTitle: '', // ?
         formAction: appendNavStateToPath(`/visit/${reference}/request/reject`, navState),
         reference,
         visitRequestRejectionReasons,

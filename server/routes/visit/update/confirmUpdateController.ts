@@ -16,6 +16,7 @@ export default class ConfirmUpdateController {
       return res.render('pages/visit/update/confirmUpdate', {
         errors: req.flash('errors'),
         backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
+        backLinkPageTitle: '', // ?
         formAction: appendNavStateToPath(`/visit/${reference}/confirm-update`, navState),
         policyNoticeDaysMin,
         reference,

@@ -24,6 +24,7 @@ export declare module 'express-session' {
     // Block visit date or session journey
     blockDateOrSession?: {
       backLinkHref: string
+      backLinkPageTitle: string
       date: string // format YYYY-MM-DD
       sessions?: SessionSchedule[]
       selectedSession?: SessionSchedule

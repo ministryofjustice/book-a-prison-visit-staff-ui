@@ -40,6 +40,7 @@ export default class SelectVisitors {
     }
 
     const backLinkHref = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
+    const backLinkPageTitle = isUpdate ? 'visit details' : 'prisoner details'
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
@@ -55,6 +56,7 @@ export default class SelectVisitors {
       prisonerDpsAlertsUrl: getDpsPrisonerAlertsUrl(offenderNo),
       urlPrefix: getUrlPrefix(isUpdate),
       backLinkHref,
+      backLinkPageTitle,
     })
   }
 

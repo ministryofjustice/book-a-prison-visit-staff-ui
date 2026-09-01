@@ -20,7 +20,9 @@ export default class BlockSessionConfirmController {
       const { blockDateOrSession } = req.session
 
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-new-session/choose'
-      const { backLinkHref, date, selectedSession } = blockDateOrSession
+      blockDateOrSession.backLinkPageTitle = 'choose new session to block'
+
+      const { backLinkHref, backLinkPageTitle, date, selectedSession } = blockDateOrSession
 
       const visitCount = (
         await this.visitService.getVisitsBySessionTemplate({
@@ -39,6 +41,7 @@ export default class BlockSessionConfirmController {
 
       return res.render('pages/blockDatesOrSessions/blockSessions/blockSessionConfirm', {
         backLinkHref,
+        backLinkPageTitle,
         errors: req.flash('errors'),
         date,
         time,
