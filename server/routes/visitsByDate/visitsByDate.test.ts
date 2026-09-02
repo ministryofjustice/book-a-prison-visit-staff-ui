@@ -134,6 +134,9 @@ describe('GET /visits - Visits by date page', () => {
           expect($('[data-test=visits-open] [data-test="view-visit-link"]').eq(0).attr('href')).toBe(
             '/visit/ab-cd-ef-gh?query=sessionReference%3D-afe.dcc.0f%26selectedDate%3D2024-02-01%26firstTabDate%3D2024-02-01&from=visits',
           )
+          expect($('[data-test=visits-open] [data-test="view-visit-link"]').eq(0).text()).toBe(
+            'View visit for Smith, John',
+          )
 
           expect($('[data-test=visit-section-heading-unknown]').length).toBe(0)
 
