@@ -62,7 +62,7 @@
             classes: "govuk-!-text-align-right",
             html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
               '" class="govuk-link--no-visited-state" data-test="view-visit-link">View' +
-              '<span class="govuk-visually-hidden"> request to visit ' + prisonerName + '</span></a>'
+              '<span class="govuk-visually-hidden"> visit for ' + (prisonerName | escape) + '</span></a>'
           }
         ]), visitsRows) %}
       {% endfor %}
