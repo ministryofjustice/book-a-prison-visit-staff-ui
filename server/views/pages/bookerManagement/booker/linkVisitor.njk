@@ -4,6 +4,8 @@
 
 {% set pageHeaderTitle = "Notify the booker about the linked visitor" %}
 {% set backLinkHref = "/manage-bookers/" + reference + "/prisoner/" + prisonerId + "/link-visitor" %}
+{% set backLinkPageTitle = "return to visitor linking page" %}
+
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -39,7 +41,7 @@
           attributes: { "data-test": "submit" },
           classes: "govuk-!-margin-top-3",
           preventDoubleClick: true
-        }) }} 
+        }) }}
       </form>
 
     </div>

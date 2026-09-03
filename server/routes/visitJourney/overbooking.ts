@@ -34,6 +34,7 @@ export default class Overbooking {
       time,
       date,
       backLinkHref: `${urlPrefix}/select-date-and-time`,
+      backLinkPageTitle: 'select date and time',
     })
   }
 
@@ -73,6 +74,7 @@ export default class Overbooking {
       time,
       date,
       backLinkHref: `${urlPrefix}/check-your-booking`,
+      backLinkPageTitle: 'check your booking',
     })
   }
 

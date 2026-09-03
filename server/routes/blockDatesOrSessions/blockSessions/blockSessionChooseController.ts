@@ -16,7 +16,9 @@ export default class BlockSessionChooseController {
       const { blockDateOrSession } = req.session
 
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-date-or-session'
-      const { backLinkHref, date } = blockDateOrSession
+      blockDateOrSession.backLinkPageTitle = 'Block date or session'
+
+      const { backLinkHref, backLinkPageTitle, date } = blockDateOrSession
 
       const sessions = await this.visitSessionsService.getSessionSchedule({
         username,
@@ -44,6 +46,7 @@ export default class BlockSessionChooseController {
 
       return res.render('pages/blockDatesOrSessions/blockSessions/blockSessionChoose', {
         backLinkHref,
+        backLinkPageTitle,
         errors: req.flash('errors'),
         date,
         sessionsRadioItems: this.buildSessionsRadioItems(sessions),

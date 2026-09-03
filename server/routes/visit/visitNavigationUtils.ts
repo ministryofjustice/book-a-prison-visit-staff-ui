@@ -71,6 +71,7 @@ export const getVisitDetailsBackLink = ({
   prisonerNumber: string
 }): {
   backLinkHref: string
+  backLinkPageTitle: string
 } => {
   const { fromPage, fromPageQuery } = navState
 
@@ -78,32 +79,38 @@ export const getVisitDetailsBackLink = ({
     case 'visit-search':
       return {
         backLinkHref: fromPageQuery ? `/search/visit/results?${fromPageQuery}` : '/search/visit/results',
+        backLinkPageTitle: 'visits search results',
       }
 
     case 'visits':
       return {
         backLinkHref: fromPageQuery ? `/visits?${fromPageQuery}` : '/visits',
+        backLinkPageTitle: 'upcoming visits list',
       }
 
     case 'request':
       return {
         backLinkHref: '/requested-visits',
+        backLinkPageTitle: 'requested visits list',
       }
 
     case 'review':
       return {
         backLinkHref: '/review',
+        backLinkPageTitle: 'visits that need review',
       }
 
     case 'vo-history':
       return {
         backLinkHref: `/prisoner/${prisonerNumber}/visiting-orders-history`,
+        backLinkPageTitle: 'prisoner visit order history',
       }
 
     case 'prisoner':
     default:
       return {
         backLinkHref: `/prisoner/${prisonerNumber}`,
+        backLinkPageTitle: 'prisoner profile',
       }
   }
 }

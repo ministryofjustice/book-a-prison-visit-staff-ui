@@ -5,7 +5,9 @@
 
 {% set pageHeaderTitle = "Edit visiting orders balances" %}
 
+{% set prisonerFullName = (prisonerVoBalance.firstName + " " + prisonerVoBalance.lastName) | properCaseFullName %}
 {% set backLinkHref = "/prisoner/" + prisonerVoBalance.prisonerId + "#visiting-orders" %}
+{% set backLinkPageTitle = "profile for " + prisonerFullName %}
 
 {% block content %}
   <div class="govuk-grid-row">
@@ -18,7 +20,7 @@
       <ul class="edit-vo-prisoner-details govuk-!-width-three-quarters">
         <li>
           <strong>Prisoner name</strong>
-          <span data-test="prisoner-name">{{ (prisonerVoBalance.firstName + " " + prisonerVoBalance.lastName) | properCaseFullName }}</span>
+          <span data-test="prisoner-name">{{ prisonerFullName }}</span>
         </li>
         <li>
           <strong>VO balance</strong>

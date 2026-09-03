@@ -14,8 +14,10 @@
 {% set query = '?' + queryParamsForBackLink if queryParamsForBackLink != '' %}
 {% if queryParamsForBackLink %}
   {% set backLinkHref = "/search/prisoner/results?" + queryParamsForBackLink %}
+  {% set backLinkPageTitle = "Prisoner search results" %}
 {% else %}
   {% set backLinkHref = "/search/prisoner" %}
+  {% set backLinkPageTitle = "Prisoner search" %}
 {% endif %}
 
 {% set notEntered = "Not entered" %}

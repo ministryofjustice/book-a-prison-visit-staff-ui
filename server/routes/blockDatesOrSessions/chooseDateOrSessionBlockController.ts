@@ -31,6 +31,7 @@ export default class ChooseDateOrSessionBlockController {
       const { blockDateOrSession } = req.session
       const { blockType } = matchedData<{ blockType: 'date' | 'session' }>(req)
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-date-or-session'
+      blockDateOrSession.backLinkPageTitle = 'Block date or session'
 
       return res.redirect(
         blockType === 'date'

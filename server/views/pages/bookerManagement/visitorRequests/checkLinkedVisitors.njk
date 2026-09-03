@@ -5,6 +5,7 @@
 
 {% set pageHeaderTitle = "Check if the visitor is already linked" %}
 {% set backLinkHref %}/manage-bookers/visitor-request/{{ visitorRequest.reference }}/link-visitor?from={{ returnTo }}{% endset %}
+{% set backLinkPageTitle = "" %}
 
 {% set linkedVisitorRows = [] %}
 {% for visitor in linkedVisitors %}
@@ -45,7 +46,7 @@
       <p>
         These visitors for
         <span data-test="prisoner-name">{{ (visitorRequest.prisonerFirstName + " " + visitorRequest.prisonerLastName) | properCaseFullName }}</span>
-        are already linked to the booker’s account. 
+        are already linked to the booker’s account.
       </p>
 
       {{ govukTable({

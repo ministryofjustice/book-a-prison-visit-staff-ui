@@ -35,6 +35,7 @@ export default class CancelVisitController {
       return res.render('pages/visit/cancel/cancel', {
         errors: req.flash('errors'),
         backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
+        backLinkPageTitle: '', // ?
         formAction: appendNavStateToPath(`/visit/${reference}/cancel`, navState),
         reference,
         visitCancellationReasons,

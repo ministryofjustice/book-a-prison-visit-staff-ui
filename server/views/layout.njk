@@ -32,12 +32,17 @@
 {% block bodyStart %}
 {% endblock %}
 
+{% set ariaLabel = "Back to " + (backLinkPageTitle or "previous page") %}
+
 {% block beforeContent %}
   {% if backLinkHref %}
     <div role="navigation" class="govuk-!-display-none-print">
       {{ govukBackLink({
         text: "Back",
-        href: backLinkHref
+        href: backLinkHref,
+        attributes: {
+          "aria-label" : ariaLabel
+        }
       }) }}
     </div>
   {% endif %}

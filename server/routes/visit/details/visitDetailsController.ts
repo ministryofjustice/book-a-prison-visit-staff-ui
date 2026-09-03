@@ -87,7 +87,7 @@ export default class VisitDetailsController {
       })
 
       const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
-      const { backLinkHref } = getVisitDetailsBackLink({
+      const { backLinkHref, backLinkPageTitle } = getVisitDetailsBackLink({
         navState,
         prisonerNumber: prisoner.prisonerNumber,
       })
@@ -106,6 +106,7 @@ export default class VisitDetailsController {
       return res.render('pages/visit/details/visitDetails', {
         pageHeaderTitle: this.getPageHeaderTitle(visitDetails.visitSubStatus),
         backLinkHref,
+        backLinkPageTitle,
         hideAlertsInset,
         availableVisitActions,
         eventsTimeline,

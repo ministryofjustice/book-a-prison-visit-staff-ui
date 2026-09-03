@@ -39,8 +39,11 @@ export default class VisitorRequestDetailsController {
           ? `/manage-bookers/${visitorRequest.bookerReference}/booker-details`
           : '/manage-bookers'
 
+      const backLinkPageTitle = returnTo === 'booker-details' ? 'booker details' : 'booker list'
+
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
         backLinkHref,
+        backLinkPageTitle,
         errors: req.flash('errors'),
         atLeastOneSelectableContact,
         showNoDobWarning,
