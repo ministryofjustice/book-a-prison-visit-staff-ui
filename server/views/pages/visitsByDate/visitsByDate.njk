@@ -36,9 +36,10 @@
       {% set visitsRows = [] %}
       {% for visit in visitsSection.visits %}
         {% set visitStatus = combinedVisitStatus(visit.visitSubStatus, visit.visitStatus) %}
+        {% set prisonerName = visit.lastName | capitalize + ", " + visit.firstName | capitalize %}
         {% set visitsRows = (visitsRows.push([
           {
-            text: visit.lastName | capitalize + ", " + visit.firstName | capitalize,
+            text: prisonerName,
             attributes: { "data-test": "prisoner-name" }
           },
           {
@@ -60,7 +61,8 @@
           {
             classes: "govuk-!-text-align-right",
             html: '<a href="/visit/' + visit.visitReference + '?' + queryParamsForBackLink +
-              '" class="govuk-link--no-visited-state" data-test="view-visit-link">View</a>'
+              '" class="govuk-link--no-visited-state" data-test="view-visit-link">View' +
+              '<span class="govuk-visually-hidden"> visit for ' + (prisonerName | escape) + '</span></a>'
           }
         ]), visitsRows) %}
       {% endfor %}
