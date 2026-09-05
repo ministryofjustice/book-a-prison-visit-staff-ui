@@ -165,7 +165,6 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(() => {
         expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(visitService.cancelVisit).toHaveBeenCalledWith({
-          username: 'user1',
           reference: 'ab-cd-ef-gh',
           cancelVisitDto: <CancelVisitOrchestrationDto>{
             cancelOutcome: {
@@ -205,7 +204,6 @@ describe('POST /visit/:reference/cancel', () => {
       .expect(() => {
         expect(visitService.cancelVisit).toHaveBeenCalledTimes(1)
         expect(visitService.cancelVisit).toHaveBeenCalledWith({
-          username: 'user1',
           reference: 'ab-cd-ef-gh',
           cancelVisitDto: <CancelVisitOrchestrationDto>{
             cancelOutcome: {

@@ -3,8 +3,6 @@ import { Contact } from '../data/prisonerContactRegistryApiTypes'
 import { VisitorListItem } from '../@types/bapv'
 import { createMockPrisonerContactRegistryApiClient } from '../data/testutils/mocks'
 
-const username = 'user'
-
 describe('Prisoner visitor service', () => {
   const prisonerContactRegistryApiClient = createMockPrisonerContactRegistryApiClient()
   let prisonerVisitorsService: PrisonerVisitorsService
@@ -115,12 +113,9 @@ describe('Prisoner visitor service', () => {
 
       prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue(contacts)
 
-      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax, username)
+      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax)
 
-      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(
-        offenderNo,
-        username,
-      )
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([
         {
           personId: 4321,
@@ -189,11 +184,8 @@ describe('Prisoner visitor service', () => {
     it('should handle prisoner having no contacts', async () => {
       prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts.mockResolvedValue([])
 
-      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax, username)
-      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(
-        offenderNo,
-        username,
-      )
+      const results = await prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax)
+      expect(prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts).toHaveBeenCalledWith(offenderNo)
       expect(results).toEqual([])
     })
   })

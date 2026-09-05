@@ -64,7 +64,6 @@ describe('Edit visit order balances', () => {
           expect($('[data-test=edit-balance]').text().trim()).toBe('Edit balance')
 
           expect(visitOrdersService.getVoBalance).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             prisonerId,
           })
@@ -138,7 +137,6 @@ describe('Edit visit order balances', () => {
         .expect('Location', `/prisoner/${prisonerId}#visiting-orders`)
         .expect(() => {
           expect(visitOrdersService.changeVoBalance).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             prisonerId,
             prisonerBalanceAdjustmentDto,

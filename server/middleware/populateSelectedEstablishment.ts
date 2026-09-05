@@ -26,11 +26,8 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       return res.redirect('/back-to-start')
     }
 
-    if (
-      activeCaseLoadId &&
-      (await supportedPrisonsService.isSupportedPrison(res.locals.user.username, activeCaseLoadId))
-    ) {
-      const prison = await supportedPrisonsService.getPrison(res.locals.user.username, activeCaseLoadId)
+    if (activeCaseLoadId && (await supportedPrisonsService.isSupportedPrison(activeCaseLoadId))) {
+      const prison = await supportedPrisonsService.getPrison(activeCaseLoadId)
 
       req.session.selectedEstablishment = { ...prison, isEnabledForPublic: isPrisonEnabledForPublic(prison) }
 

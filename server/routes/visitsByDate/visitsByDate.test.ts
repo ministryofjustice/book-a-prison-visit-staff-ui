@@ -145,19 +145,16 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: today,
             includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             reference: sessionSchedule[0].sessionTemplateReference,
             sessionDate: today,
           })
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             sessionDate: today,
           })
@@ -246,19 +243,16 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: '2024-02-02',
             includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             reference: sessionSchedule[0].sessionTemplateReference,
             sessionDate: '2024-02-02',
           })
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             sessionDate: '2024-02-02',
           })
@@ -303,19 +297,16 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: today,
             includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             reference: sessionSchedule[0].sessionTemplateReference,
             sessionDate: today,
           })
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             sessionDate: today,
           })
@@ -398,14 +389,12 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: today,
             includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).not.toHaveBeenCalled()
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             sessionDate: today,
           })
@@ -459,7 +448,6 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: '2024-02-02',
             includeExcludedSessions: false,
@@ -468,7 +456,6 @@ describe('GET /visits - Visits by date page', () => {
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
             prisonId,
             sessionDate: '2024-02-02',
-            username: 'user1',
           })
           expect(auditService.viewedVisits).toHaveBeenCalledWith({
             viewDate: '2024-02-02',
@@ -539,19 +526,16 @@ describe('GET /visits - Visits by date page', () => {
           expect(blockDatesOrSessionsService.isBlockedDate).not.toHaveBeenCalled()
           expect(visitNotificationsService.dateHasNotifications).not.toHaveBeenCalled()
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             date: today,
             includeExcludedSessions: false,
           })
           expect(visitService.getVisitsBySessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             reference: sessionSchedule[0].sessionTemplateReference,
             sessionDate: today,
           })
           expect(visitService.getVisitsWithoutSessionTemplate).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId,
             sessionDate: today,
           })
@@ -588,8 +572,8 @@ describe('GET /visits - Visits by date page', () => {
             'This date has been blocked for social visits. There are no existing bookings to cancel.',
           )
 
-          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
-          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01')
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('HEI', '2024-02-01')
         })
     })
 
@@ -610,8 +594,8 @@ describe('GET /visits - Visits by date page', () => {
           )
           expect($('[data-test="no-visits-message"] a').prop('href')).toBe('/review')
 
-          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01', 'user1')
-          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('user1', 'HEI', '2024-02-01')
+          expect(blockDatesOrSessionsService.isBlockedDate).toHaveBeenCalledWith('HEI', '2024-02-01')
+          expect(visitNotificationsService.dateHasNotifications).toHaveBeenCalledWith('HEI', '2024-02-01')
         })
     })
 

@@ -21,7 +21,6 @@ export default class PrisonerSearchService {
   async getPrisoners(
     search: string,
     prisonId: string,
-    username: string,
     page: number,
   ): Promise<{
     results: Array<PrisonerDetailsItem[]>
@@ -34,7 +33,6 @@ export default class PrisonerSearchService {
     const { totalPages, totalElements, content } = await this.prisonerSearchClient.getPrisoners(
       search,
       prisonId,
-      username,
       this.currentPage,
     )
     this.numberOfPages = totalPages
@@ -69,18 +67,13 @@ export default class PrisonerSearchService {
     }
   }
 
-  async getPrisoner(search: string, prisonId: string, username: string): Promise<Prisoner> {
-    const { content } = await this.prisonerSearchClient.getPrisoner(search, prisonId, username)
-    return content.length === 1 ? content[0] : null
+  async getPrisonerById(id: string): Promise<Prisoner> {
+    return this.prisonerSearchClient.getPrisonerById(id)
   }
 
-  async getPrisonerById(id: string, username: string): Promise<Prisoner> {
-    return this.prisonerSearchClient.getPrisonerById(id, username)
-  }
-
-  async getPrisonerNotFoundMessage(id: string, prisonName: string, username: string): Promise<string> {
+  async getPrisonerNotFoundMessage(id: string, prisonName: string): Promise<string> {
     try {
-      const prisoner = await this.prisonerSearchClient.getPrisonerById(id, username)
+      const prisoner = await this.prisonerSearchClient.getPrisonerById(id)
       if (prisoner.inOutStatus === 'OUT' || prisoner.inOutStatus === 'TRN') {
         return `This prisoner is not in ${prisonName}. They might be being moved to another establishment or have been released.`
       }

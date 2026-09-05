@@ -11,7 +11,6 @@ export default class BlockSessionChooseController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { username } = res.locals.user
       const { prisonId } = req.session.selectedEstablishment
       const { blockDateOrSession } = req.session
 
@@ -19,7 +18,6 @@ export default class BlockSessionChooseController {
       const { backLinkHref, date } = blockDateOrSession
 
       const sessions = await this.visitSessionsService.getSessionSchedule({
-        username,
         prisonId,
         date,
         includeExcludedSessions: true,

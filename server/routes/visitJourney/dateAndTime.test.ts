@@ -354,7 +354,7 @@ testJourneys.forEach(journey => {
 
             expect(visitService.createVisitApplication).not.toHaveBeenCalled()
             expect(visitService.createVisitApplicationFromVisit).not.toHaveBeenCalled()
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ visitSessionData })
 
             expect(auditService.reservedVisit).toHaveBeenCalledWith({
               applicationReference: application.reference,

@@ -15,12 +15,11 @@ export default class BookerDetailsController {
       const { username } = res.locals.user
 
       const [booker, visitorRequests] = await Promise.all([
-        this.bookerService.getBookerDetails({ username, reference }),
-        this.bookerService.getBookerVisitorRequestsByPrisoner({ username, reference }),
+        this.bookerService.getBookerDetails({ reference }),
+        this.bookerService.getBookerVisitorRequestsByPrisoner({ reference }),
       ])
 
       const { active, emailHasMultipleAccounts } = await this.bookerService.getBookerStatus({
-        username,
         email: booker.email,
         reference,
       })

@@ -10,7 +10,7 @@ export default class PrisonerContactRegistryApiClient extends RestClient {
     super('prisonerContactRegistryApiClient', config.apis.prisonerContactRegistry, logger, authenticationClient)
   }
 
-  async getPrisonersApprovedSocialContacts(offenderNo: string, username: string): Promise<Contact[]> {
+  async getPrisonersApprovedSocialContacts(offenderNo: string): Promise<Contact[]> {
     try {
       const contacts = await this.get<Contact[]>(
         {
@@ -20,7 +20,7 @@ export default class PrisonerContactRegistryApiClient extends RestClient {
             withRestrictions: 'true',
           }).toString(),
         },
-        asSystem(username),
+        asSystem(),
       )
 
       return contacts

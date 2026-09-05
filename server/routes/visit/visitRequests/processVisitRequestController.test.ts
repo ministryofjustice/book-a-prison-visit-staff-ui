@@ -101,7 +101,6 @@ describe('Process a visit request (approve / reject)', () => {
           expect(auditService.approvedVisitRequest).not.toHaveBeenCalled()
           expect(visitRequestsService.rejectVisitRequest).not.toHaveBeenCalled()
           expect(visitService.getVisitDetailed).toHaveBeenCalledWith({
-            username: 'user1',
             reference: visitDetails.reference,
           })
         })
@@ -234,7 +233,6 @@ describe('Process a visit request (approve / reject)', () => {
           })
           expect(auditService.rejectedVisitRequest).not.toHaveBeenCalled()
           expect(visitService.getVisitDetailed).toHaveBeenCalledWith({
-            username: 'user1',
             reference: visitDetails.reference,
           })
         })

@@ -57,9 +57,9 @@ describe('Visit requests service', () => {
       const visitRequests = [TestData.visitRequestSummary()]
       orchestrationApiClient.getVisitRequests.mockResolvedValue(visitRequests)
 
-      const result = await visitRequestsService.getVisitRequests(username, prisonId)
+      const result = await visitRequestsService.getVisitRequests(prisonId)
 
-      expect(orchestrationApiClient.getVisitRequests).toHaveBeenCalledWith(prisonId, username)
+      expect(orchestrationApiClient.getVisitRequests).toHaveBeenCalledWith(prisonId)
       expect(result).toStrictEqual(visitRequests)
     })
   })
@@ -69,9 +69,9 @@ describe('Visit requests service', () => {
       const visitRequestCount = 3
       orchestrationApiClient.getVisitRequestCount.mockResolvedValue(visitRequestCount)
 
-      const result = await visitRequestsService.getVisitRequestCount(username, prisonId)
+      const result = await visitRequestsService.getVisitRequestCount(prisonId)
 
-      expect(orchestrationApiClient.getVisitRequestCount).toHaveBeenCalledWith(prisonId, username)
+      expect(orchestrationApiClient.getVisitRequestCount).toHaveBeenCalledWith(prisonId)
       expect(result).toBe(visitRequestCount)
     })
   })

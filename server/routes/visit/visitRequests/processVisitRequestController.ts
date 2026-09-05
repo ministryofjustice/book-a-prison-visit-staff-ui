@@ -68,7 +68,7 @@ export default class ProcessVisitRequestController {
       } catch (error) {
         // HTTP 400 Bad Request means a visit not in REQUESTED state (i.e. already approved or rejected)
         if (error.status === 400) {
-          const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+          const visitDetails = await this.visitService.getVisitDetailed({ reference })
           req.flash('messages', this.getFailureMessage(visitDetails))
 
           return res.redirect(redirectPath)

@@ -93,11 +93,9 @@ describe('Booker management - visitor list', () => {
           expect($('[data-test=link-visitor]').text().trim()).toBe('Link the selected visitor')
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
           })
           expect(bookerService.getNonLinkedSocialContacts).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
             prisonerId: prisoner.prisonerNumber,
           })

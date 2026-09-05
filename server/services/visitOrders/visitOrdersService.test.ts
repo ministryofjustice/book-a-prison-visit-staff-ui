@@ -2,8 +2,6 @@ import TestData from '../../routes/testutils/testData'
 import { createMockOrchestrationApiClient } from '../../data/testutils/mocks'
 import VisitOrdersService, { VisitOrderHistoryPage } from './visitOrdersService'
 
-const username = 'user1'
-
 const prisonId = 'HEI'
 const prisonerId = 'A1234BC'
 
@@ -25,10 +23,10 @@ describe('Visit orders service', () => {
       const prisonerVoBalance = TestData.prisonerVoBalance()
       orchestrationApiClient.getVoBalance.mockResolvedValue(prisonerVoBalance)
 
-      const result = await visitOrdersService.getVoBalance({ username, prisonId, prisonerId })
+      const result = await visitOrdersService.getVoBalance({ prisonId, prisonerId })
 
       expect(result).toStrictEqual(prisonerVoBalance)
-      expect(orchestrationApiClient.getVoBalance).toHaveBeenCalledWith({ prisonId, prisonerId, username })
+      expect(orchestrationApiClient.getVoBalance).toHaveBeenCalledWith({ prisonId, prisonerId })
     })
   })
 
@@ -37,13 +35,12 @@ describe('Visit orders service', () => {
       const prisonerBalanceAdjustmentDto = TestData.prisonerBalanceAdjustmentDto()
       orchestrationApiClient.changeVoBalance.mockResolvedValue()
 
-      await visitOrdersService.changeVoBalance({ username, prisonId, prisonerId, prisonerBalanceAdjustmentDto })
+      await visitOrdersService.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
 
       expect(orchestrationApiClient.changeVoBalance).toHaveBeenCalledWith({
         prisonId,
         prisonerId,
         prisonerBalanceAdjustmentDto,
-        username,
       })
     })
   })
@@ -58,7 +55,7 @@ describe('Visit orders service', () => {
 
       orchestrationApiClient.getVoHistory.mockResolvedValue(voHistoryDetails)
 
-      const result = await visitOrdersService.getVoHistory({ username, prisonId, prisonerId })
+      const result = await visitOrdersService.getVoHistory({ prisonId, prisonerId })
 
       expect(result).toStrictEqual<VisitOrderHistoryPage>({
         prisonerId: voHistoryDetails.prisonerId,
@@ -85,7 +82,7 @@ describe('Visit orders service', () => {
         ],
       })
 
-      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonId, prisonerId, username })
+      expect(orchestrationApiClient.getVoHistory).toHaveBeenCalledWith({ prisonId, prisonerId })
     })
 
     it('should return visit order history page data with rows styled depending on history item type', async () => {
@@ -103,7 +100,7 @@ describe('Visit orders service', () => {
 
       orchestrationApiClient.getVoHistory.mockResolvedValue(voHistoryDetails)
 
-      const result = await visitOrdersService.getVoHistory({ username, prisonId, prisonerId })
+      const result = await visitOrdersService.getVoHistory({ prisonId, prisonerId })
 
       // Row 0: all items have secondary colour class
       expect(result.voHistoryRows[0].filter(item => item.classes === 'bapv-secondary-text').length).toBe(6)

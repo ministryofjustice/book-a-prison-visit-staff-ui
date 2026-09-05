@@ -53,7 +53,7 @@ describe('Update visit allowances - change remand visit limit and allowance rese
           expect($('input[name=remandVisitLimitPerWeek]').val()).toBe('3')
           expect($('input[name=weekStartDay]').val()).toBe('MONDAY')
 
-          expect(visitAllowanceService.getRemandConfig).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
+          expect(visitAllowanceService.getRemandConfig).toHaveBeenCalledWith({ prisonId: 'HEI' })
         })
     })
 
@@ -95,7 +95,6 @@ describe('Update visit allowances - change remand visit limit and allowance rese
         .expect(() => {
           expect(visitAllowanceService.updateRemandConfig).toHaveBeenCalledWith({
             prisonId: 'HEI',
-            username: 'user1',
             remandVisitLimitPerWeek: 2,
             weekStartDay: 'THURSDAY',
           })

@@ -15,7 +15,6 @@ export default class BlockSessionConfirmController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { username } = res.locals.user
       const { prisonId } = req.session.selectedEstablishment
       const { blockDateOrSession } = req.session
 
@@ -24,7 +23,6 @@ export default class BlockSessionConfirmController {
 
       const visitCount = (
         await this.visitService.getVisitsBySessionTemplate({
-          username,
           prisonId,
           reference: selectedSession.sessionTemplateReference,
           sessionDate: date,

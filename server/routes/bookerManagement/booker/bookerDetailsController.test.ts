@@ -118,15 +118,12 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(0)
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
           })
           expect(bookerService.getBookerVisitorRequestsByPrisoner).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
           })
           expect(bookerService.getBookerStatus).toHaveBeenCalledWith({
-            username: 'user1',
             email: booker.email,
             reference: booker.reference,
           })
@@ -227,15 +224,12 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(1)
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
           })
           expect(bookerService.getBookerVisitorRequestsByPrisoner).toHaveBeenCalledWith({
-            username: 'user1',
             reference: booker.reference,
           })
           expect(bookerService.getBookerStatus).toHaveBeenCalledWith({
-            username: 'user1',
             email: booker.email,
             reference: booker.reference,
           })

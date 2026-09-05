@@ -72,11 +72,7 @@ export default class CancelVisitController {
         userType: 'STAFF',
       }
 
-      const visit = await this.visitService.cancelVisit({
-        username,
-        reference,
-        cancelVisitDto,
-      })
+      const visit = await this.visitService.cancelVisit({ reference, cancelVisitDto })
 
       await this.auditService.cancelledVisit({
         visitReference: reference,

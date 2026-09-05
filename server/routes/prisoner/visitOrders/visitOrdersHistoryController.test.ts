@@ -53,7 +53,6 @@ describe('Visit orders history', () => {
           expect($('[data-test=pvo-balance-0]').text()).toBe('2')
 
           expect(visitOrdersService.getVoHistory).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             prisonerId,
           })

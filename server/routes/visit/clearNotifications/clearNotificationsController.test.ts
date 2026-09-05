@@ -95,7 +95,6 @@ describe('Clear visit notifications', () => {
           })
 
           expect(visitNotificationsService.ignoreNotifications).toHaveBeenCalledWith({
-            username: 'user1',
             reference: 'ab-cd-ef-gh',
             ignoreVisitNotificationsDto: { reason: 'reason', actionedBy: 'user1' },
           })

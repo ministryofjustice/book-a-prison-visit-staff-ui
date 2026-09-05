@@ -180,10 +180,7 @@ export default class DateAndTime {
 
     // See README ('Visit journeys – book and update') for explanation of this flow
     if (visitSessionData.applicationReference) {
-      await this.visitService.changeVisitApplication({
-        username: res.locals.user.username,
-        visitSessionData,
-      })
+      await this.visitService.changeVisitApplication({ visitSessionData })
     } else if (isUpdate) {
       const { reference } = await this.visitService.createVisitApplicationFromVisit({
         username: res.locals.user.username,

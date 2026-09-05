@@ -2,8 +2,6 @@ import TestData from '../routes/testutils/testData'
 import { createMockIncentivesApiClient, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import VisitAllowanceService from './visitAllowanceService'
 
-const username = 'user'
-
 describe('Visit allowance service', () => {
   const incentivesApiClient = createMockIncentivesApiClient()
   const orchestrationApiClient = createMockOrchestrationApiClient()
@@ -24,9 +22,9 @@ describe('Visit allowance service', () => {
     it('should return a list of prison incentive levels', async () => {
       incentivesApiClient.getPrisonIncentiveLevels.mockResolvedValue(prisonIncentiveLevels)
 
-      const results = await visitAllowanceService.getPrisonIncentiveLevels({ username, prisonId: 'HEI' })
+      const results = await visitAllowanceService.getPrisonIncentiveLevels({ prisonId: 'HEI' })
 
-      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI', username)
+      expect(incentivesApiClient.getPrisonIncentiveLevels).toHaveBeenCalledWith('HEI')
       expect(results).toStrictEqual(prisonIncentiveLevels)
     })
   })
@@ -38,9 +36,9 @@ describe('Visit allowance service', () => {
     it('should return remand config for current prison', async () => {
       orchestrationApiClient.getPrison.mockResolvedValue(prison)
 
-      const results = await visitAllowanceService.getRemandConfig({ username, prisonId: 'HEI' })
+      const results = await visitAllowanceService.getRemandConfig({ prisonId: 'HEI' })
 
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI', username)
+      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
       expect(results).toStrictEqual(remandConfig)
     })
   })
@@ -50,7 +48,6 @@ describe('Visit allowance service', () => {
       orchestrationApiClient.updatePrisonConfig.mockResolvedValue()
 
       await visitAllowanceService.updateRemandConfig({
-        username,
         prisonId: 'HEI',
         remandVisitLimitPerWeek: 5,
         weekStartDay: 'SUNDAY',
@@ -59,7 +56,6 @@ describe('Visit allowance service', () => {
       expect(orchestrationApiClient.updatePrisonConfig).toHaveBeenCalledWith({
         prisonId: 'HEI',
         visitSchedulerUpdatePrisonDto: { weekStartDay: 'SUNDAY', remandVisitLimitPerWeek: 5 },
-        username,
       })
     })
   })

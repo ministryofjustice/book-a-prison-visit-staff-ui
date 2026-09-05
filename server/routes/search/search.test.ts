@@ -291,7 +291,6 @@ describe('Booking search page', () => {
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
-            username: 'user1',
             prisonId: 'HEI',
           })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
@@ -322,7 +321,6 @@ describe('Booking search page', () => {
           expect($('[data-test=visit-status]').text()).toBe('Booked')
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
-            username: 'user1',
             prisonId: 'HEI',
           })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
@@ -356,7 +354,6 @@ describe('Booking search page', () => {
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
-            username: 'user1',
             prisonId: 'XYZ',
           })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)

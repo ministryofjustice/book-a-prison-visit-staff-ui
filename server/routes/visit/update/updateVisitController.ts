@@ -15,10 +15,9 @@ export default class UpdateVisitController {
   public startVisitUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
-      const { username } = res.locals.user
       const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
-      const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+      const visitDetails = await this.visitService.getVisitDetailed({ reference })
       const { prison, prisoner } = visitDetails
 
       const prisonerInVisitPrison = prison.prisonId === prisoner.prisonId

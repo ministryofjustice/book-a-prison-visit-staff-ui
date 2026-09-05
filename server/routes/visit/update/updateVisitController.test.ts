@@ -59,7 +59,7 @@ describe('Start a visit update journey', () => {
         .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ username: 'user1', reference: 'ab-cd-ef-gh' })
+          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ reference: 'ab-cd-ef-gh' })
           expect(visitSessionData).toStrictEqual(<VisitSessionData>{
             allowOverBooking: false,
             prisoner: {
@@ -128,7 +128,7 @@ describe('Start a visit update journey', () => {
         .expect('location', '/update-a-visit/select-visitors')
         .expect(res => {
           expect(clearSession).toHaveBeenCalledTimes(1)
-          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ username: 'user1', reference: 'ab-cd-ef-gh' })
+          expect(visitService.getVisitDetailed).toHaveBeenCalledWith({ reference: 'ab-cd-ef-gh' })
           expect(flashProvider).toHaveBeenCalledWith('messages', <MoJAlert>{
             variant: 'information',
             title: 'Jeanette Smith has been unapproved',

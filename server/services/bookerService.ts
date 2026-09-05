@@ -16,14 +16,8 @@ export default class BookerService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
   // get bookers by email address with most recently created (the active one) first
-  async getSortedBookersByEmail({
-    username,
-    email,
-  }: {
-    username: string
-    email: string
-  }): Promise<BookerSearchResultsDto[]> {
-    const unsortedBookers = await this.orchestrationApiClient.getBookersByEmail(email, username)
+  async getSortedBookersByEmail({ email }: { email: string }): Promise<BookerSearchResultsDto[]> {
+    const unsortedBookers = await this.orchestrationApiClient.getBookersByEmail(email)
     const bookersByCreatedDesc = unsortedBookers.toSorted((a, b) =>
       compareDesc(new Date(a.createdTimestamp), new Date(b.createdTimestamp)),
     )
@@ -31,50 +25,38 @@ export default class BookerService {
     return bookersByCreatedDesc
   }
 
-  async getBookerDetails({
-    username,
-    reference,
-  }: {
-    username: string
-    reference: string
-  }): Promise<BookerDetailedInfoDto> {
-    return this.orchestrationApiClient.getBookerDetails(reference, username)
+  async getBookerDetails({ reference }: { reference: string }): Promise<BookerDetailedInfoDto> {
+    return this.orchestrationApiClient.getBookerDetails(reference)
   }
 
   async getLinkedVisitors({
-    username,
     bookerReference,
     prisonerId,
   }: {
-    username: string
     bookerReference: string
     prisonerId: string
   }): Promise<VisitorInfoDto[]> {
-    return this.orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId, username })
+    return this.orchestrationApiClient.getLinkedVisitors({ bookerReference, prisonerId })
   }
 
   async getNonLinkedSocialContacts({
-    username,
     reference,
     prisonerId,
   }: {
-    username: string
     reference: string
     prisonerId: string
   }): Promise<SocialContactsDto[]> {
-    return this.orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId, username })
+    return this.orchestrationApiClient.getNonLinkedSocialContacts({ reference, prisonerId })
   }
 
   async getBookerStatus({
-    username,
     email,
     reference,
   }: {
-    username: string
     email: string
     reference: string
   }): Promise<{ active: boolean; emailHasMultipleAccounts: boolean }> {
-    const bookers = await this.getSortedBookersByEmail({ username, email })
+    const bookers = await this.getSortedBookersByEmail({ email })
     const emailHasMultipleAccounts = bookers.length > 1
     const active = bookers[0]?.reference === reference
 
@@ -118,38 +100,28 @@ export default class BookerService {
   }
 
   async getBookerVisitorRequestsByPrisoner({
-    username,
     reference,
   }: {
-    username: string
     reference: string
   }): Promise<Record<string, BookerPrisonerVisitorRequestDto[]>> {
-    const requests = await this.orchestrationApiClient.getBookerVisitorRequests(reference, username)
+    const requests = await this.orchestrationApiClient.getBookerVisitorRequests(reference)
     return { ...Object.groupBy(requests, request => request.prisonerId) }
   }
 
-  async getVisitorRequests({
-    username,
-    prisonId,
-  }: {
-    username: string
-    prisonId: string
-  }): Promise<PrisonVisitorRequestListEntryDto[]> {
-    return this.orchestrationApiClient.getVisitorRequests(prisonId, username)
+  async getVisitorRequests({ prisonId }: { prisonId: string }): Promise<PrisonVisitorRequestListEntryDto[]> {
+    return this.orchestrationApiClient.getVisitorRequests(prisonId)
   }
 
-  async getVisitorRequestCount({ username, prisonId }: { username: string; prisonId: string }): Promise<number> {
-    return this.orchestrationApiClient.getVisitorRequestCount(prisonId, username)
+  async getVisitorRequestCount({ prisonId }: { prisonId: string }): Promise<number> {
+    return this.orchestrationApiClient.getVisitorRequestCount(prisonId)
   }
 
   async getVisitorRequestForReview({
-    username,
     requestReference,
   }: {
-    username: string
     requestReference: string
   }): Promise<VisitorRequestForReviewDto> {
-    return this.orchestrationApiClient.getVisitorRequestForReview(requestReference, username)
+    return this.orchestrationApiClient.getVisitorRequestForReview(requestReference)
   }
 
   async approveVisitorRequest({

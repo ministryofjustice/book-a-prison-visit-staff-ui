@@ -13,10 +13,9 @@ export default class VisitorRequestDetailsController {
   public view(): RequestHandler<VisitorRequestParams> {
     return async (req, res) => {
       const { requestReference } = req.params
-      const { username } = res.locals.user
       const returnTo = req.query?.from === 'booker-details' ? 'booker-details' : 'manage-bookers'
 
-      const visitorRequest = await this.bookerService.getVisitorRequestForReview({ username, requestReference })
+      const visitorRequest = await this.bookerService.getVisitorRequestForReview({ requestReference })
 
       if (visitorRequest.status !== 'REQUESTED') {
         req.flash('messages', requestAlreadyReviewedMessage(visitorRequest.bookerReference))
@@ -24,7 +23,6 @@ export default class VisitorRequestDetailsController {
       }
 
       const linkedVisitors = await this.bookerService.getLinkedVisitors({
-        username: res.locals.user.username,
         bookerReference: visitorRequest.bookerReference,
         prisonerId: visitorRequest.prisonerId,
       })

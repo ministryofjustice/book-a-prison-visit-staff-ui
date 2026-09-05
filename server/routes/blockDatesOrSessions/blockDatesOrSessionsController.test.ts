@@ -191,10 +191,8 @@ describe('Block visit dates and sessions listing page', () => {
           expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
             prisonId: 'HEI',
             includeSessions: false,
-            username: 'user1',
           })
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             date: expectedOutputDate,
             includeExcludedSessions: true,
@@ -222,10 +220,8 @@ describe('Block visit dates and sessions listing page', () => {
           expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
             prisonId: 'HEI',
             includeSessions: false,
-            username: 'user1',
           })
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             date: expectedOutputDate,
             includeExcludedSessions: true,
@@ -322,7 +318,6 @@ describe('Block visit dates and sessions listing page', () => {
           expect(blockDatesOrSessionsService.getFutureBlockedDatesAndSessions).toHaveBeenCalledWith({
             prisonId: 'HEI',
             includeSessions: false,
-            username: 'user1',
           })
           expect(sessionData.blockDateOrSession).toBe(undefined)
           expect(flashProvider).toHaveBeenCalledWith('errors', [expectedValidationError])

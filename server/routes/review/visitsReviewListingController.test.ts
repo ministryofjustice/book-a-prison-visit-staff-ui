@@ -35,7 +35,6 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="review-reasons-list"] li').length).toBe(numNotificationTypes)
 
           expect(visitNotificationsService.getVisitNotifications).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
           })
         })
@@ -92,7 +91,6 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)
 
           expect(visitNotificationsService.getVisitNotifications).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
           })
         })
@@ -111,7 +109,6 @@ describe('Bookings needing review listing page', () => {
           expect($('[data-test="no-bookings-for-filters"]').length).toBe(0)
 
           expect(visitNotificationsService.getVisitNotifications).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
           })
         })
@@ -144,7 +141,6 @@ describe('Bookings needing review listing page', () => {
           )
 
           expect(visitNotificationsService.getVisitNotifications).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
           })
         })

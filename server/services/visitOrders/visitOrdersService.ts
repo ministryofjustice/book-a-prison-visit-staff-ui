@@ -24,42 +24,30 @@ export default class VisitOrdersService {
     'MANUAL_PRISONER_BALANCE_ADJUSTMENT',
   ]
 
-  async getVoBalance({
-    username,
-    prisonId,
-    prisonerId,
-  }: {
-    username: string
-    prisonId: string
-    prisonerId: string
-  }): Promise<PrisonerBalanceDto> {
-    return this.orchestrationApiClient.getVoBalance({ prisonId, prisonerId, username })
+  async getVoBalance({ prisonId, prisonerId }: { prisonId: string; prisonerId: string }): Promise<PrisonerBalanceDto> {
+    return this.orchestrationApiClient.getVoBalance({ prisonId, prisonerId })
   }
 
   async changeVoBalance({
-    username,
     prisonId,
     prisonerId,
     prisonerBalanceAdjustmentDto,
   }: {
-    username: string
     prisonId: string
     prisonerId: string
     prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
   }): Promise<void> {
-    await this.orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto, username })
+    await this.orchestrationApiClient.changeVoBalance({ prisonId, prisonerId, prisonerBalanceAdjustmentDto })
   }
 
   async getVoHistory({
-    username,
     prisonId,
     prisonerId,
   }: {
-    username: string
     prisonId: string
     prisonerId: string
   }): Promise<VisitOrderHistoryPage> {
-    const voHistoryDetails = await this.orchestrationApiClient.getVoHistory({ prisonId, prisonerId, username })
+    const voHistoryDetails = await this.orchestrationApiClient.getVoHistory({ prisonId, prisonerId })
     const { visitOrderHistory, ...prisonerDetails } = voHistoryDetails
 
     const voHistoryRows = visitOrderHistory.map((historyItem, index): GOVUKTableRow => {

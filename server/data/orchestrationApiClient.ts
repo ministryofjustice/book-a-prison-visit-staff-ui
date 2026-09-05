@@ -123,7 +123,7 @@ export default class OrchestrationApiClient extends RestClient {
           visitorDetails,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -151,30 +151,30 @@ export default class OrchestrationApiClient extends RestClient {
           visitorDetails,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async cancelVisit(reference: string, cancelVisitDto: CancelVisitOrchestrationDto, username: string): Promise<Visit> {
+  async cancelVisit(reference: string, cancelVisitDto: CancelVisitOrchestrationDto): Promise<Visit> {
     return this.put(
       {
         path: `/visits/${reference}/cancel`,
         data: cancelVisitDto,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getVisit(reference: string, username: string): Promise<Visit> {
-    return this.get({ path: `/visits/${reference}` }, asSystem(username))
+  async getVisit(reference: string): Promise<Visit> {
+    return this.get({ path: `/visits/${reference}` }, asSystem())
   }
 
-  async getVisitDetailed(reference: string, username: string): Promise<VisitBookingDetails> {
+  async getVisitDetailed(reference: string): Promise<VisitBookingDetails> {
     const visitDetails = await this.get<VisitBookingDetailsRaw>(
       {
         path: `/visits/${reference}/detailed`,
       },
-      asSystem(username),
+      asSystem(),
     )
 
     // Remove unsupported event and notification types and standardise types
@@ -206,7 +206,6 @@ export default class OrchestrationApiClient extends RestClient {
     reference: string,
     sessionDate: string,
     visitRestrictions: VisitRestriction[],
-    username: string,
   ): Promise<VisitPreview[]> {
     return this.get(
       {
@@ -219,11 +218,11 @@ export default class OrchestrationApiClient extends RestClient {
           ...(visitRestrictions && { visitRestrictions }),
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getBookedVisitCountByDate(prisonId: string, date: string, username: string): Promise<number> {
+  async getBookedVisitCountByDate(prisonId: string, date: string): Promise<number> {
     const visits = await this.get<PageVisitDto>(
       {
         path: `/visits/search`,
@@ -236,14 +235,14 @@ export default class OrchestrationApiClient extends RestClient {
           size: '1',
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
     return visits.totalElements ?? 0
   }
 
   //  orchestration-applications-controller
 
-  async changeVisitApplication(visitSessionData: VisitSessionData, username: string): Promise<ApplicationDto> {
+  async changeVisitApplication(visitSessionData: VisitSessionData): Promise<ApplicationDto> {
     const { visitContact, mainContactId } = this.convertMainContactToVisitContact(visitSessionData.mainContact)
 
     return this.put(
@@ -264,7 +263,7 @@ export default class OrchestrationApiClient extends RestClient {
           allowOverBooking: true,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -292,7 +291,7 @@ export default class OrchestrationApiClient extends RestClient {
           allowOverBooking: true,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -315,7 +314,7 @@ export default class OrchestrationApiClient extends RestClient {
           allowOverBooking: true,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -334,7 +333,7 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/visitor-requests/${requestReference}/reject`,
         data: <RejectVisitorRequestDto>{ rejectionReason, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -352,35 +351,33 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/visitor-requests/${requestReference}/approve`,
         data: <ApproveVisitorRequestDto>{ visitorId, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   async getLinkedVisitors({
     bookerReference,
     prisonerId,
-    username,
   }: {
     bookerReference: string
     prisonerId: string
-    username: string
   }): Promise<VisitorInfoDto[]> {
     return this.get(
       {
         path: `/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getBookersByEmail(email: string, username: string): Promise<BookerSearchResultsDto[]> {
+  async getBookersByEmail(email: string): Promise<BookerSearchResultsDto[]> {
     try {
       return await this.post(
         {
           path: '/public/booker/search',
           data: <SearchBookerDto>{ email },
         },
-        asSystem(username),
+        asSystem(),
       )
     } catch (error) {
       if (getErrorStatus(error) === 404) {
@@ -390,24 +387,22 @@ export default class OrchestrationApiClient extends RestClient {
     }
   }
 
-  async getVisitorRequestForReview(requestReference: string, username: string): Promise<VisitorRequestForReviewDto> {
-    return this.get({ path: `/visitor-requests/${requestReference}` }, asSystem(username))
+  async getVisitorRequestForReview(requestReference: string): Promise<VisitorRequestForReviewDto> {
+    return this.get({ path: `/visitor-requests/${requestReference}` }, asSystem())
   }
 
-  async getBookerDetails(reference: string, username: string): Promise<BookerDetailedInfoDto> {
-    return this.get({ path: `/public/booker/${reference}` }, asSystem(username))
+  async getBookerDetails(reference: string): Promise<BookerDetailedInfoDto> {
+    return this.get({ path: `/public/booker/${reference}` }, asSystem())
   }
 
   async getNonLinkedSocialContacts({
     reference,
     prisonerId,
-    username,
   }: {
     reference: string
     prisonerId: string
-    username: string
   }): Promise<SocialContactsDto[]> {
-    return this.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` }, asSystem(username))
+    return this.get({ path: `/public/booker/${reference}/prisoners/${prisonerId}/social-contacts` }, asSystem())
   }
 
   async linkBookerVisitor({
@@ -432,7 +427,7 @@ export default class OrchestrationApiClient extends RestClient {
           actionedBy: username,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -453,7 +448,7 @@ export default class OrchestrationApiClient extends RestClient {
           path: `/public/booker/${reference}/permitted/prisoners/${prisonerId}/permitted/visitors/${visitorId}/unlink`,
           data: <StaffUsernameDto>{ username },
         },
-        asSystem(username),
+        asSystem(),
       )
     } catch (error) {
       // If visitor already unlinked, API returns 404 so treat this as success. Throw any other error.
@@ -463,52 +458,49 @@ export default class OrchestrationApiClient extends RestClient {
     }
   }
 
-  async getBookerVisitorRequests(
-    bookerReference: string,
-    username: string,
-  ): Promise<BookerPrisonerVisitorRequestDto[]> {
-    return this.get({ path: `/public/booker/${bookerReference}/permitted/visitors/requests` }, asSystem(username))
+  async getBookerVisitorRequests(bookerReference: string): Promise<BookerPrisonerVisitorRequestDto[]> {
+    return this.get({ path: `/public/booker/${bookerReference}/permitted/visitors/requests` }, asSystem())
   }
 
-  async getVisitorRequests(prisonId: string, username: string): Promise<PrisonVisitorRequestListEntryDto[]> {
-    return this.get({ path: `/prison/${prisonId}/visitor-requests` }, asSystem(username))
+  async getVisitorRequests(prisonId: string): Promise<PrisonVisitorRequestListEntryDto[]> {
+    return this.get({ path: `/prison/${prisonId}/visitor-requests` }, asSystem())
   }
 
-  async getVisitorRequestCount(prisonId: string, username: string): Promise<number> {
+  async getVisitorRequestCount(prisonId: string): Promise<number> {
     return (
       await this.get<VisitorRequestsCountByPrisonCodeDto>(
         {
           path: `/prison/${prisonId}/visitor-requests/count`,
         },
-        asSystem(username),
+        asSystem(),
       )
     ).count
   }
 
   // visit notification controller
-  async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto, username: string): Promise<Visit> {
-    return this.put({ path: `/visits/notification/visit/${reference}/ignore`, data }, asSystem(username))
+  async ignoreNotifications(reference: string, data: IgnoreVisitNotificationsDto): Promise<Visit> {
+    return this.put({ path: `/visits/notification/visit/${reference}/ignore`, data }, asSystem())
   }
 
-  async getNotificationCount(prisonId: string, username: string): Promise<number> {
+  async getNotificationCount(prisonId: string): Promise<number> {
     return (
       await this.get<NotificationCount>(
         {
           path: `/visits/notification/${prisonId}/count`,
           query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
         },
-        asSystem(username),
+        asSystem(),
       )
     ).count
   }
 
-  async getVisitNotifications(prisonId: string, username: string): Promise<VisitNotifications[]> {
+  async getVisitNotifications(prisonId: string): Promise<VisitNotifications[]> {
     const visits = await this.get<VisitNotificationsRaw[]>(
       {
         path: `/visits/notification/${prisonId}/visits`,
         query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
 
     // return visit notifications with 'type' standardised
@@ -532,7 +524,7 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/config/prisons/prison/${prisonId}/exclude-date/remove`,
         data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -542,34 +534,32 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/config/prisons/prison/${prisonId}/exclude-date/add`,
         data: <ExcludeDateDto>{ excludeDate: date, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   async getFutureBlockedDatesAndSessions({
     prisonId,
     includeSessions,
-    username,
   }: {
     prisonId: string
     includeSessions: boolean
-    username: string
   }): Promise<PrisonAndSessionsExcludeDatesDto> {
     return this.get(
       {
         path: `/v2/prisons/${prisonId}/config/exclude-dates/future`,
         query: new URLSearchParams({ includeSessions: includeSessions.toString() }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async isBlockedDate(prisonCode: string, excludeDate: string, username: string): Promise<boolean> {
+  async isBlockedDate(prisonCode: string, excludeDate: string): Promise<boolean> {
     const { isExcluded } = await this.get<IsExcludeDateDto>(
       {
         path: `/config/prisons/prison/${prisonCode}/exclude-date/${excludeDate}/isExcluded`,
       },
-      asSystem(username),
+      asSystem(),
     )
     return isExcluded
   }
@@ -590,7 +580,7 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/prison/${prisonId}/visit-passes`,
         data: <VisitPassRequestDto>{ date, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -608,7 +598,7 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/prison/${prisonId}/visit-passes/visit/${reference}`,
         data: <StaffUsernameDto>{ username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -632,7 +622,7 @@ export default class OrchestrationApiClient extends RestClient {
           visitRequestRejectionReason,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -648,17 +638,16 @@ export default class OrchestrationApiClient extends RestClient {
         path: `/visits/requests/${reference}/approve`,
         data: <ApproveVisitRequestBodyDto>{ visitReference: reference, actionedBy: username },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getVisitRequests(prisonCode: string, username: string): Promise<VisitRequestSummary[]> {
-    return this.get({ path: `/visits/requests/${prisonCode}` }, asSystem(username))
+  async getVisitRequests(prisonCode: string): Promise<VisitRequestSummary[]> {
+    return this.get({ path: `/visits/requests/${prisonCode}` }, asSystem())
   }
 
-  async getVisitRequestCount(prisonCode: string, username: string): Promise<number> {
-    return (await this.get<VisitRequestsCountDto>({ path: `/visits/requests/${prisonCode}/count` }, asSystem(username)))
-      .count
+  async getVisitRequestCount(prisonCode: string): Promise<number> {
+    return (await this.get<VisitRequestsCountDto>({ path: `/visits/requests/${prisonCode}/count` }, asSystem())).count
   }
 
   // orchestration-sessions-controller
@@ -667,7 +656,6 @@ export default class OrchestrationApiClient extends RestClient {
     prisonCode: string,
     sessionDate: string,
     sessionTemplateReference: string,
-    username: string,
   ): Promise<VisitSession> {
     return this.get(
       {
@@ -678,7 +666,7 @@ export default class OrchestrationApiClient extends RestClient {
           sessionTemplateReference,
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -686,12 +674,10 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId,
     date,
     includeExcludedSessions,
-    username,
   }: {
     prisonId: string
     date: string
     includeExcludedSessions: boolean
-    username: string
   }): Promise<SessionSchedule[]> {
     return this.get(
       {
@@ -702,7 +688,7 @@ export default class OrchestrationApiClient extends RestClient {
           includeExcludedSessions: includeExcludedSessions.toString(),
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -711,7 +697,6 @@ export default class OrchestrationApiClient extends RestClient {
     sessionDate: string,
     sessionStartTime: string,
     sessionEndTime: string,
-    username: string,
   ): Promise<SessionCapacity> {
     try {
       return await this.get(
@@ -719,7 +704,7 @@ export default class OrchestrationApiClient extends RestClient {
           path: '/visit-sessions/capacity',
           query: new URLSearchParams({ prisonId, sessionDate, sessionStartTime, sessionEndTime }).toString(),
         },
-        asSystem(username),
+        asSystem(),
       )
     } catch {
       return null
@@ -748,25 +733,17 @@ export default class OrchestrationApiClient extends RestClient {
           includedSessionConflicts: this.enabledSessionConflictTypes,
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   // visit-orders-controller
-  async getVoBalance({
-    prisonId,
-    prisonerId,
-    username,
-  }: {
-    prisonId: string
-    prisonerId: string
-    username: string
-  }): Promise<PrisonerBalanceDto> {
+  async getVoBalance({ prisonId, prisonerId }: { prisonId: string; prisonerId: string }): Promise<PrisonerBalanceDto> {
     return this.get(
       {
         path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -774,30 +751,26 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId,
     prisonerId,
     prisonerBalanceAdjustmentDto,
-    username,
   }: {
     prisonId: string
     prisonerId: string
     prisonerBalanceAdjustmentDto: PrisonerBalanceAdjustmentDto
-    username: string
   }): Promise<void> {
     await this.put(
       {
         path: `/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`,
         data: prisonerBalanceAdjustmentDto,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   async getVoHistory({
     prisonId,
     prisonerId,
-    username,
   }: {
     prisonId: string
     prisonerId: string
-    username: string
   }): Promise<VisitOrderHistoryDetailsDto> {
     // fixed to get past 3 months of VO history
     const date3MonthsAgo = subMonths(new Date(), 3)
@@ -811,7 +784,7 @@ export default class OrchestrationApiClient extends RestClient {
           maxResults: '30',
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -834,7 +807,7 @@ export default class OrchestrationApiClient extends RestClient {
           actionedBy: username,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
@@ -855,39 +828,39 @@ export default class OrchestrationApiClient extends RestClient {
           actionedBy: username,
         },
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   // prisoner-profile-controller
 
-  async getPrisonerProfile(prisonId: string, prisonerId: string, username: string): Promise<PrisonerProfileDto> {
+  async getPrisonerProfile(prisonId: string, prisonerId: string): Promise<PrisonerProfileDto> {
     return this.get(
       {
         path: `/prisoner/${prisonId}/${prisonerId}/profile`,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
   // orchestration-prisons-config-controller
 
-  async getSupportedPrisonIds(username: string): Promise<string[]> {
+  async getSupportedPrisonIds(): Promise<string[]> {
     return this.get(
       {
         path: '/config/prisons/user-type/STAFF/supported',
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getPrison(id: string, username: string): Promise<Prison> {
+  async getPrison(id: string): Promise<Prison> {
     // rename 'code' to 'prisonId' for consistency
     const { code: prisonId, ...prisonDto } = await this.get<PrisonDto>(
       {
         path: `/config/prisons/prison/${id}`,
       },
-      asSystem(username),
+      asSystem(),
     )
     return { prisonId, ...prisonDto }
   }
@@ -895,18 +868,16 @@ export default class OrchestrationApiClient extends RestClient {
   async updatePrisonConfig({
     prisonId,
     visitSchedulerUpdatePrisonDto,
-    username,
   }: {
     prisonId: string
     visitSchedulerUpdatePrisonDto: VisitSchedulerUpdatePrisonDto
-    username: string
   }): Promise<void> {
     await this.put(
       {
         path: `/config/prisons/prison/${prisonId}`,
         data: visitSchedulerUpdatePrisonDto,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
