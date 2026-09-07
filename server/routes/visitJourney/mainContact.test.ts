@@ -309,7 +309,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.contactName).toBe('name last')
             expect(visitSessionData.mainContact.languagePreference).toBe('en')
 
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ visitSessionData })
           })
       })
 
@@ -332,7 +332,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.phoneNumber).toBe('0114 7654 321')
             expect(visitSessionData.mainContact.languagePreference).toBe('en')
 
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ visitSessionData })
           })
       })
 
@@ -365,7 +365,7 @@ testJourneys.forEach(journey => {
             expect(visitSessionData.mainContact.email).toBe('visitor@example.com')
             expect(visitSessionData.mainContact.languagePreference).toBe('cy')
 
-            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ username: 'user1', visitSessionData })
+            expect(visitService.changeVisitApplication).toHaveBeenCalledWith({ visitSessionData })
           })
       })
 

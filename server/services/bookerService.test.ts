@@ -32,10 +32,10 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getBookersByEmail.mockResolvedValue([bookerWithEarlierCreatedDate, activeBookerAccount])
 
-      const result = await bookerService.getSortedBookersByEmail({ username, email })
+      const result = await bookerService.getSortedBookersByEmail({ email })
 
       expect(result).toStrictEqual([activeBookerAccount, bookerWithEarlierCreatedDate])
-      expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email, username)
+      expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
     })
   })
 
@@ -46,10 +46,10 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getBookerDetails.mockResolvedValue(booker)
 
-      const result = await bookerService.getBookerDetails({ username, reference })
+      const result = await bookerService.getBookerDetails({ reference })
 
       expect(result).toStrictEqual(booker)
-      expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference, username)
+      expect(orchestrationApiClient.getBookerDetails).toHaveBeenCalledWith(reference)
     })
   })
 
@@ -61,10 +61,10 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getLinkedVisitors.mockResolvedValue(visitors)
 
-      const result = await bookerService.getLinkedVisitors({ username, bookerReference, prisonerId })
+      const result = await bookerService.getLinkedVisitors({ bookerReference, prisonerId })
 
       expect(result).toStrictEqual(visitors)
-      expect(orchestrationApiClient.getLinkedVisitors).toHaveBeenCalledWith({ bookerReference, prisonerId, username })
+      expect(orchestrationApiClient.getLinkedVisitors).toHaveBeenCalledWith({ bookerReference, prisonerId })
     })
   })
 
@@ -77,13 +77,12 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getNonLinkedSocialContacts.mockResolvedValue(socialContacts)
 
-      const result = await bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
+      const result = await bookerService.getNonLinkedSocialContacts({ reference, prisonerId })
 
       expect(result).toStrictEqual(socialContacts)
       expect(orchestrationApiClient.getNonLinkedSocialContacts).toHaveBeenCalledWith({
         reference,
         prisonerId,
-        username,
       })
     })
   })
@@ -110,10 +109,10 @@ describe('Booker service', () => {
       ) => {
         orchestrationApiClient.getBookersByEmail.mockResolvedValue(bookers)
 
-        const result = await bookerService.getBookerStatus({ username: 'user1', email, reference })
+        const result = await bookerService.getBookerStatus({ email, reference })
 
         expect(result).toStrictEqual({ active: expectedActive, emailHasMultipleAccounts: expectedMultipleAccounts })
-        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email, username)
+        expect(orchestrationApiClient.getBookersByEmail).toHaveBeenCalledWith(email)
       },
     )
   })
@@ -168,13 +167,13 @@ describe('Booker service', () => {
 
       orchestrationApiClient.getBookerVisitorRequests.mockResolvedValue(visitorRequests)
 
-      const result = await bookerService.getBookerVisitorRequestsByPrisoner({ username, reference })
+      const result = await bookerService.getBookerVisitorRequestsByPrisoner({ reference })
 
       expect(result).toStrictEqual({
         P1: [visitorRequests[0]],
         P2: [visitorRequests[1]],
       })
-      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(reference, username)
+      expect(orchestrationApiClient.getBookerVisitorRequests).toHaveBeenCalledWith(reference)
     })
   })
 
@@ -184,10 +183,10 @@ describe('Booker service', () => {
       const visitorRequestListEntries = [TestData.visitorRequestListEntry()]
       orchestrationApiClient.getVisitorRequests.mockResolvedValue(visitorRequestListEntries)
 
-      const result = await bookerService.getVisitorRequests({ username, prisonId })
+      const result = await bookerService.getVisitorRequests({ prisonId })
 
       expect(result).toStrictEqual(visitorRequestListEntries)
-      expect(orchestrationApiClient.getVisitorRequests).toHaveBeenCalledWith(prisonId, username)
+      expect(orchestrationApiClient.getVisitorRequests).toHaveBeenCalledWith(prisonId)
     })
   })
 
@@ -197,10 +196,10 @@ describe('Booker service', () => {
       const count = 2
       orchestrationApiClient.getVisitorRequestCount.mockResolvedValue(count)
 
-      const result = await bookerService.getVisitorRequestCount({ username, prisonId })
+      const result = await bookerService.getVisitorRequestCount({ prisonId })
 
       expect(result).toBe(count)
-      expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId, username)
+      expect(orchestrationApiClient.getVisitorRequestCount).toHaveBeenCalledWith(prisonId)
     })
   })
 
@@ -210,15 +209,11 @@ describe('Booker service', () => {
       orchestrationApiClient.getVisitorRequestForReview.mockResolvedValue(visitorRequestForReview)
 
       const result = await bookerService.getVisitorRequestForReview({
-        username,
         requestReference: visitorRequestForReview.reference,
       })
 
       expect(result).toStrictEqual(visitorRequestForReview)
-      expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(
-        visitorRequestForReview.reference,
-        username,
-      )
+      expect(orchestrationApiClient.getVisitorRequestForReview).toHaveBeenCalledWith(visitorRequestForReview.reference)
     })
   })
 

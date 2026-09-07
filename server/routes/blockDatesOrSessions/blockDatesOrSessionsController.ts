@@ -15,7 +15,6 @@ export default class BlockDatesOrSessionsController {
       const rawBlockedDatesAndSessions = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
         prisonId: req.session.selectedEstablishment.prisonId,
         includeSessions: true,
-        username: res.locals.user.username,
       })
 
       const datePickerMinDate = format(new Date(), 'dd/MM/yyyy')
@@ -49,7 +48,6 @@ export default class BlockDatesOrSessionsController {
       }
 
       const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
-        username: res.locals.user.username,
         prisonId: req.session.selectedEstablishment.prisonId,
         date,
         includeExcludedSessions: true,
@@ -88,7 +86,6 @@ export default class BlockDatesOrSessionsController {
           const { fullDateExclusions } = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
             prisonId: req.session.selectedEstablishment.prisonId,
             includeSessions: false,
-            username: req.user.username,
           })
 
           if (fullDateExclusions.some(blockedDate => blockedDate.excludeDate === date)) {

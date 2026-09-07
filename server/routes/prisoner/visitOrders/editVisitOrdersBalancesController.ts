@@ -39,11 +39,7 @@ export default class EditVisitOrdersBalancesController {
       const { prisonerId } = req.params
       const { prisonId } = req.session.selectedEstablishment
 
-      const prisonerVoBalance = await this.visitOrdersService.getVoBalance({
-        username: res.locals.user.username,
-        prisonId,
-        prisonerId,
-      })
+      const prisonerVoBalance = await this.visitOrdersService.getVoBalance({ prisonId, prisonerId })
 
       // Raw validation errors from flash need to be transformed to include current balances
       const rawErrors = req.flash('errors')
@@ -84,7 +80,6 @@ export default class EditVisitOrdersBalancesController {
 
       try {
         await this.visitOrdersService.changeVoBalance({
-          username,
           prisonId,
           prisonerId,
           prisonerBalanceAdjustmentDto,

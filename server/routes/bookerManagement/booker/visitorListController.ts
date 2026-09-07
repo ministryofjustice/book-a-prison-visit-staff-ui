@@ -10,7 +10,6 @@ export default class VisitorListController {
   public view(): RequestHandler<BookerPrisonerParams> {
     return async (req, res) => {
       const { reference, prisonerId } = req.params
-      const { username } = res.locals.user
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
       const backLinkPageTitle = 'booker details'
 
@@ -18,7 +17,7 @@ export default class VisitorListController {
         return res.redirect(bookerDetailsPageUrl)
       }
 
-      const booker = await this.bookerService.getBookerDetails({ username, reference })
+      const booker = await this.bookerService.getBookerDetails({ reference })
       const prisoner = booker.permittedPrisoners.find(
         permittedPrisoner => permittedPrisoner.prisoner.prisonerNumber === prisonerId,
       )?.prisoner
@@ -26,7 +25,7 @@ export default class VisitorListController {
       if (!prisoner) {
         return res.redirect(bookerDetailsPageUrl)
       }
-      const nonLinkedContacts = await this.bookerService.getNonLinkedSocialContacts({ username, reference, prisonerId })
+      const nonLinkedContacts = await this.bookerService.getNonLinkedSocialContacts({ reference, prisonerId })
       const showNoDobWarning = nonLinkedContacts.some(contact => contact.dateOfBirth === null)
 
       req.session.bookerLinkVisitor = { reference, prisonerId, nonLinkedContacts }

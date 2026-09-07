@@ -4,7 +4,6 @@ import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 import { Visit } from '../data/orchestrationApiTypes'
 
 const prisonId = 'HEI'
-const username = 'user'
 
 describe('Visit notifications service', () => {
   const orchestrationApiClient = createMockOrchestrationApiClient()
@@ -24,9 +23,9 @@ describe('Visit notifications service', () => {
       const notificationCount = 3
       orchestrationApiClient.getNotificationCount.mockResolvedValue(notificationCount)
 
-      const result = await visitNotificationsService.getNotificationCount(username, prisonId)
+      const result = await visitNotificationsService.getNotificationCount(prisonId)
 
-      expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledWith(prisonId, username)
+      expect(orchestrationApiClient.getNotificationCount).toHaveBeenCalledWith(prisonId)
       expect(result).toBe(notificationCount)
     })
   })
@@ -36,7 +35,7 @@ describe('Visit notifications service', () => {
       const visitNotifications = [TestData.visitNotifications()]
       orchestrationApiClient.getVisitNotifications.mockResolvedValue(visitNotifications)
 
-      const result = await visitNotificationsService.getVisitNotifications({ username, prisonId })
+      const result = await visitNotificationsService.getVisitNotifications({ prisonId })
 
       expect(result).toStrictEqual(visitNotifications)
     })
@@ -56,14 +55,14 @@ describe('Visit notifications service', () => {
     })
 
     it('should return true if a given date has any visit notifications', async () => {
-      const result = await visitNotificationsService.dateHasNotifications(username, prisonId, date)
-      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId, username)
+      const result = await visitNotificationsService.dateHasNotifications(prisonId, date)
+      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId)
       expect(result).toBe(true)
     })
 
     it('should return false if a given date has no visit notifications', async () => {
-      const result = await visitNotificationsService.dateHasNotifications(username, prisonId, '2024-04-01')
-      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId, username)
+      const result = await visitNotificationsService.dateHasNotifications(prisonId, '2024-04-01')
+      expect(orchestrationApiClient.getVisitNotifications).toHaveBeenCalledWith(prisonId)
       expect(result).toBe(false)
     })
   })
@@ -78,17 +77,9 @@ describe('Visit notifications service', () => {
       const visit = { reference } as Visit
       orchestrationApiClient.ignoreNotifications.mockResolvedValue(visit)
 
-      const result = await visitNotificationsService.ignoreNotifications({
-        username,
-        reference,
-        ignoreVisitNotificationsDto,
-      })
+      const result = await visitNotificationsService.ignoreNotifications({ reference, ignoreVisitNotificationsDto })
 
-      expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(
-        reference,
-        ignoreVisitNotificationsDto,
-        username,
-      )
+      expect(orchestrationApiClient.ignoreNotifications).toHaveBeenCalledWith(reference, ignoreVisitNotificationsDto)
       expect(result).toStrictEqual(visit)
     })
   })

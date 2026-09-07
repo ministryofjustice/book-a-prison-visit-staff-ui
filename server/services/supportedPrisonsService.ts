@@ -4,19 +4,19 @@ import { OrchestrationApiClient } from '../data'
 export default class SupportedPrisonsService {
   constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
 
-  async getActiveAgencies(username: string): Promise<string[]> {
-    return this.getSupportedPrisonIds(username)
+  async getActiveAgencies(): Promise<string[]> {
+    return this.getSupportedPrisonIds()
   }
 
-  async getSupportedPrisonIds(username: string): Promise<string[]> {
-    return this.orchestrationApiClient.getSupportedPrisonIds(username)
+  async getSupportedPrisonIds(): Promise<string[]> {
+    return this.orchestrationApiClient.getSupportedPrisonIds()
   }
 
-  async isSupportedPrison(username: string, prisonId: string): Promise<boolean> {
-    return (await this.getSupportedPrisonIds(username)).includes(prisonId)
+  async isSupportedPrison(prisonId: string): Promise<boolean> {
+    return (await this.getSupportedPrisonIds()).includes(prisonId)
   }
 
-  async getPrison(username: string, prisonId: string): Promise<Prison> {
-    return this.orchestrationApiClient.getPrison(prisonId, username)
+  async getPrison(prisonId: string): Promise<Prison> {
+    return this.orchestrationApiClient.getPrison(prisonId)
   }
 }

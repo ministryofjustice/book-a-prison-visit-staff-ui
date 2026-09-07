@@ -32,14 +32,12 @@ describe('Visit sessions service', () => {
         prisonCode: 'HEI',
         sessionDate,
         sessionTemplateReference: visitSession.sessionTemplateReference,
-        username,
       })
 
       expect(orchestrationApiClient.getSingleVisitSession).toHaveBeenCalledWith(
         'HEI',
         sessionDate,
         visitSession.sessionTemplateReference,
-        username,
       )
       expect(results).toEqual(visitSession)
     })
@@ -54,7 +52,6 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getSessionSchedule.mockResolvedValue(sessionSchedule)
 
       const results = await visitSessionsService.getSessionSchedule({
-        username,
         prisonId,
         date,
         includeExcludedSessions,
@@ -64,7 +61,6 @@ describe('Visit sessions service', () => {
         prisonId,
         date,
         includeExcludedSessions,
-        username,
       })
       expect(results).toEqual(sessionSchedule)
     })
@@ -80,7 +76,6 @@ describe('Visit sessions service', () => {
       orchestrationApiClient.getVisitSessionCapacity.mockResolvedValue(sessionCapacity)
 
       const results = await visitSessionsService.getVisitSessionCapacity(
-        'user1',
         prisonId,
         sessionDate,
         sessionStartTime,
@@ -92,7 +87,6 @@ describe('Visit sessions service', () => {
         sessionDate,
         sessionStartTime,
         sessionEndTime,
-        username,
       )
       expect(results).toEqual(sessionCapacity)
     })
@@ -519,7 +513,7 @@ describe('Visit sessions service', () => {
       })
       const visitSessionWithExistingVisit = TestData.visitSessionV2({
         sessionTemplateReference: 'c',
-        sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+        sessionConflicts: [{ sessionConflict: 'DOUBLE_BOOKING_OR_RESERVATION', additionalAttributes: [] }],
       })
 
       it('should be blue if there are no available visit sessions', async () => {
@@ -841,7 +835,7 @@ describe('Visit sessions service', () => {
       it('should tag and disable the visit session if prisoner already has a visit', async () => {
         const visitSessionWithExistingVisit = TestData.visitSessionV2({
           sessionTemplateReference: 'a',
-          sessionConflicts: ['DOUBLE_BOOKING_OR_RESERVATION'],
+          sessionConflicts: [{ sessionConflict: 'DOUBLE_BOOKING_OR_RESERVATION', additionalAttributes: [] }],
         })
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [

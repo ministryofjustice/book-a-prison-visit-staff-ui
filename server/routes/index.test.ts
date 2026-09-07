@@ -74,10 +74,7 @@ describe('GET /', () => {
 
         expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
         expect(visitRequestsService.getVisitRequestCount).not.toHaveBeenCalled()
-        expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(
-          'user1',
-          selectedEstablishment.prisonId,
-        )
+        expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(selectedEstablishment.prisonId)
       })
   })
 
@@ -93,10 +90,7 @@ describe('GET /', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="visit-request-count"]').text()).toBe(visitRequestCount.toString())
-          expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(
-            'user1',
-            selectedEstablishment.prisonId,
-          )
+          expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(selectedEstablishment.prisonId)
         })
     })
 
@@ -218,7 +212,7 @@ describe('GET /', () => {
 
           expect($('[data-test="visitor-request-count"]').text()).toBe('10')
 
-          expect(bookerService.getVisitorRequestCount).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
+          expect(bookerService.getVisitorRequestCount).toHaveBeenCalledWith({ prisonId: 'HEI' })
         })
     })
   })

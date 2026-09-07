@@ -26,7 +26,7 @@ export default function setUpHealthChecks(
     '/info',
     async (_req, res, next) => {
       try {
-        const activeAgencies = await supportedPrisonsService.getActiveAgencies(res.locals?.user?.username)
+        const activeAgencies = await supportedPrisonsService.getActiveAgencies()
         // eslint-disable-next-line no-param-reassign
         applicationInfo.additionalFields = { activeAgencies }
         next()

@@ -59,7 +59,6 @@ describe('View visits timetable', () => {
           prisonId: 'HEI',
           date: fakeDate,
           includeExcludedSessions: false,
-          username: 'user1',
         })
       })
   })
@@ -94,7 +93,6 @@ describe('View visits timetable', () => {
           prisonId: 'HEI',
           date: fakeDate,
           includeExcludedSessions: false,
-          username: 'user1',
         })
       })
   })
@@ -129,7 +127,6 @@ describe('View visits timetable', () => {
           prisonId: 'HEI',
           date: fakeDate,
           includeExcludedSessions: false,
-          username: 'user1',
         })
       })
   })

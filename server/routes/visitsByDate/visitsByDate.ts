@@ -28,17 +28,8 @@ export default function routes({
 
     // get selected day's session schedules and any 'unknown' visits (migrated data with no session template)
     const [sessionSchedulesForDay, unknownVisits] = await Promise.all([
-      visitSessionsService.getSessionSchedule({
-        username,
-        prisonId,
-        date: selectedDateString,
-        includeExcludedSessions: false,
-      }),
-      visitService.getVisitsWithoutSessionTemplate({
-        username,
-        prisonId,
-        sessionDate: selectedDateString,
-      }),
+      visitSessionsService.getSessionSchedule({ prisonId, date: selectedDateString, includeExcludedSessions: false }),
+      visitService.getVisitsWithoutSessionTemplate({ prisonId, sessionDate: selectedDateString }),
     ])
 
     // identify if a session schedule has been selected or can be defaulted
@@ -69,7 +60,6 @@ export default function routes({
       const allowedSubStatuses: Partial<Visit['visitSubStatus']>[] = ['APPROVED', 'AUTO_APPROVED', 'REQUESTED']
       const openAndClosedVisits = (
         await visitService.getVisitsBySessionTemplate({
-          username,
           prisonId,
           reference: sessionSchedule.sessionTemplateReference,
           sessionDate: selectedDateString,
@@ -96,9 +86,9 @@ export default function routes({
     // if no visits, check if this is an exclude date - and if so are there any notifications
     const areNoVisits = !Object.keys(visits).some((visitType: keyof typeof visits) => visits[visitType].visits.length)
     const isAnExcludeDate =
-      areNoVisits && (await blockDatesOrSessionsService.isBlockedDate(prisonId, selectedDateString, username))
+      areNoVisits && (await blockDatesOrSessionsService.isBlockedDate(prisonId, selectedDateString))
     const isAnExcludeDateWithVisitNotifications =
-      isAnExcludeDate && (await visitNotificationsService.dateHasNotifications(username, prisonId, selectedDateString))
+      isAnExcludeDate && (await visitNotificationsService.dateHasNotifications(prisonId, selectedDateString))
 
     const queryParamsForBackLink = new URLSearchParams({
       query: new URLSearchParams({

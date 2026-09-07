@@ -58,7 +58,6 @@ export default class Overbooking {
       prisonCode: visitSessionData.prisonId,
       sessionDate: visitSessionData.selectedVisitSession.date,
       sessionTemplateReference: visitSessionData.selectedVisitSession.sessionTemplateReference,
-      username: req.user.username,
     })
 
     const bookingsCount =

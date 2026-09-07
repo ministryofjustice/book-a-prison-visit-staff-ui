@@ -79,7 +79,7 @@ describe('Booker management - search for booker by email and visitor request lis
           )
 
           expect(sessionData.matchedBookers).toBeUndefined()
-          expect(bookerService.getVisitorRequests).toHaveBeenCalledWith({ username: 'user1', prisonId: 'HEI' })
+          expect(bookerService.getVisitorRequests).toHaveBeenCalledWith({ prisonId: 'HEI' })
         })
     })
 
@@ -166,7 +166,7 @@ describe('Booker management - search for booker by email and visitor request lis
         .expect(302)
         .expect('location', `/manage-bookers/${booker.reference}/booker-details`)
         .expect(() => {
-          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
@@ -185,7 +185,7 @@ describe('Booker management - search for booker by email and visitor request lis
         .expect(302)
         .expect('location', '/manage-bookers/select-account')
         .expect(() => {
-          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',
@@ -204,7 +204,7 @@ describe('Booker management - search for booker by email and visitor request lis
         .expect(302)
         .expect('location', urlNoBookerFound)
         .expect(() => {
-          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ username: 'user1', email: booker.email })
+          expect(bookerService.getSortedBookersByEmail).toHaveBeenCalledWith({ email: booker.email })
           expect(auditService.bookerSearch).toHaveBeenCalledWith({
             search: booker.email,
             username: 'user1',

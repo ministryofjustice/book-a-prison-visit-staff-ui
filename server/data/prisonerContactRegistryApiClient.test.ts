@@ -9,7 +9,6 @@ describe('prisonerContactRegistryApiClient', () => {
   let fakePrisonerContactRegistryApi: nock.Scope
   let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   const token = 'token-1'
-  const username = 'user'
 
   beforeEach(() => {
     mockAuthenticationClient = {
@@ -42,7 +41,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, contact)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo, username)
+      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual(contact)
     })
@@ -59,7 +58,7 @@ describe('prisonerContactRegistryApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(404)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo, username)
+      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual([])
     })

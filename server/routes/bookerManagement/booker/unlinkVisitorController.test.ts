@@ -58,7 +58,7 @@ describe('Booker management - unlink a visitor from a booker account', () => {
         .expect(302)
         .expect('location', bookerDetailsUrl)
         .expect(() => {
-          expect(bookerService.getBookerDetails).toHaveBeenCalledWith({ username: 'user1', reference })
+          expect(bookerService.getBookerDetails).toHaveBeenCalledWith({ reference })
           expect(bookerService.unlinkBookerVisitor).toHaveBeenCalledWith({
             username: 'user1',
             reference,

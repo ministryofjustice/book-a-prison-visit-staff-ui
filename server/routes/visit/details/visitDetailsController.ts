@@ -27,7 +27,7 @@ export default class VisitDetailsController {
       const { selectedEstablishment } = req.session
       const { username } = res.locals.user
 
-      const visitDetails = await this.visitService.getVisitDetailed({ username, reference })
+      const visitDetails = await this.visitService.getVisitDetailed({ reference })
       const { prison, prisoner } = visitDetails
 
       await this.auditService.viewedVisitDetails({

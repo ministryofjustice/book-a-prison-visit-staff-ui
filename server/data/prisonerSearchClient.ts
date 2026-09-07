@@ -15,7 +15,6 @@ export default class PrisonerSearchClient extends RestClient {
   async getPrisoners(
     search: string,
     prisonId: string,
-    username: string,
     page = 0,
   ): Promise<{ totalPages: number; totalElements: number; content: Prisoner[] }> {
     return this.get(
@@ -27,28 +26,16 @@ export default class PrisonerSearchClient extends RestClient {
           size: this.pageSize.toString(),
         }).toString(),
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 
-  async getPrisoner(search: string, prisonId: string, username: string): Promise<{ content: Prisoner[] }> {
-    return this.get(
-      {
-        path: `/prison/${prisonId}/prisoners`,
-        query: new URLSearchParams({
-          term: search,
-        }).toString(),
-      },
-      asSystem(username),
-    )
-  }
-
-  async getPrisonerById(id: string, username: string): Promise<Prisoner> {
+  async getPrisonerById(id: string): Promise<Prisoner> {
     return this.get(
       {
         path: `/prisoner/${id}`,
       },
-      asSystem(username),
+      asSystem(),
     )
   }
 }

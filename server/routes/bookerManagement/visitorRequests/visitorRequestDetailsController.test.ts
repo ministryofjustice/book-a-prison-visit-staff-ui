@@ -95,12 +95,10 @@ describe('Booker management - visitor requests - link a visitor', () => {
           expect($('label[for=visitor-none]').text().trim()).toBe('None of the above')
 
           expect(bookerService.getVisitorRequestForReview).toHaveBeenCalledWith({
-            username: 'user1',
             requestReference: visitorRequestForReview.reference,
           })
 
           expect(bookerService.getLinkedVisitors).toHaveBeenCalledWith({
-            username: 'user1',
             bookerReference: visitorRequestForReview.bookerReference,
             prisonerId: visitorRequestForReview.prisonerId,
           })
@@ -158,7 +156,6 @@ describe('Booker management - visitor requests - link a visitor', () => {
           )
 
           expect(bookerService.getVisitorRequestForReview).toHaveBeenCalledWith({
-            username: 'user1',
             requestReference: visitorRequestForReview.reference,
           })
 

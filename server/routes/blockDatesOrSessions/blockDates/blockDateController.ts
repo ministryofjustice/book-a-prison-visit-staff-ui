@@ -18,7 +18,6 @@ export default class BlockDateController {
 
       const { prisonId } = req.session.selectedEstablishment
       const visitCount = await this.visitService.getBookedVisitCountByDate({
-        username: res.locals.user.username,
         prisonId,
         date,
       })

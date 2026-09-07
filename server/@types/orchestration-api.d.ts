@@ -146,6 +146,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/visitor-requests/{requestReference}/withdraw': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /**
+     * Withdraw visitor request.
+     * @description Withdraw a pending visitor request.
+     */
+    put: operations['withdrawVisitorRequest']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/visitor-requests/{requestReference}/reject': {
     parameters: {
       query?: never
@@ -1373,27 +1393,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/config/prisons/prison/{prisonCode}/exclude-date/future': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * Get all current or future exclude dates for a given prison
-     * @deprecated
-     * @description Get current or future exclude dates for a given prison
-     */
-    get: operations['getFutureExcludeDatesForPrison']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1592,9 +1591,11 @@ export interface components {
       endTimestamp: string
       /** @description Visit Notes */
       visitNotes?: components['schemas']['VisitNoteDto'][] | null
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto'] | null
       /** @description List of visitors associated with the visit */
       visitors?: components['schemas']['VisitorDto'][] | null
+      /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'] | null
       /**
        * Format: date-time
@@ -1614,6 +1615,7 @@ export interface components {
        * @example 2018-12-01T13:45:00
        */
       firstBookedDateTime?: string | null
+      /** @description External system details associated with the visit */
       visitExternalSystemDetails?: components['schemas']['VisitExternalSystemDetails'] | null
     }
     VisitExternalSystemDetails: {
@@ -1777,9 +1779,11 @@ export interface components {
        * @example 2018-12-01
        */
       sessionDate: string
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto'] | null
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][] | null
+      /** @description additional support associated with the visit, if null support will not be updated */
       visitorSupport?: components['schemas']['ApplicationSupportDto'] | null
       /** @description allow over booking */
       allowOverBooking: boolean
@@ -1832,9 +1836,11 @@ export interface components {
       endTimestamp: string
       /** @description Visit Notes */
       visitNotes: components['schemas']['VisitNoteDto'][]
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto'] | null
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description Additional support associated with the application */
       visitorSupport?: components['schemas']['VisitorSupportDto'] | null
       /**
        * Format: date-time
@@ -1889,9 +1895,11 @@ export interface components {
        * @enum {string}
        */
       applicationRestriction: 'OPEN' | 'CLOSED'
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['ContactDto'] | null
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['VisitorDto'][]
+      /** @description additional support associated with the visit, if null support will not be updated */
       visitorSupport?: components['schemas']['ApplicationSupportDto'] | null
       /**
        * @description User type
@@ -1907,18 +1915,12 @@ export interface components {
       /** @description allow over booking */
       allowOverBooking: boolean
     }
-    RejectVisitorRequestDto: {
+    WithdrawVisitorRequestDto: {
       /**
-       * @description Rejection Reason type
-       * @example ALREADY_LINKED
-       * @enum {string}
+       * @description Reference of booker who rejected the visitor
+       * @example ab-cd-ef-gh
        */
-      rejectionReason: 'ALREADY_LINKED' | 'REJECT'
-      /**
-       * @description STAFF username who rejected the visitor
-       * @example ABC123D
-       */
-      actionedBy: string
+      bookerReference: string
     }
     PrisonVisitorRequestDto: {
       /**
@@ -1968,12 +1970,25 @@ export interface components {
        * @example REQUESTED
        * @enum {string}
        */
-      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED' | 'WITHDRAWN'
       /**
        * @description The language in which your correspondence will be sent
        * @enum {string}
        */
       languagePreference: 'en' | 'cy'
+    }
+    RejectVisitorRequestDto: {
+      /**
+       * @description Rejection Reason type
+       * @example ALREADY_LINKED
+       * @enum {string}
+       */
+      rejectionReason: 'ALREADY_LINKED' | 'REJECT'
+      /**
+       * @description STAFF username who rejected the visitor
+       * @example ABC123D
+       */
+      actionedBy: string
     }
     ApproveVisitorRequestDto: {
       /**
@@ -2283,7 +2298,7 @@ export interface components {
        * @example REQUESTED or AUTO_APPROVED
        * @enum {string}
        */
-      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED' | 'WITHDRAWN'
       /**
        * @description Reference of booker who submitted the request
        * @example abc-def-ghi
@@ -2491,6 +2506,7 @@ export interface components {
        * @example 2000-01-01
        */
       dateOfBirth?: string | null
+      /** @description Address associated with the contact */
       address?: components['schemas']['AddressDto'] | null
     }
     /** @description AlertDto returned from orchestration, made of fields from AlertResponseDto from Alerts API call */
@@ -2828,7 +2844,9 @@ export interface components {
       sessionTemplateReference?: string | null
       /** @description Visit Notes */
       visitNotes?: components['schemas']['VisitNoteDto'][] | null
+      /** @description Contact associated with the visit */
       visitContact?: components['schemas']['VisitContactDto'] | null
+      /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'] | null
       /** @description Prison code and name */
       prison: components['schemas']['PrisonRegisterPrisonDto']
@@ -2955,6 +2973,7 @@ export interface components {
       relationshipDescription?: string | null
       /** @description List of restrictions associated with the contact */
       restrictions: components['schemas']['RestrictionDto'][]
+      /** @description Primary address for the contact or the first address if no primary address available, null if address list is empty */
       primaryAddress?: components['schemas']['AddressDto'] | null
     }
     /**
@@ -3037,21 +3056,21 @@ export interface components {
         'APPROVED' | 'AUTO_APPROVED' | 'REQUESTED' | 'REJECTED' | 'AUTO_REJECTED' | 'WITHDRAWN' | 'CANCELLED'
     }
     PageVisitDto: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
-      /** Format: int32 */
-      numberOfElements?: number
-      first?: boolean
-      last?: boolean
-      sort?: components['schemas']['SortObject']
-      pageable?: components['schemas']['PageableObject']
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['VisitDto'][]
       /** Format: int32 */
       number?: number
+      sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
+      /** Format: int32 */
+      numberOfElements?: number
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
@@ -3221,7 +3240,7 @@ export interface components {
        * @example REQUESTED
        * @enum {string}
        */
-      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED'
+      status: 'REQUESTED' | 'APPROVED' | 'AUTO_APPROVED' | 'REJECTED' | 'WITHDRAWN'
       /**
        * @description Date request was submitted
        * @example 2025-10-28
@@ -3271,6 +3290,33 @@ export interface components {
        * @example 2025-09-12
        */
       lastApprovedForVisitDate?: string | null
+    }
+    AdditionalConflictInfoDto: {
+      /**
+       * @description Attribute Name
+       * @enum {string}
+       */
+      attributeName: 'PRISONER_NUMBER' | 'CONFLICT_TYPE' | 'REFERENCE'
+      /** @description Attribute value */
+      attributeValue: string
+    }
+    SessionConflictDto: {
+      /**
+       * @description Session Conflict
+       * @example NON_ASSOCIATION
+       * @enum {string}
+       */
+      sessionConflict:
+        | 'NON_ASSOCIATION'
+        | 'DOUBLE_BOOKING_OR_RESERVATION'
+        | 'SESSION_DATE_BLOCKED'
+        | 'PRISON_DATE_BLOCKED'
+        | 'REMAND_VISITS_LIMIT_REACHED'
+        | 'NO_VO_BALANCE'
+        | 'NO_PVO_BALANCE'
+        | 'NO_VO_OR_PVO_BALANCE'
+      /** @description Session Conflict attributes */
+      additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
     }
     /** @description Visit Session */
     VisitSessionDto: {
@@ -3337,7 +3383,7 @@ export interface components {
        */
       endTimestamp: string
       /** @description Session conflicts */
-      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION' | 'REMAND_VISITS_LIMIT_REACHED')[] | null
+      sessionConflicts: components['schemas']['SessionConflictDto'][]
     }
     /** @description Session Capacity */
     SessionCapacityDto: {
@@ -3488,6 +3534,32 @@ export interface components {
        */
       endTime?: string | null
     }
+    SessionConflictV2Dto: {
+      /**
+       * @description Session Conflict
+       * @example DOUBLE_BOOKING_OR_RESERVATION
+       * @enum {string}
+       */
+      sessionConflict:
+        | 'DOUBLE_BOOKING_OR_RESERVATION'
+        | 'SESSION_DATE_BLOCKED'
+        | 'REMAND_VISITS_LIMIT_REACHED'
+        | 'NO_VO_BALANCE'
+        | 'NO_PVO_BALANCE'
+        | 'NO_VO_OR_PVO_BALANCE'
+      /** @description Session Conflict attributes */
+      additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
+    }
+    SessionDateConflictDto: {
+      /**
+       * @description Session Date Conflict
+       * @example NON_ASSOCIATION
+       * @enum {string}
+       */
+      sessionDateConflict: 'NON_ASSOCIATION' | 'PRISON_DATE_BLOCKED' | 'OUTSIDE_BOOKING_WINDOW'
+      /** @description Session Conflict attributes */
+      additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
+    }
     SessionsAndScheduleDto: {
       /**
        * Format: date
@@ -3497,8 +3569,10 @@ export interface components {
       date: string
       /** @description Visit sessions */
       visitSessions: components['schemas']['VisitSessionV2Dto'][]
-      /** @description Visit sessions */
+      /** @description Prisoner's scheduled events (appointments etc.) */
       scheduledEvents: components['schemas']['PrisonerScheduledEventDto'][]
+      /** @description Conflicts for session date */
+      sessionDateConflicts: components['schemas']['SessionDateConflictDto'][]
     }
     VisitSessionV2Dto: {
       /**
@@ -3548,7 +3622,7 @@ export interface components {
        */
       endTime: string
       /** @description Session conflicts */
-      sessionConflicts?: ('NON_ASSOCIATION' | 'DOUBLE_BOOKING_OR_RESERVATION' | 'REMAND_VISITS_LIMIT_REACHED')[] | null
+      sessionConflicts: components['schemas']['SessionConflictV2Dto'][]
       /**
        * @description Session vo restriction
        * @enum {string}
@@ -3755,6 +3829,7 @@ export interface components {
        * @example A-1-002
        */
       cellLocation?: string | null
+      /** @description Incentive level */
       currentIncentive?: components['schemas']['CurrentIncentive'] | null
       /**
        * @description current prison or outside with last movement information.
@@ -3877,9 +3952,11 @@ export interface components {
        * @example 2018-12-01T13:45:00
        */
       endTimestamp: string
+      /** @description Contact associated with the visit */
       visitContact: components['schemas']['ContactDto'] | null
       /** @description List of visitors associated with the visit */
       visitors: components['schemas']['OrchestrationVisitorDto'][]
+      /** @description Additional support associated with the visit */
       visitorSupport?: components['schemas']['VisitorSupportDto'] | null
     }
     /** @description Visitor */
@@ -4089,6 +4166,7 @@ export interface components {
       incentiveLevel?: string | null
       /** @description Alert */
       alerts?: components['schemas']['AlertDto'][] | null
+      /** @description Balances of visit orders and privilege visit orders */
       visitBalances?: components['schemas']['VisitBalancesDto'] | null
       /** @description Past and future visits for the prisoner based on configured duration. */
       visits: components['schemas']['VisitSummaryDto'][]
@@ -5009,6 +5087,68 @@ export interface operations {
       }
       /** @description Incorrect permissions to change a visit */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  withdrawVisitorRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        requestReference: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WithdrawVisitorRequestDto']
+      }
+    }
+    responses: {
+      /** @description Visit request withdrawn, no visitor will be linked to booker's prisoner */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          '*/*': components['schemas']['PrisonVisitorRequestDto']
+        }
+      }
+      /** @description Incorrect request to withdraw a pending visitor request */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to withdraw visitor request */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Pending visitor request not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -7699,6 +7839,15 @@ export interface operations {
          * @example user-1
          */
         username?: string
+        /** @description Comma-separated list of session conflicts to include only sessions with no session conflicts or sessions where all session conflicts are in this list. Session-level conflicts returned are those represented by SessionConflictV2; date-level conflicts (e.g. NON_ASSOCIATION) are returned separately in sessionDateConflicts. */
+        includedSessionConflicts?: (
+          | 'DOUBLE_BOOKING_OR_RESERVATION'
+          | 'SESSION_DATE_BLOCKED'
+          | 'REMAND_VISITS_LIMIT_REACHED'
+          | 'NO_VO_BALANCE'
+          | 'NO_PVO_BALANCE'
+          | 'NO_VO_OR_PVO_BALANCE'
+        )[]
       }
       header?: never
       path?: never
@@ -8819,59 +8968,6 @@ export interface operations {
     }
   }
   getPastExcludeDatesForPrison: {
-    parameters: {
-      query?: never
-      header?: never
-      path: {
-        /**
-         * @description prison code
-         * @example HEI
-         */
-        prisonCode: string
-      }
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      /** @description Exclude dates successfully returned */
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ExcludeDateDto'][]
-        }
-      }
-      /** @description Unauthorized to access this endpoint */
-      401: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Incorrect permissions to view exclude dates */
-      403: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-      /** @description Prison not found on visit-scheduler */
-      404: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['ErrorResponse']
-        }
-      }
-    }
-  }
-  getFutureExcludeDatesForPrison: {
     parameters: {
       query?: never
       header?: never

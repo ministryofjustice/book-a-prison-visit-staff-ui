@@ -11,7 +11,6 @@ describe('prisonSearchClientBuilder', () => {
 
   const prisonId = 'HEI'
   const token = 'token-1'
-  const username = 'user'
 
   beforeEach(() => {
     mockAuthenticationClient = {
@@ -54,35 +53,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
 
-      const output = await prisonerSearchClient.getPrisoners('test', prisonId, username)
-
-      expect(output).toEqual(results)
-    })
-  })
-
-  describe('getPrisoner', () => {
-    it('should return data from api', async () => {
-      const results = {
-        totalPage: 1,
-        totalElements: 1,
-        content: [
-          {
-            lastName: 'test',
-            firstName: 'test',
-            prisonerNumber: 'test',
-            dateOfBirth: '2000-01-01',
-          },
-        ],
-      }
-      fakePrisonerSearchApi
-        .get('/prison/HEI/prisoners')
-        .query({
-          term: 'test',
-        })
-        .matchHeader('authorization', `Bearer ${token}`)
-        .reply(200, results)
-
-      const output = await prisonerSearchClient.getPrisoner('test', prisonId, username)
+      const output = await prisonerSearchClient.getPrisoners('test', prisonId)
 
       expect(output).toEqual(results)
     })
@@ -97,7 +68,7 @@ describe('prisonSearchClientBuilder', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisoner)
 
-      const output = await prisonerSearchClient.getPrisonerById('A1234BC', username)
+      const output = await prisonerSearchClient.getPrisonerById('A1234BC')
 
       expect(output).toEqual(prisoner)
     })

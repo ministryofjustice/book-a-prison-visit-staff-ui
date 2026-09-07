@@ -26,11 +26,11 @@ export default class VisitRequestsService {
     return this.orchestrationApiClient.approveVisitRequest({ reference, username })
   }
 
-  async getVisitRequests(username: string, prisonId: string): Promise<VisitRequestSummary[]> {
-    return this.orchestrationApiClient.getVisitRequests(prisonId, username)
+  async getVisitRequests(prisonId: string): Promise<VisitRequestSummary[]> {
+    return this.orchestrationApiClient.getVisitRequests(prisonId)
   }
 
-  async getVisitRequestCount(username: string, prisonId: string): Promise<number> {
-    return this.orchestrationApiClient.getVisitRequestCount(prisonId, username)
+  async getVisitRequestCount(prisonId: string): Promise<number> {
+    return this.orchestrationApiClient.getVisitRequestCount(prisonId)
   }
 }

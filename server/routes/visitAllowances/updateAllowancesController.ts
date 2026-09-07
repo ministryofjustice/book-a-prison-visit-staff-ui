@@ -14,10 +14,7 @@ export default class UpdateAllowancesController {
     return async (req, res) => {
       const { prisonId } = req.session.selectedEstablishment
 
-      const remandConfig = await this.visitAllowanceService.getRemandConfig({
-        username: res.locals.user.username,
-        prisonId,
-      })
+      const remandConfig = await this.visitAllowanceService.getRemandConfig({ prisonId })
 
       const formValues = {
         weekStartDay: remandConfig.weekStartDay,
@@ -47,7 +44,6 @@ export default class UpdateAllowancesController {
       const { weekStartDay, remandVisitLimitPerWeek } = matchedData<PrisonRemandConfig>(req)
 
       await this.visitAllowanceService.updateRemandConfig({
-        username: res.locals.user.username,
         prisonId,
         weekStartDay,
         remandVisitLimitPerWeek,

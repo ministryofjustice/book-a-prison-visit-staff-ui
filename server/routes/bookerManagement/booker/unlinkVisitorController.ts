@@ -23,7 +23,7 @@ export default class UnlinkVisitorController {
         return res.redirect(bookerDetailsPageUrl)
       }
 
-      const booker = await this.bookerService.getBookerDetails({ username, reference })
+      const booker = await this.bookerService.getBookerDetails({ reference })
       const visitorToUnlink = booker.permittedPrisoners
         .find(prisoner => prisoner.prisoner.prisonerNumber === prisonerId)
         ?.permittedVisitors.find(visitor => visitor.visitorId === visitorId)

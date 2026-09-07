@@ -54,6 +54,7 @@ test.describe('Update a visit', () => {
       date: format(date, shortDateFormat),
       visitSessions: [],
       scheduledEvents: [],
+      sessionDateConflicts: [],
     }))
 
     sessionsAndSchedule.at(7).visitSessions = [

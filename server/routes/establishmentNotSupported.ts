@@ -8,10 +8,7 @@ export default function routes({ supportedPrisonsService }: Services): Router {
   router.get('/', async (req, res) => {
     const activeCaseLoad = res.locals.feComponents?.sharedData?.activeCaseLoad
 
-    if (
-      !activeCaseLoad ||
-      (await supportedPrisonsService.isSupportedPrison(res.locals.user.username, activeCaseLoad.caseLoadId))
-    ) {
+    if (!activeCaseLoad || (await supportedPrisonsService.isSupportedPrison(activeCaseLoad.caseLoadId))) {
       return res.redirect('/')
     }
 

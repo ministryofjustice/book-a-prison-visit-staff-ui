@@ -86,7 +86,6 @@ describe('Choose which session to block', () => {
           expect(sessionData.blockDateOrSession.sessions).toEqual([session1, session2Blocked])
 
           expect(visitSessionsService.getSessionSchedule).toHaveBeenCalledWith({
-            username: 'user1',
             prisonId: 'HEI',
             date,
             includeExcludedSessions: true,

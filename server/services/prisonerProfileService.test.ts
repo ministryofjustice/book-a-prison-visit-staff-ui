@@ -4,8 +4,6 @@ import { PrisonerProfilePage } from '../@types/bapv'
 import TestData from '../routes/testutils/testData'
 import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
-const username = 'user'
-
 describe('Prisoner profile service', () => {
   const orchestrationApiClient = createMockOrchestrationApiClient()
 
@@ -53,9 +51,9 @@ describe('Prisoner profile service', () => {
         },
       }
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId)
 
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results).toStrictEqual(prisonerProfilePage)
     })
 
@@ -63,9 +61,9 @@ describe('Prisoner profile service', () => {
       const prisonerProfile = TestData.prisonerProfile({ convictedStatus: 'Remand' })
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId)
 
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
       expect(results.prisonerDetails.visitBalances).toBeNull()
     })
 
@@ -95,7 +93,7 @@ describe('Prisoner profile service', () => {
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId)
 
       expect(results.visitsByMonth).toEqual(
         new Map([
@@ -121,9 +119,9 @@ describe('Prisoner profile service', () => {
 
       orchestrationApiClient.getPrisonerProfile.mockResolvedValue(prisonerProfile)
 
-      const results = await prisonerProfileService.getProfile(prisonId, prisonerId, username)
+      const results = await prisonerProfileService.getProfile(prisonId, prisonerId)
 
-      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId, username)
+      expect(orchestrationApiClient.getPrisonerProfile).toHaveBeenCalledWith(prisonId, prisonerId)
 
       expect(results.alerts).toStrictEqual([alertNotToFlag, ...alertsToFlag])
       expect(results.flaggedAlerts).toStrictEqual(alertsToFlag)

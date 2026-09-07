@@ -12,11 +12,10 @@ export default class ManageBookersController {
     return async (req, res) => {
       delete req.session.matchedBookers
       const { prisonId } = req.session.selectedEstablishment
-      const { username } = res.locals.user
 
       const noBookerFound = req.query['no-booker-found'] === ''
 
-      const visitorRequests = await this.bookerService.getVisitorRequests({ username, prisonId })
+      const visitorRequests = await this.bookerService.getVisitorRequests({ prisonId })
 
       res.render('pages/bookerManagement/manageBookers', {
         errors: req.flash('errors'),
@@ -41,7 +40,7 @@ export default class ManageBookersController {
 
       const { search } = matchedData<{ search: string }>(req) // field 'search' rather than 'email' to avoid browser autofill
       const { username } = res.locals.user
-      const bookers = await this.bookerService.getSortedBookersByEmail({ username, email: search })
+      const bookers = await this.bookerService.getSortedBookersByEmail({ email: search })
 
       await this.auditService.bookerSearch({
         search,

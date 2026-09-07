@@ -66,10 +66,7 @@ export default class MainContact {
     }
 
     // update visit application to have the latest data
-    await this.visitService.changeVisitApplication({
-      username: res.locals.user.username,
-      visitSessionData,
-    })
+    await this.visitService.changeVisitApplication({ visitSessionData })
 
     return res.redirect(`${urlPrefix}/request-method`)
   }

@@ -16,7 +16,6 @@ export default class TimetableController {
 
       const { prisonId } = req.session.selectedEstablishment
       const schedules = await this.visitSessionsService.getSessionSchedule({
-        username: res.locals.user.username,
         prisonId,
         date: selectedDate,
         includeExcludedSessions: false,
