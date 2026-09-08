@@ -35,14 +35,16 @@ export default class SelectVisitors {
       formValues.visitors = visitSessionData.visitorIds.map(id => id.toString())
     }
 
+    const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
+
     const backLinkHref = isUpdate ? `/visit/${visitSessionData.visitReference}` : `/prisoner/${offenderNo}`
-    const backLinkPageTitle = isUpdate ? 'visit details' : 'prisoner details'
+    const backLinkPageTitle = isUpdate ? 'Visit booking details' : `Profile for ${prisonerName}`
 
     res.render('pages/bookAVisit/visitors', {
       errors: req.flash('errors'),
       messages: req.flash('messages'),
       offenderNo: visitSessionData.prisoner.offenderNo,
-      prisonerName: `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`,
+      prisonerName,
       visitorList,
       atLeastOneAdult,
       eligibleVisitors,

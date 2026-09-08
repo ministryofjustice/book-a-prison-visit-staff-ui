@@ -15,7 +15,7 @@ export default class BlockSessionChooseController {
       const { blockDateOrSession } = req.session
 
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-date-or-session'
-      blockDateOrSession.backLinkPageTitle = 'Block date or session'
+      blockDateOrSession.backLinkPageTitle = 'Block visit dates or sessions'
 
       const { backLinkHref, backLinkPageTitle, date } = blockDateOrSession
 

@@ -79,38 +79,38 @@ export const getVisitDetailsBackLink = ({
     case 'visit-search':
       return {
         backLinkHref: fromPageQuery ? `/search/visit/results?${fromPageQuery}` : '/search/visit/results',
-        backLinkPageTitle: 'visits search results',
+        backLinkPageTitle: 'Search for a booking results',
       }
 
     case 'visits':
       return {
         backLinkHref: fromPageQuery ? `/visits?${fromPageQuery}` : '/visits',
-        backLinkPageTitle: 'upcoming visits list',
+        backLinkPageTitle: 'View visits by date',
       }
 
     case 'request':
       return {
         backLinkHref: '/requested-visits',
-        backLinkPageTitle: 'requested visits list',
+        backLinkPageTitle: 'Requested visits',
       }
 
     case 'review':
       return {
         backLinkHref: '/review',
-        backLinkPageTitle: 'visits that need review',
+        backLinkPageTitle: 'Visits that need review',
       }
 
     case 'vo-history':
       return {
         backLinkHref: `/prisoner/${prisonerNumber}/visiting-orders-history`,
-        backLinkPageTitle: 'prisoner visit order history',
+        backLinkPageTitle: 'Visiting orders history',
       }
 
     case 'prisoner':
     default:
       return {
         backLinkHref: `/prisoner/${prisonerNumber}`,
-        backLinkPageTitle: 'prisoner profile',
+        backLinkPageTitle: 'Prisoner profile',
       }
   }
 }

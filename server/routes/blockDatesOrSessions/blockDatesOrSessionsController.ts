@@ -43,7 +43,7 @@ export default class BlockDatesOrSessionsController {
       const { date } = matchedData<{ date: string }>(req)
       req.session.blockDateOrSession = {
         backLinkHref: '/block-visit-dates-or-sessions',
-        backLinkPageTitle: 'block visit dates or sessions',
+        backLinkPageTitle: 'Block visit dates or sessions',
         date,
       }
 

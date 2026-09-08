@@ -33,7 +33,9 @@ export default class BookerDetailsController {
       })
 
       const backLinkHref = req.session.matchedBookers?.length ? '/manage-bookers/select-account' : '/manage-bookers'
-      const backLinkPageTitle = req.session.matchedBookers?.length ? 'select booker account' : 'manage bookers'
+      const backLinkPageTitle = req.session.matchedBookers?.length
+        ? 'Select account to manage'
+        : 'Manage online bookers'
 
       const messages = [...req.flash('messages'), ...this.getBookerDetailsMessages(active, emailHasMultipleAccounts)]
 

@@ -104,13 +104,13 @@ export default class VisitPassesController {
   ): { backLinkHref: string; backLinkPageTitle: string } {
     switch (from) {
       case 'visit':
-        return { backLinkHref: `/visit/${reference}`, backLinkPageTitle: 'visit overview' }
+        return { backLinkHref: `/visit/${reference}`, backLinkPageTitle: 'Visit booking details' }
 
       case 'visits':
-        return { backLinkHref: `/visits?${query}`, backLinkPageTitle: 'visits search results' }
+        return { backLinkHref: `/visits?${query}`, backLinkPageTitle: 'Search for a booking results' }
 
       default:
-        return { backLinkHref: '/', backLinkPageTitle: 'social visits home' }
+        return { backLinkHref: '/', backLinkPageTitle: 'Social Visits home' }
     }
   }
 }

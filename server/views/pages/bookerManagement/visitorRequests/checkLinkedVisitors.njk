@@ -4,8 +4,9 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
 {% set pageHeaderTitle = "Check if the visitor is already linked" %}
+{% set visitorName = visitorRequest.firstName + " " + visitorRequest.lastName %}
 {% set backLinkHref %}/manage-bookers/visitor-request/{{ visitorRequest.reference }}/link-visitor?from={{ returnTo }}{% endset %}
-{% set backLinkPageTitle = "" %}
+{% set backLinkPageTitle = "Link visitor " + visitorName %}
 
 {% set linkedVisitorRows = [] %}
 {% for visitor in linkedVisitors %}
@@ -36,7 +37,7 @@
         <span data-test="booker-email">{{ visitorRequest.bookerEmail }}</span> has requested to link:
       </p>
       <p class="govuk-body-l">
-        <span data-test="requested-visitor-name" class="govuk-!-font-weight-bold">{{ visitorRequest.firstName }} {{ visitorRequest.lastName }}</span>,
+        <span data-test="requested-visitor-name" class="govuk-!-font-weight-bold">{{ visitorName }}</span>,
         born on
         <span data-test="requested-visitor-dob" class="govuk-!-font-weight-bold">{{ visitorRequest.dateOfBirth | formatDate }}</span>
       </p>

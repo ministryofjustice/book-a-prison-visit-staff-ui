@@ -19,7 +19,7 @@ export default class BlockSessionConfirmController {
       const { blockDateOrSession } = req.session
 
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-new-session/choose'
-      blockDateOrSession.backLinkPageTitle = 'choose new session to block'
+      blockDateOrSession.backLinkPageTitle = '"Which session would you like to block?"'
 
       const { backLinkHref, backLinkPageTitle, date, selectedSession } = blockDateOrSession
 

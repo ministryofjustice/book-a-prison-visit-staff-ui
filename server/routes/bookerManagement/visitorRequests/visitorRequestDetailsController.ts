@@ -37,7 +37,7 @@ export default class VisitorRequestDetailsController {
           ? `/manage-bookers/${visitorRequest.bookerReference}/booker-details`
           : '/manage-bookers'
 
-      const backLinkPageTitle = returnTo === 'booker-details' ? 'booker details' : 'booker list'
+      const backLinkPageTitle = returnTo === 'booker-details' ? 'Booker details' : 'Manage online bookers'
 
       return res.render('pages/bookerManagement/visitorRequests/visitorRequestDetails', {
         backLinkHref,

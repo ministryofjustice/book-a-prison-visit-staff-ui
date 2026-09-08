@@ -11,7 +11,7 @@ export default class VisitorListController {
     return async (req, res) => {
       const { reference, prisonerId } = req.params
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
-      const backLinkPageTitle = 'booker details'
+      const backLinkPageTitle = 'Booker details'
 
       if (!isValidPrisonerNumber(prisonerId)) {
         return res.redirect(bookerDetailsPageUrl)

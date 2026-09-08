@@ -199,7 +199,7 @@ describe('Block visit dates and sessions listing page', () => {
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
             backLinkHref: '/block-visit-dates-or-sessions',
-            backLinkPageTitle: 'block visit dates or sessions',
+            backLinkPageTitle: 'Block visit dates or sessions',
             date: expectedOutputDate,
           })
           expect(flashProvider).not.toHaveBeenCalled()
@@ -229,7 +229,7 @@ describe('Block visit dates and sessions listing page', () => {
           })
           expect(sessionData.blockDateOrSession).toStrictEqual({
             backLinkHref: '/block-visit-dates-or-sessions',
-            backLinkPageTitle: 'block visit dates or sessions',
+            backLinkPageTitle: 'Block visit dates or sessions',
             date: expectedOutputDate,
           })
           expect(flashProvider).not.toHaveBeenCalled()
