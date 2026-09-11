@@ -375,11 +375,7 @@ export default class VisitSessionsService {
     sessionConflicts: VisitSessionV2Dto['sessionConflicts']
     conflictType: SessionConflict
   }): boolean {
-    return sessionConflicts.some(
-      conflict =>
-        (conflict as unknown as string) === conflictType || // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
-        conflict.sessionConflict === conflictType,
-    )
+    return sessionConflicts.some(conflict => conflict.sessionConflict === conflictType)
   }
 
   private sessionConflictCount({
@@ -389,13 +385,6 @@ export default class VisitSessionsService {
     sessionConflicts: VisitSessionV2Dto['sessionConflicts']
     excludeConflictTypes: SessionConflict[]
   }): number {
-    return sessionConflicts.filter(conflict => {
-      // TODO remove this when orchestration-api.d.ts is updated to use the new sessionConflicts type
-      if (typeof conflict === 'string') {
-        return conflict !== 'REMAND_VISITS_LIMIT_REACHED'
-      }
-
-      return !excludeConflictTypes.includes(conflict.sessionConflict)
-    }).length
+    return sessionConflicts.filter(conflict => !excludeConflictTypes.includes(conflict.sessionConflict)).length
   }
 }
