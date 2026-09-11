@@ -891,5 +891,63 @@ describe('Visit sessions service', () => {
         })
       })
     })
+
+    describe('Blocked visit session (SESSION_DATE_BLOCKED)', () => {
+      it('should not show a visit session if it is blocked - day has single session that is blocked', async () => {
+        const blockedVisitSession = TestData.visitSessionV2({
+          sessionConflicts: [{ sessionConflict: 'SESSION_DATE_BLOCKED', additionalAttributes: [] }],
+        })
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [TestData.sessionsAndScheduleDto({ visitSessions: [blockedVisitSession] })],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendar[0].colour).toBeUndefined() // i.e. default grey for no sessions
+        expect(result.calendar[0].selected).toBe(false)
+        expect(result.calendar[0].outline).toBe(false)
+        expect(result.calendar[0].visitSessions).toHaveLength(0)
+      })
+
+      it('should not show a visit session if it is blocked - day has two sessions and ONLY one is blocked', async () => {
+        const visitSession = TestData.visitSessionV2()
+        const blockedVisitSession = TestData.visitSessionV2({
+          sessionConflicts: [{ sessionConflict: 'SESSION_DATE_BLOCKED', additionalAttributes: [] }],
+        })
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({ visitSessions: [visitSession, blockedVisitSession] }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendar[0].colour).toBeUndefined() // i.e. default blue for an available session
+        expect(result.calendar[0].selected).toBe(true)
+        expect(result.calendar[0].outline).toBe(false)
+        expect(result.calendar[0].visitSessions).toHaveLength(1) // only the non-blocked session should be shown
+        expect(result.calendar[0].visitSessions[0].sessionConflicts).toHaveLength(0)
+      })
+    })
   })
 })

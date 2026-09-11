@@ -37,7 +37,6 @@ import {
   RejectVisitRequestBodyDto,
   SearchBookerDto,
   SessionCapacity,
-  SessionConflict,
   SessionSchedule,
   SocialContactsDto,
   StaffUsernameDto,
@@ -83,14 +82,6 @@ export default class OrchestrationApiClient extends RestClient {
     'IGNORE_VISIT_NOTIFICATIONS_EVENT',
     'VISITOR_UNAPPROVED_EVENT',
     ...this.enabledRawNotifications,
-  ]
-
-  private enabledSessionConflictTypes: SessionConflict[] = [
-    'DOUBLE_BOOKING_OR_RESERVATION',
-    'REMAND_VISITS_LIMIT_REACHED',
-    'NO_VO_BALANCE',
-    'NO_PVO_BALANCE',
-    'NO_VO_OR_PVO_BALANCE',
   ]
 
   constructor(authenticationClient: AuthenticationClient) {
@@ -730,7 +721,6 @@ export default class OrchestrationApiClient extends RestClient {
           prisonerId,
           min: minNumberOfDays.toString(),
           username,
-          includedSessionConflicts: this.enabledSessionConflictTypes,
         }).toString(),
       },
       asSystem(),
