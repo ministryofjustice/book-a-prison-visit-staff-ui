@@ -20,7 +20,6 @@ import {
   RejectVisitorRequestDto,
   RejectVisitRequestBodyDto,
   SearchBookerDto,
-  SessionConflict,
   SessionSchedule,
   StaffUsernameDto,
   Visit,
@@ -1131,14 +1130,6 @@ describe('orchestrationApiClient', () => {
             prisonerId,
             min: minNumberOfDays.toString(),
             username,
-            includedSessionConflicts: <SessionConflict[]>[
-              'DOUBLE_BOOKING_OR_RESERVATION',
-              'SESSION_DATE_BLOCKED',
-              'REMAND_VISITS_LIMIT_REACHED',
-              'NO_VO_BALANCE',
-              'NO_PVO_BALANCE',
-              'NO_VO_OR_PVO_BALANCE',
-            ],
           }).toString(),
         )
         .matchHeader('authorization', `Bearer ${token}`)
