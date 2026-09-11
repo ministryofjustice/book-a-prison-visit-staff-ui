@@ -1133,6 +1133,7 @@ describe('orchestrationApiClient', () => {
             username,
             includedSessionConflicts: <SessionConflict[]>[
               'DOUBLE_BOOKING_OR_RESERVATION',
+              'SESSION_DATE_BLOCKED',
               'REMAND_VISITS_LIMIT_REACHED',
               'NO_VO_BALANCE',
               'NO_PVO_BALANCE',

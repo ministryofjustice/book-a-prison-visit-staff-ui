@@ -116,13 +116,23 @@ export default class VisitSessionsService {
     const calendar: CalendarDay[] = sessionsAndSchedule.map(day => {
       const { date, visitSessions, scheduledEvents } = day
 
-      // Filter out sessions with no capacity for requested visit restriction type
-      const visitSessionsWithCapacityForRestriction = visitSessions.filter(visitSession =>
-        visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0,
-      )
+      // Filter out sessions if:
+      //  - no capacity for requested visit restriction type (OPEN/CLOSED)
+      //  - a SESSION_DATE_BLOCKED conflict is present
+      const filteredVisitSessions = visitSessions.filter(visitSession => {
+        const hasCapacity =
+          visitRestriction === 'OPEN' ? visitSession.openVisitCapacity > 0 : visitSession.closedVisitCapacity > 0
+
+        const sessionIsBlocked = this.sessionHasConflictOfType({
+          sessionConflicts: visitSession.sessionConflicts,
+          conflictType: 'SESSION_DATE_BLOCKED',
+        })
+
+        return hasCapacity && !sessionIsBlocked
+      })
 
       // Transform visit sessions and events data for calendar
-      const calendarVisitSessions = visitSessionsWithCapacityForRestriction.map(visitSession =>
+      const calendarVisitSessions = filteredVisitSessions.map(visitSession =>
         this.buildVisitSession(date, visitSession, visitRestriction, selectedVisitSession, originalVisitSession),
       )
       const calendarScheduledEvents = scheduledEvents.map(event => this.buildScheduledEvent(event))

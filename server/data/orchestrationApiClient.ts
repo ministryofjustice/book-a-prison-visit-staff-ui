@@ -87,6 +87,7 @@ export default class OrchestrationApiClient extends RestClient {
 
   private enabledSessionConflictTypes: SessionConflict[] = [
     'DOUBLE_BOOKING_OR_RESERVATION',
+    'SESSION_DATE_BLOCKED',
     'REMAND_VISITS_LIMIT_REACHED',
     'NO_VO_BALANCE',
     'NO_PVO_BALANCE',
@@ -730,6 +731,7 @@ export default class OrchestrationApiClient extends RestClient {
           prisonerId,
           min: minNumberOfDays.toString(),
           username,
+          // TODO remove param below (and from mock API response) when VB-6921 is in prod
           includedSessionConflicts: this.enabledSessionConflictTypes,
         }).toString(),
       },
