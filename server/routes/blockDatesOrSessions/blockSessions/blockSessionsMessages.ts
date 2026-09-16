@@ -2,7 +2,7 @@ import { format, parseISO } from 'date-fns'
 import { MoJAlert } from '../../../@types/bapv'
 import { SessionSchedule } from '../../../data/orchestrationApiTypes'
 import { escapeHtml, formatStartToEndTime } from '../../../utils/utils'
-import { buildAttendeesText } from '../../timetable/timetableItemBuilder'
+import { buildPrisonersText } from '../../timetable/timetableItemBuilder'
 
 export const getSessionBlockedMessage = ({ date, session }: { date: string; session: SessionSchedule }): MoJAlert => {
   return buildMessage(date, session, 'blocked')
@@ -16,7 +16,7 @@ const buildMessage = (date: string, session: SessionSchedule, type: 'blocked' | 
   const formattedDate = format(parseISO(date), 'EEEE d MMMM yyyy')
   const time = formatStartToEndTime(session.sessionTimeSlot.startTime, session.sessionTimeSlot.endTime)
   const visitRoom = escapeHtml(session.visitRoom)
-  const attendees = escapeHtml(buildAttendeesText({ ...session }))
+  const attendees = escapeHtml(buildPrisonersText({ ...session }))
 
   return {
     variant: 'success',

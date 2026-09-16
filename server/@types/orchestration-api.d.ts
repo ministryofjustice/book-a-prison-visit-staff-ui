@@ -3472,6 +3472,8 @@ export interface components {
       visitOrderRestriction: 'VO_PVO' | 'VO' | 'PVO' | 'NONE'
       /** @description Flag to indicate if the session is excluded for the date. True will indicate that the session is excluded. */
       isSessionExcluded: boolean
+      isAgeRestricted: boolean
+      ageRestriction: number
     }
     /** @description Visit Session */
     AvailableVisitSessionDto: {

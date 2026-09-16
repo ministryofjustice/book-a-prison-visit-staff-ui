@@ -15,7 +15,7 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
     expect(timetable).toStrictEqual(expectedTimetable)
   })
 
-  it('should return "all prisoners" for who can attend, if no category group names present', () => {
+  it('should return "all prisoners, all visitors" for who can attend, if no category group names present and not age restricted', () => {
     schedules = [
       TestData.sessionSchedule({
         prisonerCategoryGroupNames: [],
@@ -29,9 +29,8 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         time: '1:45pm to 3:45pm',
         type: 'Open',
         capacity: '40 tables',
-        attendees: 'All prisoners',
-        frequency: 'Every week',
-        endDate: 'Not entered',
+        prisoners: 'All prisoners',
+        visitors: 'All visitors',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -51,51 +50,8 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
         time: '1:45pm to 3:45pm',
         type: 'Open',
         capacity: '40 tables',
-        attendees: 'Category 1 prisoners on Incentive 1 and Incentive 2 in Location 1, Location 2 and Location 3',
-        frequency: 'Every week',
-        endDate: 'Not entered',
-      },
-    ]
-    const timetable = timetableItemBuilder(schedules)
-    expect(timetable).toStrictEqual(expectedTimetable)
-  })
-
-  it('should correctly display different schedule frequency options', () => {
-    schedules = [
-      TestData.sessionSchedule({
-        sessionDateRange: {
-          validToDate: '2025-05-05',
-          validFromDate: '2025-05-05',
-        },
-      }),
-      TestData.sessionSchedule({
-        weeklyFrequency: 1,
-      }),
-      TestData.sessionSchedule({
-        weeklyFrequency: 2,
-      }),
-    ]
-    const otherTimetableInformation = {
-      time: '1:45pm to 3:45pm',
-      type: 'Open',
-      capacity: '40 tables',
-      attendees: 'All prisoners',
-    } as const
-    const expectedTimetable: TimetableItem[] = [
-      {
-        ...otherTimetableInformation,
-        frequency: 'One off',
-        endDate: '5 May 2025',
-      },
-      {
-        ...otherTimetableInformation,
-        frequency: 'Every week',
-        endDate: 'Not entered',
-      },
-      {
-        ...otherTimetableInformation,
-        frequency: 'Every 2 weeks',
-        endDate: 'Not entered',
+        prisoners: 'Category 1 prisoners on Incentive 1 and Incentive 2 in Location 1, Location 2 and Location 3',
+        visitors: 'All visitors',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -113,9 +69,8 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
     ]
     const otherTimetableInformation = {
       time: '1:45pm to 3:45pm',
-      attendees: 'All prisoners',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      prisoners: 'All prisoners',
+      visitors: 'All visitors',
     }
     const expectedTimetable: TimetableItem[] = [
       {
@@ -187,37 +142,36 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      visitors: 'All visitors',
     } as const
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except Category prisoners, prisoners on Incentive and prisoners in Location',
+        prisoners: 'All prisoners except Category prisoners, prisoners on Incentive and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners except prisoners on Incentive and prisoners in Location',
+        prisoners: 'Category prisoners except prisoners on Incentive and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners in Location except prisoners on Incentive',
+        prisoners: 'Category prisoners in Location except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive except Category prisoners and prisoners in Location',
+        prisoners: 'Prisoners on Incentive except Category prisoners and prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive in Location except Category prisoners',
+        prisoners: 'Prisoners on Incentive in Location except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners on Incentive except prisoners in Location',
+        prisoners: 'Category prisoners on Incentive except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners on Incentive in Location',
+        prisoners: 'Category prisoners on Incentive in Location',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -259,25 +213,71 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      visitors: 'All visitors',
     } as const
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners on Incentive',
+        prisoners: 'Category prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners except prisoners on Incentive',
+        prisoners: 'Category prisoners except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive except Category prisoners',
+        prisoners: 'Prisoners on Incentive except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except Category prisoners and prisoners on Incentive',
+        prisoners: 'All prisoners except Category prisoners and prisoners on Incentive',
+      },
+    ]
+    const timetable = timetableItemBuilder(schedules)
+    expect(timetable).toStrictEqual(expectedTimetable)
+  })
+
+  it('should display correct information for which visitors can attend', () => {
+    schedules = [
+      TestData.sessionSchedule({
+        isAgeRestricted: true,
+        ageRestriction: 18,
+      }),
+      TestData.sessionSchedule({
+        isAgeRestricted: true,
+        ageRestriction: 16,
+      }),
+      TestData.sessionSchedule({
+        isAgeRestricted: false,
+        ageRestriction: 18,
+      }),
+      TestData.sessionSchedule({
+        isAgeRestricted: false,
+        ageRestriction: 16,
+      }),
+    ]
+    const otherTimetableInformation = {
+      time: '1:45pm to 3:45pm',
+      type: 'Open',
+      capacity: '40 tables',
+      prisoners: 'All prisoners',
+    } as const
+    const expectedTimetable: TimetableItem[] = [
+      {
+        ...otherTimetableInformation,
+        visitors: 'Visitors aged 18 years old or older',
+      },
+      {
+        ...otherTimetableInformation,
+        visitors: 'Visitors aged 16 years old or older',
+      },
+      {
+        ...otherTimetableInformation,
+        visitors: 'All visitors',
+      },
+      {
+        ...otherTimetableInformation,
+        visitors: 'All visitors',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -316,25 +316,24 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      visitors: 'All visitors',
     } as const
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners in Location',
+        prisoners: 'Category prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners except prisoners in Location',
+        prisoners: 'Category prisoners except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners in Location except Category prisoners',
+        prisoners: 'Prisoners in Location except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except Category prisoners and prisoners in Location',
+        prisoners: 'All prisoners except Category prisoners and prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -373,25 +372,24 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      visitors: 'All visitors',
     } as const
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive in Location',
+        prisoners: 'Prisoners on Incentive in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive except prisoners in Location',
+        prisoners: 'Prisoners on Incentive except prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners in Location except prisoners on Incentive',
+        prisoners: 'Prisoners in Location except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except prisoners on Incentive and prisoners in Location',
+        prisoners: 'All prisoners except prisoners on Incentive and prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
@@ -441,33 +439,32 @@ describe('timetableItemBuilder - Build timetable rows from visit schedules', () 
       time: '1:45pm to 3:45pm',
       type: 'Open',
       capacity: '40 tables',
-      frequency: 'Every week',
-      endDate: 'Not entered',
+      visitors: 'All visitors',
     } as const
     const expectedTimetable: TimetableItem[] = [
       {
         ...otherTimetableInformation,
-        attendees: 'Category prisoners',
+        prisoners: 'Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except Category prisoners',
+        prisoners: 'All prisoners except Category prisoners',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners on Incentive',
+        prisoners: 'Prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except prisoners on Incentive',
+        prisoners: 'All prisoners except prisoners on Incentive',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'Prisoners in Location',
+        prisoners: 'Prisoners in Location',
       },
       {
         ...otherTimetableInformation,
-        attendees: 'All prisoners except prisoners in Location',
+        prisoners: 'All prisoners except prisoners in Location',
       },
     ]
     const timetable = timetableItemBuilder(schedules)
