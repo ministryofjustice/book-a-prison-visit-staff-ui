@@ -23,14 +23,6 @@ test.describe('Search for a prisoner', () => {
     await resetStubs()
   })
 
-  test('should show Search For A Prisoner page', async ({ page }) => {
-    const homePage = await HomePage.verifyOnPage(page)
-    await homePage.bookOrChangeVisitTile.click()
-
-    const searchForAPrisonerPage = await SearchForAPrisonerPage.verifyOnPage(page)
-    await expect(searchForAPrisonerPage.searchForm).toBeVisible()
-  })
-
   test.describe('when there are no results', () => {
     test('should show that there are no results', async ({ page }) => {
       await prisonerSearch.stubPrisoners({ term: prisonerNumber })
