@@ -183,7 +183,9 @@ export default class VisitService {
   private buildVisitorDetails(visitors: VisitorListItem[]): BookingRequestVisitorDetailsDto[] {
     return visitors.map(visitor => ({
       visitorId: visitor.personId,
-      visitorAge: visitor.age,
+      // TODO the '?? null' below is to handle in-progress sessions where age might not have been set earlier in the journey.
+      // Will be resolved within minutes of deployment then this can be removed.
+      visitorAge: visitor.age ?? null,
     }))
   }
 }
