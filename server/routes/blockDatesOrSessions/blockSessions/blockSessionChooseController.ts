@@ -4,7 +4,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { VisitSessionsService } from '../../../services'
 import type { SessionSchedule } from '../../../data/orchestrationApiTypes'
 import { formatStartToEndTime } from '../../../utils/utils'
-import { buildAttendeesText } from '../../timetable/timetableItemBuilder'
+import { buildPrisonersText } from '../../timetable/timetableItemBuilder'
 
 export default class BlockSessionChooseController {
   public constructor(private readonly visitSessionsService: VisitSessionsService) {}
@@ -86,7 +86,7 @@ export default class BlockSessionChooseController {
   private buildSessionsRadioItems(sessions: SessionSchedule[]): { value: string; text: string; disabled?: true }[] {
     return sessions.map(session => {
       const time = formatStartToEndTime(session.sessionTimeSlot.startTime, session.sessionTimeSlot.endTime)
-      const attendees = buildAttendeesText({ ...session })
+      const attendees = buildPrisonersText({ ...session })
       return {
         value: session.sessionTemplateReference,
         text: `${time} (${session.visitRoom}), ${attendees}`,

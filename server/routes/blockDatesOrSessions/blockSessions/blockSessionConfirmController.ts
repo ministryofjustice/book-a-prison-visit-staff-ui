@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BlockDatesOrSessionsService, VisitService } from '../../../services'
 import { formatStartToEndTime } from '../../../utils/utils'
-import { buildAttendeesText } from '../../timetable/timetableItemBuilder'
+import { buildPrisonersText } from '../../timetable/timetableItemBuilder'
 import logger from '../../../../logger'
 import { getSessionBlockedMessage } from './blockSessionsMessages'
 
@@ -33,7 +33,7 @@ export default class BlockSessionConfirmController {
         selectedSession.sessionTimeSlot.startTime,
         selectedSession.sessionTimeSlot.endTime,
       )
-      const attendees = buildAttendeesText({ ...selectedSession })
+      const attendees = buildPrisonersText({ ...selectedSession })
 
       return res.render('pages/blockDatesOrSessions/blockSessions/blockSessionConfirm', {
         backLinkHref,

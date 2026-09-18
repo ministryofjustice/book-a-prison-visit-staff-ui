@@ -13,27 +13,23 @@
   {% set timetableRows = (timetableRows.push([
     {
       text: timetableItem.time,
-      attributes: { "data-test" : "schedule-time-" + rowNumber } 
+      attributes: { "data-test" : "schedule-time-" + rowNumber }
     },
     {
       text: timetableItem.type,
-      attributes: { "data-test" : "schedule-type-" + rowNumber } 
+      attributes: { "data-test" : "schedule-type-" + rowNumber }
     },
     {
       text: timetableItem.capacity,
-      attributes: { "data-test" : "schedule-capacity-" + rowNumber } 
+      attributes: { "data-test" : "schedule-capacity-" + rowNumber }
     },
     {
-      text: timetableItem.attendees,
-      attributes: { "data-test" : "schedule-attendees-" + rowNumber } 
+      text: timetableItem.visitors,
+      attributes: { "data-test" : "schedule-visitors-" + rowNumber }
     },
     {
-      text: timetableItem.frequency,
-      attributes: { "data-test" : "schedule-frequency-" + rowNumber } 
-    },
-    {
-      text: timetableItem.endDate,
-      attributes: { "data-test" : "schedule-end-date-" + rowNumber } 
+      text: timetableItem.prisoners,
+      attributes: { "data-test" : "schedule-prisoners-" + rowNumber }
     }
   ]), timetableRows) %}
 {% endmacro %}
@@ -98,13 +94,10 @@
               text: "Capacity"
             },
             {
-              text: "Who can attend"
+              text: "Visitors who can attend"
             },
             {
-              text: "How often"
-            },
-            {
-              text: "End date"
+              text: "Prisoners who can attend"
             }
           ],
           rows: timetableRows

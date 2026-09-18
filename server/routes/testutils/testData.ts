@@ -538,6 +538,8 @@ export default class TestData {
     visitRoom = 'Visits hall',
     visitOrderRestriction = 'VO_PVO',
     isSessionExcluded = false,
+    isAgeRestricted = false,
+    ageRestriction = 18,
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -554,6 +556,8 @@ export default class TestData {
     visitRoom,
     visitOrderRestriction,
     isSessionExcluded,
+    isAgeRestricted,
+    ageRestriction,
   })
 
   static socialContact = ({
