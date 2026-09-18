@@ -8,6 +8,7 @@ import {
   addWeeks,
   subWeeks,
   parse,
+  isValid,
 } from 'date-fns'
 import nunjucks from 'nunjucks'
 import { parsePhoneNumberFromString as parsePhoneNumber } from 'libphonenumber-js/mobile'
@@ -100,14 +101,17 @@ export const getResultsPagingLinks = ({
 }
 
 /**
- * Checks if the date of birth represents an adult
- * @param dateOfBirth date of birth string
- * @param referenceDate date to check against (defaults to now)
- * @returns true if an adult
+ * Calculates the age in years based on the provided date of birth.
+ *
+ * @param dateOfBirth date of birth string YYYY-MM-DD
+ * @returns age in years or null if date of birth is invalid or not provided.
  */
-export const isAdult = (dateOfBirth: string, referenceDate: Date = new Date()): boolean => {
-  const dobDate = parseISO(dateOfBirth)
-  return differenceInYears(referenceDate, dobDate) >= 18
+export const ageInYears = (dateOfBirth: string | undefined | null): number | null => {
+  if (!dateOfBirth) {
+    return null
+  }
+  const parsedDateOfBirth = parseISO(dateOfBirth)
+  return isValid(parsedDateOfBirth) ? differenceInYears(new Date(), parsedDateOfBirth) : null
 }
 
 /**

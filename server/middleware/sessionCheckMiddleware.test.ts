@@ -18,6 +18,7 @@ const visitorsData: VisitSessionData['visitors'] = [
   {
     personId: 123,
     name: 'abc',
+    age: null,
     adult: true,
     relationshipDescription: 'abc',
     restrictions: [

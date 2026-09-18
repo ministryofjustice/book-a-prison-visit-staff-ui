@@ -92,6 +92,7 @@ export default class VisitSessionsService {
     prisonId,
     prisonerId,
     minNumberOfDays,
+    youngestVisitorAge,
     visitRestriction,
     selectedVisitSession,
     originalVisitSession,
@@ -100,6 +101,7 @@ export default class VisitSessionsService {
     prisonId: string
     prisonerId: string
     minNumberOfDays: number
+    youngestVisitorAge: number | null
     visitRestriction: VisitSessionData['visitRestriction']
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
@@ -110,6 +112,7 @@ export default class VisitSessionsService {
         prisonerId,
         minNumberOfDays,
         username,
+        youngestVisitorAge,
       })
 
     // map raw session/schedule data to format for calendar

@@ -192,6 +192,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/incentive-reviews/prisoner/{prisonerNumber}/repair-booking-switch': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Repairs a prisoner left on the wrong incentive level after NOMIS switched their booking
+     * @description When a recall is mistakenly admitted onto a new booking and NOMIS staff correct it by re-admitting the prisoner onto their earlier booking, the default-level review written against the mistaken booking stays current and masks the level held on the reinstated booking. This does what the `READMISSION_SWITCH_BOOKING` event now does, for prisoners affected before it was handled or for whom the event was missed, and publishes `incentives.iep-review.updated` so downstream services resync. Safe to re-run: a prisoner who needs no repair is left untouched. Requires INCENTIVE_REVIEWS role and write scope.
+     */
+    post: operations['repairAfterBookingSwitch']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/incentive-reviews/prisoner/{prisonerNumber}': {
     parameters: {
       query?: never
@@ -484,6 +504,55 @@ export interface components {
        * @example false
        */
       required: boolean
+    }
+    /** @description Outcome of repairing a prisoner whose incentive level was left on a booking that NOMIS has since switched away from */
+    BookingSwitchRepairResult: {
+      /**
+       * @description Prisoner number
+       * @example A1234BC
+       */
+      prisonerNumber: string
+      /**
+       * Format: int64
+       * @description The booking prisoner-search reports the prisoner is on — the one their level is reinstated to
+       * @example 1234567
+       */
+      bookingId: number
+      /**
+       * @description What was done
+       * @enum {string}
+       */
+      outcome: 'REPAIRED' | 'NOTHING_TO_DO'
+      /**
+       * @description Whether this was a dry run, in which case nothing was written
+       * @example false
+       */
+      dryRun: boolean
+      /**
+       * @description The prisoner's current incentive level before the repair
+       * @example STD
+       */
+      levelCodeBefore?: string | null
+      /**
+       * @description The prisoner's current incentive level after the repair; for a dry run, what it would become
+       * @example ENH
+       */
+      levelCodeAfter?: string | null
+      /**
+       * @description Ids of the reviews on the mistaken booking that are no longer current
+       * @example [
+       *       2345
+       *     ]
+       */
+      reviewIdsStoodDown: number[]
+      /**
+       * Format: int64
+       * @description Id of the review on the reinstated booking that was made current again, if any
+       * @example 1234
+       */
+      reviewIdReinstated?: number | null
+      /** @description Human-readable summary, useful when nothing was changed */
+      message: string
     }
     /** @description Request to add a new incentive review */
     CreateIncentiveReviewRequest: {
@@ -1575,6 +1644,65 @@ export interface operations {
       }
       /** @description Incorrect permissions to use this endpoint */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+    }
+  }
+  repairAfterBookingSwitch: {
+    parameters: {
+      query?: {
+        /**
+         * @description Report what would change without writing anything or publishing any events
+         * @example false
+         */
+        'dry-run'?: boolean
+      }
+      header?: never
+      path: {
+        /**
+         * @description Prisoner Number
+         * @example A1234AB
+         */
+        prisonerNumber: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Repair attempted; the response body reports what was changed, if anything */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['BookingSwitchRepairResult']
+        }
+      }
+      /** @description Unauthorized to access this endpoint */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Incorrect permissions to use this endpoint */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponse']
+        }
+      }
+      /** @description Prisoner not found */
+      404: {
         headers: {
           [name: string]: unknown
         }

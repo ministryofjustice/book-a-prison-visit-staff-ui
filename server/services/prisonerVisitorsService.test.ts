@@ -20,13 +20,14 @@ describe('Prisoner visitor service', () => {
     })
 
     it('Retrieves and processes prisoner and approved visitor details', async () => {
+      const adultDateOfBirth = `${new Date().getFullYear() - 18}-03-02`
       const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-      const contacts: Contact[] = [
+      const contacts = <Contact[]>[
         {
           personId: 4321,
           firstName: 'Jeanette',
           lastName: 'Smith',
-          dateOfBirth: '1986-07-28',
+          dateOfBirth: adultDateOfBirth,
           relationshipCode: 'SIS',
           relationshipDescription: 'Sister',
           contactType: 'S',
@@ -120,7 +121,8 @@ describe('Prisoner visitor service', () => {
         {
           personId: 4321,
           name: 'Jeanette Smith',
-          dateOfBirth: '1986-07-28',
+          dateOfBirth: adultDateOfBirth,
+          age: 18,
           adult: true,
           relationshipDescription: 'Sister',
           address: 'Premises,\nFlat 23B,\n123 The Street,\nSpringfield,\nCoventry,\nWest Midlands,\nC1 2AB,\nEngland',
@@ -162,6 +164,7 @@ describe('Prisoner visitor service', () => {
           personId: 4322,
           name: 'Bob Smith',
           dateOfBirth: undefined,
+          age: null,
           adult: true,
           relationshipDescription: 'Brother',
           address: '123 The Street',
@@ -172,6 +175,7 @@ describe('Prisoner visitor service', () => {
           personId: 4324,
           name: 'Anne Smith',
           dateOfBirth: childDateOfBirth,
+          age: 4,
           adult: false,
           relationshipDescription: 'Niece',
           address: 'Not entered',

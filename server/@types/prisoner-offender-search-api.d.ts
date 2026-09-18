@@ -729,60 +729,60 @@ export interface components {
        * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
        * @example A1234AA,
        */
-      prisonerIdentifier?: string
+      prisonerIdentifier?: string | null
       /**
        * @description First Name
        * @example John
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Last Name
        * @example Smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * @description List of supporting Prison Ids to restrict the search by. Unrestricted if not supplied or null
        * @example [
        *       "MDI"
        *     ]
        */
-      supportingPrisonIds?: string[]
+      supportingPrisonIds?: string[] | null
     }
     Address: {
       /**
        * @description The full address on a single line.  No fixed address records will have the fullAddress set to 'No fixed address'. Will never be null.
        * @example 1 Main Street, Crookes, Sheffield, South Yorkshire, S10 1BP, England
        */
-      fullAddress?: string
+      fullAddress?: string | null
       /**
        * @description The postal code
        * @example S10 1BP
        */
-      postalCode?: string
+      postalCode?: string | null
       /**
        * Format: date
        * @description The date the address became active according to NOMIS. Will never be null.
        * @example 2020-07-17
        */
-      startDate?: string
+      startDate?: string | null
       /**
        * @description Whether the address is currently marked as the primary address. Will never be null.
        * @example true
        */
-      primaryAddress?: boolean
+      primaryAddress?: boolean | null
       /**
        * @description No fixed address. This address record is only ever returned if it is also the primary address, otherwise it is ignored. Will never be null.
        * @example true
        */
-      noFixedAddress?: boolean
+      noFixedAddress?: boolean | null
       /** @description Phone numbers linked to the address. Note the phone number contains only numbers, no whitespace. Therefore searching on 'addresses.phoneNumbers.number' should not pass any non-numeric characters. */
-      phoneNumbers?: components['schemas']['PhoneNumber'][]
+      phoneNumbers?: components['schemas']['PhoneNumber'][] | null
     }
     BodyPartDetail: {
       /**
        * @description Part of the body that has the mark. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023.
        * @example Head
-       * @enum {string}
+       * @enum {string|null}
        */
       bodyPart?:
         | 'Ankle'
@@ -803,84 +803,85 @@ export interface components {
         | 'Thigh'
         | 'Toe'
         | 'Torso'
+        | null
       /**
        * @description Optional free text comment describing the mark
        * @example Skull and crossbones covering chest
        */
-      comment?: string
+      comment?: string | null
     }
     CurrentIncentive: {
       /** @description Incentive level. Will never be null. */
-      level?: components['schemas']['IncentiveLevel']
+      level?: components['schemas']['IncentiveLevel'] | null
       /**
        * Format: date-time
        * @description Date time of the incentive. Will never be null.
        * @example 2022-11-10T15:47:24
        */
-      dateTime: string
+      dateTime: string | null
       /**
        * Format: date
        * @description Schedule new review date
        * @example 2022-11-10
        */
-      nextReviewDate: string
+      nextReviewDate: string | null
     }
     EmailAddress: {
       /**
        * @description The email address. Will never be null.
        * @example john.smith@gmail.com
        */
-      email?: string
+      email?: string | null
     }
     Identifier: {
       /**
        * @description The type of identifier. Will never be null.
        * @example PNC, CRO, DL, NINO
        */
-      type?: string
+      type?: string | null
       /**
        * @description The identifier value. Will never be null.
        * @example 12/394773H
        */
-      value?: string
+      value?: string | null
       /**
        * Format: date
        * @description The date the identifier was issued according to NOMIS
        * @example 2020-07-17
        */
-      issuedDate?: string
+      issuedDate?: string | null
       /** @description Free text entered into NOMIS when the identifier was recorded. */
-      issuedAuthorityText?: string
+      issuedAuthorityText?: string | null
       /**
        * Format: date-time
        * @description The date/time the identifier was created in the system. Will never be null.
        * @example 2020-07-17T12:34:56.833Z
        */
-      createdDateTime?: string
+      createdDateTime?: string | null
     }
     IncentiveLevel: {
       /**
        * @description code. Will never be null.
        * @example STD
        */
-      code?: string
+      code?: string | null
       /**
        * @description description. Will never be null.
        * @example Standard
        */
-      description?: string
+      description?: string | null
     }
     Language: {
       /**
        * @description A LOV from domain LANG_TYPE
-       * @enum {string}
+       * @enum {string|null}
        */
-      type?: 'PRIM' | 'SEC' | 'PREF_SPEAK' | 'PREF_WRITE'
+      type?: 'PRIM' | 'SEC' | 'PREF_SPEAK' | 'PREF_WRITE' | null
       /**
        * @description The actual language code, from domain LANG
        * @example ENG
        */
-      code?: string
+      code?: string | null
       /**
        * @description The level of reading skill, from domain LANG_SKILLS:
        *         |Y  Yes
@@ -890,82 +891,94 @@ export interface components {
        *         |N	Nil
        *         |P	Poor
        *         |R	Refused
-       * @enum {string}
+       * @enum {string|null}
        */
-      readSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      readSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R' | null
       /**
        * @description The level of writing skill, see description for readSkill
-       * @enum {string}
+       * @enum {string|null}
        */
-      writeSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      writeSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R' | null
       /**
        * @description The level of writing skill, see description for readSkill
-       * @enum {string}
+       * @enum {string|null}
        */
-      speakSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R'
+      speakSkill?: 'Y' | 'N' | 'A' | 'D' | 'G' | 'P' | 'R' | null
       /** @description Whether an interpreter requested */
-      interpreterRequested?: boolean
+      interpreterRequested?: boolean | null
+    }
+    MainOffence: {
+      /**
+       * @description Offence code, from the charge held in NOMIS
+       * @example RR84070
+       */
+      offenceCode?: string | null
+      /**
+       * @description Description of the offence
+       * @example Actual bodily harm
+       */
+      offenceDescription?: string | null
     }
     Offence: {
       /**
        * @description The statue code. Will never be null.
        * @example TH68
        */
-      statuteCode?: string
+      statuteCode?: string | null
       /**
        * @description The offence code. Will never be null.
        * @example TH68010
        */
-      offenceCode?: string
+      offenceCode?: string | null
       /**
        * @description The offence description. Will never be null.
        * @example Theft from a shop
        */
-      offenceDescription?: string
+      offenceDescription?: string | null
       /**
        * Format: date
        * @description The date of the offence
        * @example 2024-05-23
        */
-      offenceDate?: string
+      offenceDate?: string | null
       /** @description Indicates this offence is for the latest NOMIS booking. Will never be null. */
-      latestBooking?: boolean
+      latestBooking?: boolean | null
       /**
        * Format: date
        * @description Start date of sentence - null if there is no associated sentence
        * @example 2018-03-10
        */
-      sentenceStartDate?: string
+      sentenceStartDate?: string | null
       /** @description Primary sentence - true if it is not a consecutive sentence, false if it is a consecutive sentence, null if no sentence found for the charge. */
-      primarySentence?: boolean
+      primarySentence?: boolean | null
     }
     PagePrisoner: {
-      /** Format: int64 */
-      totalElements?: number
       /** Format: int32 */
       totalPages?: number
+      /** Format: int64 */
+      totalElements?: number
       /** Format: int32 */
       size?: number
       content?: components['schemas']['Prisoner'][]
       /** Format: int32 */
       number?: number
-      first?: boolean
-      last?: boolean
       sort?: components['schemas']['SortObject']
+      pageable?: components['schemas']['PageableObject']
       /** Format: int32 */
       numberOfElements?: number
-      pageable?: components['schemas']['PageableObject']
+      first?: boolean
+      last?: boolean
       empty?: boolean
     }
     PageableObject: {
       /** Format: int64 */
       offset?: number
-      sort?: components['schemas']['SortObject']
-      /** Format: int32 */
-      pageSize?: number
       paged?: boolean
       /** Format: int32 */
       pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
+      sort?: components['schemas']['SortObject']
       unpaged?: boolean
     }
     PersonalCareNeed: {
@@ -973,241 +986,241 @@ export interface components {
        * @description Problem Type, from reference data with domain 'HEALTH'
        * @example MATSTAT
        */
-      problemType?: string
+      problemType?: string | null
       /**
        * @description Problem Code, from reference data with domain 'HEALTH_PBLM'
        * @example ACCU9
        */
-      problemCode?: string
+      problemCode?: string | null
       /**
        * @description Problem Status, from reference data with domain 'HEALTH_STS'
-       * @enum {string}
+       * @enum {string|null}
        */
-      problemStatus?: 'ON' | 'I' | 'EBS'
+      problemStatus?: 'ON' | 'I' | 'EBS' | null
       /** @description Problem Description */
-      problemDescription?: string
+      problemDescription?: string | null
       /** @description Comment */
-      commentText?: string
+      commentText?: string | null
       /**
        * Format: date
        * @description Start Date
        * @example 2020-06-21
        */
-      startDate?: string
+      startDate?: string | null
       /**
        * Format: date
        * @description End Date
        * @example 2025-05-11
        */
-      endDate?: string
+      endDate?: string | null
     }
     PhoneNumber: {
       /**
        * @description The type of the phone number. Will never be null.
        * @example HOME, MOB
        */
-      type?: string
+      type?: string | null
       /**
        * @description The phone number. Numeric characters only (no whitespace). Will never be null.
        * @example 01141234567
        */
-      number?: string
+      number?: string | null
     }
     Prisoner: {
       /**
        * @description Prisoner Number
        * @example A1234AA
        */
-      prisonerNumber: string
+      prisonerNumber: string | null
       /**
        * @description PNC Number
        * @example 12/394773H
        */
-      pncNumber?: string
+      pncNumber?: string | null
       /**
        * @description PNC Number
        * @example 12/394773H
        */
-      pncNumberCanonicalShort?: string
+      pncNumberCanonicalShort?: string | null
       /**
        * @description PNC Number
        * @example 2012/394773H
        */
-      pncNumberCanonicalLong?: string
+      pncNumberCanonicalLong?: string | null
       /**
        * @description CRO Number
        * @example 29906/12J
        */
-      croNumber?: string
+      croNumber?: string | null
       /**
        * @description Booking Id
        * @example 2900924
        */
-      bookingId?: string
+      bookingId?: string | null
       /**
        * @description Book Number
        * @example 38412A
        */
-      bookNumber?: string
+      bookNumber?: string | null
       /**
        * @description Title
        * @example Ms
        */
-      title?: string
+      title?: string | null
       /**
        * @description First Name
        * @example Robert
        */
-      firstName: string
+      firstName?: string | null
       /**
        * @description Middle Names
        * @example John James
        */
-      middleNames?: string
+      middleNames?: string | null
       /**
        * @description Last name
        * @example Larsen
        */
-      lastName: string
+      lastName?: string | null
       /**
        * Format: date
        * @description Date of Birth
        * @example 1975-04-02
        */
-      dateOfBirth: string
+      dateOfBirth?: string | null
       /**
        * @description Gender
        * @example Female
        */
-      gender: string
+      gender?: string | null
       /**
        * @description Ethnicity
        * @example White: Eng./Welsh/Scot./N.Irish/British
        */
-      ethnicity: string
+      ethnicity?: string | null
       /**
        * @description Ethnicity code
        * @example W1
        */
-      raceCode: string
+      raceCode?: string | null
       /**
        * @description Youth Offender?
        * @example true
        */
-      youthOffender: boolean
+      youthOffender?: boolean | null
       /**
        * @description Marital Status
        * @example Widowed
        */
-      maritalStatus: string
+      maritalStatus?: string | null
       /**
        * @description Religion
        * @example Church of England (Anglican)
        */
-      religion: string
+      religion?: string | null
       /**
        * @description Nationality
        * @example Egyptian
        */
-      nationality: string
+      nationality?: string | null
       /**
        * @description Smoker (V=vapes)
-       * @enum {string}
+       * @enum {string|null}
        */
-      smoker?: 'Y' | 'N' | 'V'
+      smoker?: 'Y' | 'N' | 'V' | null
       /** @description Personal Care Needs */
-      personalCareNeeds?: components['schemas']['PersonalCareNeed'][]
+      personalCareNeeds?: components['schemas']['PersonalCareNeed'][] | null
       /** @description Languages */
-      languages?: components['schemas']['Language'][]
+      languages?: components['schemas']['Language'][] | null
       /**
        * Format: int64
        * @description The prisoner's current facial image can be retrieved by plugging this id into the prison-api endpoint /app/images/{prisonerNumber}/data?imageId={imageId}
        * @example 2122100
        */
-      currentFacialImageId?: number
+      currentFacialImageId?: number | null
       /** @description True if prisoner has been recorded as being in the military. */
-      militaryRecord?: boolean
+      militaryRecord?: boolean | null
       /**
        * @description Status of the prisoner
        * @example ACTIVE IN
        */
-      status: string
+      status?: string | null
       /**
        * @description Last Movement Type Code of prisoner
        * @example CRT
        */
-      lastMovementTypeCode?: string
+      lastMovementTypeCode?: string | null
       /**
        * @description Last Movement Reason of prisoner
        * @example CA
        */
-      lastMovementReasonCode?: string
+      lastMovementReasonCode?: string | null
       /**
        * Format: date
        * @description Date of the last movement of the prisoner
        * @example 2023-05-01
        */
-      lastMovementDate?: string
+      lastMovementDate?: string | null
       /**
        * @description In/Out Status
        * @example IN
-       * @enum {string}
+       * @enum {string|null}
        */
-      inOutStatus?: 'IN' | 'OUT' | 'TRN'
+      inOutStatus?: 'IN' | 'OUT' | 'TRN' | null
       /**
        * @description Current Prison ID (or OUT)
        * @example MDI
        */
-      prisonId?: string
+      prisonId?: string | null
       /**
        * @description Current Prison Name
        * @example HMP Leeds
        */
-      prisonName?: string
+      prisonName?: string | null
       /**
        * @description The last i.e. final prison for the prisoner (which is the same as the prisonId if they are still inside prison)
        * @example MDI
        */
-      lastPrisonId?: string
+      lastPrisonId?: string | null
       /**
        * @description The previous prison for the prisoner within the current term
        * @example MDI
        */
-      previousPrisonId?: string
+      previousPrisonId?: string | null
       /**
        * Format: date
        * @description The date they left the previous prison
        * @example 2025-09-15
        */
-      previousPrisonLeavingDate?: string
+      previousPrisonLeavingDate?: string | null
       /**
        * @description In prison cell location
        * @example A-1-002
        */
-      cellLocation?: string
+      cellLocation?: string | null
       /** @description Aliases Names and Details */
-      aliases?: components['schemas']['PrisonerAlias'][]
+      aliases?: components['schemas']['PrisonerAlias'][] | null
       /** @description Alerts */
-      alerts?: components['schemas']['PrisonerAlert'][]
+      alerts?: components['schemas']['PrisonerAlert'][] | null
       /**
        * @description Cell Sharing Risk Assessment
        * @example HIGH
        */
-      csra?: string
+      csra?: string | null
       /**
        * @description Prisoner Category
        * @example C
        */
-      category?: string
+      category?: string | null
       /**
        * @description Complexity of Need level if female
        * @example low
        */
-      complexityOfNeedLevel?: string
+      complexityOfNeedLevel?: string | null
       /**
        * @description Legal Status
        * @example SENTENCED
-       * @enum {string}
+       * @enum {string|null}
        */
       legalStatus?:
         | 'RECALL'
@@ -1220,229 +1233,232 @@ export interface components {
         | 'REMAND'
         | 'UNKNOWN'
         | 'OTHER'
+        | null
       /**
        * @description The prisoner's imprisonment status code.
        * @example LIFE
        */
-      imprisonmentStatus?: string
+      imprisonmentStatus?: string | null
       /**
        * @description The prisoner's imprisonment status description.
        * @example Serving Life Imprisonment
        */
-      imprisonmentStatusDescription?: string
+      imprisonmentStatusDescription?: string | null
       /**
        * @description The prisoner's convicted status code.
        * @example Convicted
-       * @enum {string}
+       * @enum {string|null}
        */
-      convictedStatus?: 'Convicted' | 'Remand'
+      convictedStatus?: 'Convicted' | 'Remand' | null
       /**
        * @description Most serious offence for this sentence
        * @example Robbery
        */
-      mostSeriousOffence: string
+      mostSeriousOffence?: string | null
+      /** @description The main offence: the most serious active charge, whether or not it has resulted in a conviction. Unlike mostSeriousOffence this is populated for a prisoner without a conviction, such as someone on remand. */
+      mainOffence?: components['schemas']['MainOffence'] | null
       /**
        * @description Indicates that the prisoner has been recalled
        * @example false
        */
-      recall?: boolean
+      recall?: boolean | null
       /**
        * @description Indicates that the prisoner has an indeterminate sentence
        * @example true
        */
-      indeterminateSentence?: boolean
+      indeterminateSentence?: boolean | null
       /**
        * Format: date
        * @description Start Date for this sentence
        * @example 2020-04-03
        */
-      sentenceStartDate?: string
+      sentenceStartDate?: string | null
       /**
        * Format: date
        * @description Actual of most likely Release Date
        * @example 2023-05-02
        */
-      releaseDate?: string
+      releaseDate?: string | null
       /**
        * Format: date
        * @description Release Date Confirmed
        * @example 2023-05-01
        */
-      confirmedReleaseDate?: string
+      confirmedReleaseDate?: string | null
       /**
        * Format: date
        * @description Sentence Expiry Date
        * @example 2023-05-01
        */
-      sentenceExpiryDate?: string
+      sentenceExpiryDate?: string | null
       /**
        * Format: date
        * @description Licence Expiry Date
        * @example 2023-05-01
        */
-      licenceExpiryDate?: string
+      licenceExpiryDate?: string | null
       /**
        * Format: date
        * @description HDC Eligibility Date
        * @example 2023-05-01
        */
-      homeDetentionCurfewEligibilityDate?: string
+      homeDetentionCurfewEligibilityDate?: string | null
       /**
        * Format: date
        * @description HDC Actual Date
        * @example 2023-05-01
        */
-      homeDetentionCurfewActualDate?: string
+      homeDetentionCurfewActualDate?: string | null
       /**
        * Format: date
        * @description HDC End Date
        * @example 2023-05-02
        */
-      homeDetentionCurfewEndDate?: string
+      homeDetentionCurfewEndDate?: string | null
       /**
        * Format: date
        * @description Top-up supervision start date
        * @example 2023-04-29
        */
-      topupSupervisionStartDate?: string
+      topupSupervisionStartDate?: string | null
       /**
        * Format: date
        * @description Top-up supervision expiry date
        * @example 2023-05-01
        */
-      topupSupervisionExpiryDate?: string
+      topupSupervisionExpiryDate?: string | null
       /**
        * Format: int32
        * @description Days added to sentence term due to adjustments.
        * @example 10
        */
-      additionalDaysAwarded?: number
+      additionalDaysAwarded?: number | null
       /**
        * Format: date
        * @description Release date for Non determinant sentence (if applicable). This will be based on one of ARD, CRD, NPD or PRRD.
        * @example 2023-05-01
        */
-      nonDtoReleaseDate?: string
+      nonDtoReleaseDate?: string | null
       /**
        * @description Indicates which type of non-DTO release date is the effective release date. One of 'ARD’, 'CRD’, ‘NPD’ or 'PRRD’.
        * @example ARD
-       * @enum {string}
+       * @enum {string|null}
        */
-      nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD'
+      nonDtoReleaseDateType?: 'ARD' | 'CRD' | 'NPD' | 'PRRD' | null
       /**
        * Format: date
        * @description Date prisoner was received into prison at the start of the term
        * @example 2023-05-01
        */
-      receptionDate?: string
+      receptionDate?: string | null
       /**
        * Format: date
        * @description Date prisoner was transferred into the current or latest prison
        * @example 2023-05-01
        */
-      lastAdmissionDate?: string
+      lastAdmissionDate?: string | null
       /**
        * Format: date
        * @description Parole  Eligibility Date
        * @example 2023-05-01
        */
-      paroleEligibilityDate?: string
+      paroleEligibilityDate?: string | null
       /**
        * Format: date
        * @description Automatic Release Date. If automaticReleaseOverrideDate is available then it will be set as automaticReleaseDate
        * @example 2023-05-01
        */
-      automaticReleaseDate?: string
+      automaticReleaseDate?: string | null
       /**
        * Format: date
        * @description Post Recall Release Date. if postRecallReleaseOverrideDate is available then it will be set as postRecallReleaseDate
        * @example 2023-05-01
        */
-      postRecallReleaseDate?: string
+      postRecallReleaseDate?: string | null
       /**
        * Format: date
        * @description Conditional Release Date. If conditionalReleaseOverrideDate is available then it will be set as conditionalReleaseDate
        * @example 2023-05-01
        */
-      conditionalReleaseDate?: string
+      conditionalReleaseDate?: string | null
       /**
        * Format: date
        * @description Non-parole date. If nonParoleOverrideDate date is available then it will be set as nonParoleDate
        * @example 2023-05-01
        */
-      nonParoleDate?: string
+      nonParoleDate?: string | null
       /**
        * Format: date
        * @description Actual Parole Date
        * @example 2023-05-01
        */
-      actualParoleDate?: string
+      actualParoleDate?: string | null
       /**
        * Format: date
        * @description Tariff Date
        * @example 2023-05-01
        */
-      tariffDate?: string
+      tariffDate?: string | null
       /**
        * Format: date
        * @description Release on Temporary Licence Date
        * @example 2023-05-01
        */
-      releaseOnTemporaryLicenceDate?: string
+      releaseOnTemporaryLicenceDate?: string | null
       /**
        * @description current prison or outside with last movement information.
        * @example Outside - released from Leeds
        */
-      locationDescription?: string
+      locationDescription?: string | null
       /**
        * @description Indicates a restricted patient. Will never be null.
        * @example true
        */
-      restrictedPatient: boolean
+      restrictedPatient?: boolean | null
       /**
        * @description Supporting prison ID for POM
        * @example LEI
        */
-      supportingPrisonId?: string
+      supportingPrisonId?: string | null
       /**
        * @description Which hospital the prisoner has been discharged to
        * @example HAZLWD
        */
-      dischargedHospitalId?: string
+      dischargedHospitalId?: string | null
       /**
        * @description Hospital name to which the prisoner was discharged
        * @example Hazelwood House
        */
-      dischargedHospitalDescription?: string
+      dischargedHospitalDescription?: string | null
       /**
        * Format: date
        * @description Date of discharge
        * @example 2020-05-01
        */
-      dischargeDate?: string
+      dischargeDate?: string | null
       /**
        * @description Any additional discharge details
        * @example Psychiatric Hospital Discharge to Hazelwood House
        */
-      dischargeDetails?: string
+      dischargeDetails?: string | null
       /** @description Incentive level */
-      currentIncentive?: components['schemas']['CurrentIncentive']
+      currentIncentive?: components['schemas']['CurrentIncentive'] | null
       /**
        * Format: int32
        * @description Height in centimetres of the prisoner
        * @example 200
        */
-      heightCentimetres?: number
+      heightCentimetres?: number | null
       /**
        * Format: int32
        * @description Weight in kilograms of the prisoner
        * @example 102
        */
-      weightKilograms?: number
+      weightKilograms?: number | null
       /**
        * @description Hair colour. From PROFILE_CODES table where PROFILE_TYPE = HAIR. Allowable values extracted 07/02/2023.
        * @example Blonde
-       * @enum {string}
+       * @enum {string|null}
        */
       hairColour?:
         | 'Bald'
@@ -1460,22 +1476,23 @@ export interface components {
         | 'Multi-coloured'
         | 'Red'
         | 'White'
+        | null
       /**
        * @description Right eye colour. From PROFILE_CODES table where PROFILE_TYPE = R_EYE_C. Allowable values extracted 07/02/2023.
        * @example Green
-       * @enum {string}
+       * @enum {string|null}
        */
-      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White' | null
       /**
        * @description Left eye colour. From PROFILE_CODES table where PROFILE_TYPE = L_EYE_C. Allowable values extracted 07/02/2023.
        * @example Hazel
-       * @enum {string}
+       * @enum {string|null}
        */
-      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White' | null
       /**
        * @description Facial hair. From PROFILE_CODES table where PROFILE_TYPE = FACIAL_HAIR. Allowable values extracted 07/02/2023.
        * @example Clean Shaven
-       * @enum {string}
+       * @enum {string|null}
        */
       facialHair?:
         | 'Full Beard'
@@ -1485,16 +1502,17 @@ export interface components {
         | 'Not Applicable (Female Offender)'
         | 'No Facial Hair'
         | 'Sideburns'
+        | null
       /**
        * @description Shape of face. From PROFILE_CODES table where PROFILE_TYPE = FACE. Allowable values extracted 07/02/2023.
        * @example Round
-       * @enum {string}
+       * @enum {string|null}
        */
-      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular'
+      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular' | null
       /**
        * @description Build. From PROFILE_CODES table where PROFILE_TYPE = BUILD. Allowable values extracted 07/02/2023.
        * @example Muscular
-       * @enum {string}
+       * @enum {string|null}
        */
       build?:
         | 'Fat'
@@ -1509,93 +1527,94 @@ export interface components {
         | 'Stocky'
         | 'Stooped'
         | 'Thin'
+        | null
       /**
        * Format: int32
        * @description UK shoe size
        * @example 10
        */
-      shoeSize?: number
+      shoeSize?: number | null
       /** @description List of parts of the body that have tattoos. This includes marks and other marks whose comment contains 'tattoo'. 'From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
-      tattoos?: components['schemas']['BodyPartDetail'][]
+      tattoos?: components['schemas']['BodyPartDetail'][] | null
       /** @description List of parts of the body that have scars. This includes marks and other marks whose comment contains 'scar'. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
-      scars?: components['schemas']['BodyPartDetail'][]
+      scars?: components['schemas']['BodyPartDetail'][] | null
       /** @description List of parts of the body that have marks. This includes NOMIS physical details of type 'marks' and 'otherMarks'. If we find a comment with either 'tattoo' or 'scar' we also add to the list of tattoos or scars. From REFERENCE_CODES table where DOMAIN = BODY_PART. Allowable values extracted 08/02/2023. */
-      marks?: components['schemas']['BodyPartDetail'][]
+      marks?: components['schemas']['BodyPartDetail'][] | null
       /** @description Addresses. Note that no fixed addresses are only ever returned if they are also the primary address, otherwise they are filtered out. */
-      addresses?: components['schemas']['Address'][]
+      addresses?: components['schemas']['Address'][] | null
       /** @description Email addresses */
-      emailAddresses?: components['schemas']['EmailAddress'][]
+      emailAddresses?: components['schemas']['EmailAddress'][] | null
       /** @description Telephone numbers. Note that the number will contain only numeric characters [0-9] (including no break between area code and number). Therefore if searching on 'phoneNumbers.number' you should not pass any non-numeric characters. */
-      phoneNumbers?: components['schemas']['PhoneNumber'][]
+      phoneNumbers?: components['schemas']['PhoneNumber'][] | null
       /** @description All identifiers for the prisoner including those recorded against aliases. Currently supports only PNC, CRO, NINO and DL. */
-      identifiers?: components['schemas']['Identifier'][]
+      identifiers?: components['schemas']['Identifier'][] | null
       /** @description All historical convicted offences */
-      allConvictedOffences?: components['schemas']['Offence'][]
+      allConvictedOffences?: components['schemas']['Offence'][] | null
     }
     PrisonerAlert: {
       /**
        * @description Alert Type. Will never be null.
        * @example H
        */
-      alertType?: string
+      alertType?: string | null
       /**
        * @description Alert Code. Will never be null.
        * @example HA
        */
-      alertCode?: string
+      alertCode?: string | null
       /**
        * @description Active. Will never be null.
        * @example true
        */
-      active?: boolean
+      active?: boolean | null
       /**
        * @description Expired. Will never be null.
        * @example true
        */
-      expired?: boolean
+      expired?: boolean | null
     }
     PrisonerAlias: {
       /**
        * @description Title. Will never be null.
        * @example Ms
        */
-      title?: string
+      title?: string | null
       /**
        * @description First Name. Will never be null.
        * @example Robert
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Middle names. Will never be null.
        * @example Trevor
        */
-      middleNames?: string
+      middleNames?: string | null
       /**
        * @description Last name. Will never be null.
        * @example Lorsen
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * Format: date
        * @description Date of birth. Will never be null.
        * @example 1975-04-02
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Gender. Will never be null.
        * @example Male
        */
-      gender?: string
+      gender?: string | null
       /**
        * @description Ethnicity. Will never be null.
        * @example White : Irish
        */
-      ethnicity?: string
+      ethnicity?: string | null
       /**
        * @description Ethnicity code. Will never be null.
        * @example W1
        */
-      raceCode?: string
+      raceCode?: string | null
     }
     SortObject: {
       empty?: boolean
@@ -1609,20 +1628,20 @@ export interface components {
        * @description The lower bound for the release date range of which to search - defaults to today if not provided
        * @example 2022-04-20
        */
-      earliestReleaseDate?: string
+      earliestReleaseDate?: string | null
       /**
        * Format: date
        * @description The upper bound for the release date range of which to search. A required field.
        * @example 2022-05-20
        */
-      latestReleaseDate: string
+      latestReleaseDate: string | null
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
        * @example [
        *       "MDI"
        *     ]
        */
-      prisonIds?: string[]
+      prisonIds?: string[] | null
     }
     PrisonerNumbers: {
       /**
@@ -1639,28 +1658,28 @@ export interface components {
        * @description Prisoner first name
        * @example john
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Prisoner last Name
        * @example smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * Format: date
        * @description Prisoner date of birth
        * @example 1996-02-10
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Police National Computer (PNC) number (This will match both long and short PNC formats)
        * @example 2018/0123456X
        */
-      pncNumber?: string
+      pncNumber?: string | null
       /**
        * @description The Prisoner NOMIS Id (aka prison number/offender no in DPS)
        * @example A1234AB
        */
-      nomsNumber?: string
+      nomsNumber?: string | null
     }
     /** @description Search Criteria for Prisoner Search */
     PrisonSearch: {
@@ -1668,22 +1687,22 @@ export interface components {
        * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
        * @example A1234AA,
        */
-      prisonerIdentifier?: string
+      prisonerIdentifier?: string | null
       /**
        * @description First Name
        * @example John
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Last Name
        * @example Smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * @description Prison Id, Prison Id or OUT or TRN
        * @example MDI
        */
-      prisonId?: string
+      prisonId?: string | null
       /**
        * @description Include aliases in search
        * @default false
@@ -1697,24 +1716,24 @@ export interface components {
        * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
        * @example A1234AA,
        */
-      prisonerIdentifier?: string
+      prisonerIdentifier?: string | null
       /**
        * @description First Name
        * @example John
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Last Name
        * @example Smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * @description List of Prison Ids (can include OUT and TRN) to restrict the search by. Unrestricted if not supplied or null
        * @example [
        *       "MDI"
        *     ]
        */
-      prisonIds?: string[]
+      prisonIds?: string[] | null
       /**
        * @description Include aliases in search
        * @default false
@@ -1752,43 +1771,43 @@ export interface components {
        * @description Prisoner first name
        * @example john
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Prisoner last name
        * @example smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * @description Prisoner number (aka. offenderId, nomisId)
        * @example A1234AA
        */
-      nomsNumber?: string
+      nomsNumber?: string | null
       /**
        * @description Police National Computer (PNC) number
        * @example 2018/0123456X
        */
-      pncNumber?: string
+      pncNumber?: string | null
       /**
        * @description Criminal Records Office (CRO) number
        * @example SF80/655108T
        */
-      croNumber?: string
+      croNumber?: string | null
       /**
        * @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above.
        * @example false
        */
-      fuzzyMatch?: boolean
+      fuzzyMatch?: boolean | null
       /**
        * @description List of prison codes to filter results by
        * @example ['LEI', 'MDI']
        */
-      prisonIds: string[]
+      prisonIds: string[] | null
       /**
        * Format: date
        * @description Date of birth to filter results by
        * @example 1970-02-28
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Include aliases in search
        * @default true
@@ -1827,29 +1846,29 @@ export interface components {
        * @description Developer Information message
        * @example System is down
        */
-      developerMessage?: string
+      developerMessage?: string | null
       /**
        * Format: int32
        * @description Internal Error Code
        * @example 20012
        */
-      errorCode: number
+      errorCode: number | null
       /**
        * @description Error message information
        * @example Prisoner Not Found
        */
-      userMessage: string
+      userMessage: string | null
       /**
        * @description Additional information about the error
        * @example Hard disk failure
        */
-      moreInfo?: string
+      moreInfo?: string | null
     }
     BodyPart: {
       /**
        * @description Body part that has the physical mark, searching on the description in the type BODY_PART in the REFERENCE_CODES table. Allowable values extracted 08/02/2023.
        * @example Arm
-       * @enum {string}
+       * @enum {string|null}
        */
       bodyPart?:
         | 'Ankle'
@@ -1870,33 +1889,34 @@ export interface components {
         | 'Thigh'
         | 'Toe'
         | 'Torso'
+        | null
       /**
        * @description Comment on the physical mark.
        * @example dragon
        */
-      comment?: string
+      comment?: string | null
     }
     PhysicalDetailRequest: {
       /**
        * @description List of prison codes to filter results by
        * @example ['LEI', 'MDI']
        */
-      prisonIds: string[]
+      prisonIds: string[] | null
       /**
        * @description Filter for the prisoners cell location. A block wing or cell can be specified. With prison id can be included or absent so HEI-3-1 and 3-1 are equivalent when the prison id is HEI
        * @example 3-1
        */
-      cellLocationPrefix?: string
+      cellLocationPrefix?: string | null
       /**
        * @description Gender, searching on the description in the domain SEX in the REFERENCE_CODES table.
        * @example Male
-       * @enum {string}
+       * @enum {string|null}
        */
-      gender?: 'Female' | 'Male' | 'Not Known / Not Recorded' | 'Not Specified (Indeterminate)' | 'Refused'
+      gender?: 'Female' | 'Male' | 'Not Known / Not Recorded' | 'Not Specified (Indeterminate)' | 'Refused' | null
       /**
        * @description Ethnicity, searching on the description in the domain ETHNICITY in the REFERENCE_CODES table.
        * @example White : Irish
-       * @enum {string}
+       * @enum {string|null}
        */
       ethnicity?:
         | 'Asian/Asian British: Indian'
@@ -1921,34 +1941,35 @@ export interface components {
         | 'White: Gypsy or Irish Traveller'
         | 'White : Irish Traveller/Gypsy'
         | 'White: Any other background'
+        | null
       /**
        * Format: int32
        * @description Minimum height of the prisoner in centimetres
        * @example 170
        */
-      minHeight?: number
+      minHeight?: number | null
       /**
        * Format: int32
        * @description Maximum height of the prisoner in centimetres
        * @example 198
        */
-      maxHeight?: number
+      maxHeight?: number | null
       /**
        * Format: int32
        * @description Minimum weight of the prisoner in kilograms
        * @example 80
        */
-      minWeight?: number
+      minWeight?: number | null
       /**
        * Format: int32
        * @description Maximum weight of the prisoner in kilograms
        * @example 90
        */
-      maxWeight?: number
+      maxWeight?: number | null
       /**
        * @description Hair colour, searching on the description in the type HAIR in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Brunette
-       * @enum {string}
+       * @enum {string|null}
        */
       hairColour?:
         | 'Bald'
@@ -1966,22 +1987,23 @@ export interface components {
         | 'Multi-coloured'
         | 'Red'
         | 'White'
+        | null
       /**
        * @description Right eye colour, searching on the description in the type R_EYE_C in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Green
-       * @enum {string}
+       * @enum {string|null}
        */
-      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      rightEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White' | null
       /**
        * @description Left eye colour, searching on the description in the type L_EYE_C in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Hazel
-       * @enum {string}
+       * @enum {string|null}
        */
-      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White'
+      leftEyeColour?: 'Blue' | 'Brown' | 'Clouded' | 'Green' | 'Grey' | 'Hazel' | 'Missing' | 'Pink' | 'White' | null
       /**
        * @description Facial hair, searching on the description in the type FACIAL_HAIR in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Goatee Beard
-       * @enum {string}
+       * @enum {string|null}
        */
       facialHair?:
         | 'Full Beard'
@@ -1991,16 +2013,17 @@ export interface components {
         | 'Not Applicable (Female Offender)'
         | 'No Facial Hair'
         | 'Sideburns'
+        | null
       /**
        * @description Shape of face, searching on the description in the type FACE in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Bullet
-       * @enum {string}
+       * @enum {string|null}
        */
-      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular'
+      shapeOfFace?: 'Angular' | 'Bullet' | 'Oval' | 'Round' | 'Square' | 'Triangular' | null
       /**
        * @description Physical build, searching on the description in the type BUILD in the PROFILE_CODES table. Allowable values extracted 07/02/2023.
        * @example Medium
-       * @enum {string}
+       * @enum {string|null}
        */
       build?:
         | 'Fat'
@@ -2015,24 +2038,25 @@ export interface components {
         | 'Stocky'
         | 'Stooped'
         | 'Thin'
+        | null
       /**
        * Format: int32
        * @description Minimum UK shoe size of the prisoner
        * @example 5
        */
-      minShoeSize?: number
+      minShoeSize?: number | null
       /**
        * Format: int32
        * @description Maximum UK shoe size of the prisoner
        * @example 10
        */
-      maxShoeSize?: number
+      maxShoeSize?: number | null
       /** @description List of body parts that have tattoos */
-      tattoos?: components['schemas']['BodyPart'][]
+      tattoos?: components['schemas']['BodyPart'][] | null
       /** @description List of body parts that have marks */
-      marks?: components['schemas']['BodyPart'][]
+      marks?: components['schemas']['BodyPart'][] | null
       /** @description List of body parts that have scars */
-      scars?: components['schemas']['BodyPart'][]
+      scars?: components['schemas']['BodyPart'][] | null
       /**
        * @description Whether all terms are required to match. If set to true then only matches on all fields will return a result.
        *             If set to false then matches will return a higher score than non matches, but all will be returned.
@@ -2066,33 +2090,33 @@ export interface components {
        * @description Prisoner first name
        * @example john
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Prisoner last Name
        * @example smith
        */
-      lastName: string
+      lastName: string | null
       /**
        * Format: date
        * @description Prisoner date of birth
        * @example 1996-02-10
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Police National Computer (PNC) number
        * @example 2018/0123456X
        */
-      pncNumber?: string
+      pncNumber?: string | null
       /**
        * @description Criminal Records Office (CRO) number
        * @example SF80/655108T
        */
-      croNumber?: string
+      croNumber?: string | null
       /**
        * @description The Prisoner NOMIS Id (aka prison number/offender no in DPS)
        * @example A1234AB
        */
-      nomsNumber?: string
+      nomsNumber?: string | null
     }
     PrisonerMatch: {
       /** @description Details of the matching prisoner */
@@ -2120,27 +2144,27 @@ export interface components {
        * @description Match where any of the keywords are present in any text field
        * @example smith james john
        */
-      orWords?: string
+      orWords?: string | null
       /**
        * @description Match where all keywords are present in any text field
        * @example smith james
        */
-      andWords?: string
+      andWords?: string | null
       /**
        * @description Filter results where any of these words are present in any text field
        * @example jonas
        */
-      notWords?: string
+      notWords?: string | null
       /**
        * @description Match only prisoners where the full phrase is present in any text field
        * @example John Smith
        */
-      exactPhrase?: string
+      exactPhrase?: string | null
       /**
        * @description Fuzzy matching. Allow a one character difference in spelling in word lengths below five and two differences above.
        * @example false
        */
-      fuzzyMatch?: boolean
+      fuzzyMatch?: boolean | null
       /**
        * @description List of prison codes to filter results, null means all
        * @example [
@@ -2148,7 +2172,7 @@ export interface components {
        *       "MDI"
        *     ]
        */
-      prisonIds?: string[]
+      prisonIds?: string[] | null
       /** @description Pagination options. Will default to the first page if omitted. */
       pagination: components['schemas']['PaginationRequest']
       /**
@@ -2159,20 +2183,20 @@ export interface components {
       /**
        * @description Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate)
        * @example M
-       * @enum {string}
+       * @enum {string|null}
        */
-      gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL'
+      gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL' | null
       /**
        * @description Location, Inside or Outside
        * @example IN
        */
-      location?: string
+      location?: string | null
       /**
        * Format: date
        * @description Date of birth
        * @example 1970-02-28
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
     }
     KeywordResponse: {
       /** Format: int64 */
@@ -2198,34 +2222,34 @@ export interface components {
        * @description Prisoner identifier, one of prisoner number, book number, booking ID or PNC
        * @example A1234AA
        */
-      prisonerIdentifier?: string
+      prisonerIdentifier?: string | null
       /**
        * @description First Name
        * @example John
        */
-      firstName?: string
+      firstName?: string | null
       /**
        * @description Last Name
        * @example Smith
        */
-      lastName?: string
+      lastName?: string | null
       /**
        * @description Gender, F - Female, M - Male, NK - Not Known / Not Recorded or NS - Not Specified (Indeterminate)
        * @example M
-       * @enum {string}
+       * @enum {string|null}
        */
-      gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL'
+      gender?: 'M' | 'F' | 'NK' | 'NS' | 'ALL' | null
       /**
        * @description Location, All or Inside or Outside
        * @example IN
        */
-      location?: string
+      location?: string | null
       /**
        * Format: date
        * @description Date of birth
        * @example 1970-02-28
        */
-      dateOfBirth?: string
+      dateOfBirth?: string | null
       /**
        * @description Include aliases in search
        * @default false
@@ -2293,7 +2317,7 @@ export interface components {
        * @description The minimum value to match
        * @example 2024-01-01
        */
-      minValue?: string
+      minValue?: string | null
       /**
        * @description Whether the minimum value is inclusive or exclusive
        * @default true
@@ -2304,7 +2328,7 @@ export interface components {
        * @description The maximum value to match
        * @example 2024-01-31
        */
-      maxValue?: string
+      maxValue?: string | null
       /**
        * @description Whether the maximum value is inclusive or exclusive
        * @default true
@@ -2339,13 +2363,13 @@ export interface components {
        * @description The minimum value to match
        * @example 2024-01-01T09:00:00Z
        */
-      minValue?: string
+      minValue?: string | null
       /**
        * Format: date-time
        * @description The maximum value to match
        * @example 2024-01-31T21:00:00Z
        */
-      maxValue?: string
+      maxValue?: string | null
     } & {
       /**
        * @description discriminator enum property added by openapi-typescript
@@ -2377,7 +2401,7 @@ export interface components {
        * @description The minimum value to match on
        * @example 150
        */
-      minValue?: number
+      minValue?: number | null
       /**
        * @description Whether the minimum value is inclusive
        * @default true
@@ -2388,7 +2412,7 @@ export interface components {
        * @description The maximum value to match on
        * @example 180
        */
-      maxValue?: number
+      maxValue?: number | null
       /**
        * @description Whether the maximum value is inclusive
        * @default true
@@ -2437,16 +2461,18 @@ export interface components {
        */
       joinType: 'AND' | 'OR'
       /** @description Matchers that will be applied to this query */
-      matchers?: (
-        | components['schemas']['BooleanMatcher']
-        | components['schemas']['DateMatcher']
-        | components['schemas']['DateTimeMatcher']
-        | components['schemas']['IntMatcher']
-        | components['schemas']['PncMatcher']
-        | components['schemas']['StringMatcher']
-      )[]
+      matchers?:
+        | (
+            | components['schemas']['BooleanMatcher']
+            | components['schemas']['DateMatcher']
+            | components['schemas']['DateTimeMatcher']
+            | components['schemas']['IntMatcher']
+            | components['schemas']['PncMatcher']
+            | components['schemas']['StringMatcher']
+          )[]
+        | null
       /** @description A list of sub-queries of type Query that will be combined with the matchers in this query */
-      subQueries?: components['schemas']['Query'][]
+      subQueries?: components['schemas']['Query'][] | null
     }
     /**
      * @description A matcher for a string attribute from the prisoner record.
@@ -2495,12 +2521,17 @@ export interface components {
        * @description Prison id. Current prison or OUT if outside. Will not be returned if no bookings.
        * @example MDI
        */
-      prisonId?: string
+      prisonId?: string | null
       /**
-       * @description Last prison id. If prisonId is OUT then will contain last prison, otherwise will be the same as prisonId. Will not be returned if no bookings.
+       * @description Last i.e. final prison id. If prisonId is OUT then will contain last prison, otherwise will be the same as prisonId. Will not be returned if no bookings.
        * @example MDI
        */
-      lastPrisonId?: string
+      lastPrisonId?: string | null
+      /**
+       * @description The previous prison for the prisoner within the current term
+       * @example MDI
+       */
+      previousPrisonId?: string | null
       /**
        * @description First Name
        * @example Robert
@@ -2518,9 +2549,9 @@ export interface components {
        * @description Scroll id. To be kept and used in next request
        * @example FGluY2x1ZGVfY29udGV4dF91dWlkDnF1ZXJ5VGhlbkZldG...
        */
-      scrollId?: string
+      scrollId?: string | null
       /** @description List of prisoner locations */
-      locations?: components['schemas']['PrisonerLocation'][]
+      locations?: components['schemas']['PrisonerLocation'][] | null
     }
     /** @description An attribute that can be searched for in a query */
     Attribute: {

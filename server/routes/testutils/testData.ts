@@ -538,6 +538,8 @@ export default class TestData {
     visitRoom = 'Visits hall',
     visitOrderRestriction = 'VO_PVO',
     isSessionExcluded = false,
+    isAgeRestricted = false,
+    ageRestriction = null,
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -554,6 +556,8 @@ export default class TestData {
     visitRoom,
     visitOrderRestriction,
     isSessionExcluded,
+    isAgeRestricted,
+    ageRestriction,
   })
 
   static socialContact = ({
@@ -1187,6 +1191,8 @@ export default class TestData {
     closedVisitBookedCount = 1,
     startTimestamp = '2022-01-14T10:00:00',
     endTimestamp = '2022-01-14T11:00:00',
+    isAgeRestricted = false,
+    ageRestriction = null,
     sessionConflicts = undefined,
   }: Partial<VisitSession> = {}): VisitSession => ({
     sessionTemplateReference,
@@ -1200,6 +1206,8 @@ export default class TestData {
     closedVisitBookedCount,
     startTimestamp,
     endTimestamp,
+    isAgeRestricted,
+    ageRestriction,
     sessionConflicts,
   })
 
@@ -1214,6 +1222,8 @@ export default class TestData {
     endTime = '11:00',
     sessionConflicts = [],
     visitOrderRestriction = 'VO_PVO',
+    isAgeRestricted = false,
+    ageRestriction = null,
   }: Partial<VisitSessionV2Dto> = {}): VisitSessionV2Dto => ({
     sessionTemplateReference,
     visitRoom,
@@ -1225,6 +1235,8 @@ export default class TestData {
     endTime,
     sessionConflicts,
     visitOrderRestriction,
+    isAgeRestricted,
+    ageRestriction,
   })
 
   static visitSessionsAndSchedule = ({
