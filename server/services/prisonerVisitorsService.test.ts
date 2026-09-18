@@ -21,7 +21,7 @@ describe('Prisoner visitor service', () => {
 
     it('Retrieves and processes prisoner and approved visitor details', async () => {
       const childDateOfBirth = `${new Date().getFullYear() - 4}-03-02`
-      const contacts: Contact[] = [
+      const contacts = <Contact[]>[
         {
           personId: 4321,
           firstName: 'Jeanette',
