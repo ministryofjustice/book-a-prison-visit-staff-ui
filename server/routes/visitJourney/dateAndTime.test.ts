@@ -83,7 +83,7 @@ beforeEach(() => {
       {
         personId: 4323,
         name: 'Ted Smith',
-        dateOfBirth: '1968-07-28',
+        age: null,
         adult: true,
         relationshipDescription: 'Father',
         address: '1st listed address',

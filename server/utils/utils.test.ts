@@ -2,7 +2,6 @@ import { format } from 'date-fns'
 import {
   convertToTitleCase,
   getResultsPagingLinks,
-  isAdult,
   prisonerDateTimePretty,
   properCaseFullName,
   properCase,
@@ -14,6 +13,7 @@ import {
   formatStartToEndTime,
   pluralise,
   escapeHtml,
+  ageInYears,
 } from './utils'
 import getResultsPagingLinksTestData from './utils.testData'
 
@@ -41,15 +41,25 @@ describe('Return pagination pages', () => {
   })
 })
 
-describe('Check if adult', () => {
-  it('Is an adult - now', () => {
-    expect(isAdult('2000-01-01')).toEqual(true)
+describe('ageInYears', () => {
+  const fakeDate = new Date('2020-02-01T09:00:00')
+
+  beforeEach(() => {
+    jest.useFakeTimers({ now: fakeDate })
   })
-  it('Is an adult - on given date', () => {
-    expect(isAdult('2000-01-02', new Date(2018, 0, 2))).toEqual(true)
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
-  it('Is a child - on given date', () => {
-    expect(isAdult('2000-01-02', new Date(2018, 0, 1))).toEqual(false)
+
+  it.each([
+    ['2000-01-01', 20],
+    ['2010-01-01', 10],
+    ['2020-01-01', 0],
+    [null, null],
+    [undefined, null],
+  ])('ageInYears (%s) should return %s', (dateOfBirth, expectedAge) => {
+    expect(ageInYears(dateOfBirth)).toBe(expectedAge)
   })
 })
 

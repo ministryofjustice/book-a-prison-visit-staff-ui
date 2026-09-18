@@ -54,6 +54,7 @@ testJourneys.forEach(journey => {
           {
             address: '1st listed address',
             adult: true,
+            age: 50,
             dateOfBirth: '1986-07-28',
             name: 'Bob Smith',
             personId: 4322,
