@@ -1,34 +1,26 @@
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/button/macro.njk" import govukButton %}
+{%- from "moj/components/search/macro.njk" import mojSearch -%}
+
 <div class="govuk-grid-column-full">
   <div class="block-background">
-    <div class="moj-search govuk-!-width-one-half">
-      <form action="/search/prisoner" method="POST" novalidate>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-        {{ govukInput({
-          classes: "moj-search__input",
-          label: {
-            text: "Enter name or prison number"
-          },
-          id: "search",
-          name: "search",
-          spellcheck: false,
-          value: search,
-          autocomplete: "off",
-          errorMessage: errors | findError('search')
-        }) }}
-
-        {{ govukButton({
-          classes: "moj-search__button",
-          text: "Search",
-          preventDoubleClick: true,
-          attributes: {
-            "data-test": "search"
-          }
-        }) }}
-
-      </form>
-    </div>
+    {{ mojSearch({
+      action: "/search/prisoner",
+      method: "post",
+      csrf: { value: csrfToken },
+      input: {
+        id: "search",
+        name: "search",
+        value: search,
+        autocomplete: "off",
+        errorMessage: errors | findError('search')
+      },
+      label: {
+        text: "Enter name or prison number",
+        classes: "govuk-!-font-weight-regular"
+      },
+      button: {
+        text: "Search"
+      },
+      classes: "govuk-!-width-one-half"
+    }) }}
   </div>
 </div>
