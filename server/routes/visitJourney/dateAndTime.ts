@@ -52,6 +52,7 @@ export default class DateAndTime {
       prisonId,
       prisonerId: visitSessionData.prisoner.offenderNo,
       minNumberOfDays,
+      youngestVisitorAge: null,
       visitRestriction: visitSessionData.visitRestriction,
       selectedVisitSession: visitSessionData.selectedVisitSession,
       originalVisitSession: visitSessionData.originalVisitSession,

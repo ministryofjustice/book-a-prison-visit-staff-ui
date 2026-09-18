@@ -707,11 +707,13 @@ export default class OrchestrationApiClient extends RestClient {
     prisonerId,
     minNumberOfDays,
     username,
+    youngestVisitorAge,
   }: {
     prisonId: string
     prisonerId: string
     minNumberOfDays: number
     username: string
+    youngestVisitorAge: number | null
   }): Promise<VisitSessionsAndScheduleDto> {
     return this.get(
       {
@@ -721,6 +723,7 @@ export default class OrchestrationApiClient extends RestClient {
           prisonerId,
           min: minNumberOfDays.toString(),
           username,
+          ...(youngestVisitorAge !== null && { youngestVisitorAge: youngestVisitorAge.toString() }),
         }).toString(),
       },
       asSystem(),
