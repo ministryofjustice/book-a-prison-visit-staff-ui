@@ -41,9 +41,9 @@ describe('Visit service', () => {
       }
 
       const visitors: VisitorListItem[] = [
-        { personId: 1, age: 0 }, // infant; age 0 years
-        { personId: 2, age: 5 }, // child; age 5 years
-        { personId: 3, age: 18 }, // adult; age 25 years
+        { personId: 1, age: 0 }, // infant
+        { personId: 2, age: 5 }, // child
+        { personId: 3, age: 18 }, // adult
         { personId: 4, age: null }, // missing DoB
       ] as VisitorListItem[]
 
