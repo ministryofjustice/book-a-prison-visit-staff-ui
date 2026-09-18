@@ -31,15 +31,6 @@ describe('Visit service', () => {
 
   describe('Visit booking, update and cancellation', () => {
     describe('bookVisit and updateVisit', () => {
-      beforeEach(() => {
-        const fakeDate = new Date('2025-10-05T09:00:00')
-        jest.useFakeTimers({ now: fakeDate })
-      })
-
-      afterEach(() => {
-        jest.useRealTimers()
-      })
-
       const applicationReference = 'aaa-bbb-ccc'
       const applicationMethod: ApplicationMethodType = 'NOT_KNOWN'
 
@@ -50,21 +41,17 @@ describe('Visit service', () => {
       }
 
       const visitors: VisitorListItem[] = [
-        { personId: 1, dateOfBirth: '2025-07-01' }, // infant; age 0 years
-        { personId: 2, dateOfBirth: '2020-10-01' }, // child; age 5 years
-        { personId: 3, dateOfBirth: '2000-01-01' }, // adult; age 25 years
-        { personId: 4, dateOfBirth: '' }, // missing DoB
-        { personId: 5, dateOfBirth: null }, // missing DoB
-        { personId: 6, dateOfBirth: undefined }, // missing DoB
+        { personId: 1, age: 0 }, // infant; age 0 years
+        { personId: 2, age: 5 }, // child; age 5 years
+        { personId: 3, age: 18 }, // adult; age 25 years
+        { personId: 4, age: null }, // missing DoB
       ] as VisitorListItem[]
 
       const expectedVisitorDetails: BookingRequestVisitorDetailsDto[] = [
         { visitorId: 1, visitorAge: 0 },
         { visitorId: 2, visitorAge: 5 },
-        { visitorId: 3, visitorAge: 25 },
+        { visitorId: 3, visitorAge: 18 },
         { visitorId: 4, visitorAge: null },
-        { visitorId: 5, visitorAge: null },
-        { visitorId: 6, visitorAge: null },
       ]
 
       it('should book a visit including visitor age data', async () => {

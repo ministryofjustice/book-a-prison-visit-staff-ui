@@ -1,5 +1,4 @@
 import { NotFound } from 'http-errors'
-import { intervalToDuration, isValid, parseISO } from 'date-fns'
 import { VisitInformation, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import {
   ApplicationDto,
@@ -182,25 +181,9 @@ export default class VisitService {
   }
 
   private buildVisitorDetails(visitors: VisitorListItem[]): BookingRequestVisitorDetailsDto[] {
-    const now = new Date()
-    return visitors.map(visitor => {
-      const { personId: visitorId } = visitor
-
-      let visitorAge: number
-      try {
-        const visitorDoB = parseISO(visitor.dateOfBirth)
-
-        if (isValid(visitorDoB)) {
-          const ageAsDuration = intervalToDuration({ start: visitorDoB, end: now })
-          visitorAge = ageAsDuration?.years ?? 0
-        } else {
-          visitorAge = null
-        }
-      } catch {
-        visitorAge = null
-      }
-
-      return { visitorId, visitorAge }
-    })
+    return visitors.map(visitor => ({
+      visitorId: visitor.personId,
+      visitorAge: visitor.age,
+    }))
   }
 }
