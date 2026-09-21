@@ -56,8 +56,8 @@ describe('ageInYears', () => {
     ['2000-01-01', 20],
     ['2010-01-01', 10],
     ['2020-01-01', 0],
-    [null, null],
-    [undefined, null],
+    [null, undefined],
+    [undefined, undefined],
   ])('ageInYears (%s) should return %s', (dateOfBirth, expectedAge) => {
     expect(ageInYears(dateOfBirth)).toBe(expectedAge)
   })

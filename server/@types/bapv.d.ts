@@ -30,7 +30,7 @@ export type VisitorListItem = {
   personId: number
   name: string
   dateOfBirth?: string
-  age: number | null
+  age?: number // Age in years
   adult: boolean
   relationshipDescription: string
   address?: string

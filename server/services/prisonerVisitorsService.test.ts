@@ -163,8 +163,6 @@ describe('Prisoner visitor service', () => {
         {
           personId: 4322,
           name: 'Bob Smith',
-          dateOfBirth: undefined,
-          age: null,
           adult: true,
           relationshipDescription: 'Brother',
           address: '123 The Street',

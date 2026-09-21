@@ -53,7 +53,6 @@ beforeEach(() => {
       {
         personId: 4323,
         name: 'Ted Smith',
-        age: null,
         adult: true,
         relationshipDescription: 'Father',
         address: '1st listed address',
@@ -269,7 +268,6 @@ testJourneys.forEach(journey => {
           {
             personId: 123,
             name: 'name last',
-            age: null,
             adult: true,
             relationshipDescription: 'relate',
             restrictions: [

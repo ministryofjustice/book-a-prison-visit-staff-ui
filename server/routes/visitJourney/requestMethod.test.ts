@@ -52,7 +52,6 @@ testJourneys.forEach(journey => {
           {
             personId: 123,
             name: 'name last',
-            age: null,
             adult: true,
             relationshipDescription: 'relate',
             restrictions: [

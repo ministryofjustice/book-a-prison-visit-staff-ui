@@ -47,7 +47,7 @@ describe('buildVisitorListItem', () => {
     delete contact.dateOfBirth
     const visitorListItem = buildVisitorListItem(contact, policyNoticeDaysMax)
 
-    expect(visitorListItem.age).toBe(null)
+    expect(visitorListItem.age).toBe(undefined)
     expect(visitorListItem.adult).toBe(true)
   })
 })

@@ -104,14 +104,14 @@ export const getResultsPagingLinks = ({
  * Calculates the age in years based on the provided date of birth.
  *
  * @param dateOfBirth date of birth string YYYY-MM-DD
- * @returns age in years or null if date of birth is invalid or not provided.
+ * @returns age in years or undefined if date of birth is invalid or not provided.
  */
-export const ageInYears = (dateOfBirth: string | undefined | null): number | null => {
+export const ageInYears = (dateOfBirth: string | undefined | null): number | undefined => {
   if (!dateOfBirth) {
-    return null
+    return undefined
   }
   const parsedDateOfBirth = parseISO(dateOfBirth)
-  return isValid(parsedDateOfBirth) ? differenceInYears(new Date(), parsedDateOfBirth) : null
+  return isValid(parsedDateOfBirth) ? differenceInYears(new Date(), parsedDateOfBirth) : undefined
 }
 
 /**

@@ -10,13 +10,13 @@ const ADULT_AGE: number = 18
 export const buildVisitorListItem = (visitor: Contact, policyNoticeDaysMax: number): VisitorListItem => {
   const age = ageInYears(visitor.dateOfBirth)
   // Count as adult if age is unknown or age is 18 or older
-  const adult = age === null || age >= ADULT_AGE
+  const adult = age === undefined || age >= ADULT_AGE
 
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
     ...(visitor.dateOfBirth && { dateOfBirth: visitor.dateOfBirth }),
-    age,
+    ...(age !== undefined && { age }),
     adult,
     relationshipDescription: visitor.relationshipDescription,
     address: getFormattedAddress(visitor.address),
