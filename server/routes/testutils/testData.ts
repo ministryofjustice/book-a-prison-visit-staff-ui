@@ -539,7 +539,7 @@ export default class TestData {
     visitOrderRestriction = 'VO_PVO',
     isSessionExcluded = false,
     isAgeRestricted = false,
-    ageRestriction = null,
+    ageRestriction = 18,
   }: Partial<SessionSchedule> = {}): SessionSchedule => ({
     sessionTemplateReference,
     sessionTimeSlot,
@@ -1192,7 +1192,7 @@ export default class TestData {
     startTimestamp = '2022-01-14T10:00:00',
     endTimestamp = '2022-01-14T11:00:00',
     isAgeRestricted = false,
-    ageRestriction = null,
+    ageRestriction = 18,
     sessionConflicts = undefined,
   }: Partial<VisitSession> = {}): VisitSession => ({
     sessionTemplateReference,
@@ -1223,7 +1223,7 @@ export default class TestData {
     sessionConflicts = [],
     visitOrderRestriction = 'VO_PVO',
     isAgeRestricted = false,
-    ageRestriction = null,
+    ageRestriction = 18,
   }: Partial<VisitSessionV2Dto> = {}): VisitSessionV2Dto => ({
     sessionTemplateReference,
     visitRoom,

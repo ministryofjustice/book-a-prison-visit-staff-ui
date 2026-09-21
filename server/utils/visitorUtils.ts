@@ -15,7 +15,7 @@ export const buildVisitorListItem = (visitor: Contact, policyNoticeDaysMax: numb
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
-    dateOfBirth: visitor.dateOfBirth,
+    ...(visitor.dateOfBirth && { dateOfBirth: visitor.dateOfBirth }),
     age,
     adult,
     relationshipDescription: visitor.relationshipDescription,
