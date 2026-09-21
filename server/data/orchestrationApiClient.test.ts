@@ -1118,10 +1118,10 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVisitSessionsAndSchedule', () => {
-    it('should return array of visit sessions and events for specified prisoner', async () => {
-      const visitSessionsAndScheduleDto = TestData.visitSessionsAndSchedule()
-      const minNumberOfDays = 2
+    const visitSessionsAndScheduleDto = TestData.visitSessionsAndSchedule()
+    const minNumberOfDays = 2
 
+    it('should return array of visit sessions and events for specified prisoner (with youngest visitor age null)', async () => {
       fakeOrchestrationApi
         .get('/visit-sessions-and-schedule')
         .query(
@@ -1130,6 +1130,7 @@ describe('orchestrationApiClient', () => {
             prisonerId,
             min: minNumberOfDays.toString(),
             username,
+            // youngestVisitorAge not sent for null
           }).toString(),
         )
         .matchHeader('authorization', `Bearer ${token}`)
@@ -1140,6 +1141,33 @@ describe('orchestrationApiClient', () => {
         prisonerId,
         minNumberOfDays,
         username,
+        youngestVisitorAge: null,
+      })
+
+      expect(output).toStrictEqual(visitSessionsAndScheduleDto)
+    })
+
+    it('should return array of visit sessions and events for specified prisoner (with youngest visitor age provided)', async () => {
+      fakeOrchestrationApi
+        .get('/visit-sessions-and-schedule')
+        .query(
+          new URLSearchParams({
+            prisonId,
+            prisonerId,
+            min: minNumberOfDays.toString(),
+            username,
+            youngestVisitorAge: '16',
+          }).toString(),
+        )
+        .matchHeader('authorization', `Bearer ${token}`)
+        .reply(200, visitSessionsAndScheduleDto)
+
+      const output = await orchestrationApiClient.getVisitSessionsAndSchedule({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+        youngestVisitorAge: 16,
       })
 
       expect(output).toStrictEqual(visitSessionsAndScheduleDto)

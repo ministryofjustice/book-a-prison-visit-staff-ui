@@ -328,6 +328,12 @@ export interface components {
        */
       dateOfBirth?: string | null
       /**
+       * Format: int64
+       * @description Key of specific relationship
+       * @example 1234567
+       */
+      relationshipId: number
+      /**
        * @description Code for relationship to Prisoner
        * @example RO
        */
@@ -355,6 +361,7 @@ export interface components {
       nextOfKin: boolean
       /** @description List of restrictions associated with the contact */
       restrictions: components['schemas']['RestrictionDto'][]
+      /** @description Address associated with the contact */
       address?: components['schemas']['AddressDto'] | null
       /**
        * @description Additional Information
@@ -507,6 +514,7 @@ export interface components {
       contactTypeDescription?: string | null
       /** @description List of restrictions associated with the contact */
       restrictions: components['schemas']['RestrictionDto'][]
+      /** @description Address associated with the contact */
       address?: components['schemas']['AddressDto'] | null
       /**
        * @description Is this prisoner's contact relationship approved?
