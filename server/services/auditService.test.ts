@@ -32,7 +32,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'SEARCHED_PRISONERS',
+        what: 'SEARCHED_PRISONERS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -53,7 +53,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'VIEWED_PRISONER',
+        what: 'VIEWED_PRISONER',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -80,7 +80,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'RESERVED_VISIT',
+        what: 'RESERVED_VISIT',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -116,7 +116,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'BOOKED_VISIT',
+        what: 'BOOKED_VISIT',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -148,7 +148,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'DISMISSED_NOTIFICATIONS',
+        what: 'DISMISSED_NOTIFICATIONS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -171,7 +171,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'CANCELLED_VISIT',
+        what: 'CANCELLED_VISIT',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -197,7 +197,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'VIEWED_VISITS',
+        what: 'VIEWED_VISITS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -213,7 +213,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'OVERRODE_ZERO_VO',
+        what: 'OVERRODE_ZERO_VO',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -235,7 +235,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'VISIT_RESTRICTION_SELECTED',
+        what: 'VISIT_RESTRICTION_SELECTED',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -251,7 +251,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'SEARCHED_VISITS',
+        what: 'SEARCHED_VISITS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -273,7 +273,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'VIEWED_VISIT_DETAILS',
+        what: 'VIEWED_VISIT_DETAILS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -294,7 +294,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'BLOCKED_VISIT_DATE',
+        what: 'BLOCKED_VISIT_DATE',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -315,7 +315,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'UNBLOCKED_VISIT_DATE',
+        what: 'UNBLOCKED_VISIT_DATE',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -336,7 +336,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'BLOCKED_VISIT_SESSION',
+        what: 'BLOCKED_VISIT_SESSION',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -357,7 +357,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'UNBLOCKED_VISIT_SESSION',
+        what: 'UNBLOCKED_VISIT_SESSION',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -377,7 +377,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'SEARCHED_BOOKERS',
+        what: 'SEARCHED_BOOKERS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -398,7 +398,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'VIEWED_BOOKER',
+        what: 'VIEWED_BOOKER',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -420,7 +420,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'LINKED_BOOKER_VISITOR',
+        what: 'LINKED_BOOKER_VISITOR',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -442,7 +442,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'UNLINKED_BOOKER_VISITOR',
+        what: 'UNLINKED_BOOKER_VISITOR',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -462,7 +462,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'APPROVED_VISIT_REQUEST',
+        what: 'APPROVED_VISIT_REQUEST',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -483,7 +483,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'REJECTED_VISIT_REQUEST',
+        what: 'REJECTED_VISIT_REQUEST',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -504,7 +504,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'APPROVED_VISITOR_REQUEST',
+        what: 'APPROVED_VISITOR_REQUEST',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -525,7 +525,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'REJECTED_VISITOR_REQUEST',
+        what: 'REJECTED_VISITOR_REQUEST',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -549,7 +549,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'ADJUSTED_VISIT_BALANCE',
+        what: 'ADJUSTED_VISIT_BALANCE',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -577,7 +577,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'UPDATED_VISIT_ALLOWANCES',
+        what: 'UPDATED_VISIT_ALLOWANCES',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -599,7 +599,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'PRINTED_VISIT_PASS',
+        what: 'PRINTED_VISIT_PASS',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
@@ -620,7 +620,7 @@ describe('Audit service', () => {
     expect(sendMessage).toHaveBeenCalledTimes(1)
     expect(sendMessage).toHaveBeenCalledWith(
       {
-        action: 'PRINTED_VISIT_PASSES',
+        what: 'PRINTED_VISIT_PASSES',
         who: 'username',
         correlationId: 'operation-id',
         subjectType: 'NOT_APPLICABLE',
