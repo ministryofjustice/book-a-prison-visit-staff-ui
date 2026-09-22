@@ -140,6 +140,7 @@ describe('View visits timetable', () => {
         prisonerCategoryGroupNames: ['Category A (High Risk)'],
         prisonerIncentiveLevelGroupNames: ['Enhanced'],
         prisonerLocationGroupNames: ['Group 1'],
+        isAgeRestricted: true,
       }),
     ]
 
@@ -156,20 +157,18 @@ describe('View visits timetable', () => {
         expect($('[data-test="schedule-time-1"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-1"]').text()).toBe('Open')
         expect($('[data-test="schedule-capacity-1"]').text()).toBe('11 tables')
-        expect($('[data-test="schedule-attendees-1"]').text().trim()).toBe(
+        expect($('[data-test="schedule-prisoners-1"]').text().trim()).toBe(
           'Category A (High Risk) prisoners on Enhanced in Group 1',
         )
-        expect($('[data-test="schedule-frequency-1"]').text()).toBe('Every 3 weeks')
-        expect($('[data-test="schedule-end-date-1"]').text()).toBe('31 December 2025')
+        expect($('[data-test="schedule-visitors-1"]').text().trim()).toBe('Visitors aged 18 years old or older')
         // Row 2
         expect($('[data-test="schedule-time-2"]').text()).toBe('1:45pm to 3:45pm')
         expect($('[data-test="schedule-type-2"]').text()).toBe('Closed')
         expect($('[data-test="schedule-capacity-2"]').text()).toBe('22 tables')
-        expect($('[data-test="schedule-attendees-2"]').text().trim()).toBe(
+        expect($('[data-test="schedule-prisoners-2"]').text().trim()).toBe(
           'Category A (High Risk) prisoners on Enhanced in Group 1',
         )
-        expect($('[data-test="schedule-frequency-2"]').text()).toBe('Every 3 weeks')
-        expect($('[data-test="schedule-end-date-2"]').text()).toBe('31 December 2025')
+        expect($('[data-test="schedule-visitors-2"]').text().trim()).toBe('Visitors aged 18 years old or older')
       })
   })
 })

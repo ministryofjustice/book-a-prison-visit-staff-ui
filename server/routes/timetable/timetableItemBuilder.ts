@@ -1,14 +1,12 @@
-import { format, parseISO } from 'date-fns'
 import { SessionSchedule } from '../../data/orchestrationApiTypes'
-import { formatStartToEndTime } from '../../utils/utils'
+import { formatStartToEndTime, pluralise } from '../../utils/utils'
 
 export type TimetableItem = {
   time: string
   type: 'Open' | 'Closed'
   capacity: string
-  attendees: string
-  frequency: string
-  endDate: string
+  visitors: string
+  prisoners: string
 }
 
 // Formats as, e.g.  "A, B and C" (and handles cases of zero, one or two items)
@@ -19,26 +17,16 @@ const listFormatter = new Intl.ListFormat('en-GB', {
 
 // Builds timetable rows, using all session schedules for the selected date
 export default (schedules: SessionSchedule[]): TimetableItem[] => {
-  const dateFormat = 'd MMMM yyyy'
   const timetableItems: TimetableItem[] = []
   schedules.forEach(schedule => {
-    const { validToDate, validFromDate } = schedule.sessionDateRange
     const { startTime, endTime } = schedule.sessionTimeSlot
 
     const time = formatStartToEndTime(startTime, endTime)
 
-    const endDate = validToDate ? format(parseISO(validToDate), dateFormat) : 'Not entered'
-
-    let frequency = 'One off'
-    if (validFromDate !== validToDate) {
-      frequency = schedule.weeklyFrequency === 1 ? 'Every week' : `Every ${schedule.weeklyFrequency} weeks`
-    }
-
     const otherTimetableInformation = {
       time,
-      attendees: buildAttendeesText(schedule),
-      frequency,
-      endDate,
+      visitors: buildVisitorsText(schedule),
+      prisoners: buildPrisonersText(schedule),
     }
     if (schedule.capacity.open !== 0) {
       timetableItems.push({
@@ -59,8 +47,18 @@ export default (schedules: SessionSchedule[]): TimetableItem[] => {
   return timetableItems
 }
 
+// Function to build description of which visitors are allowed to attend session
+export const buildVisitorsText = ({
+  isAgeRestricted,
+  ageRestriction,
+}: Pick<SessionSchedule, 'isAgeRestricted' | 'ageRestriction'>): string => {
+  return isAgeRestricted
+    ? `Visitors aged ${ageRestriction} ${pluralise('year', ageRestriction)} old or older`
+    : 'All visitors'
+}
+
 // Function to build description of groups included/excluded from this particular session
-export const buildAttendeesText = ({
+export const buildPrisonersText = ({
   prisonerCategoryGroupNames,
   prisonerIncentiveLevelGroupNames,
   prisonerLocationGroupNames,

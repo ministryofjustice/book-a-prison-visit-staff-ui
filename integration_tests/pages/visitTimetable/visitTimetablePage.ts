@@ -58,15 +58,11 @@ export default class VisitTimetablePage extends AbstractPage {
     return this.page.getByTestId(`schedule-capacity-${row}`)
   }
 
-  scheduleAttendees(row: number): Locator {
-    return this.page.getByTestId(`schedule-attendees-${row}`)
+  scheduleVisitors(row: number): Locator {
+    return this.page.getByTestId(`schedule-visitors-${row}`)
   }
 
-  scheduleFrequency(row: number): Locator {
-    return this.page.getByTestId(`schedule-frequency-${row}`)
-  }
-
-  scheduleEndDate(row: number): Locator {
-    return this.page.getByTestId(`schedule-end-date-${row}`)
+  schedulePrisoners(row: number): Locator {
+    return this.page.getByTestId(`schedule-prisoners-${row}`)
   }
 }

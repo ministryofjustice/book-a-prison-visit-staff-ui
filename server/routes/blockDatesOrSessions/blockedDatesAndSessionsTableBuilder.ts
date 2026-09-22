@@ -1,6 +1,6 @@
 import { PrisonAndSessionsExcludeDatesDto } from '../../data/orchestrationApiTypes'
 import { formatStartToEndTime } from '../../utils/utils'
-import { buildAttendeesText } from '../timetable/timetableItemBuilder'
+import { buildPrisonersText } from '../timetable/timetableItemBuilder'
 
 export type BlockedDateOrSessionRow = {
   date: string // YYYY-MM-DD
@@ -33,7 +33,7 @@ const buildBlockedDatesAndSessionsTable = ({
         sessionExclusion.sessionTimeSlot?.startTime,
         sessionExclusion.sessionTimeSlot?.endTime,
       ),
-      attendees: buildAttendeesText({ ...sessionExclusion }),
+      attendees: buildPrisonersText({ ...sessionExclusion }),
       where: sessionExclusion.visitRoom,
       actionedBy: sessionExclusion.excludeDate.actionedBy,
       sessionTemplateReference: sessionExclusion.sessionTemplateReference,
