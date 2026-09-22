@@ -373,8 +373,6 @@ test.describe('Check visit details page', () => {
       validationErrors: ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'],
     })
 
-    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId, youngestVisitorAge: 5 })
-
     await checkYourBookingPage.clickSubmit()
 
     // Should return to date/time page with alert
