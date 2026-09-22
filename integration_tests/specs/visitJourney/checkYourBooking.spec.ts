@@ -93,6 +93,7 @@ test.describe('Check visit details page', () => {
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId,
       visitSessionsAndSchedule,
+      youngestVisitorAge: 18,
     })
 
     await orchestrationApi.stubCreateVisitApplication(
@@ -180,6 +181,11 @@ test.describe('Check visit details page', () => {
     await expect(visitorsPage.getVisitor(contacts[0].personId)).toBeChecked()
     await expect(visitorsPage.getVisitor(contacts[1].personId)).not.toBeChecked()
     await visitorsPage.getVisitor(contacts[1].personId).check()
+    await orchestrationApi.stubGetVisitSessionsAndSchedule({
+      prisonerId,
+      visitSessionsAndSchedule,
+      youngestVisitorAge: 5,
+    })
     await visitorsPage.continueButton.click()
 
     await orchestrationApi.stubChangeVisitApplication(
@@ -307,6 +313,7 @@ test.describe('Check visit details page', () => {
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId,
       visitSessionsAndSchedule,
+      youngestVisitorAge: 18,
     })
 
     await orchestrationApi.stubCreateVisitApplication(
@@ -366,7 +373,7 @@ test.describe('Check visit details page', () => {
       validationErrors: ['APPLICATION_INVALID_NON_ASSOCIATION_VISITS'],
     })
 
-    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId })
+    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId, youngestVisitorAge: 5 })
 
     await checkYourBookingPage.clickSubmit()
 

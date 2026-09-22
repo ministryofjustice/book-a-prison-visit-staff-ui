@@ -107,6 +107,7 @@ test.describe('Update a visit', () => {
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId: offenderNo,
       visitSessionsAndSchedule,
+      youngestVisitorAge: 5,
     })
 
     await selectVisitorsPage.continueButton.click()

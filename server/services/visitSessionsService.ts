@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { OrchestrationApiClient } from '../data'
-import { GOVUKTag, VisitSessionData } from '../@types/bapv'
+import { GOVUKTag, VisitorListItem, VisitSessionData } from '../@types/bapv'
 import {
   VisitSession,
   SessionCapacity,
@@ -92,7 +92,7 @@ export default class VisitSessionsService {
     prisonId,
     prisonerId,
     minNumberOfDays,
-    youngestVisitorAge,
+    visitors,
     visitRestriction,
     selectedVisitSession,
     originalVisitSession,
@@ -101,7 +101,7 @@ export default class VisitSessionsService {
     prisonId: string
     prisonerId: string
     minNumberOfDays: number
-    youngestVisitorAge: number | null
+    visitors: VisitorListItem[]
     visitRestriction: VisitSessionData['visitRestriction']
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined
@@ -112,7 +112,7 @@ export default class VisitSessionsService {
         prisonerId,
         minNumberOfDays,
         username,
-        youngestVisitorAge,
+        youngestVisitorAge: this.getYoungestVisitorAge(visitors),
       })
 
     // map raw session/schedule data to format for calendar
@@ -177,6 +177,17 @@ export default class VisitSessionsService {
     }
 
     return { calendar, scheduledEventsAvailable }
+  }
+
+  private getYoungestVisitorAge(visitors: VisitorListItem[]): number | null {
+    const visitorsWithAge = visitors.filter(visitor => typeof visitor.age === 'number')
+
+    if (visitorsWithAge.length === 0) {
+      return null
+    }
+
+    const youngestAge = Math.min(...visitorsWithAge.map(visitor => visitor.age))
+    return youngestAge
   }
 
   private buildVisitSession(
