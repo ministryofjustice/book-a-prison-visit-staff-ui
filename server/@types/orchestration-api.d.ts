@@ -3074,20 +3074,20 @@ export interface components {
       empty?: boolean
     }
     PageableObject: {
-      sort?: components['schemas']['SortObject']
-      paged?: boolean
-      unpaged?: boolean
-      /** Format: int32 */
-      pageSize?: number
-      /** Format: int32 */
-      pageNumber?: number
       /** Format: int64 */
       offset?: number
+      paged?: boolean
+      /** Format: int32 */
+      pageNumber?: number
+      /** Format: int32 */
+      pageSize?: number
+      sort?: components['schemas']['SortObject']
+      unpaged?: boolean
     }
     SortObject: {
+      empty?: boolean
       sorted?: boolean
       unsorted?: boolean
-      empty?: boolean
     }
     OrchestrationVisitRequestSummaryDto: {
       /** @description Visit reference */
@@ -3472,7 +3472,16 @@ export interface components {
       visitOrderRestriction: 'VO_PVO' | 'VO' | 'PVO' | 'NONE'
       /** @description Flag to indicate if the session is excluded for the date. True will indicate that the session is excluded. */
       isSessionExcluded: boolean
+      /**
+       * @description Determines if the age restriction is enabled for this session
+       * @example true
+       */
       isAgeRestricted: boolean
+      /**
+       * Format: int32
+       * @description Minimum required age for attending the session
+       * @example 18
+       */
       ageRestriction: number
     }
     /** @description Visit Session */
@@ -7841,15 +7850,6 @@ export interface operations {
          * @example user-1
          */
         username?: string
-        /** @description Comma-separated list of session conflicts to include only sessions with no session conflicts or sessions where all session conflicts are in this list. Session-level conflicts returned are those represented by SessionConflictV2; date-level conflicts (e.g. NON_ASSOCIATION) are returned separately in sessionDateConflicts. */
-        includedSessionConflicts?: (
-          | 'DOUBLE_BOOKING_OR_RESERVATION'
-          | 'SESSION_DATE_BLOCKED'
-          | 'REMAND_VISITS_LIMIT_REACHED'
-          | 'NO_VO_BALANCE'
-          | 'NO_PVO_BALANCE'
-          | 'NO_VO_OR_PVO_BALANCE'
-        )[]
       }
       header?: never
       path?: never

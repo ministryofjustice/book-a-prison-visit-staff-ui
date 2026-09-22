@@ -1,5 +1,5 @@
 import { SessionSchedule } from '../../data/orchestrationApiTypes'
-import { formatStartToEndTime } from '../../utils/utils'
+import { formatStartToEndTime, pluralise } from '../../utils/utils'
 
 export type TimetableItem = {
   time: string
@@ -23,13 +23,9 @@ export default (schedules: SessionSchedule[]): TimetableItem[] => {
 
     const time = formatStartToEndTime(startTime, endTime)
 
-    const visitors = schedule.isAgeRestricted
-      ? `Visitors aged ${schedule.ageRestriction} years old or older`
-      : 'All visitors'
-
     const otherTimetableInformation = {
       time,
-      visitors,
+      visitors: buildVisitorsText(schedule),
       prisoners: buildPrisonersText(schedule),
     }
     if (schedule.capacity.open !== 0) {
@@ -49,6 +45,16 @@ export default (schedules: SessionSchedule[]): TimetableItem[] => {
   })
 
   return timetableItems
+}
+
+// Function to build description of which visitors are allowed to attend session
+export const buildVisitorsText = ({
+  isAgeRestricted,
+  ageRestriction,
+}: Pick<SessionSchedule, 'isAgeRestricted' | 'ageRestriction'>): string => {
+  return isAgeRestricted
+    ? `Visitors aged ${ageRestriction} ${pluralise('year', ageRestriction)} old or older`
+    : 'All visitors'
 }
 
 // Function to build description of groups included/excluded from this particular session
