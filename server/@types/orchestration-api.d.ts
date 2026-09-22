@@ -3315,6 +3315,7 @@ export interface components {
         | 'NO_VO_BALANCE'
         | 'NO_PVO_BALANCE'
         | 'NO_VO_OR_PVO_BALANCE'
+        | 'AGE_RESTRICTION'
       /** @description Session Conflict attributes */
       additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
     }
@@ -3382,6 +3383,17 @@ export interface components {
        * @example 2020-11-01T14:30:00
        */
       endTimestamp: string
+      /**
+       * @description Determines if the age restriction is enabled for this session
+       * @example true
+       */
+      isAgeRestricted: boolean
+      /**
+       * Format: int32
+       * @description Minimum required age for attending the session
+       * @example 18
+       */
+      ageRestriction: number
       /** @description Session conflicts */
       sessionConflicts: components['schemas']['SessionConflictDto'][]
     }
@@ -3515,6 +3527,19 @@ export interface components {
        * @enum {string}
        */
       visitOrderRestriction: 'VO_PVO' | 'VO' | 'PVO' | 'NONE'
+      /**
+       * @description Determines if the age restriction is enabled for this session
+       * @example true
+       */
+      isAgeRestricted: boolean
+      /**
+       * Format: int32
+       * @description Minimum required age for attending the session
+       * @example 18
+       */
+      ageRestriction: number
+      /** @description Session conflicts */
+      sessionConflicts: 'AGE_RESTRICTION'[]
     }
     /** @description Visit Session restriction type */
     AvailableVisitSessionRestrictionDto: {
@@ -3558,6 +3583,7 @@ export interface components {
         | 'NO_VO_BALANCE'
         | 'NO_PVO_BALANCE'
         | 'NO_VO_OR_PVO_BALANCE'
+        | 'AGE_RESTRICTION'
       /** @description Session Conflict attributes */
       additionalAttributes: components['schemas']['AdditionalConflictInfoDto'][][]
     }
@@ -3639,6 +3665,17 @@ export interface components {
        * @enum {string}
        */
       visitOrderRestriction: 'VO_PVO' | 'VO' | 'PVO' | 'NONE'
+      /**
+       * @description Determines if the age restriction is enabled for this session
+       * @example true
+       */
+      isAgeRestricted: boolean
+      /**
+       * Format: int32
+       * @description Minimum required age for attending the session
+       * @example 18
+       */
+      ageRestriction: number
     }
     VisitSessionsAndScheduleDto: {
       /**
@@ -7406,6 +7443,11 @@ export interface operations {
          * @example STAFF
          */
         userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        /**
+         * @description Age of the youngest visitor
+         * @example 18
+         */
+        youngestVisitorAge?: number
       }
       header?: never
       path?: never
@@ -7592,6 +7634,11 @@ export interface operations {
          * @example PUBLIC
          */
         userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        /**
+         * @description Age of the youngest visitor
+         * @example 18
+         */
+        youngestVisitorAge?: number
       }
       header?: never
       path?: never
@@ -7742,6 +7789,11 @@ export interface operations {
          * @example PUBLIC
          */
         userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        /**
+         * @description Age of the youngest visitor
+         * @example 18
+         */
+        youngestVisitorAge?: number
       }
       header?: never
       path?: never
@@ -7850,6 +7902,11 @@ export interface operations {
          * @example user-1
          */
         username?: string
+        /**
+         * @description Age of the youngest visitor
+         * @example 18
+         */
+        youngestVisitorAge?: number
       }
       header?: never
       path?: never

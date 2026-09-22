@@ -1058,12 +1058,14 @@ export default {
     prisonerId = 'A1234BC',
     minNumberOfDays = 3,
     username = 'USER1',
+    youngestVisitorAge = null,
     visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
   }: {
     prisonId?: string
     prisonerId?: string
     minNumberOfDays?: number
     username?: string
+    youngestVisitorAge?: number | null
     visitSessionsAndSchedule?: VisitSessionsAndScheduleDto
   } = {}): SuperAgentRequest => {
     return stubFor({
@@ -1075,6 +1077,7 @@ export default {
           prisonerId: { equalTo: prisonerId },
           min: { equalTo: minNumberOfDays.toString() },
           username: { equalTo: username },
+          ...(youngestVisitorAge !== null && { youngestVisitorAge: { equalTo: youngestVisitorAge.toString() } }),
         },
       },
       response: {

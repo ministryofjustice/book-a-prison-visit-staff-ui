@@ -5,8 +5,6 @@ import { properCase } from '../../../server/utils/utils'
 import AbstractPage from '../abstractPage'
 
 export default class SearchForAPrisonerResultsPage extends AbstractPage {
-  readonly searchForm: Locator
-
   readonly searchInput: Locator
 
   readonly searchButton: Locator
@@ -26,9 +24,8 @@ export default class SearchForAPrisonerResultsPage extends AbstractPage {
   constructor(page: Page) {
     super(page, 'Search for a prisoner')
 
-    this.searchForm = page.locator('[action="/search/prisoner"]')
-    this.searchInput = page.locator('.moj-search__input')
-    this.searchButton = page.locator('.moj-search__button')
+    this.searchInput = page.getByRole('searchbox', { name: 'Enter name or prison number' })
+    this.searchButton = page.getByRole('button', { name: 'Search' })
     this.noResults = page.locator('#search-results-none')
     this.hasResults = page.locator('#search-results-true')
     this.resultRows = page.locator('.bapv-result-row').locator('xpath=ancestor::tr')

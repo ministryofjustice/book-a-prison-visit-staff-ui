@@ -34,7 +34,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'SEARCHED_PRISONERS',
+      what: 'SEARCHED_PRISONERS',
       who: username,
       operationId,
       details: {
@@ -56,7 +56,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'VIEWED_PRISONER',
+      what: 'VIEWED_PRISONER',
       who: username,
       operationId,
       details: {
@@ -90,7 +90,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'RESERVED_VISIT',
+      what: 'RESERVED_VISIT',
       who: username,
       operationId,
       details: {
@@ -130,7 +130,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'BOOKED_VISIT',
+      what: 'BOOKED_VISIT',
       who: username,
       operationId,
       details: {
@@ -162,7 +162,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'DISMISSED_NOTIFICATIONS',
+      what: 'DISMISSED_NOTIFICATIONS',
       who: username,
       operationId,
       details: {
@@ -190,7 +190,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'CANCELLED_VISIT',
+      what: 'CANCELLED_VISIT',
       who: username,
       operationId,
       details: {
@@ -214,7 +214,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'VIEWED_VISITS',
+      what: 'VIEWED_VISITS',
       who: username,
       operationId,
       details: {
@@ -234,7 +234,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'OVERRODE_ZERO_VO',
+      what: 'OVERRODE_ZERO_VO',
       who: username,
       operationId,
       details: {
@@ -257,7 +257,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'VISIT_RESTRICTION_SELECTED',
+      what: 'VISIT_RESTRICTION_SELECTED',
       who: username,
       operationId,
       details: {
@@ -278,7 +278,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'SEARCHED_VISITS',
+      what: 'SEARCHED_VISITS',
       who: username,
       operationId,
       details: {
@@ -301,7 +301,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'VIEWED_VISIT_DETAILS',
+      what: 'VIEWED_VISIT_DETAILS',
       who: username,
       operationId,
       details: {
@@ -324,7 +324,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'BLOCKED_VISIT_DATE',
+      what: 'BLOCKED_VISIT_DATE',
       who: username,
       operationId,
       details: {
@@ -346,7 +346,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'UNBLOCKED_VISIT_DATE',
+      what: 'UNBLOCKED_VISIT_DATE',
       who: username,
       operationId,
       details: {
@@ -368,7 +368,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'BLOCKED_VISIT_SESSION',
+      what: 'BLOCKED_VISIT_SESSION',
       who: username,
       operationId,
       details: {
@@ -390,7 +390,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'UNBLOCKED_VISIT_SESSION',
+      what: 'UNBLOCKED_VISIT_SESSION',
       who: username,
       operationId,
       details: {
@@ -402,7 +402,7 @@ export default class AuditService {
 
   async bookerSearch({ search, username, operationId }: { search: string; username: string; operationId: string }) {
     return this.sendAuditMessage({
-      action: 'SEARCHED_BOOKERS',
+      what: 'SEARCHED_BOOKERS',
       who: username,
       operationId,
       details: { search },
@@ -421,7 +421,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'VIEWED_BOOKER',
+      what: 'VIEWED_BOOKER',
       who: username,
       operationId,
       details: { reference, prisonerIds },
@@ -442,7 +442,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'LINKED_BOOKER_VISITOR',
+      what: 'LINKED_BOOKER_VISITOR',
       who: username,
       operationId,
       details: { reference, prisonerId, visitorId },
@@ -463,7 +463,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'UNLINKED_BOOKER_VISITOR',
+      what: 'UNLINKED_BOOKER_VISITOR',
       who: username,
       operationId,
       details: { reference, prisonerId, visitorId },
@@ -480,7 +480,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'APPROVED_VISIT_REQUEST',
+      what: 'APPROVED_VISIT_REQUEST',
       who: username,
       operationId,
       details: { visitReference },
@@ -499,7 +499,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'REJECTED_VISIT_REQUEST',
+      what: 'REJECTED_VISIT_REQUEST',
       who: username,
       operationId,
       details: { visitReference, rejectionReason },
@@ -518,7 +518,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'APPROVED_VISITOR_REQUEST',
+      what: 'APPROVED_VISITOR_REQUEST',
       who: username,
       operationId,
       details: { requestReference, visitorId },
@@ -537,7 +537,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'REJECTED_VISITOR_REQUEST',
+      what: 'REJECTED_VISITOR_REQUEST',
       who: username,
       operationId,
       details: { requestReference, rejectionReason },
@@ -562,7 +562,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'ADJUSTED_VISIT_BALANCE',
+      what: 'ADJUSTED_VISIT_BALANCE',
       who: username,
       operationId,
       details: { prisonerId, voChange, pvoChange, reason, reasonDetails },
@@ -583,7 +583,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'UPDATED_VISIT_ALLOWANCES',
+      what: 'UPDATED_VISIT_ALLOWANCES',
       who: username,
       operationId,
       details: { weekStartDay, remandVisitLimitPerWeek, prisonId },
@@ -604,7 +604,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'PRINTED_VISIT_PASS',
+      what: 'PRINTED_VISIT_PASS',
       who: username,
       operationId,
       details: { visitReference, prisonerId, prisonId },
@@ -623,7 +623,7 @@ export default class AuditService {
     operationId: string
   }) {
     return this.sendAuditMessage({
-      action: 'PRINTED_VISIT_PASSES',
+      what: 'PRINTED_VISIT_PASSES',
       who: username,
       operationId,
       details: { date, prisonId },
@@ -631,12 +631,12 @@ export default class AuditService {
   }
 
   private async sendAuditMessage({
-    action,
+    what,
     who,
     operationId,
     details,
   }: {
-    action: string
+    what: string
     who: string
     operationId: string
     details: object
@@ -647,7 +647,7 @@ export default class AuditService {
     // handing off, since the audit client JSON.stringifies `details` itself.
     await this.auditClient.sendMessage(
       {
-        action,
+        what,
         who,
         correlationId: operationId,
         subjectType: 'NOT_APPLICABLE',

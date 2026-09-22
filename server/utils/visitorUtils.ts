@@ -1,16 +1,23 @@
 import { differenceInDays } from 'date-fns'
 import { VisitorListItem } from '../@types/bapv'
 import { Address, Contact, Restriction } from '../data/prisonerContactRegistryApiTypes'
-import { isAdult } from './utils'
+import { ageInYears } from './utils'
 
 type BanStatus = { isBanned: boolean; numDays?: number }
 
+const ADULT_AGE: number = 18
+
 export const buildVisitorListItem = (visitor: Contact, policyNoticeDaysMax: number): VisitorListItem => {
+  const age = ageInYears(visitor.dateOfBirth)
+  // Count as adult if age is unknown or age is 18 or older
+  const adult = age === undefined || age >= ADULT_AGE
+
   return {
     personId: visitor.personId,
     name: `${visitor.firstName} ${visitor.lastName}`,
-    dateOfBirth: visitor.dateOfBirth,
-    adult: visitor.dateOfBirth ? isAdult(visitor.dateOfBirth) : true,
+    ...(visitor.dateOfBirth && { dateOfBirth: visitor.dateOfBirth }),
+    ...(age !== undefined && { age }),
+    adult,
     relationshipDescription: visitor.relationshipDescription,
     address: getFormattedAddress(visitor.address),
     restrictions: visitor.restrictions,
