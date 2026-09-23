@@ -155,6 +155,7 @@ describe('Visit sessions service', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
             {
               date: '2025-09-01',
@@ -167,6 +168,7 @@ describe('Visit sessions service', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [
@@ -352,6 +354,7 @@ describe('Visit sessions service', () => {
                 capacity: 10,
                 sessionConflicts: [],
                 disabled: false,
+                tags: [],
               },
             ],
             scheduledEvents: [],
@@ -422,6 +425,7 @@ describe('Visit sessions service', () => {
                 capacity: 10,
                 sessionConflicts: [],
                 disabled: false,
+                tags: [],
               },
             ],
             scheduledEvents: [],
@@ -748,7 +752,8 @@ describe('Visit sessions service', () => {
         expect(result.calendar[1].colour).toBeUndefined()
         expect(result.calendar[1].selected).toBe(true)
         expect(result.calendar[1].outline).toBe(true)
-        expect(result.calendar[1].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+        expect(result.calendar[1].visitSessions[0].tags.length).toBe(1)
+        expect(result.calendar[1].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
           text: 'Original booking',
           classes: 'govuk-tag--light-blue',
         })
@@ -886,11 +891,12 @@ describe('Visit sessions service', () => {
         expect(result.calendar[0].colour).toBeUndefined()
         expect(result.calendar[0].selected).toBe(true)
         expect(result.calendar[0].outline).toBe(true)
-        expect(result.calendar[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+        expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
+        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
           text: 'Reserved visit time',
           classes: 'govuk-tag--light-blue',
         })
-        expect(result.calendar[0].visitSessions[1].tag).toBeUndefined()
+        expect(result.calendar[0].visitSessions[1].tags.length).toBe(0)
       })
     })
 
@@ -923,7 +929,8 @@ describe('Visit sessions service', () => {
         expect(result.calendar[0].selected).toBe(true)
         expect(result.calendar[0].outline).toBe(false)
         expect(result.calendar[0].visitSessions[0].disabled).toBe(true)
-        expect(result.calendar[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+        expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
+        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
           text: 'Prisoner has a visit',
           classes: 'govuk-tag--red',
         })
@@ -950,7 +957,8 @@ describe('Visit sessions service', () => {
           originalVisitSession: undefined,
         })
 
-        expect(result.calendar[0].visitSessions[0].tag).toStrictEqual<GOVUKTag>({
+        expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
+        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
           text: 'Fully booked',
           classes: 'govuk-tag--orange',
         })

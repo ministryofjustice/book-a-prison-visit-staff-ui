@@ -40,6 +40,7 @@ const calendarVisitSession1: CalendarVisitSession = {
   capacity: 20,
   sessionConflicts: [],
   disabled: false,
+  tags: [],
 }
 
 const calendarVisitSession2: CalendarVisitSession = {
@@ -53,6 +54,7 @@ const calendarVisitSession2: CalendarVisitSession = {
   capacity: 25,
   sessionConflicts: [],
   disabled: false,
+  tags: [],
 }
 
 const calendarDay: CalendarDay = {

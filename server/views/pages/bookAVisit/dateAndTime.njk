@@ -163,16 +163,19 @@
                           <br>
                           <span>{{ visitSession.visitRoom }}</span>
                           <br>
-                          {% if visitSession.tag %}
-                            {{ govukTag({
-                              text: visitSession.tag.text,
-                              classes: visitSession.tag.classes
-                            }) }}
-                          {% else %}
+
+                          {% if visitSession.availableTables > 0 %}
                             <span class="bapv-secondary-text">
                               {{ visitSession.availableTables }} {{ "table" | pluralise(visitSession.availableTables) }} available
                             </span>
                           {% endif %}
+
+                          {% for tag in visitSession.tags %}
+                            {{ govukTag({
+                              text: tag.text,
+                              classes: tag.classes
+                            }) }}
+                          {% endfor %}
                         {%- endset %}
                         {% set visitSessionItems = (visitSessionItems.push({
                           value: radioValue,

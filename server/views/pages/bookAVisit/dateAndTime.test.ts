@@ -110,6 +110,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [],
@@ -219,6 +220,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [],
@@ -260,6 +262,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
             {
               date: '2025-08-31',
@@ -272,6 +275,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: true,
+              tags: [],
             },
           ],
           scheduledEvents: [
@@ -303,11 +307,11 @@ describe('Select date and time page (calendar)', () => {
               startTime: '10:30',
               endTime: '11:30',
               visitRoom: 'Visit Room 3',
-              availableTables: 2,
+              availableTables: 0,
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
-              tag: { text: 'tag text', classes: 'tag-class' },
+              tags: [{ text: 'tag text', classes: 'tag-class' }],
             },
           ],
           scheduledEvents: [
@@ -361,7 +365,7 @@ describe('Select date and time page (calendar)', () => {
 
       // day with morning visit and afternoon events, so afternoon section should not render
       expect($('.bapv-calendar__day-group').eq(1).find('legend').text().trim()).toBe('Monday 1 September 2025')
-      // Morning - visit session (with tag instead of table availability)
+      // Morning - visit session (with no available tables text as availability is zero)
       expect($('.bapv-calendar__day-group').eq(1).find('h3').eq(0).text()).toBe('Morning')
       expect($('input#date-2025-09-01-morning').val()).toBe('2025-09-01_c')
       expect($('input#date-2025-09-01-morning').prop('disabled')).toBe(false)
@@ -396,6 +400,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [],
@@ -426,6 +431,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [],
@@ -463,6 +469,7 @@ describe('Select date and time page (calendar)', () => {
               capacity: 20,
               sessionConflicts: [],
               disabled: false,
+              tags: [],
             },
           ],
           scheduledEvents: [],

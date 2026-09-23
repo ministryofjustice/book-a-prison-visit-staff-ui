@@ -38,7 +38,7 @@ export type CalendarVisitSession = {
   capacity: number
   sessionConflicts: VisitSessionV2Dto['sessionConflicts']
   disabled: boolean // is radio input disabled
-  tag?: GOVUKTag
+  tags: GOVUKTag[]
 }
 
 // Single prisoner event entry
@@ -204,8 +204,6 @@ export default class VisitSessionsService {
 
     const capacity = visitRestriction === 'OPEN' ? visitSession.openVisitCapacity : visitSession.closedVisitCapacity
 
-    const tag = this.getVisitSessionTag(date, visitSession, selectedVisitSession, originalVisitSession, availableTables)
-
     return {
       date,
       sessionTemplateReference: visitSession.sessionTemplateReference,
@@ -217,7 +215,7 @@ export default class VisitSessionsService {
       capacity,
       sessionConflicts: visitSession.sessionConflicts,
       disabled: this.isVisitSessionDisabled(date, visitSession, originalVisitSession),
-      ...(tag && { tag }),
+      tags: this.getVisitSessionTags(date, visitSession, selectedVisitSession, originalVisitSession, availableTables),
     }
   }
 
@@ -242,31 +240,36 @@ export default class VisitSessionsService {
     })
   }
 
-  private getVisitSessionTag(
+  private getVisitSessionTags(
     date: string,
     visitSession: VisitSessionV2Dto,
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
     availableTables: number,
-  ): GOVUKTag | undefined {
+  ): GOVUKTag[] {
+    // TODO build array and refactor conditionals with named vars
     if (
       date === originalVisitSession?.date &&
       visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
     ) {
-      return {
-        text: 'Original booking',
-        classes: 'govuk-tag--light-blue',
-      }
+      return [
+        {
+          text: 'Original booking',
+          classes: 'govuk-tag--light-blue',
+        },
+      ]
     }
 
     if (
       date === selectedVisitSession?.date &&
       visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
     ) {
-      return {
-        text: 'Reserved visit time',
-        classes: 'govuk-tag--light-blue',
-      }
+      return [
+        {
+          text: 'Reserved visit time',
+          classes: 'govuk-tag--light-blue',
+        },
+      ]
     }
 
     if (
@@ -275,20 +278,24 @@ export default class VisitSessionsService {
         conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
       })
     ) {
-      return {
-        text: 'Prisoner has a visit',
-        classes: 'govuk-tag--red',
-      }
+      return [
+        {
+          text: 'Prisoner has a visit',
+          classes: 'govuk-tag--red',
+        },
+      ]
     }
 
     if (availableTables <= 0) {
-      return {
-        text: 'Fully booked',
-        classes: 'govuk-tag--orange',
-      }
+      return [
+        {
+          text: 'Fully booked',
+          classes: 'govuk-tag--orange',
+        },
+      ]
     }
 
-    return undefined
+    return []
   }
 
   private buildScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
