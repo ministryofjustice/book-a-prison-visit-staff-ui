@@ -97,6 +97,7 @@ describe('Visit sessions service', () => {
     const minNumberOfDays = 2
 
     const visitorNoDoB = {} as VisitorListItem
+    const visitorAged0 = { age: 0 } as VisitorListItem // infant visitor
     const visitorAged16 = { age: 16 } as VisitorListItem
     const visitorAged18 = { age: 18 } as VisitorListItem
     const visitors = [visitorNoDoB]
@@ -274,6 +275,7 @@ describe('Visit sessions service', () => {
         ['Visitor with no DoB and visitor aged 16', [visitorNoDoB, visitorAged16], 16],
         ['Visitor with no DoB and visitor aged 18', [visitorNoDoB, visitorAged18], 18],
         ['Visitors aged 16 and 18', [visitorAged16, visitorAged18], 16],
+        ['Visitors aged 0, 16 and 18', [visitorAged0, visitorAged16, visitorAged18], 0],
         ['Visitor with no DoB, visitor aged 16 and visitor aged 18', [visitorNoDoB, visitorAged16, visitorAged18], 16],
       ])('%s', async (_: string, selectedVisitors: VisitorListItem[], expectedYoungestAge: number | null) => {
         orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(TestData.visitSessionsAndSchedule())
