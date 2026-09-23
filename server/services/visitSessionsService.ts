@@ -249,19 +249,32 @@ export default class VisitSessionsService {
   ): GOVUKTag[] {
     const tags: GOVUKTag[] = []
 
-    // Original booking (for update journey)
+    // Define conditions
+
+    // Original booking session (in an update journey)
     const isOriginallyBookedSession =
       date === originalVisitSession?.date &&
       visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
-
-    if (isOriginallyBookedSession) {
-      tags.push({ text: 'Original booking', classes: 'govuk-tag--light-blue' })
-    }
 
     // Reserved visit time (for currently selected session on book or update)
     const isCurrentlyReservedSession =
       date === selectedVisitSession?.date &&
       visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
+
+    // Prisoner has an existing booking or reservation
+    const hasExistingBookingOrReservation = this.sessionHasConflictOfType({
+      sessionConflicts: visitSession.sessionConflicts,
+      conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+    })
+
+    // Session fully booked
+    const isFullyBooked = availableTables <= 0
+
+    // Determine which tags apply
+
+    if (isOriginallyBookedSession) {
+      tags.push({ text: 'Original booking', classes: 'govuk-tag--light-blue' })
+    }
 
     if (isCurrentlyReservedSession && !isOriginallyBookedSession) {
       tags.push({
@@ -270,19 +283,16 @@ export default class VisitSessionsService {
       })
     }
 
-    // Prisoner has an existing visit (excluding the original booking on update journey)
-    if (
-      this.sessionHasConflictOfType({
-        sessionConflicts: visitSession.sessionConflicts,
-        conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
-      }) &&
-      !isOriginallyBookedSession
-    ) {
+    if (hasExistingBookingOrReservation && !isOriginallyBookedSession) {
       tags.push({ text: 'Prisoner has a visit', classes: 'govuk-tag--red' })
     }
 
-    // Session fully booked (excluding the currently reserved session)
-    if (!isCurrentlyReservedSession && availableTables <= 0) {
+    if (
+      isFullyBooked &&
+      !hasExistingBookingOrReservation &&
+      !isOriginallyBookedSession &&
+      !isCurrentlyReservedSession
+    ) {
       tags.push({ text: 'Fully booked', classes: 'govuk-tag--orange' })
     }
 
