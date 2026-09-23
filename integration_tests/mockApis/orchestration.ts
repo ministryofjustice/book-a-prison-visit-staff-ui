@@ -1058,7 +1058,7 @@ export default {
     prisonerId = 'A1234BC',
     minNumberOfDays = 3,
     username = 'USER1',
-    youngestVisitorAge = null,
+    youngestVisitorAge = 18,
     visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
   }: {
     prisonId?: string

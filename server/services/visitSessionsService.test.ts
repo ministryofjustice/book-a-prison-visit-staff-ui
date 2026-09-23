@@ -1,4 +1,4 @@
-import { GOVUKTag } from '../@types/bapv'
+import { GOVUKTag, VisitorListItem } from '../@types/bapv'
 import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
 import VisitSessionsService, { CalendarDay } from './visitSessionsService'
@@ -95,7 +95,12 @@ describe('Visit sessions service', () => {
   describe('getVisitSessionsAndScheduleCalendar', () => {
     const prisonerId = 'A1234BC'
     const minNumberOfDays = 2
-    const youngestVisitorAge: number | null = null
+
+    const visitorNoDoB = {} as VisitorListItem
+    const visitorAged0 = { age: 0 } as VisitorListItem // infant visitor
+    const visitorAged16 = { age: 16 } as VisitorListItem
+    const visitorAged18 = { age: 18 } as VisitorListItem
+    const visitors = [visitorNoDoB]
 
     it('should return CalendarDay array with days, visit sessions and events correctly transformed from raw data', async () => {
       const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
@@ -186,12 +191,19 @@ describe('Visit sessions service', () => {
         prisonId,
         prisonerId,
         minNumberOfDays,
-        youngestVisitorAge,
+        visitors,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
         originalVisitSession: undefined,
       })
 
+      expect(orchestrationApiClient.getVisitSessionsAndSchedule).toHaveBeenCalledWith({
+        prisonId,
+        prisonerId,
+        minNumberOfDays,
+        username,
+        youngestVisitorAge: null,
+      })
       expect(result.calendar).toStrictEqual(expectedCalendarDays)
       expect(result.scheduledEventsAvailable).toBe(true)
     })
@@ -227,7 +239,7 @@ describe('Visit sessions service', () => {
         prisonId,
         prisonerId,
         minNumberOfDays,
-        youngestVisitorAge,
+        visitors,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
         originalVisitSession: undefined,
@@ -247,13 +259,46 @@ describe('Visit sessions service', () => {
         prisonId,
         prisonerId,
         minNumberOfDays,
-        youngestVisitorAge,
+        visitors,
         visitRestriction: 'OPEN',
         selectedVisitSession: undefined,
         originalVisitSession: undefined,
       })
 
       expect(result.scheduledEventsAvailable).toBe(false)
+    })
+
+    describe('Age restricted sessions handling - calculate and pass youngestVisitorAge parameter', () => {
+      it.each([
+        ['Single visitor with no DoB', [visitorNoDoB], null],
+        ['Single visitor aged 18', [visitorAged18], 18],
+        ['Visitor with no DoB and visitor aged 16', [visitorNoDoB, visitorAged16], 16],
+        ['Visitor with no DoB and visitor aged 18', [visitorNoDoB, visitorAged18], 18],
+        ['Visitors aged 16 and 18', [visitorAged16, visitorAged18], 16],
+        ['Visitors aged 0, 16 and 18', [visitorAged0, visitorAged16, visitorAged18], 0],
+        ['Visitor with no DoB, visitor aged 16 and visitor aged 18', [visitorNoDoB, visitorAged16, visitorAged18], 16],
+      ])('%s', async (_: string, selectedVisitors: VisitorListItem[], expectedYoungestAge: number | null) => {
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(TestData.visitSessionsAndSchedule())
+
+        await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          prisonId,
+          username,
+          prisonerId,
+          minNumberOfDays,
+          visitors: selectedVisitors,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(orchestrationApiClient.getVisitSessionsAndSchedule).toHaveBeenCalledWith({
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          username,
+          youngestVisitorAge: expectedYoungestAge,
+        })
+      })
     })
 
     describe('Visit restriction (OPEN / CLOSED) - session filtering and availability', () => {
@@ -318,7 +363,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -388,7 +433,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge: null,
+          visitors,
           visitRestriction: 'CLOSED',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -419,7 +464,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: {
             date: '2025-08-31',
@@ -457,7 +502,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: {
             date: '2025-08-30',
@@ -495,7 +540,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -536,7 +581,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -560,7 +605,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -589,7 +634,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: {
             date: '2025-09-01',
@@ -627,7 +672,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -651,7 +696,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -682,7 +727,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: {
@@ -729,7 +774,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: {
@@ -774,7 +819,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: {
             date: '2025-08-31',
@@ -824,7 +869,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: {
             date: visitSessionsAndSchedule.sessionsAndSchedule[0].date,
@@ -869,7 +914,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -899,7 +944,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -928,7 +973,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,
@@ -958,7 +1003,7 @@ describe('Visit sessions service', () => {
           prisonId,
           prisonerId,
           minNumberOfDays,
-          youngestVisitorAge,
+          visitors,
           visitRestriction: 'OPEN',
           selectedVisitSession: undefined,
           originalVisitSession: undefined,

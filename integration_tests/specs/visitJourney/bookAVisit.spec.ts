@@ -24,6 +24,8 @@ test.describe('Book a visit', () => {
   const longDateFormat = 'EEEE d MMMM yyyy'
 
   const today = new Date()
+  const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
+  const childDob = format(sub(today, { years: 5 }), shortDateFormat)
 
   test.beforeEach(async () => {
     await orchestrationApi.stubSupportedPrisonIds()
@@ -36,9 +38,6 @@ test.describe('Book a visit', () => {
   })
 
   test('Should complete the book a visit journey', async ({ page }) => {
-    const adultDob = format(sub(today, { years: 18 }), shortDateFormat)
-    const childDob = format(sub(today, { years: 5 }), shortDateFormat)
-
     const contacts = [
       TestData.contact({
         dateOfBirth: adultDob,
@@ -158,9 +157,8 @@ test.describe('Book a visit', () => {
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId: offenderNo,
       visitSessionsAndSchedule,
-      username: 'USER1',
       minNumberOfDays: 3,
-      prisonId: 'HEI',
+      youngestVisitorAge: 5,
     })
 
     // --- Stub creating a visit application ---
@@ -303,7 +301,10 @@ test.describe('Book a visit', () => {
   })
   test('Should prompt for visit type selection for prisoner with closed restriction', async ({ page }) => {
     const prisonerDisplayName = 'Smith, John'
-    const contacts = [TestData.contact({ personId: 4321 }), TestData.contact({ personId: 4322 })]
+    const contacts = [
+      TestData.contact({ personId: 4321, dateOfBirth: adultDob }),
+      TestData.contact({ personId: 4322, dateOfBirth: undefined }),
+    ]
     const prisonerRestrictions = [
       TestData.offenderRestriction({
         restrictionType: 'CLOSED',
@@ -340,7 +341,7 @@ test.describe('Book a visit', () => {
     const selectVisitTypePage = await SelectVisitTypePage.verifyOnPage(page)
     await expect(selectVisitTypePage.getPrisonerRestrictionType(1)).toContainText('Closed')
     await selectVisitTypePage.selectClosedVisitType()
-    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId: offenderNo })
+    await orchestrationApi.stubGetVisitSessionsAndSchedule({ prisonerId: offenderNo, youngestVisitorAge: 18 })
     await selectVisitTypePage.continueButton.click()
     // --- Select date & time ---
     const selectVisitDateAndTimePage = await SelectVisitDateAndTimePage.verifyOnPage(page)
