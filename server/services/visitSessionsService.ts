@@ -38,7 +38,7 @@ export type CalendarVisitSession = {
   capacity: number
   sessionConflicts: VisitSessionV2Dto['sessionConflicts']
   disabled: boolean // is radio input disabled
-  tag?: GOVUKTag
+  tags: GOVUKTag[]
 }
 
 // Single prisoner event entry
@@ -204,8 +204,6 @@ export default class VisitSessionsService {
 
     const capacity = visitRestriction === 'OPEN' ? visitSession.openVisitCapacity : visitSession.closedVisitCapacity
 
-    const tag = this.getVisitSessionTag(date, visitSession, selectedVisitSession, originalVisitSession, availableTables)
-
     return {
       date,
       sessionTemplateReference: visitSession.sessionTemplateReference,
@@ -217,7 +215,7 @@ export default class VisitSessionsService {
       capacity,
       sessionConflicts: visitSession.sessionConflicts,
       disabled: this.isVisitSessionDisabled(date, visitSession, originalVisitSession),
-      ...(tag && { tag }),
+      tags: this.getVisitSessionTags(date, visitSession, selectedVisitSession, originalVisitSession, availableTables),
     }
   }
 
@@ -242,53 +240,63 @@ export default class VisitSessionsService {
     })
   }
 
-  private getVisitSessionTag(
+  private getVisitSessionTags(
     date: string,
     visitSession: VisitSessionV2Dto,
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
     availableTables: number,
-  ): GOVUKTag | undefined {
-    if (
+  ): GOVUKTag[] {
+    const tags: GOVUKTag[] = []
+
+    // Define conditions
+
+    // Original booking session (in an update journey)
+    const isOriginallyBookedSession =
       date === originalVisitSession?.date &&
       visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
-    ) {
-      return {
-        text: 'Original booking',
-        classes: 'govuk-tag--light-blue',
-      }
-    }
 
-    if (
+    // Reserved visit time (for currently selected session on book or update)
+    const isCurrentlyReservedSession =
       date === selectedVisitSession?.date &&
       visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
-    ) {
-      return {
+
+    // Prisoner has an existing booking or reservation
+    const hasExistingBookingOrReservation = this.sessionHasConflictOfType({
+      sessionConflicts: visitSession.sessionConflicts,
+      conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+    })
+
+    // Session fully booked
+    const isFullyBooked = availableTables <= 0
+
+    // Determine which tags apply
+
+    if (isOriginallyBookedSession) {
+      tags.push({ text: 'Original booking', classes: 'govuk-tag--light-blue' })
+    }
+
+    if (isCurrentlyReservedSession && !isOriginallyBookedSession) {
+      tags.push({
         text: 'Reserved visit time',
         classes: 'govuk-tag--light-blue',
-      }
+      })
+    }
+
+    if (hasExistingBookingOrReservation && !isOriginallyBookedSession) {
+      tags.push({ text: 'Prisoner has a visit', classes: 'govuk-tag--red' })
     }
 
     if (
-      this.sessionHasConflictOfType({
-        sessionConflicts: visitSession.sessionConflicts,
-        conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
-      })
+      isFullyBooked &&
+      !hasExistingBookingOrReservation &&
+      !isOriginallyBookedSession &&
+      !isCurrentlyReservedSession
     ) {
-      return {
-        text: 'Prisoner has a visit',
-        classes: 'govuk-tag--red',
-      }
+      tags.push({ text: 'Fully booked', classes: 'govuk-tag--orange' })
     }
 
-    if (availableTables <= 0) {
-      return {
-        text: 'Fully booked',
-        classes: 'govuk-tag--orange',
-      }
-    }
-
-    return undefined
+    return tags
   }
 
   private buildScheduledEvent(event: PrisonerScheduledEventDto): CalendarScheduledEvent {
