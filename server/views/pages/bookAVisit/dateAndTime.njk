@@ -151,7 +151,7 @@
                 <div class="govuk-grid-row">
 
                   {# radio inputs #}
-                  <div class="govuk-grid-column-one-quarter">
+                  <div class="govuk-grid-column-one-third">
                     <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
                       {# build radio items #}
                       {% set visitSessionItems = [] %}
@@ -197,7 +197,7 @@
                   {# prisoner schedule #}
                   {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
                   {% if scheduledEventsByDaySection[sectionLabel] | length %}
-                    <div class="govuk-grid-column-three-quarters">
+                    <div class="govuk-grid-column-two-thirds">
                       <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
                       {% for event in scheduledEventsByDaySection[sectionLabel] %}
                         <div class="bapv-calendar__event">
