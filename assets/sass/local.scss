@@ -2,6 +2,10 @@
   min-height: 600px;
 }
 
+.govuk-tag {
+  max-width: unset;
+}
+
 // Hide element if JavaScript is not enabled
 body:not(.js-enabled) .no-js-hidden {
   display: none;
