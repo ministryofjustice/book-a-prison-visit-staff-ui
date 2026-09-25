@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns'
 import { OrchestrationApiClient } from '../data'
-import { GOVUKTag, VisitorListItem, VisitSessionData } from '../@types/bapv'
+import { VisitorListItem, VisitSessionData } from '../@types/bapv'
 import {
   VisitSession,
   SessionCapacity,
@@ -20,11 +20,16 @@ export type CalendarDay = {
   selected: boolean // renders with filled circle background
   outline: boolean // renders with circular outline
 
+  showAgeRestrictionWarning: boolean // show day level age restriction warning
+
   visitSessions: CalendarVisitSession[] // visit sessions with capacity for given OPEN/CLOSED restriction
   scheduledEvents: CalendarScheduledEvent[]
 }
 
 type CalendarDaySection = 'morning' | 'afternoon'
+
+export type CalendarVisitSessionTag =
+  'ORIGINAL_BOOKING' | 'CURRENT_RESERVATION' | 'EXISTING_BOOKING' | 'FULLY_BOOKED' | 'AGE_RESTRICTED'
 
 // Single visit session entry
 export type CalendarVisitSession = {
@@ -36,9 +41,10 @@ export type CalendarVisitSession = {
   visitRoom: string
   availableTables: number
   capacity: number
+  ageRestriction: number
   sessionConflicts: VisitSessionV2Dto['sessionConflicts']
   disabled: boolean // is radio input disabled
-  tags: GOVUKTag[]
+  tags: CalendarVisitSessionTag[]
 }
 
 // Single prisoner event entry
@@ -142,12 +148,18 @@ export default class VisitSessionsService {
 
       const colour = this.getDayColour(calendarVisitSessions, selectedVisitSession, originalVisitSession)
 
+      // Show age restriction warning if at least one of the day's visit sessions has an AGE_RESTRICTION tag
+      const showAgeRestrictionWarning = calendarVisitSessions.some(visitSession =>
+        visitSession.tags.includes('AGE_RESTRICTED'),
+      )
+
       return {
         date,
         monthHeading: format(parseISO(date), 'MMMM'),
         ...(colour && { colour }),
         selected: false,
         outline: selectedVisitSession?.date === date || originalVisitSession?.date === date,
+        showAgeRestrictionWarning,
         visitSessions: calendarVisitSessions,
         scheduledEvents: calendarScheduledEvents,
       }
@@ -213,6 +225,7 @@ export default class VisitSessionsService {
       visitRoom: visitSession.visitRoom,
       availableTables,
       capacity,
+      ageRestriction: visitSession.ageRestriction,
       sessionConflicts: visitSession.sessionConflicts,
       disabled: this.isVisitSessionDisabled(date, visitSession, originalVisitSession),
       tags: this.getVisitSessionTags(date, visitSession, selectedVisitSession, originalVisitSession, availableTables),
@@ -224,7 +237,17 @@ export default class VisitSessionsService {
     visitSession: VisitSessionV2Dto,
     originalVisitSession: VisitSessionData['originalVisitSession'],
   ): boolean {
-    // original visit session should be selectable (not disabled)
+    // an age-restricted visit session should always be disabled
+    if (
+      this.sessionHasConflictOfType({
+        sessionConflicts: visitSession.sessionConflicts,
+        conflictType: 'AGE_RESTRICTION',
+      })
+    ) {
+      return true
+    }
+
+    // the original visit session (i.e. on an update journey) should not be disabled
     if (
       originalVisitSession &&
       date === originalVisitSession.date &&
@@ -233,7 +256,7 @@ export default class VisitSessionsService {
       return false
     }
 
-    // otherwise disabled if existing booking
+    // an existing booking should disable the visit session
     return this.sessionHasConflictOfType({
       sessionConflicts: visitSession.sessionConflicts,
       conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
@@ -246,54 +269,60 @@ export default class VisitSessionsService {
     selectedVisitSession: VisitSessionData['selectedVisitSession'] | undefined,
     originalVisitSession: VisitSessionData['originalVisitSession'] | undefined,
     availableTables: number,
-  ): GOVUKTag[] {
-    const tags: GOVUKTag[] = []
+  ): CalendarVisitSessionTag[] {
+    const tags: CalendarVisitSessionTag[] = []
 
-    // Define conditions
+    // *** Define conditions for tags ***
 
-    // Original booking session (in an update journey)
+    // Originally booked visit session (in an update journey)
     const isOriginallyBookedSession =
       date === originalVisitSession?.date &&
       visitSession.sessionTemplateReference === originalVisitSession.sessionTemplateReference
 
-    // Reserved visit time (for currently selected session on book or update)
+    // Currently reserved visit session (the one currently selected on book or update journey)
     const isCurrentlyReservedSession =
       date === selectedVisitSession?.date &&
       visitSession.sessionTemplateReference === selectedVisitSession.sessionTemplateReference
 
-    // Prisoner has an existing booking or reservation
-    const hasExistingBookingOrReservation = this.sessionHasConflictOfType({
+    // Session is either:
+    // 1. an existing visit booking for the prisoner
+    // 2. (on an update journey) the existing booking that is kept reserved until the update is completed
+    const isBookedOrReserved = this.sessionHasConflictOfType({
       sessionConflicts: visitSession.sessionConflicts,
       conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
+    })
+
+    // Prisoner has an existing booking on this visit session
+    const isAlreadyBooked = isBookedOrReserved && !isOriginallyBookedSession
+
+    // Session has an age restriction conflict
+    const isAgeRestricted = this.sessionHasConflictOfType({
+      sessionConflicts: visitSession.sessionConflicts,
+      conflictType: 'AGE_RESTRICTION',
     })
 
     // Session fully booked
     const isFullyBooked = availableTables <= 0
 
-    // Determine which tags apply
-
+    // *** Apply tags ***
     if (isOriginallyBookedSession) {
-      tags.push({ text: 'Original booking', classes: 'govuk-tag--light-blue' })
+      tags.push('ORIGINAL_BOOKING')
     }
 
     if (isCurrentlyReservedSession && !isOriginallyBookedSession) {
-      tags.push({
-        text: 'Reserved visit time',
-        classes: 'govuk-tag--light-blue',
-      })
+      tags.push('CURRENT_RESERVATION')
     }
 
-    if (hasExistingBookingOrReservation && !isOriginallyBookedSession) {
-      tags.push({ text: 'Prisoner has a visit', classes: 'govuk-tag--red' })
+    if (isAlreadyBooked) {
+      tags.push('EXISTING_BOOKING')
     }
 
-    if (
-      isFullyBooked &&
-      !hasExistingBookingOrReservation &&
-      !isOriginallyBookedSession &&
-      !isCurrentlyReservedSession
-    ) {
-      tags.push({ text: 'Fully booked', classes: 'govuk-tag--orange' })
+    if (isFullyBooked && !isBookedOrReserved && !isOriginallyBookedSession && !isCurrentlyReservedSession) {
+      tags.push('FULLY_BOOKED')
+    }
+
+    if (isAgeRestricted && !isAlreadyBooked) {
+      tags.push('AGE_RESTRICTED')
     }
 
     return tags
@@ -342,13 +371,8 @@ export default class VisitSessionsService {
       return undefined
     }
 
-    const allSessionsHaveExistingVisit = calendarVisitSessions.every(visitSession =>
-      this.sessionHasConflictOfType({
-        sessionConflicts: visitSession.sessionConflicts,
-        conflictType: 'DOUBLE_BOOKING_OR_RESERVATION',
-      }),
-    )
-    if (allSessionsHaveExistingVisit) {
+    const allSessionsAreDisabled = calendarVisitSessions.every(visitSession => visitSession.disabled)
+    if (allSessionsAreDisabled) {
       return 'red'
     }
 
