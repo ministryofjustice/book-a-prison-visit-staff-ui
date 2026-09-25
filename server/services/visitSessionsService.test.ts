@@ -1,7 +1,7 @@
-import { GOVUKTag, VisitorListItem } from '../@types/bapv'
+import { VisitorListItem } from '../@types/bapv'
 import { VisitSession, SessionSchedule } from '../data/orchestrationApiTypes'
 import TestData from '../routes/testutils/testData'
-import VisitSessionsService, { CalendarDay } from './visitSessionsService'
+import VisitSessionsService, { CalendarDay, CalendarVisitSessionTag } from './visitSessionsService'
 import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
 const username = 'user1'
@@ -135,6 +135,7 @@ describe('Visit sessions service', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -143,6 +144,7 @@ describe('Visit sessions service', () => {
           monthHeading: 'September',
           selected: true, // first date with session and no selectedSession so defaults to true
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-09-01',
@@ -153,6 +155,7 @@ describe('Visit sessions service', () => {
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -166,6 +169,7 @@ describe('Visit sessions service', () => {
               visitRoom: TestData.visitSessionV2().visitRoom,
               availableTables: 15,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -270,11 +274,10 @@ describe('Visit sessions service', () => {
       expect(result.scheduledEventsAvailable).toBe(false)
     })
 
-    describe('Age restricted sessions handling - calculate and pass youngestVisitorAge parameter', () => {
+    describe('Calculate and pass youngestVisitorAge parameter to API', () => {
       it.each([
         ['Single visitor with no DoB', [visitorNoDoB], null],
-        ['Single visitor aged 18', [visitorAged18], 18],
-        ['Visitor with no DoB and visitor aged 16', [visitorNoDoB, visitorAged16], 16],
+        ['Single visitor aged 16', [visitorAged16], 16],
         ['Visitor with no DoB and visitor aged 18', [visitorNoDoB, visitorAged18], 18],
         ['Visitors aged 16 and 18', [visitorAged16, visitorAged18], 16],
         ['Visitors aged 0, 16 and 18', [visitorAged0, visitorAged16, visitorAged18], 0],
@@ -334,6 +337,7 @@ describe('Visit sessions service', () => {
             monthHeading: 'August',
             selected: false,
             outline: false,
+            showAgeRestrictionWarning: false,
             visitSessions: [],
             scheduledEvents: [],
           },
@@ -342,6 +346,7 @@ describe('Visit sessions service', () => {
             monthHeading: 'September',
             selected: true,
             outline: false,
+            showAgeRestrictionWarning: false,
             visitSessions: [
               {
                 date: '2025-09-01',
@@ -352,6 +357,7 @@ describe('Visit sessions service', () => {
                 visitRoom: TestData.visitSessionV2().visitRoom,
                 availableTables: 4,
                 capacity: 10,
+                ageRestriction: 18,
                 sessionConflicts: [],
                 disabled: false,
                 tags: [],
@@ -405,6 +411,7 @@ describe('Visit sessions service', () => {
             monthHeading: 'August',
             selected: false,
             outline: false,
+            showAgeRestrictionWarning: false,
             visitSessions: [],
             scheduledEvents: [],
           },
@@ -413,6 +420,7 @@ describe('Visit sessions service', () => {
             monthHeading: 'September',
             selected: true,
             outline: false,
+            showAgeRestrictionWarning: false,
             visitSessions: [
               {
                 date: '2025-09-01',
@@ -423,6 +431,7 @@ describe('Visit sessions service', () => {
                 visitRoom: TestData.visitSessionV2().visitRoom,
                 availableTables: 4,
                 capacity: 10,
+                ageRestriction: 18,
                 sessionConflicts: [],
                 disabled: false,
                 tags: [],
@@ -573,6 +582,10 @@ describe('Visit sessions service', () => {
         sessionTemplateReference: 'c',
         sessionConflicts: [{ sessionConflict: 'DOUBLE_BOOKING_OR_RESERVATION', additionalAttributes: [] }],
       })
+      const visitSessionWithAgeRestriction = TestData.visitSessionV2({
+        sessionTemplateReference: 'd',
+        sessionConflicts: [{ sessionConflict: 'AGE_RESTRICTION', additionalAttributes: [] }],
+      })
 
       it('should be blue if there are no available visit sessions', async () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
@@ -598,7 +611,12 @@ describe('Visit sessions service', () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
             TestData.sessionsAndScheduleDto({
-              visitSessions: [availableVisitSession, fullVisitSession, visitSessionWithExistingVisit],
+              visitSessions: [
+                availableVisitSession,
+                fullVisitSession,
+                visitSessionWithExistingVisit,
+                visitSessionWithAgeRestriction,
+              ],
             }),
           ],
         })
@@ -665,7 +683,7 @@ describe('Visit sessions service', () => {
         const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
           sessionsAndSchedule: [
             TestData.sessionsAndScheduleDto({
-              visitSessions: [fullVisitSession, visitSessionWithExistingVisit],
+              visitSessions: [fullVisitSession, visitSessionWithExistingVisit, visitSessionWithAgeRestriction],
             }),
           ],
         })
@@ -690,6 +708,30 @@ describe('Visit sessions service', () => {
           sessionsAndSchedule: [
             TestData.sessionsAndScheduleDto({
               visitSessions: [visitSessionWithExistingVisit],
+            }),
+          ],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          visitors,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendar[0].colour).toBe('red')
+      })
+
+      it('should be red if there is only a visit session with an age restriction available', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              visitSessions: [visitSessionWithAgeRestriction],
             }),
           ],
         })
@@ -752,11 +794,62 @@ describe('Visit sessions service', () => {
         expect(result.calendar[1].colour).toBeUndefined()
         expect(result.calendar[1].selected).toBe(true)
         expect(result.calendar[1].outline).toBe(true)
+        expect(result.calendar[1].visitSessions[0].disabled).toBe(false)
         expect(result.calendar[1].visitSessions[0].tags.length).toBe(1)
-        expect(result.calendar[1].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
-          text: 'Original booking',
-          classes: 'govuk-tag--light-blue',
+        expect(result.calendar[1].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('ORIGINAL_BOOKING')
+      })
+
+      it('should disable the original visit session if it now also has an age-restriction', async () => {
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-30',
+              visitSessions: [TestData.visitSessionV2({ sessionTemplateReference: 'a' })],
+            }),
+            // original visit session - now age-restricted
+            TestData.sessionsAndScheduleDto({
+              date: '2025-08-31',
+              visitSessions: [
+                TestData.visitSessionV2({
+                  sessionTemplateReference: 'b',
+                  sessionConflicts: [{ sessionConflict: 'AGE_RESTRICTION', additionalAttributes: [] }],
+                }),
+              ],
+            }),
+          ],
         })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          visitors,
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: {
+            date: '2025-08-31',
+            sessionTemplateReference: 'b',
+            startTime: '',
+            endTime: '',
+            visitRestriction: 'OPEN',
+          },
+        })
+
+        expect(result.calendar.length).toBe(2)
+
+        expect(result.calendar[0].colour).toBeUndefined()
+        expect(result.calendar[0].selected).toBe(false)
+        expect(result.calendar[0].outline).toBe(false)
+
+        expect(result.calendar[1].colour).toBeUndefined()
+        expect(result.calendar[1].selected).toBe(true)
+        expect(result.calendar[1].outline).toBe(true)
+        expect(result.calendar[1].visitSessions[0].disabled).toBe(true)
+        expect(result.calendar[1].visitSessions[0].tags.length).toBe(2)
+        expect(result.calendar[1].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('ORIGINAL_BOOKING')
+        expect(result.calendar[1].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('AGE_RESTRICTED')
       })
 
       it('should outline day matching originalVisitSession if that session not present and default to selecting first day with a session', async () => {
@@ -892,10 +985,7 @@ describe('Visit sessions service', () => {
         expect(result.calendar[0].selected).toBe(true)
         expect(result.calendar[0].outline).toBe(true)
         expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
-        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
-          text: 'Reserved visit time',
-          classes: 'govuk-tag--light-blue',
-        })
+        expect(result.calendar[0].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('CURRENT_RESERVATION')
         expect(result.calendar[0].visitSessions[1].tags.length).toBe(0)
       })
     })
@@ -930,10 +1020,7 @@ describe('Visit sessions service', () => {
         expect(result.calendar[0].outline).toBe(false)
         expect(result.calendar[0].visitSessions[0].disabled).toBe(true)
         expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
-        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
-          text: 'Prisoner has a visit',
-          classes: 'govuk-tag--red',
-        })
+        expect(result.calendar[0].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('EXISTING_BOOKING')
       })
     })
 
@@ -958,10 +1045,7 @@ describe('Visit sessions service', () => {
         })
 
         expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
-        expect(result.calendar[0].visitSessions[0].tags[0]).toStrictEqual<GOVUKTag>({
-          text: 'Fully booked',
-          classes: 'govuk-tag--orange',
-        })
+        expect(result.calendar[0].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('FULLY_BOOKED')
       })
     })
 
@@ -1022,6 +1106,37 @@ describe('Visit sessions service', () => {
         expect(result.calendar[0].outline).toBe(false)
         expect(result.calendar[0].visitSessions).toHaveLength(1) // only the non-blocked session should be shown
         expect(result.calendar[0].visitSessions[0].sessionConflicts).toHaveLength(0)
+      })
+    })
+
+    describe('Age-restricted visit session', () => {
+      it('should tag and disable the visit session if there is an AGE_RESTRICTION session conflict', async () => {
+        const ageRestrictedVisitSession = TestData.visitSessionV2({
+          isAgeRestricted: true,
+          ageRestriction: 16,
+          sessionConflicts: [{ sessionConflict: 'AGE_RESTRICTION', additionalAttributes: [] }],
+        })
+
+        const visitSessionsAndSchedule = TestData.visitSessionsAndSchedule({
+          sessionsAndSchedule: [TestData.sessionsAndScheduleDto({ visitSessions: [ageRestrictedVisitSession] })],
+        })
+        orchestrationApiClient.getVisitSessionsAndSchedule.mockResolvedValue(visitSessionsAndSchedule)
+
+        const result = await visitSessionsService.getVisitSessionsAndScheduleCalendar({
+          username,
+          prisonId,
+          prisonerId,
+          minNumberOfDays,
+          visitors: [visitorAged16, visitorAged18],
+          visitRestriction: 'OPEN',
+          selectedVisitSession: undefined,
+          originalVisitSession: undefined,
+        })
+
+        expect(result.calendar[0].showAgeRestrictionWarning).toBe(true)
+        expect(result.calendar[0].visitSessions[0].disabled).toBe(true)
+        expect(result.calendar[0].visitSessions[0].tags.length).toBe(1)
+        expect(result.calendar[0].visitSessions[0].tags).toContain<CalendarVisitSessionTag>('AGE_RESTRICTED')
       })
     })
   })

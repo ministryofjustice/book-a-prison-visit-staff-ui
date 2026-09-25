@@ -98,6 +98,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -108,6 +109,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit room',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -120,6 +122,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'September',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -167,6 +170,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -175,6 +179,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'September',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -183,6 +188,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'October',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -208,6 +214,7 @@ describe('Select date and time page (calendar)', () => {
           colour: 'orange',
           selected: true,
           outline: true,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -218,6 +225,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit room',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -241,6 +249,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [],
           scheduledEvents: [],
         },
@@ -250,6 +259,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: true,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -260,6 +270,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 1',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -273,9 +284,10 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 2',
               availableTables: 1,
               capacity: 20,
+              ageRestriction: 16,
               sessionConflicts: [],
               disabled: true,
-              tags: [],
+              tags: ['AGE_RESTRICTED'],
             },
           ],
           scheduledEvents: [
@@ -299,6 +311,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'September',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-09-01',
@@ -309,9 +322,10 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 3',
               availableTables: 0,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
-              tags: [{ text: 'tag text', classes: 'tag-class' }],
+              tags: ['ORIGINAL_BOOKING'],
             },
           ],
           scheduledEvents: [
@@ -330,6 +344,7 @@ describe('Select date and time page (calendar)', () => {
 
       // day with both a morning and afternoon visit session and event
       expect($('.bapv-calendar__day-group').eq(0).find('legend').text().trim()).toBe('Sunday 31 August 2025')
+      expect($('[data-test="date-2025-08-31-age-restriction-warning"]').length).toBe(1)
       // Morning - visit session
       expect($('.bapv-calendar__day-group').eq(0).find('h3').eq(0).text()).toBe('Morning')
       expect($('input#date-2025-08-31-morning').val()).toBe('2025-08-31_a')
@@ -338,6 +353,7 @@ describe('Select date and time page (calendar)', () => {
       expect($('label[for=date-2025-08-31-morning]').text()).toContain('10am to 11am')
       expect($('label[for=date-2025-08-31-morning]').text()).toContain('Visit Room 1')
       expect($('label[for=date-2025-08-31-morning]').text()).toContain('18 tables available')
+      expect($('label[for=date-2025-08-31-morning]').find('.govuk-tag').length).toBe(0)
       // Morning - event
       expect($('.bapv-calendar__day-group').eq(0).find('h3').eq(1).text()).toBe('Prisoner schedule')
       expect($('.bapv-calendar__day-group').eq(0).find('h3').eq(1).next('.bapv-calendar__event').text()).toContain(
@@ -354,6 +370,9 @@ describe('Select date and time page (calendar)', () => {
       expect($('label[for=date-2025-08-31-afternoon]').text()).toContain('1:30pm to 3pm')
       expect($('label[for=date-2025-08-31-afternoon]').text()).toContain('Visit Room 2')
       expect($('label[for=date-2025-08-31-afternoon]').text()).toContain('1 table available')
+      expect($('label[for=date-2025-08-31-afternoon]').find('.govuk-tag').eq(0).text()).toContain(
+        'No visitors under 16 years old',
+      )
       // Afternoon - event
       expect($('.bapv-calendar__day-group').eq(0).find('h3').eq(3).text()).toBe('Prisoner schedule')
       expect($('.bapv-calendar__day-group').eq(0).find('h3').eq(3).next('.bapv-calendar__event').text()).toContain(
@@ -365,6 +384,7 @@ describe('Select date and time page (calendar)', () => {
 
       // day with morning visit and afternoon events, so afternoon section should not render
       expect($('.bapv-calendar__day-group').eq(1).find('legend').text().trim()).toBe('Monday 1 September 2025')
+      expect($('[data-test="date-2025-09-01-age-restriction-warning"]').length).toBe(0)
       // Morning - visit session (with no available tables text as availability is zero)
       expect($('.bapv-calendar__day-group').eq(1).find('h3').eq(0).text()).toBe('Morning')
       expect($('input#date-2025-09-01-morning').val()).toBe('2025-09-01_c')
@@ -373,8 +393,7 @@ describe('Select date and time page (calendar)', () => {
       expect($('label[for=date-2025-09-01-morning]').text()).toContain('10:30am to 11:30am')
       expect($('label[for=date-2025-09-01-morning]').text()).toContain('Visit Room 3')
       expect($('label[for=date-2025-09-01-morning]').text()).not.toContain('available')
-      expect($('label[for=date-2025-09-01-morning]').find('.govuk-tag').text()).toContain('tag text')
-      expect($('label[for=date-2025-09-01-morning]').find('.govuk-tag').hasClass('tag-class')).toBe(true)
+      expect($('label[for=date-2025-09-01-morning]').find('.govuk-tag').eq(0).text()).toContain('Original booking')
       // No events or afternoon
       expect($('.bapv-calendar__day-group').eq(1).text()).not.toContain('Prisoner schedule')
       expect($('.bapv-calendar__day-group').eq(1).find('.bapv-calendar__event').length).toBe(0)
@@ -388,6 +407,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -398,6 +418,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 1',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -419,6 +440,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -429,6 +451,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 1',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],
@@ -457,6 +480,7 @@ describe('Select date and time page (calendar)', () => {
           monthHeading: 'August',
           selected: false,
           outline: false,
+          showAgeRestrictionWarning: false,
           visitSessions: [
             {
               date: '2025-08-31',
@@ -467,6 +491,7 @@ describe('Select date and time page (calendar)', () => {
               visitRoom: 'Visit Room 1',
               availableTables: 18,
               capacity: 20,
+              ageRestriction: 18,
               sessionConflicts: [],
               disabled: false,
               tags: [],

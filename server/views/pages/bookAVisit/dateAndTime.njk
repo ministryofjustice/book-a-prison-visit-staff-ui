@@ -11,6 +11,43 @@
 
 {% set backLinkHref = urlPrefix + "/select-visitors" %}
 
+{% macro renderVisitSessionTag(tagType, ageRestriction) %}
+  {% if tagType == 'ORIGINAL_BOOKING' %}
+    {{ govukTag({
+      text: "Original booking",
+      classes: "govuk-tag--light-blue"
+    }) }}
+  {% endif %}
+
+  {% if tagType == 'CURRENT_RESERVATION' %}
+    {{ govukTag({
+      text: "Reserved visit time",
+      classes: "govuk-tag--light-blue"
+    }) }}
+  {% endif %}
+
+  {% if tagType == 'EXISTING_BOOKING' %}
+    {{ govukTag({
+      text: "Prisoner has a visit",
+      classes: "govuk-tag--red"
+    }) }}
+  {% endif %}
+
+  {% if tagType == 'FULLY_BOOKED' %}
+    {{ govukTag({
+      text: "Fully booked",
+      classes: "govuk-tag--orange"
+    }) }}
+  {% endif %}
+
+  {% if tagType == 'AGE_RESTRICTED' %}
+    {{ govukTag({
+      text: "No visitors under " + ageRestriction + (" year" | pluralise(ageRestriction)) + " old",
+      classes: "govuk-tag--red"
+    }) }}
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -140,7 +177,6 @@
                 {{ govukWarningText({
                   text: "The prisoner schedule is unavailable. " +
                     "Check NOMIS for court appearances, official visits and medical appointments.",
-                  iconFallbackText: "Warning",
                   classes: "govuk-!-width-two-thirds govuk-!-margin-top-5 govuk-!-margin-bottom-4",
                   attributes: { "data-test": "prisoner-schedule-unavailable" }
                 }) }}
@@ -151,7 +187,7 @@
                 <div class="govuk-grid-row">
 
                   {# radio inputs #}
-                  <div class="govuk-grid-column-one-quarter">
+                  <div class="govuk-grid-column-one-third">
                     <h3 class="govuk-heading-s">{{ sectionLabel | capitalize }}</h3>
                       {# build radio items #}
                       {% set visitSessionItems = [] %}
@@ -171,10 +207,7 @@
                           {% endif %}
 
                           {% for tag in visitSession.tags %}
-                            {{ govukTag({
-                              text: tag.text,
-                              classes: tag.classes
-                            }) }}
+                            {{ renderVisitSessionTag(tag, visitSession.ageRestriction) }}
                           {% endfor %}
                         {%- endset %}
                         {% set visitSessionItems = (visitSessionItems.push({
@@ -197,7 +230,7 @@
                   {# prisoner schedule #}
                   {% set scheduledEventsByDaySection = day.scheduledEvents | groupby("daySection") %}
                   {% if scheduledEventsByDaySection[sectionLabel] | length %}
-                    <div class="govuk-grid-column-three-quarters">
+                    <div class="govuk-grid-column-two-thirds">
                       <h3 class="govuk-heading-s{{ " bapv-visibility-hidden" if loop.index > 1 }}">Prisoner schedule</h3>
                       {% for event in scheduledEventsByDaySection[sectionLabel] %}
                         <div class="bapv-calendar__event">
@@ -218,6 +251,17 @@
               </p>
 
               {%- endcall %}
+
+              {# Age-restriction warning #}
+              {% if day.showAgeRestrictionWarning %}
+                {{ govukWarningText({
+                  html: "Age restricted visits cannot be selected. " +
+                    '<a href="' + urlPrefix + '/select-visitors" class="govuk-link--no-visited-state">' +
+                    "You can change visitors</a>.",
+                  classes: "govuk-!-margin-top-6 govuk-!-margin-bottom-9",
+                  attributes: { "data-test": "date-" + day.date + "-age-restriction-warning" }
+                }) }}
+              {% endif %}
             </div>
           {% endif %}
         {% endfor %}
