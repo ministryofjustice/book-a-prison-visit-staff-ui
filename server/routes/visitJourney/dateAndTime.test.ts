@@ -38,6 +38,7 @@ const calendarVisitSession1: CalendarVisitSession = {
   visitRoom: 'Visit room',
   availableTables: 18,
   capacity: 20,
+  ageRestriction: 18,
   sessionConflicts: [],
   disabled: false,
   tags: [],
@@ -52,6 +53,7 @@ const calendarVisitSession2: CalendarVisitSession = {
   visitRoom: 'Visit room',
   availableTables: 15,
   capacity: 25,
+  ageRestriction: 18,
   sessionConflicts: [],
   disabled: false,
   tags: [],
@@ -62,6 +64,7 @@ const calendarDay: CalendarDay = {
   monthHeading: 'August',
   selected: false,
   outline: false,
+  showAgeRestrictionWarning: false,
   visitSessions: [],
   scheduledEvents: [],
 }

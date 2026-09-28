@@ -8,7 +8,6 @@
 
 .restriction-tag {
   margin-top: 0;
-  max-width: unset;
   padding: 6px 10px;
 
   &--CHILD {
@@ -59,7 +58,6 @@
   color: govuk-colour("black");
   font-size: 14pt;
   margin-right: 0;
-  max-width: unset;
   padding: 2px 8px;
 
   &--C { // Child

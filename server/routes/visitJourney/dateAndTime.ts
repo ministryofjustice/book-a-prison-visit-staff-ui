@@ -42,7 +42,7 @@ export default class DateAndTime {
     const errors = req.flash('errors')
     const messages: MoJAlert[] = req.flash('messages')
 
-    // calculate min booking window and any override or bans in place
+    // Calculate min booking window and any override or bans in place
     const adjustedPolicyNoticeDaysMin = visitSessionData.overrideBookingWindow ? 0 : policyNoticeDaysMin + 1 // + 1 to ensure 'full' min days
     const isBanActive = visitSessionData.daysUntilBanExpiry > adjustedPolicyNoticeDaysMin
     const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : adjustedPolicyNoticeDaysMin
@@ -71,7 +71,7 @@ export default class DateAndTime {
       return res.render('pages/bookAVisit/dateAndTimeNoVisitSessions', data)
     }
 
-    // store visit sessions for use in validation
+    // Store visit sessions for use in validation
     const allVisitSessions: CalendarVisitSession[] = calendar.reduce((acc, cur) => acc.concat(cur.visitSessions), [])
     visitSessionData.allVisitSessions = allVisitSessions
 
@@ -79,19 +79,11 @@ export default class DateAndTime {
     messages.push(...this.getAdditionalMessages(isUpdate, isBanActive, visitSessionData))
 
     // Populate formValues if returning to the page or update journey
-    const selectedVisitSessionId = this.isVisitSessionAvailable(visitSessionData.selectedVisitSession, allVisitSessions)
-      ? `${visitSessionData.selectedVisitSession.date}_${visitSessionData.selectedVisitSession.sessionTemplateReference}`
-      : undefined
+    const visitSessionId = this.getSelectedVisitSessionId(visitSessionData)
+    const formValues = visitSessionId ? { visitSessionId } : {}
 
-    const originalVisitSessionId =
-      visitSessionData.originalVisitSession &&
-      `${visitSessionData.originalVisitSession.date}_${visitSessionData.originalVisitSession.sessionTemplateReference}`
-
-    const formValues = {
-      visitSessionId: selectedVisitSessionId ?? originalVisitSessionId ?? '',
-    }
-
-    visitSessionData.allowOverBooking = false // intentionally reset when returning to date and time page
+    // Intentionally reset when returning to date and time page
+    visitSessionData.allowOverBooking = false
 
     const data: DateAndTimePageData = {
       urlPrefix: getUrlPrefix(isUpdate),
@@ -130,7 +122,7 @@ export default class DateAndTime {
     }
 
     const { visitSessionId } = matchedData<{ visitSessionId: string }>(req)
-    const selectedVisitSession = this.getSelectedVisitSession(visitSessionData.allVisitSessions, visitSessionId)
+    const selectedVisitSession = this.getVisitSessionById(visitSessionData.allVisitSessions, visitSessionId)
     visitSessionData.selectedVisitSession = {
       date: selectedVisitSession.date,
       sessionTemplateReference: selectedVisitSession.sessionTemplateReference,
@@ -216,12 +208,16 @@ export default class DateAndTime {
   validate(): ValidationChain {
     return body('visitSessionId')
       .custom((visitSessionId: string, { req }: Meta & { req: Express.Request }) => {
-        return !!this.getSelectedVisitSession(req.session.visitSessionData.allVisitSessions, visitSessionId)
+        return !!this.getVisitSessionById(req.session.visitSessionData.allVisitSessions, visitSessionId)
       })
       .withMessage('No visit time selected')
   }
 
-  private getSelectedVisitSession(
+  private buildVisitSessionId(date: string, sessionTemplateReference: string): string {
+    return `${date}_${sessionTemplateReference}`
+  }
+
+  private getVisitSessionById(
     allVisitSessions: CalendarVisitSession[],
     visitSessionId: string,
   ): CalendarVisitSession | undefined {
@@ -231,7 +227,7 @@ export default class DateAndTime {
     )
   }
 
-  private isVisitSessionAvailable(
+  private isVisitSessionInAllSessions(
     visitSession: VisitSessionData['selectedVisitSession'] | VisitSessionData['originalVisitSession'],
     allVisitSessions: CalendarVisitSession[],
   ): boolean {
@@ -244,6 +240,32 @@ export default class DateAndTime {
         session.date === visitSession.date &&
         session.sessionTemplateReference === visitSession.sessionTemplateReference,
     )
+  }
+
+  private getSelectedVisitSessionId({
+    allVisitSessions,
+    selectedVisitSession,
+    originalVisitSession,
+  }: VisitSessionData): string | undefined {
+    // Currently selected visit session (if available) if one is selected)
+    // Could be new booking or an update journey with a new selected visit session
+    const selectedVisitSessionId = this.isVisitSessionInAllSessions(selectedVisitSession, allVisitSessions)
+      ? this.buildVisitSessionId(selectedVisitSession.date, selectedVisitSession.sessionTemplateReference)
+      : undefined
+
+    // Original visit session (if available) during an update journey
+    const originalVisitSessionId = this.isVisitSessionInAllSessions(originalVisitSession, allVisitSessions)
+      ? this.buildVisitSessionId(originalVisitSession.date, originalVisitSession.sessionTemplateReference)
+      : undefined
+
+    // Prefer the selected visit session ID if available, otherwise fall back to the original visit session ID
+    const visitSessionId = selectedVisitSessionId ?? originalVisitSessionId
+
+    // A disabled visit session (e.g. because of an age restriction) cannot be selected
+    const isVisitSessionIdAvailableAndNotDisabled =
+      visitSessionId && !this.getVisitSessionById(allVisitSessions, visitSessionId)?.disabled
+
+    return isVisitSessionIdAvailableAndNotDisabled ? visitSessionId : undefined
   }
 
   private isAnOverbooking(
@@ -295,7 +317,7 @@ export default class DateAndTime {
 
     // Messages to add if updating and no session selected yet
     if (isUpdate && !visitSessionData.selectedVisitSession) {
-      const isOriginalSessionAvailable = this.isVisitSessionAvailable(
+      const isOriginalSessionAvailable = this.isVisitSessionInAllSessions(
         visitSessionData.originalVisitSession,
         visitSessionData.allVisitSessions,
       )
