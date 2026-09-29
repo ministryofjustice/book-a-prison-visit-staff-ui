@@ -50,6 +50,7 @@ export const user: PrisonUser = {
   userId: 'id',
   token: 'token',
   username: 'user1',
+  userUuid: '11111111-1111-1111-1111-111111111111',
   displayName: 'First Last',
   authSource: 'nomis',
   staffId: 1234,
