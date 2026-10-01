@@ -18,18 +18,3 @@ const shutdown = async () => {
 
 process.on('SIGTERM', () => shutdown())
 process.on('SIGINT', () => shutdown())
-
-export default function addUsernameAndCaseloadToTelemetry(): RequestHandler {
-  return (req, res, next) => {
-    const { username, activeCaseLoadId } = res?.locals?.user || {}
-
-    if (username) {
-      telemetry.setSpanAttributes({
-        ...(username && { username }),
-        ...(activeCaseLoadId && { activeCaseLoadId }),
-      })
-    }
-
-    return next()
-  }
-}
