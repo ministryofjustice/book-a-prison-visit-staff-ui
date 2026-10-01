@@ -1,4 +1,5 @@
-import express from 'express'
+import express, { Request } from 'express'
+import { telemetryMiddleware } from '@ministryofjustice/hmpps-azure-telemetry'
 
 import createError from 'http-errors'
 
@@ -37,7 +38,6 @@ import type { Services } from './services'
 import config from './config'
 import logger from '../logger'
 import bapvUserRoles from './constants/bapvUserRoles'
-import addUsernameAndCaseloadToTelemetry from './utils/azureAppInsights'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -70,7 +70,11 @@ export default function createApp(services: Services): express.Application {
 
   app.use(populateSelectedEstablishment(services))
   app.use(appInsightsOperationId)
-  app.use(addUsernameAndCaseloadToTelemetry())
+  app.use(
+    telemetryMiddleware.addUserMetadataToTelemetry({
+      getAttributes: (req: Request) => ({ username: req.user?.username }),
+    }),
+  )
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))
