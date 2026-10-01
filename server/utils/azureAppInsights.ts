@@ -1,5 +1,4 @@
 import { initialiseTelemetry, flushTelemetry, telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
-import type { RequestHandler } from 'express'
 
 initialiseTelemetry({
   serviceName: 'book-a-prison-visit-staff-ui',
