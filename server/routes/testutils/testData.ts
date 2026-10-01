@@ -13,6 +13,7 @@ import {
   PrisonerBalanceDto,
   PrisonerProfileDto,
   PrisonerScheduledEventDto,
+  PrisonUserClientDto,
   PrisonVisitorRequestDto,
   PrisonVisitorRequestListEntryDto,
   SessionCapacity,
@@ -590,10 +591,12 @@ export default class TestData {
     maxAdultVisitors = this.prisonDto().maxAdultVisitors,
     maxChildVisitors = this.prisonDto().maxChildVisitors,
     adultAgeYears = this.prisonDto().adultAgeYears,
-    webAddress = this.prisonDto().webAddress,
-    clients = this.prisonDto().clients,
     weekStartDay = this.prisonDto().weekStartDay,
     remandVisitLimitPerWeek = this.prisonDto().remandVisitLimitPerWeek,
+    webAddress = this.prisonDto().webAddress,
+    staffClient = this.prisonDto().staffClient,
+    publicClient = this.prisonDto().publicClient,
+    clients = this.prisonDto().clients,
   }: Partial<Prison> = {}): Prison =>
     ({
       prisonId,
@@ -606,9 +609,11 @@ export default class TestData {
       maxChildVisitors,
       adultAgeYears,
       webAddress,
-      clients,
       weekStartDay,
       remandVisitLimitPerWeek,
+      staffClient,
+      publicClient,
+      clients,
     }) as Prison
 
   static prisonAndSessionsExcludeDatesDto = ({
@@ -630,10 +635,12 @@ export default class TestData {
     maxAdultVisitors = 3,
     maxChildVisitors = 4,
     adultAgeYears = 18,
-    webAddress = 'https://www.example.com/hewell',
-    clients = [{ userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 }],
     weekStartDay = 'MONDAY',
     remandVisitLimitPerWeek = 3,
+    webAddress = 'https://www.example.com/hewell',
+    staffClient = this.prisonUserClientDto(),
+    publicClient = this.prisonUserClientDto({ clientType: 'PUBLIC' }),
+    clients = [],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -645,11 +652,27 @@ export default class TestData {
       maxAdultVisitors,
       maxChildVisitors,
       adultAgeYears,
-      webAddress,
-      clients,
       weekStartDay,
       remandVisitLimitPerWeek,
+      webAddress,
+      staffClient,
+      publicClient,
+      clients,
     }) as PrisonDto
+
+  static prisonUserClientDto = ({
+    clientType = 'STAFF',
+    policyNoticeDaysMin = 2,
+    policyNoticeDaysMax = 28,
+    active = true,
+  }: Partial<PrisonUserClientDto> = {}): PrisonUserClientDto =>
+    ({
+      userType: clientType,
+      clientType,
+      active,
+      policyNoticeDaysMin,
+      policyNoticeDaysMax,
+    }) as PrisonUserClientDto
 
   static prisonerVoBalance = ({
     prisonerId = 'A1234BC',

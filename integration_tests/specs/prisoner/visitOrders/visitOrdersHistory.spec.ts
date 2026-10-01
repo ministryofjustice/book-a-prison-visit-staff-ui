@@ -13,6 +13,8 @@ test.describe('Visiting orders history', () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitRequestCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
     await orchestrationApi.stubGetVisitorRequests()
 
     await orchestrationApi.stubPrisonerProfile(profile)

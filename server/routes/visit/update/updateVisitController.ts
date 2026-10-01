@@ -96,7 +96,7 @@ export default class UpdateVisitController {
 
       req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
-      const { policyNoticeDaysMin } = req.session.selectedEstablishment
+      const { policyNoticeDaysMin } = req.session.selectedEstablishment.staffClient
 
       const numberOfDays = differenceInCalendarDays(new Date(visitDetails.startTimestamp), new Date())
 

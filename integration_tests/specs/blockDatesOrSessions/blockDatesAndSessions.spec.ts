@@ -23,7 +23,8 @@ test.describe('Block visit dates and sessions', () => {
   test.beforeEach(async () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitRequestCount()
   })
 
   test.afterEach(async () => {

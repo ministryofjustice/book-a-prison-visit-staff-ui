@@ -12,7 +12,7 @@ export default class VisitRequestsListingController {
 
       return res.render('pages/request/visitRequestsListing', {
         messages: req.flash('messages'),
-        checkBeforeDays: selectedEstablishment.policyNoticeDaysMin,
+        checkBeforeDays: selectedEstablishment.staffClient.policyNoticeDaysMin,
         prisonName: selectedEstablishment.prisonName,
         visitRequests,
       })

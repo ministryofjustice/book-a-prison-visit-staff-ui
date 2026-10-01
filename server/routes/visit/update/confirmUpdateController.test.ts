@@ -9,7 +9,9 @@ import TestData from '../../testutils/testData'
 let app: Express
 let flashData: FlashData
 
-const prison = TestData.prison()
+const selectedEstablishment = TestData.prison({
+  staffClient: TestData.prisonUserClientDto({ policyNoticeDaysMin: 4 }),
+})
 let visitSessionData: VisitSessionData
 
 beforeEach(() => {
@@ -19,7 +21,7 @@ beforeEach(() => {
     services: {},
 
     sessionData: {
-      selectedEstablishment: { ...prison, policyNoticeDaysMin: 4 },
+      selectedEstablishment,
     } as SessionData,
   })
 })

@@ -8,22 +8,16 @@ import { resetStubs, login } from '../../testUtils'
 import VisitRequestRejectionReasonPage from '../../pages/visit/visitRequests/visitRequestRejectionReasonPage'
 
 test.describe('Process a visit Request', () => {
-  const prisonStaffAndPublic = TestData.prisonDto({
-    policyNoticeDaysMin: 0,
-    clients: [
-      { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-      { userType: 'PUBLIC', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-    ],
-  })
-
   const visitRequest = TestData.visitRequestSummary()
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
     await orchestrationApi.stubSupportedPrisonIds()
-    await orchestrationApi.stubGetPrison(prisonStaffAndPublic)
+    await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetVisitRequestCount({ visitRequestCount: 1 })
     await orchestrationApi.stubGetNotificationCount({ notificationCount: 0 })
+    await orchestrationApi.stubGetVisitorRequestCount()
+
     await login(page)
   })
 

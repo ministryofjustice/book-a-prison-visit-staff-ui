@@ -40,5 +40,5 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
 }
 
 function isPrisonEnabledForPublic(prison: Prison): boolean {
-  return prison.clients.some(client => client.userType === 'PUBLIC' && client.active)
+  return prison.publicClient?.active ?? false
 }

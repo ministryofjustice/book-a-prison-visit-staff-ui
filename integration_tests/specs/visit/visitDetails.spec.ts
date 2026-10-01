@@ -13,7 +13,10 @@ test.describe('Visit details page', () => {
   test.beforeEach(async ({ page }) => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
+
     await login(page)
   })
 
