@@ -9,7 +9,13 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       return next()
     }
 
-    const { selectedEstablishment } = req.session
+    // TODO This handles old PrisonDto structure in the session.
+    // Can be removed once API and PrisonDto changes in this app have been deployed for at least a day
+    // const { selectedEstablishment } = req.session
+    const selectedEstablishment = req.session?.selectedEstablishment?.staffClient
+      ? req.session.selectedEstablishment
+      : undefined
+
     const { activeCaseLoadId } = res.locals.user
     const establishmentAndCaseLoadMatch = selectedEstablishment?.prisonId === activeCaseLoadId
 

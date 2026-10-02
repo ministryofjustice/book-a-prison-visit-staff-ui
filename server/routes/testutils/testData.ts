@@ -596,7 +596,6 @@ export default class TestData {
     webAddress = this.prisonDto().webAddress,
     staffClient = this.prisonDto().staffClient,
     publicClient = this.prisonDto().publicClient,
-    clients = this.prisonDto().clients,
   }: Partial<Prison> = {}): Prison =>
     ({
       prisonId,
@@ -613,7 +612,7 @@ export default class TestData {
       remandVisitLimitPerWeek,
       staffClient,
       publicClient,
-      clients,
+      clients: [],
     }) as Prison
 
   static prisonAndSessionsExcludeDatesDto = ({
@@ -640,7 +639,6 @@ export default class TestData {
     webAddress = 'https://www.example.com/hewell',
     staffClient = this.prisonUserClientDto(),
     publicClient = this.prisonUserClientDto({ clientType: 'PUBLIC' }),
-    clients = [],
   }: Partial<PrisonDto> = {}): PrisonDto =>
     ({
       code,
@@ -657,7 +655,7 @@ export default class TestData {
       webAddress,
       staffClient,
       publicClient,
-      clients,
+      clients: [],
     }) as PrisonDto
 
   static prisonUserClientDto = ({

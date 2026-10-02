@@ -341,7 +341,7 @@ describe('Booking search page', () => {
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
         services: { auditService, prisonerSearchService, visitService },
-        sessionData: { selectedEstablishment: { prisonId: 'XYZ' } } as SessionData,
+        sessionData: { selectedEstablishment: TestData.prison({ prisonId: 'XYZ' }) } as SessionData,
       })
 
       return request(app)
