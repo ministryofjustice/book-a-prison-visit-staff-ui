@@ -16,6 +16,8 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitRequestCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
     await orchestrationApi.stubGetVisitorRequests()
   })
 

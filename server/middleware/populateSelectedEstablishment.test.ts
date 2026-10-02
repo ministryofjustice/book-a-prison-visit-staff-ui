@@ -5,6 +5,7 @@ import { createMockSupportedPrisonsService } from '../services/testutils/mocks'
 import populateSelectedEstablishment from './populateSelectedEstablishment'
 import { user } from '../routes/testutils/appSetup'
 import { Services } from '../services'
+import { Prison } from '../@types/bapv'
 
 const supportedPrisonsService = createMockSupportedPrisonsService()
 const services = { supportedPrisonsService } as unknown as Services
@@ -37,111 +38,132 @@ describe('populateSelectedEstablishment', () => {
   })
 
   describe('should ignore path /establishment-not-supported', () => {
-    it('should call next() if the path is /establishment-not-supported', () => {
+    it('should call next() if the path is /establishment-not-supported', async () => {
       ;(req.path as string) = '/establishment-not-supported'
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(next).toHaveBeenCalled()
+      expect(supportedPrisonsService.isSupportedPrison).not.toHaveBeenCalled()
+      expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
     })
   })
 
   describe('when selected establishment and active case load both set', () => {
-    it('should populate res.locals and call next() when they match', () => {
+    it('should populate res.locals and call next() when they match', async () => {
       user.activeCaseLoadId = prison.prisonId
       req.session.selectedEstablishment = selectedEstablishment
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(supportedPrisonsService.isSupportedPrison).not.toHaveBeenCalled()
+      expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
 
-    it('should clear selected establishment and redirect to /back-to-start when they do not match', () => {
+    it('should clear selected establishment and redirect to /back-to-start when they do not match', async () => {
       user.activeCaseLoadId = 'XYZ'
       req.session.selectedEstablishment = selectedEstablishment
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(res.locals.selectedEstablishment).toBe(undefined)
       expect(req.session.selectedEstablishment).toBe(undefined)
+      expect(supportedPrisonsService.isSupportedPrison).not.toHaveBeenCalled()
+      expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith('/back-to-start')
     })
   })
 
   // because front-end components meta data (e.g. activeCaseLoad) only gets set on GET requests
   describe('when selected establishment is set but active case load is not set', () => {
-    it('should populate res.locals and call next()', () => {
+    it('should populate res.locals and call next()', async () => {
       user.activeCaseLoadId = undefined
       req.session.selectedEstablishment = selectedEstablishment
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
       expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(supportedPrisonsService.isSupportedPrison).not.toHaveBeenCalled()
+      expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
     })
   })
 
   // e.g. new session or after case load change detected
   describe('when selected establishment is not set but active case load is set', () => {
-    it('should populate selected establishment when active case load is a supported prison (public enabled)', () => {
+    it('should populate selected establishment when active case load is a supported prison (public enabled)', async () => {
       user.activeCaseLoadId = prison.prisonId
       req.session.selectedEstablishment = undefined
 
       supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
       supportedPrisonsService.getPrison.mockResolvedValue(prison)
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
-      expect(() => {
-        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', prison.prisonId)
-        expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith('user1', prison.prisonId)
-        expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
-        expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
-        expect(next).toHaveBeenCalled()
-      })
+      expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(next).toHaveBeenCalled()
     })
 
-    it('should populate selected establishment when active case load is a supported prison (not public enabled)', () => {
+    it('should populate selected establishment when active case load is a supported prison (not public enabled)', async () => {
       user.activeCaseLoadId = prison.prisonId
       req.session.selectedEstablishment = undefined
 
+      const prisonNotPublicEnabled: Prison = { ...prison, publicClient: null }
       supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
-      supportedPrisonsService.getPrison.mockResolvedValue({
-        ...prison,
-        clients: [
-          { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-          { userType: 'PUBLIC', active: false, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-        ],
-      })
+      supportedPrisonsService.getPrison.mockResolvedValue(prisonNotPublicEnabled)
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
-      expect(() => {
-        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', prison.prisonId)
-        expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith('user1', prison.prisonId)
-        expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: false })
-        expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: false })
-        expect(next).toHaveBeenCalled()
-      })
+      expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(req.session.selectedEstablishment).toStrictEqual({ ...prisonNotPublicEnabled, isEnabledForPublic: false })
+      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prisonNotPublicEnabled, isEnabledForPublic: false })
+      expect(next).toHaveBeenCalled()
     })
 
-    it('should redirect to /establishment-not-supported when active case load is not a supported prison', () => {
+    it('should redirect to /establishment-not-supported when active case load is not a supported prison', async () => {
       const unsupportedPrison = TestData.prison({ prisonId: 'XYZ', prisonName: 'XYZ (HMP)' })
       user.activeCaseLoadId = unsupportedPrison.prisonId
       req.session.selectedEstablishment = undefined
 
       supportedPrisonsService.isSupportedPrison.mockResolvedValue(false)
 
-      populateSelectedEstablishment(services)(req, res, next)
+      await populateSelectedEstablishment(services)(req, res, next)
 
-      expect(() => {
-        expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith('user1', unsupportedPrison.prisonId)
-        expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
-        expect(req.session.selectedEstablishment).toBe(undefined)
-        expect(res.locals.selectedEstablishment).toBe(undefined)
-        expect(res.redirect).toHaveBeenCalledWith('/establishment-not-supported')
-      })
+      expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith(unsupportedPrison.prisonId)
+      expect(supportedPrisonsService.getPrison).not.toHaveBeenCalled()
+      expect(req.session.selectedEstablishment).toBe(undefined)
+      expect(res.locals.selectedEstablishment).toBe(undefined)
+      expect(res.redirect).toHaveBeenCalledWith('/establishment-not-supported')
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+
+  // TODO Can be removed once API and PrisonDto changes in this app have been deployed for at least a day
+  // PrisonDto structure has changed. Users could have prison data cached in session in the old
+  // format which would cause a runtime error.
+  // This test ensures that the application can handle the old structure gracefully and update the session.
+  describe('Temporarily handle changes to PrisonDto structure', () => {
+    it('should clear and then re-populate selected establishment if session data is old PrisonDto structure', async () => {
+      user.activeCaseLoadId = prison.prisonId
+      req.session.selectedEstablishment = selectedEstablishment
+      delete req.session.selectedEstablishment.staffClient // Simulate old PrisonDto structure without staffClient
+
+      supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
+      supportedPrisonsService.getPrison.mockResolvedValue(prison)
+
+      await populateSelectedEstablishment(services)(req, res, next)
+
+      expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith(prison.prisonId)
+      expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
+      expect(next).toHaveBeenCalled()
     })
   })
 })

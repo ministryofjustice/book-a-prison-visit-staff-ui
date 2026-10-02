@@ -36,7 +36,8 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const { prisonId, policyNoticeDaysMin, policyNoticeDaysMax } = req.session.selectedEstablishment
+    const { prisonId } = req.session.selectedEstablishment
+    const { policyNoticeDaysMin, policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
     const { visitSessionData } = req.session
 
     const errors = req.flash('errors')

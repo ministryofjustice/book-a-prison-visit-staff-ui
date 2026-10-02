@@ -12,6 +12,8 @@ test.describe('Prisoner profile page', () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitRequestCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
     await orchestrationApi.stubGetVisitorRequests()
 
     await login(page)

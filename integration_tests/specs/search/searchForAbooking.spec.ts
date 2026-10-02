@@ -19,7 +19,10 @@ test.describe('Search for a booking by reference', () => {
     await resetStubs()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
+
     await login(page)
   })
 

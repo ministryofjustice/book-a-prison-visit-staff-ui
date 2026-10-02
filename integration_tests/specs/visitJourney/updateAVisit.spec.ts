@@ -41,7 +41,9 @@ test.describe('Update a visit', () => {
     await resetStubs()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
   })
 
   test('should complete the update a visit journey', async ({ page }) => {
@@ -160,8 +162,9 @@ test.describe('Update a visit', () => {
         startTimestamp: session8Start,
         endTimestamp: session8End,
         visitContact: {
-          name: 'Jeanette Smith',
           telephone: '09876 543 321',
+          email: 'visitor@example.com',
+          name: 'Jeanette Smith',
           languagePreference: 'en',
         },
         visitors: [

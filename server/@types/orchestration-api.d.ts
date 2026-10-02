@@ -2149,11 +2149,18 @@ export interface components {
     /** @description Prison user client dto */
     PrisonUserClientDto: {
       /**
+       * @deprecated
        * @description User type
        * @example STAFF
        * @enum {string}
        */
-      userType: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+      userType: 'STAFF' | 'PUBLIC'
+      /**
+       * @description Prison client type (STAFF / PUBLIC)
+       * @example STAFF
+       * @enum {string}
+       */
+      clientType: 'STAFF' | 'PUBLIC'
       /**
        * Format: int32
        * @description minimum number of days notice from the current date to book a visit
@@ -2186,12 +2193,14 @@ export interface components {
       active: boolean
       /**
        * Format: int32
+       * @deprecated
        * @description minimum number of days notice from the current date to booked a visit
        * @example 2
        */
       policyNoticeDaysMin: number
       /**
        * Format: int32
+       * @deprecated
        * @description maximum number of days notice from the current date to booked a visit
        * @example 28
        */
@@ -4574,12 +4583,14 @@ export interface components {
       active: boolean
       /**
        * Format: int32
+       * @deprecated
        * @description minimum number of days notice from the current date to booked a visit
        * @example 2
        */
       policyNoticeDaysMin: number
       /**
        * Format: int32
+       * @deprecated
        * @description maximum number of days notice from the current date to booked a visit
        * @example 28
        */
@@ -4623,7 +4634,14 @@ export interface components {
       phoneNumber?: string | null
       /** @description Web address of prison */
       webAddress?: string | null
-      /** @description prison user client */
+      /** @description Staff Client details */
+      staffClient: components['schemas']['PrisonUserClientDto']
+      /** @description Public Client details (if available) */
+      publicClient?: components['schemas']['PrisonUserClientDto'] | null
+      /**
+       * @deprecated
+       * @description prison user client
+       */
       clients: components['schemas']['PrisonUserClientDto'][]
     }
   }
@@ -7442,7 +7460,7 @@ export interface operations {
          * @description user type for the session
          * @example STAFF
          */
-        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        userType?: 'STAFF' | 'PUBLIC'
         /**
          * @description Age of the youngest visitor
          * @example 18
@@ -7633,7 +7651,7 @@ export interface operations {
          * @description user type for the session
          * @example PUBLIC
          */
-        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        userType?: 'STAFF' | 'PUBLIC'
         /**
          * @description Age of the youngest visitor
          * @example 18
@@ -7788,7 +7806,7 @@ export interface operations {
          * @description user type for the session
          * @example PUBLIC
          */
-        userType?: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        userType?: 'STAFF' | 'PUBLIC'
         /**
          * @description Age of the youngest visitor
          * @example 18
@@ -8883,7 +8901,7 @@ export interface operations {
          * @description type
          * @example STAFF
          */
-        type: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        type: 'STAFF' | 'PUBLIC'
       }
       cookie?: never
     }
@@ -8933,7 +8951,7 @@ export interface operations {
          * @description type
          * @example STAFF
          */
-        type: 'STAFF' | 'PUBLIC' | 'SYSTEM' | 'PRISONER'
+        type: 'STAFF' | 'PUBLIC'
       }
       cookie?: never
     }

@@ -10,6 +10,8 @@ test.describe('SignIn', () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
   })
 
   test.afterEach(async () => {

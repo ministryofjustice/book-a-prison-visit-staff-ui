@@ -96,6 +96,7 @@ export type VisitSessionV2Dto = components['schemas']['VisitSessionV2Dto']
 export type PrisonerScheduledEventDto = components['schemas']['PrisonerScheduledEventDto']
 
 export type PrisonDto = components['schemas']['PrisonDto']
+export type PrisonUserClientDto = components['schemas']['PrisonUserClientDto']
 
 export type ExcludeDateDto = components['schemas']['ExcludeDateDto']
 

@@ -17,7 +17,7 @@ export default class SelectVisitors {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
-    const { policyNoticeDaysMax } = req.session.selectedEstablishment
+    const { policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
 
     const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax)
     if (!req.session.visitorList) {
@@ -98,7 +98,7 @@ export default class SelectVisitors {
     )
 
     const allSelectedVisitorBans = selectedVisitors.flatMap(visitor => visitor.restrictions)
-    const { policyNoticeDaysMax } = req.session.selectedEstablishment
+    const { policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
 
     const banStatus = getBanStatus(allSelectedVisitorBans, policyNoticeDaysMax)
     visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined

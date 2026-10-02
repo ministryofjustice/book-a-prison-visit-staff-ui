@@ -27,7 +27,9 @@ test.describe('Establishment not supported', () => {
   }) => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
     await login(page)
 
     // Start on homepage - with user having a supported case load

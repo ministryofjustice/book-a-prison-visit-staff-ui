@@ -35,6 +35,8 @@ test.describe('Bookings review listing page', () => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
     await login(page)
   })
 

@@ -7,15 +7,8 @@ import TestData from '../../server/routes/testutils/testData'
 import bapvUserRoles from '../../server/constants/bapvUserRoles'
 
 test.describe('Home page', () => {
-  const prisonStaffOnly = TestData.prisonDto({
-    clients: [{ userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 }],
-  })
-  const prisonStaffAndPublic = TestData.prisonDto({
-    clients: [
-      { userType: 'STAFF', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-      { userType: 'PUBLIC', active: true, policyNoticeDaysMin: 3, policyNoticeDaysMax: 5 },
-    ],
-  })
+  const prisonStaffOnly = TestData.prisonDto({ publicClient: null })
+  const prisonStaffAndPublic = TestData.prisonDto()
 
   const visitRequestCount = 3
   const visitorRequestCount = 3
@@ -29,7 +22,7 @@ test.describe('Home page', () => {
     await resetStubs()
   })
 
-  test('should render the index page with the correct tiles - non-PUBLIC prison', async ({ page }) => {
+  test('should render the index page with the correct tiles - STAFF-only prison', async ({ page }) => {
     await orchestrationApi.stubGetPrison(prisonStaffOnly)
     await orchestrationApi.stubGetNotificationCount({ notificationCount })
     await login(page)
@@ -56,7 +49,9 @@ test.describe('Home page', () => {
     await expect(homePage.bookerManagementTile).toContainText('Manage online bookers')
   })
 
-  test('should render the index page with the correct tiles (inc visit requests) - PUBLIC prison', async ({ page }) => {
+  test('should render the index page with the correct tiles (inc visit requests) - STAFF & PUBLIC prison', async ({
+    page,
+  }) => {
     await orchestrationApi.stubGetPrison(prisonStaffAndPublic)
     await orchestrationApi.stubGetVisitRequestCount({ visitRequestCount })
     await orchestrationApi.stubGetVisitorRequestCount({ visitorRequestCount })

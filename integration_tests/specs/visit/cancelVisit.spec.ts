@@ -34,9 +34,12 @@ test.describe('Cancel visit journey', () => {
   test.beforeEach(async ({ page }) => {
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
-    await orchestrationApi.stubGetNotificationCount({})
-    await login(page)
+    await orchestrationApi.stubGetNotificationCount()
+    await orchestrationApi.stubGetVisitorRequestCount()
+    await orchestrationApi.stubGetVisitRequestCount()
     await orchestrationApi.stubGetVisitDetailed(visitDetails)
+
+    await login(page)
   })
 
   test.afterEach(async () => {
