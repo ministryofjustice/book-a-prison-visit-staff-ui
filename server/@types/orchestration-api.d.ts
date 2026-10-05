@@ -2149,13 +2149,6 @@ export interface components {
     /** @description Prison user client dto */
     PrisonUserClientDto: {
       /**
-       * @deprecated
-       * @description User type
-       * @example STAFF
-       * @enum {string}
-       */
-      userType: 'STAFF' | 'PUBLIC'
-      /**
        * @description Prison client type (STAFF / PUBLIC)
        * @example STAFF
        * @enum {string}
@@ -2191,20 +2184,6 @@ export interface components {
        * @example true
        */
       active: boolean
-      /**
-       * Format: int32
-       * @deprecated
-       * @description minimum number of days notice from the current date to booked a visit
-       * @example 2
-       */
-      policyNoticeDaysMin: number
-      /**
-       * Format: int32
-       * @deprecated
-       * @description maximum number of days notice from the current date to booked a visit
-       * @example 28
-       */
-      policyNoticeDaysMax: number
       /**
        * Format: int32
        * @description Max number of total visitors
@@ -4583,20 +4562,6 @@ export interface components {
       active: boolean
       /**
        * Format: int32
-       * @deprecated
-       * @description minimum number of days notice from the current date to booked a visit
-       * @example 2
-       */
-      policyNoticeDaysMin: number
-      /**
-       * Format: int32
-       * @deprecated
-       * @description maximum number of days notice from the current date to booked a visit
-       * @example 28
-       */
-      policyNoticeDaysMax: number
-      /**
-       * Format: int32
        * @description Max number of total visitors
        */
       maxTotalVisitors: number
@@ -4638,11 +4603,6 @@ export interface components {
       staffClient: components['schemas']['PrisonUserClientDto']
       /** @description Public Client details (if available) */
       publicClient?: components['schemas']['PrisonUserClientDto'] | null
-      /**
-       * @deprecated
-       * @description prison user client
-       */
-      clients: components['schemas']['PrisonUserClientDto'][]
     }
   }
   responses: never

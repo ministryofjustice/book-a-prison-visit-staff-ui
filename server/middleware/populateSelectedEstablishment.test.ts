@@ -143,27 +143,4 @@ describe('populateSelectedEstablishment', () => {
       expect(next).not.toHaveBeenCalled()
     })
   })
-
-  // TODO Can be removed once API and PrisonDto changes in this app have been deployed for at least a day
-  // PrisonDto structure has changed. Users could have prison data cached in session in the old
-  // format which would cause a runtime error.
-  // This test ensures that the application can handle the old structure gracefully and update the session.
-  describe('Temporarily handle changes to PrisonDto structure', () => {
-    it('should clear and then re-populate selected establishment if session data is old PrisonDto structure', async () => {
-      user.activeCaseLoadId = prison.prisonId
-      req.session.selectedEstablishment = selectedEstablishment
-      delete req.session.selectedEstablishment.staffClient // Simulate old PrisonDto structure without staffClient
-
-      supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
-      supportedPrisonsService.getPrison.mockResolvedValue(prison)
-
-      await populateSelectedEstablishment(services)(req, res, next)
-
-      expect(supportedPrisonsService.isSupportedPrison).toHaveBeenCalledWith(prison.prisonId)
-      expect(supportedPrisonsService.getPrison).toHaveBeenCalledWith(prison.prisonId)
-      expect(req.session.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
-      expect(res.locals.selectedEstablishment).toStrictEqual({ ...prison, isEnabledForPublic: true })
-      expect(next).toHaveBeenCalled()
-    })
-  })
 })
