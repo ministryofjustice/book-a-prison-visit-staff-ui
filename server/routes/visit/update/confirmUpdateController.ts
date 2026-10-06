@@ -10,14 +10,12 @@ export default class ConfirmUpdateController {
   public viewConfirmUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const reference = getVisitReference(req)
-      const { policyNoticeDaysMin } = req.session.selectedEstablishment.staffClient
       const navState = extractVisitNavState({ from: req.query.from, query: req.query.query })
 
       return res.render('pages/visit/update/confirmUpdate', {
         errors: req.flash('errors'),
         backLinkHref: appendNavStateToPath(`/visit/${reference}`, navState),
         formAction: appendNavStateToPath(`/visit/${reference}/confirm-update`, navState),
-        policyNoticeDaysMin,
         reference,
       })
     }

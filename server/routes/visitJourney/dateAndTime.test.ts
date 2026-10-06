@@ -181,7 +181,7 @@ testJourneys.forEach(journey => {
               username: 'user1',
               prisonId,
               prisonerId: visitSessionData.prisoner.offenderNo,
-              minNumberOfDays: 3,
+              minNumberOfDays: 2,
               visitors: visitSessionData.visitors,
               visitRestriction: visitSessionData.visitRestriction,
               selectedVisitSession: visitSessionData.selectedVisitSession,

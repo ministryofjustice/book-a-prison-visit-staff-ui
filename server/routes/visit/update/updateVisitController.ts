@@ -12,6 +12,9 @@ import isPublicBooking from './isPublicBooking'
 export default class UpdateVisitController {
   public constructor(private readonly visitService: VisitService) {}
 
+  // Updating a visit within this window will require confirmation from the user.
+  private CONFIRM_UPDATE_WINDOW_DAYS = 2
+
   public startVisitUpdate(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
@@ -96,11 +99,9 @@ export default class UpdateVisitController {
 
       req.session.visitSessionData = Object.assign(req.session.visitSessionData ?? {}, visitSessionData)
 
-      const { policyNoticeDaysMin } = req.session.selectedEstablishment.staffClient
-
       const numberOfDays = differenceInCalendarDays(new Date(visitDetails.startTimestamp), new Date())
 
-      if (numberOfDays > policyNoticeDaysMin) {
+      if (numberOfDays > this.CONFIRM_UPDATE_WINDOW_DAYS) {
         return res.redirect('/update-a-visit/select-visitors')
       }
       return res.redirect(appendNavStateToPath(`/visit/${reference}/confirm-update`, navState))
