@@ -4,26 +4,16 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import { VisitSessionData } from '../../../@types/bapv'
-import TestData from '../../testutils/testData'
 
 let app: Express
 let flashData: FlashData
 
-const selectedEstablishment = TestData.prison({
-  staffClient: TestData.prisonUserClientDto({ policyNoticeDaysMin: 4 }),
-})
 let visitSessionData: VisitSessionData
 
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
-  app = appWithAllRoutes({
-    services: {},
-
-    sessionData: {
-      selectedEstablishment,
-    } as SessionData,
-  })
+  app = appWithAllRoutes({})
 })
 
 afterEach(() => {
@@ -39,7 +29,7 @@ describe('GET /visit/:reference/confirm-update', () => {
       .expect(res => {
         const $ = cheerio.load(res.text)
         expect($('.govuk-back-link').attr('href')).toBe(`/visit/ab-cd-ef-gh`)
-        expect($('h1').text().trim()).toContain('This visit is in less than 4 days.')
+        expect($('h1').text().trim()).toContain('This visit is in less than 2 days.')
         expect($('h1').text().trim()).toContain('Do you want to update the booking?')
         expect($('form').attr('action')).toBe('/visit/ab-cd-ef-gh/confirm-update')
       })

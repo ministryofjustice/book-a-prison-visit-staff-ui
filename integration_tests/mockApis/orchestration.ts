@@ -1056,7 +1056,7 @@ export default {
   stubGetVisitSessionsAndSchedule: ({
     prisonId = 'HEI',
     prisonerId = 'A1234BC',
-    minNumberOfDays = 3,
+    minNumberOfDays = 2,
     username = 'USER1',
     youngestVisitorAge = 18,
     visitSessionsAndSchedule = TestData.visitSessionsAndSchedule(),
