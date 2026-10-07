@@ -44,7 +44,7 @@ export default class DateAndTime {
     const messages: MoJAlert[] = req.flash('messages')
 
     // Calculate min booking window and any override or bans in place
-    const adjustedPolicyNoticeDaysMin = visitSessionData.overrideBookingWindow ? 0 : policyNoticeDaysMin + 1 // + 1 to ensure 'full' min days
+    const adjustedPolicyNoticeDaysMin = visitSessionData.overrideBookingWindow ? 0 : policyNoticeDaysMin
     const isBanActive = visitSessionData.daysUntilBanExpiry > adjustedPolicyNoticeDaysMin
     const minNumberOfDays = isBanActive ? visitSessionData.daysUntilBanExpiry : adjustedPolicyNoticeDaysMin
 

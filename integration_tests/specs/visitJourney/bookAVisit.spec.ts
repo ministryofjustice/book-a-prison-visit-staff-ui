@@ -159,7 +159,6 @@ test.describe('Book a visit', () => {
     await orchestrationApi.stubGetVisitSessionsAndSchedule({
       prisonerId: offenderNo,
       visitSessionsAndSchedule,
-      minNumberOfDays: 3,
       youngestVisitorAge: 5,
     })
 
