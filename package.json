@@ -7,7 +7,7 @@
   "scripts": {
     "prepare": "hmpps-precommit-hooks-prepare",
     "copy-views": "cp -R server/views dist/server/",
-    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.scss:./assets/stylesheets/application.css --style compressed",
+    "compile-sass": "sass --quiet-deps --no-source-map --load-path=node_modules --load-path=node_modules/govuk-frontend/dist --load-path=node_modules/@ministryofjustice/frontend --load-path=. ./assets/sass/application.scss:./assets/stylesheets/application.css --style compressed",
     "watch-ts": "tsc -w",
     "watch-views": "nodemon --watch server/views -e html,njk -x npm run copy-views",
     "watch-node": "DEBUG=gov-starter-server* nodemon -r dotenv/config --watch dist/ dist/server.js | bunyan -o short",
@@ -39,7 +39,7 @@
     "@ministryofjustice/hmpps-audit-client": "2.0.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.1.0",
-    "@ministryofjustice/hmpps-connect-dps-components": "^6.3.5",
+    "@ministryofjustice/hmpps-connect-dps-components": "^6.4.1",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",
     "@ministryofjustice/hmpps-rest-client": "^2.2.0",
     "agentkeepalive": "^4.6.0",
@@ -62,7 +62,7 @@
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
     "passport-oauth2": "^1.8.0",
-    "redis": "^6.2.1",
+    "redis": "^6.3.0",
     "superagent": "^10.4.1"
   },
   "devDependencies": {
@@ -101,7 +101,7 @@
     "nodemon": "^3.1.14",
     "prettier": "^3.9.9",
     "prettier-plugin-jinja-template": "^2.2.0",
-    "sass": "^1.105.0",
+    "sass": "^1.105.1",
     "supertest": "^7.3.0",
     "ts-jest": "^29.4.14",
     "typescript": "^6.0.3"
@@ -112,6 +112,6 @@
     "js-yaml": "5.4.2",
     "moment": "2.31.0",
     "proxy-addr": "2.0.8",
-    "shell-quote": "1.10.0"
+    "shell-quote": "1.12.0"
   }
 }
