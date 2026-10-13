@@ -33,5 +33,4 @@ generic-service:
       - circleci
 
 generic-prometheus-alerts:
-  alertSeverity: visits-alerts-nonprod
   businessHoursOnly: true
