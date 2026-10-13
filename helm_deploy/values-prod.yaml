@@ -22,6 +22,3 @@ generic-service:
     DPS_INCENTIVES_URL: "https://incentives-ui.hmpps.service.justice.gov.uk/"
     ENVIRONMENT_NAME: prod
     REDIS_KEY: "bapv-staff-prod"
-
-generic-prometheus-alerts:
-  alertSeverity: visits-alerts
