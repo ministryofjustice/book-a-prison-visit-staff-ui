@@ -28,6 +28,7 @@ test.describe('Book a visit', () => {
   const childDob = format(sub(today, { years: 5 }), shortDateFormat)
 
   test.beforeEach(async () => {
+    await prisonerSearch.stubPrisonerById()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
