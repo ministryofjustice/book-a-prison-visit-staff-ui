@@ -1,4 +1,5 @@
 /* eslint-disable import/first */
+import { PrisonerBasePermission } from '@ministryofjustice/hmpps-prison-permissions-lib'
 // eslint-disable-next-line import/order
 import type { ApplicationInfo } from '../../applicationInfo'
 
@@ -57,6 +58,8 @@ export const user: PrisonUser = {
   userRoles: [],
   activeCaseLoadId: 'HEI',
 }
+
+export const prisonerBasePermission: Record<PrisonerBasePermission, boolean> = { [PrisonerBasePermission.read]: true }
 
 export type FlashData = {
   errors?: ValidationError[]

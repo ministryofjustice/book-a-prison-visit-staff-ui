@@ -1,3 +1,5 @@
+import { PermissionsService } from '@ministryofjustice/hmpps-prison-permissions-lib'
+import { telemetry } from '@ministryofjustice/hmpps-azure-telemetry'
 import { dataAccess } from '../data'
 import AuditService from './auditService'
 import BlockDatesOrSessionsService from './blockDatesOrSessionsService'
@@ -12,9 +14,12 @@ import VisitRequestsService from './visitRequestsService'
 import VisitService from './visitService'
 import VisitSessionsService from './visitSessionsService'
 import VisitAllowanceService from './visitAllowanceService'
+import config from '../config'
+import logger from '../../logger'
 
 export const services = () => {
   const {
+    hmppsAuthClient,
     orchestrationApiClient,
     prisonerContactRegistryApiClient,
     prisonerSearchClient,
@@ -28,13 +33,20 @@ export const services = () => {
 
   const bookerService = new BookerService(orchestrationApiClient)
 
-  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
-
   const prisonerProfileService = new PrisonerProfileService(orchestrationApiClient)
 
   const prisonerSearchService = new PrisonerSearchService(prisonerSearchClient)
 
   const prisonerVisitorsService = new PrisonerVisitorsService(prisonerContactRegistryApiClient)
+
+  const prisonPermissionsService = PermissionsService.create({
+    prisonerSearchConfig: config.apis.prisonerSearch,
+    authenticationClient: hmppsAuthClient,
+    logger,
+    telemetryClient: telemetry,
+  })
+
+  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
 
   const visitAllowanceService = new VisitAllowanceService(incentivesApiClient, orchestrationApiClient)
 
@@ -55,6 +67,7 @@ export const services = () => {
     prisonerProfileService,
     prisonerSearchService,
     prisonerVisitorsService,
+    prisonPermissionsService,
     supportedPrisonsService,
     visitAllowanceService,
     visitNotificationsService,

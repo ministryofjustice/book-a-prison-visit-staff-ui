@@ -41,6 +41,7 @@
     "@ministryofjustice/hmpps-azure-telemetry": "1.1.0",
     "@ministryofjustice/hmpps-connect-dps-components": "^6.4.1",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",
+    "@ministryofjustice/hmpps-prison-permissions-lib": "4.5.1",
     "@ministryofjustice/hmpps-rest-client": "^2.2.0",
     "agentkeepalive": "^4.6.0",
     "bunyan": "^1.8.15",

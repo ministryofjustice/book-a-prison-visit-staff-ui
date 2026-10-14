@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { BadRequest } from 'http-errors'
+import { PrisonerBasePermission, prisonerPermissionsGuard } from '@ministryofjustice/hmpps-prison-permissions-lib'
 import { Services } from '../../services'
 import VisitOrdersHistoryController from './visitOrders/visitOrdersHistoryController'
 import { isValidPrisonerNumber } from '../validationChecks'
@@ -29,7 +30,16 @@ export default function routes(services: Services): Router {
   })
 
   // Prisoner profile
-  router.get('/:prisonerId', prisonerProfileController.view())
+  router.get(
+    '/:prisonerId',
+    // Check user's permissions for this prisoner for the profile view
+    prisonerPermissionsGuard(services.prisonPermissionsService, {
+      requestDependentOn: [PrisonerBasePermission.read],
+      getPrisonerNumberFunction: req => req.params.prisonerId as string,
+    }),
+
+    prisonerProfileController.view(),
+  )
   router.post('/:prisonerId', prisonerProfileController.submit())
 
   // Visiting orders
