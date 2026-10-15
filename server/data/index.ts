@@ -7,6 +7,9 @@ import { createRedisClient } from './redisClient'
 import applicationInfoSupplier from '../applicationInfo'
 import logger from '../../logger'
 import config from '../config'
+import RedisDataCache from './dataCache/redisDataCache'
+import InMemoryDataCache from './dataCache/inMemoryDataCache'
+import type { DataCache } from './dataCache/dataCache'
 
 const applicationInfo = applicationInfoSupplier()
 
@@ -20,7 +23,7 @@ const hmppsAuthClient = new AuthenticationClient(
 export const dataAccess = () => ({
   applicationInfo,
   hmppsAuthClient,
-
+  dataCache: config.redis.enabled ? new RedisDataCache(redisClient!) : new InMemoryDataCache(),
   incentivesApiClient: new IncentivesApiClient(hmppsAuthClient),
   orchestrationApiClient: new OrchestrationApiClient(hmppsAuthClient),
   prisonerContactRegistryApiClient: new PrisonerContactRegistryApiClient(hmppsAuthClient),
@@ -31,6 +34,7 @@ export type DataAccess = ReturnType<typeof dataAccess>
 
 export {
   AuthenticationClient,
+  DataCache,
   IncentivesApiClient,
   OrchestrationApiClient,
   PrisonerContactRegistryApiClient,

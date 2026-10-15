@@ -1,16 +1,17 @@
 import SupportedPrisonsService from './supportedPrisonsService'
 import TestData from '../routes/testutils/testData'
-import { createMockOrchestrationApiClient } from '../data/testutils/mocks'
+import { createMockDataCache, createMockOrchestrationApiClient } from '../data/testutils/mocks'
 
 describe('Supported prisons service', () => {
   const orchestrationApiClient = createMockOrchestrationApiClient()
+  const dataCache = createMockDataCache()
 
   let supportedPrisonsService: SupportedPrisonsService
 
   const supportedPrisonIds = TestData.supportedPrisonIds()
 
   beforeEach(() => {
-    supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
+    supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient, dataCache)
   })
 
   afterEach(() => {
@@ -56,13 +57,25 @@ describe('Supported prisons service', () => {
   describe('getPrison', () => {
     const prison = TestData.prison()
 
-    it('should return a Prison for given prison ID', async () => {
+    it('should return prison config for given prison code if cache hit', async () => {
+      dataCache.get.mockResolvedValue(prison)
+
+      expect(await supportedPrisonsService.getPrison(prison.prisonId)).toStrictEqual(prison)
+
+      expect(dataCache.get).toHaveBeenCalledWith(`prison:${prison.prisonId}`)
+      expect(dataCache.set).not.toHaveBeenCalled()
+      expect(orchestrationApiClient.getPrison).not.toHaveBeenCalled()
+    })
+
+    it('should return prison config for given prison code and save to cache if a cache miss', async () => {
+      dataCache.get.mockResolvedValue(null)
       orchestrationApiClient.getPrison.mockResolvedValue(prison)
 
-      const results = await supportedPrisonsService.getPrison('HEI')
+      expect(await supportedPrisonsService.getPrison(prison.prisonId)).toStrictEqual(prison)
 
-      expect(orchestrationApiClient.getPrison).toHaveBeenCalledWith('HEI')
-      expect(results).toStrictEqual(prison)
+      expect(dataCache.get).toHaveBeenCalledWith(`prison:${prison.prisonId}`)
+      expect(dataCache.set).toHaveBeenCalledWith(`prison:${prison.prisonId}`, prison, 300) // 5 mins
+      expect(orchestrationApiClient.getPrison).toHaveBeenCalled()
     })
   })
 })
