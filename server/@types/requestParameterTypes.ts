@@ -1,22 +1,24 @@
-export interface BookerPrisonerParams {
+import type { ParamsDictionary } from 'express-serve-static-core'
+
+export interface BookerPrisonerParams extends ParamsDictionary {
   reference: string
   prisonerId: string
 }
 
-export interface BookerPrisonerVisitorParams {
+export interface BookerPrisonerVisitorParams extends ParamsDictionary {
   reference: string
   prisonerId: string
   visitorId: string
 }
 
-export interface PrisonerParams {
+export interface PrisonerParams extends ParamsDictionary {
   prisonerId: string
 }
 
-export interface VisitorRequestParams {
+export interface VisitorRequestParams extends ParamsDictionary {
   requestReference: string
 }
 
-export interface VisitReferenceParams {
+export interface VisitReferenceParams extends ParamsDictionary {
   reference: string
 }

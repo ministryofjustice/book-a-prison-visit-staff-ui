@@ -3,7 +3,7 @@ import { telemetryMiddleware } from '@ministryofjustice/hmpps-azure-telemetry'
 
 import createError from 'http-errors'
 
-import { getFrontendComponents } from '@ministryofjustice/hmpps-connect-dps-components'
+import { getFrontendComponents, retrieveCaseLoadData } from '@ministryofjustice/hmpps-connect-dps-components'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
@@ -55,6 +55,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware([bapvUserRoles.STAFF_USER]))
   app.use(setUpCsrf())
+
   app.get(
     '*any',
     getFrontendComponents({
@@ -64,6 +65,13 @@ export default function createApp(services: Services): express.Application {
       requestOptions: { includeSharedData: true },
     }),
   )
+  app.use(
+    retrieveCaseLoadData({
+      logger,
+      prisonApiConfig: config.apis.prisonApi,
+    }),
+  )
+
   app.use(setUpCurrentUser())
 
   app.use(maintenancePageRoute())

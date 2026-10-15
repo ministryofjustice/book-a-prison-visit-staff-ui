@@ -1,6 +1,7 @@
 import { SuperAgentRequest } from 'superagent'
 import { stubFor } from './wiremock'
 import { Prisoner } from '../../server/data/prisonerOffenderSearchTypes'
+import TestData from '../../server/routes/testutils/testData'
 
 export default {
   stubPrisoners: ({
@@ -32,7 +33,7 @@ export default {
       },
     })
   },
-  stubPrisonerById: (prisoner: Prisoner): SuperAgentRequest => {
+  stubPrisonerById: (prisoner: Prisoner = TestData.prisoner()): SuperAgentRequest => {
     return stubFor({
       request: {
         method: 'GET',

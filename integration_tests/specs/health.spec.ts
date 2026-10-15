@@ -7,6 +7,7 @@ import prisonerSearchApi from '../mockApis/prisonerSearch'
 import tokenVerification from '../mockApis/tokenVerification'
 
 import { resetStubs } from '../testUtils'
+import prisonApi from '../mockApis/prisonApi'
 
 test.describe('Health', () => {
   test.afterEach(async () => {
@@ -19,6 +20,7 @@ test.describe('Health', () => {
         hmppsAuth.stubPing(),
         incentivesApi.stubPing(),
         orchestrationApi.stubPing(),
+        prisonApi.stubPing(),
         prisonerContactRegistryApi.stubPing(),
         prisonerSearchApi.stubPing(),
         tokenVerification.stubPing(),
@@ -60,6 +62,7 @@ test.describe('Health', () => {
         hmppsAuth.stubPing(),
         incentivesApi.stubPing(),
         orchestrationApi.stubPing(),
+        prisonApi.stubPing(),
         prisonerContactRegistryApi.stubPing(),
         prisonerSearchApi.stubPing(),
         tokenVerification.stubPing(500),

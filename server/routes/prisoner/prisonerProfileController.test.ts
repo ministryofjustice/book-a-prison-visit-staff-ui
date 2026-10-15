@@ -3,7 +3,7 @@ import request from 'supertest'
 import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { PrisonerProfilePage, VisitSessionData } from '../../@types/bapv'
-import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider, prisonerBasePermission } from '../testutils/appSetup'
 import * as visitorUtils from '../visitorUtils'
 import TestData from '../testutils/testData'
 import {
@@ -11,6 +11,9 @@ import {
   createMockPrisonerProfileService,
   createMockVisitService,
 } from '../../services/testutils/mocks'
+import mockPermissions from '../testutils/mockPermissions'
+
+jest.mock('@ministryofjustice/hmpps-prison-permissions-lib')
 
 let app: Express
 let flashData: FlashData
@@ -29,6 +32,7 @@ beforeEach(() => {
 
   sessionData = {} as SessionData
 
+  mockPermissions(prisonerBasePermission)
   app = appWithAllRoutes({
     services: { auditService, prisonerProfileService, visitService },
     sessionData,
@@ -408,6 +412,17 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(res.text).toContain('BadRequestError: Bad Request')
         })
     })
+
+    // Permissions library sends 403 in this case; default app error handler redirects to /sign-out
+    it('should redirect the user to /sign-out if they do not have required permissions', () => {
+      mockPermissions({})
+      app = appWithAllRoutes({
+        services: { auditService, prisonerProfileService, visitService },
+        sessionData,
+      })
+
+      return request(app).get('/prisoner/A1234BC').expect(302).expect('location', '/sign-out')
+    })
   })
 
   describe('POST /prisoner/A1234BC', () => {
@@ -536,6 +551,16 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
         .expect(res => {
           expect(res.text).toContain('BadRequestError: Bad Request')
         })
+    })
+
+    it('should redirect the user to /sign-out if they do not have required permissions', () => {
+      mockPermissions({})
+      app = appWithAllRoutes({
+        services: { auditService, prisonerProfileService, visitService },
+        sessionData,
+      })
+
+      return request(app).post('/prisoner/A1234BC').expect(302).expect('location', '/sign-out')
     })
   })
 })

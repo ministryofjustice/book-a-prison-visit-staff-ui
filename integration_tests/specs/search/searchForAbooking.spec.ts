@@ -17,6 +17,7 @@ test.describe('Search for a booking by reference', () => {
 
   test.beforeEach(async ({ page }) => {
     await resetStubs()
+    await prisonerSearch.stubPrisonerById()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()

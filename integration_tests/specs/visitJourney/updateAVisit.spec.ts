@@ -14,6 +14,7 @@ import orchestrationApi from '../../mockApis/orchestration'
 import prisonerContactRegistry from '../../mockApis/prisonerContactRegistry'
 import { login, resetStubs } from '../../testUtils'
 import { SessionsAndScheduleDto } from '../../../server/data/orchestrationApiTypes'
+import prisonerSearch from '../../mockApis/prisonerSearch'
 
 test.describe('Update a visit', () => {
   const shortDateFormat = 'yyyy-MM-dd'
@@ -39,6 +40,7 @@ test.describe('Update a visit', () => {
 
   test.beforeEach(async () => {
     await resetStubs()
+    await prisonerSearch.stubPrisonerById()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()

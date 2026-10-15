@@ -4,12 +4,14 @@ import { login, resetStubs } from '../../../testUtils'
 import TestData from '../../../../server/routes/testutils/testData'
 import PrisonerProfilePage from '../../../pages/prisoner/prisonerProfilePage'
 import VisitOrdersHistoryPage from '../../../pages/prisoner/visitOrders/visitOrdersHistoryPage'
+import prisonerSearch from '../../../mockApis/prisonerSearch'
 
 test.describe('Visiting orders history', () => {
   const profile = TestData.prisonerProfile()
   const { prisonerId } = profile
 
   test.beforeEach(async ({ page }) => {
+    await prisonerSearch.stubPrisonerById()
     await orchestrationApi.stubSupportedPrisonIds()
     await orchestrationApi.stubGetPrison()
     await orchestrationApi.stubGetNotificationCount()
