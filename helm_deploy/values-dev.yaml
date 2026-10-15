@@ -25,6 +25,8 @@ generic-service:
     REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
 
+    DATA_CACHE_PRISON_TTL_SECS: "30"
+
     FEATURE_REMAND_LIMITS: "true"
 
   allowlist:
