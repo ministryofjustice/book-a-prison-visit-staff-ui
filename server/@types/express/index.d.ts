@@ -14,7 +14,6 @@ export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
-    nowInMinutes: number
     visitorList: { visitors: VisitorListItem[] } // TODO move into VisitSessionData
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
     visitSessionData: VisitSessionData
