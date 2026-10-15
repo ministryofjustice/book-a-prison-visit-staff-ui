@@ -552,5 +552,15 @@ describe('/prisoner/:offenderNo - Prisoner profile', () => {
           expect(res.text).toContain('BadRequestError: Bad Request')
         })
     })
+
+    it('should redirect the user to /sign-out if they do not have required permissions', () => {
+      mockPermissions({})
+      app = appWithAllRoutes({
+        services: { auditService, prisonerProfileService, visitService },
+        sessionData,
+      })
+
+      return request(app).post('/prisoner/A1234BC').expect(302).expect('location', '/sign-out')
+    })
   })
 })

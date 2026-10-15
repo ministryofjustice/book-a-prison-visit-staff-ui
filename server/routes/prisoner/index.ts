@@ -30,17 +30,17 @@ export default function routes(services: Services): Router {
   })
 
   // Prisoner profile
-  router.get(
-    '/:prisonerId',
+  router
+    .route('/:prisonerId')
     // Check user's permissions for this prisoner for the profile view
-    prisonerPermissionsGuard(services.prisonPermissionsService, {
-      requestDependentOn: [PrisonerBasePermission.read],
-      getPrisonerNumberFunction: req => req.params.prisonerId as string,
-    }),
-
-    prisonerProfileController.view(),
-  )
-  router.post('/:prisonerId', prisonerProfileController.submit())
+    .all(
+      prisonerPermissionsGuard(services.prisonPermissionsService, {
+        requestDependentOn: [PrisonerBasePermission.read],
+        getPrisonerNumberFunction: req => req.params.prisonerId as string,
+      }),
+    )
+    .get(prisonerProfileController.view())
+    .post(prisonerProfileController.submit())
 
   // Visiting orders
   router.get('/:prisonerId/edit-visiting-orders-balances', editVisitOrdersBalancesController.view())
