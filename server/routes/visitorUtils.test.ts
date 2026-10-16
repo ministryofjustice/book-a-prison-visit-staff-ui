@@ -32,7 +32,6 @@ describe('clearSession', () => {
   const req: Partial<Request> = {}
   const sessionData: SessionData = {
     returnTo: '/url',
-    nowInMinutes: 123456,
     cookie: undefined,
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
@@ -54,7 +53,6 @@ describe('clearSession', () => {
 
     expect(req.session).toStrictEqual(<Session & Partial<SessionData>>{
       returnTo: '/url',
-      nowInMinutes: 123456,
       cookie: undefined,
       selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
     })

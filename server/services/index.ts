@@ -15,6 +15,7 @@ import VisitAllowanceService from './visitAllowanceService'
 
 export const services = () => {
   const {
+    dataCache,
     orchestrationApiClient,
     prisonerContactRegistryApiClient,
     prisonerSearchClient,
@@ -28,7 +29,7 @@ export const services = () => {
 
   const bookerService = new BookerService(orchestrationApiClient)
 
-  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient)
+  const supportedPrisonsService = new SupportedPrisonsService(orchestrationApiClient, dataCache)
 
   const prisonerProfileService = new PrisonerProfileService(orchestrationApiClient)
 

@@ -18,9 +18,17 @@ jest.mock('../../applicationInfo', () => {
   return jest.fn(() => testAppInfo)
 })
 
-import { IncentivesApiClient, OrchestrationApiClient, PrisonerContactRegistryApiClient, PrisonerSearchClient } from '..'
+import {
+  DataCache,
+  IncentivesApiClient,
+  OrchestrationApiClient,
+  PrisonerContactRegistryApiClient,
+  PrisonerSearchClient,
+} from '..'
 
 jest.mock('..')
+
+export const createMockDataCache = () => ({ set: jest.fn(), get: jest.fn() }) as jest.Mocked<DataCache>
 
 export const createMockIncentivesApiClient = () => new IncentivesApiClient(null) as jest.Mocked<IncentivesApiClient>
 

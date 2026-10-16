@@ -1,8 +1,15 @@
 import { Prison } from '../@types/bapv'
+import config from '../config'
 import { OrchestrationApiClient } from '../data'
+import type { DataCache } from '../data/dataCache/dataCache'
 
 export default class SupportedPrisonsService {
-  constructor(private readonly orchestrationApiClient: OrchestrationApiClient) {}
+  private readonly prisonCacheConfig = config.dataCache.prison
+
+  constructor(
+    private readonly orchestrationApiClient: OrchestrationApiClient,
+    private readonly dataCache: DataCache,
+  ) {}
 
   async getActiveAgencies(): Promise<string[]> {
     return this.getSupportedPrisonIds()
@@ -17,6 +24,19 @@ export default class SupportedPrisonsService {
   }
 
   async getPrison(prisonId: string): Promise<Prison> {
-    return this.orchestrationApiClient.getPrison(prisonId)
+    const cachedPrison = await this.dataCache.get<Prison>(`${this.prisonCacheConfig.key}:${prisonId}`)
+
+    if (cachedPrison) {
+      return cachedPrison
+    }
+
+    const prison = await this.orchestrationApiClient.getPrison(prisonId)
+
+    await this.dataCache.set<Prison>(
+      `${this.prisonCacheConfig.key}:${prisonId}`,
+      prison,
+      this.prisonCacheConfig.ttlSecs,
+    )
+    return prison
   }
 }

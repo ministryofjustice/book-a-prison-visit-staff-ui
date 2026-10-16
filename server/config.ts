@@ -1,3 +1,4 @@
+import { DataCacheConfig } from './data/dataCache/dataCache'
 import { NotificationTypeRaw } from './data/orchestrationApiTypes'
 
 const production = process.env.NODE_ENV === 'production'
@@ -152,6 +153,19 @@ export default {
       agent: new AgentConfig(Number(get('INCENTIVES_API_TIMEOUT_RESPONSE', 10000))),
     },
   },
+
+  dataCache: {
+    // include short Git ref in dataCache prefix to invalidate data cache on deploy of new build
+    // DATA_CACHE_PREFIX overrides for integration tests
+    prefix: `dataCache_${get('DATA_CACHE_PREFIX', '') || get('GIT_REF', 'local').slice(0, 7)}:`,
+
+    // Cache for for per-prison prison configuration
+    prison: <DataCacheConfig>{
+      key: 'prison',
+      ttlSecs: Number(get('DATA_CACHE_PRISON_TTL_SECS', 60 * 5)), // 5 mins
+    },
+  },
+
   visit: {
     // Max number of days AFTER a visit that it can be marked CANCELLED
     cancellationLimitDays: Number(get('CANCELLATION_LIMIT_DAYS', 28)),
