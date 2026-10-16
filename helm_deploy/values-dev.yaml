@@ -22,7 +22,6 @@ generic-service:
     DPS_PRISONER_URL: "https://prisoner-dev.digital.prison.service.justice.gov.uk/"
     DPS_CONTACTS_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
     DPS_INCENTIVES_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk/"
-    REDIS_KEY: "bapv-staff-dev"
     ENVIRONMENT_NAME: dev
 
     DATA_CACHE_PRISON_TTL_SECS: "30"

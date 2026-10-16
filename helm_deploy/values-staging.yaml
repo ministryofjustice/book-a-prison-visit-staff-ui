@@ -23,7 +23,6 @@ generic-service:
     DPS_CONTACTS_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
     DPS_INCENTIVES_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk/"
     APPLICATIONINSIGHTS_CONNECTION_STRING: null # disable App Insights for staging
-    REDIS_KEY: "bapv-staff-staging"
     ENVIRONMENT_NAME: staging
 
   allowlist:
