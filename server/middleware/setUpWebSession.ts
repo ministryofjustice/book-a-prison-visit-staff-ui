@@ -11,7 +11,7 @@ export default function setUpWebSession(): Router {
   if (config.redis.enabled) {
     const client = createRedisClient()
     client.connect().catch((err: Error) => logger.error(`Error connecting to Redis`, err))
-    store = new RedisStore({ client, prefix: config.redis.sessionPrefix })
+    store = new RedisStore({ client })
   } else {
     store = new MemoryStore()
   }
@@ -20,6 +20,7 @@ export default function setUpWebSession(): Router {
   router.use(
     session({
       store,
+      name: 'book-a-prison-visit-staff-ui.session',
       cookie: { secure: config.https, sameSite: 'lax', maxAge: config.session.expiryMinutes * 60 * 1000 },
       secret: config.session.secret,
       resave: false, // redis implements touch so shouldn't need this
