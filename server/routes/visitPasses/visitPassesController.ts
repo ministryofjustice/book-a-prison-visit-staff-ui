@@ -2,7 +2,7 @@ import { RequestHandler, Request } from 'express'
 import { format, isBefore, startOfToday } from 'date-fns'
 import { AuditService, VisitService } from '../../services'
 import { getParsedDateFromQueryString } from '../../utils/utils'
-import { VisitReferenceParams } from '../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../@types/requestTypes'
 import { buildVisitPass } from './visitPassBuilder'
 
 export default class VisitPassesController {
@@ -14,7 +14,7 @@ export default class VisitPassesController {
   public viewByDate(): RequestHandler {
     return async (req, res, next) => {
       const date = getParsedDateFromQueryString(req.query.date?.toString())
-      const { prisonId, prisonName } = req.session.selectedEstablishment
+      const { prisonId, prisonName } = res.locals.selectedEstablishment
       const { username } = res.locals.user
 
       if (isBefore(date, startOfToday())) {
@@ -52,7 +52,7 @@ export default class VisitPassesController {
   public viewByVisit(): RequestHandler<VisitReferenceParams> {
     return async (req, res, next) => {
       const { reference } = req.params
-      const { prisonId, prisonName } = req.session.selectedEstablishment
+      const { prisonId, prisonName } = res.locals.selectedEstablishment
       const { username } = res.locals.user
 
       try {

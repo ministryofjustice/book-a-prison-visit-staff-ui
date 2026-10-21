@@ -18,7 +18,7 @@ export default class UnblockDateController {
       }
 
       const { date } = matchedData<{ date: string }>(req)
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
 
       try {
         await this.blockDatesOrSessionsService.unblockVisitDate(res.locals.user.username, prisonId, date)

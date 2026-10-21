@@ -36,8 +36,8 @@ export default class DateAndTime {
 
   async get(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
-    const { prisonId } = req.session.selectedEstablishment
-    const { policyNoticeDaysMin, policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
+    const { prisonId } = res.locals.selectedEstablishment
+    const { policyNoticeDaysMin, policyNoticeDaysMax } = res.locals.selectedEstablishment.staffClient
     const { visitSessionData } = req.session
 
     const errors = req.flash('errors')
@@ -169,7 +169,7 @@ export default class DateAndTime {
 
   private async reserveOrChangeApplication(req: Request, res: Response): Promise<void> {
     const { visitSessionData } = req.session
-    const { prisonId } = req.session.selectedEstablishment
+    const { prisonId } = res.locals.selectedEstablishment
     const isUpdate = this.mode === 'update'
 
     // See README ('Visit journeys – book and update') for explanation of this flow

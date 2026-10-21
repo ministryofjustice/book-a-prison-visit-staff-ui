@@ -36,7 +36,7 @@ export default class UnblockSessionController {
         })
 
         const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
-          prisonId: req.session.selectedEstablishment.prisonId,
+          prisonId: res.locals.selectedEstablishment.prisonId,
           date,
           includeExcludedSessions: true,
         })

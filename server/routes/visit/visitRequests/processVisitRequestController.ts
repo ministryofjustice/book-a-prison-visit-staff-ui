@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitRequestsService, VisitService } from '../../../services'
 import { MoJAlert } from '../../../@types/bapv'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { convertToTitleCase } from '../../../utils/utils'
 import {
   VisitBookingDetails,

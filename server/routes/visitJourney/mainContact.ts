@@ -15,7 +15,7 @@ export default class MainContact {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const formValues = getFlashFormValues(req)
-    const { isEnabledForPublic } = req.session.selectedEstablishment
+    const isEnabledForPublic = res.locals.selectedEstablishment.publicClient?.active ?? false
 
     if (!Object.keys(formValues).length && visitSessionData.mainContact) {
       formValues.contact = visitSessionData.mainContact.contactId

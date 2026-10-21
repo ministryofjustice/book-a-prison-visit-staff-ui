@@ -15,7 +15,7 @@ export default class VisitsReviewListingController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { selectedEstablishment } = req.session
+      const { selectedEstablishment } = res.locals
       const { username } = res.locals.user
 
       const { bookedBy = [], type = [] } = matchedData<AppliedFilters>(req, { locations: ['query'] })

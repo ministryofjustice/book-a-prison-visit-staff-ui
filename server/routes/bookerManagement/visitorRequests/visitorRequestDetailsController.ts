@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
 import { requestAlreadyReviewedMessage, requestApprovedMessage, requestRejectedMessage } from './visitorRequestMessages'
-import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
+import { VisitorRequestParams } from '../../../@types/requestTypes'
 
 export default class VisitorRequestDetailsController {
   public constructor(

@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitService } from '../../../services'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { CancelVisitOrchestrationDto } from '../../../data/orchestrationApiTypes'
 import { requestMethodsCancellation } from '../../../constants/requestMethods'
 import { getFlashFormValues } from '../../visitorUtils'

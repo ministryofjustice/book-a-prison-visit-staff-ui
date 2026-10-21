@@ -80,21 +80,17 @@ function appSetup(
   app.set('view engine', 'njk')
 
   nunjucksSetup(app, testAppInfo)
+
   app.use((req, res, next) => {
     req.user = userSupplier() as Express.User
     req.flash = flashProvider
+
     res.locals = {
       user: { ...req.user } as PrisonUser,
       feComponents,
     }
 
     // res.locals.appInsightsOperationId = 'operationId' // FIXME
-
-    // set default 'selectedEstablishment' unless explicitly set with corresponding service for 'populateSelectedEstablishment()'
-    if (!sessionData.selectedEstablishment && !services.supportedPrisonsService) {
-      // eslint-disable-next-line no-param-reassign
-      sessionData.selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: true }
-    }
 
     req.session = sessionData as Session & Partial<SessionData>
 
@@ -105,7 +101,16 @@ function appSetup(
 
   app.use(maintenancePageRoute())
 
-  app.use(populateSelectedEstablishment(services))
+  app.use(
+    populateSelectedEstablishment({
+      // provide a default mock (with getPrison()) unless overridden
+      supportedPrisonsService: {
+        getPrison: jest.fn().mockResolvedValue(TestData.prison()),
+        isSupportedPrison: jest.fn().mockResolvedValue(true),
+      },
+      ...services,
+    }),
+  )
 
   app.use('/', indexRoutes(services))
   app.use('/book-a-visit', visitJourneyRoutes(services, 'book'))

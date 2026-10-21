@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { differenceInCalendarDays, format, parseISO } from 'date-fns'
 import { VisitService } from '../../../services'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { clearSession } from '../../visitorUtils'
 import { VisitSessionData } from '../../../@types/bapv'
 import { convertToTitleCase } from '../../../utils/utils'
@@ -24,7 +24,7 @@ export default class UpdateVisitController {
       const { prison, prisoner } = visitDetails
 
       const prisonerInVisitPrison = prison.prisonId === prisoner.prisonId
-      const visitInSelectedEstablishment = prison.prisonId === req.session.selectedEstablishment.prisonId
+      const visitInSelectedEstablishment = prison.prisonId === res.locals.selectedEstablishment.prisonId
       if (!prisonerInVisitPrison || !visitInSelectedEstablishment) {
         return res.redirect(appendNavStateToPath(`/visit/${visitDetails.reference}`, navState))
       }

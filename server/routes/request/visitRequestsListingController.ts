@@ -6,7 +6,7 @@ export default class VisitRequestsListingController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { selectedEstablishment } = req.session
+      const { selectedEstablishment } = res.locals
 
       const visitRequests = await this.visitRequestsService.getVisitRequests(selectedEstablishment.prisonId)
 

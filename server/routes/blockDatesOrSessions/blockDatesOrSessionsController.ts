@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, Meta, ValidationChain, validationResult } from 'express-validator'
 import { format, parse, startOfYesterday } from 'date-fns'
+import type { RequestWithSelectedEstablishment } from '../../@types/requestTypes'
 import { BlockDatesOrSessionsService, VisitSessionsService } from '../../services'
 import buildBlockedDatesAndSessionsTable from './blockedDatesAndSessionsTableBuilder'
 
@@ -13,7 +14,7 @@ export default class BlockDatesOrSessionsController {
   public view(): RequestHandler {
     return async (req, res) => {
       const rawBlockedDatesAndSessions = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
-        prisonId: req.session.selectedEstablishment.prisonId,
+        prisonId: res.locals.selectedEstablishment.prisonId,
         includeSessions: true,
       })
 
@@ -47,7 +48,7 @@ export default class BlockDatesOrSessionsController {
       }
 
       const sessionSchedule = await this.visitSessionsService.getSessionSchedule({
-        prisonId: req.session.selectedEstablishment.prisonId,
+        prisonId: res.locals.selectedEstablishment.prisonId,
         date,
         includeExcludedSessions: true,
       })
@@ -83,7 +84,7 @@ export default class BlockDatesOrSessionsController {
         // date cannot be an existing blocked date
         .custom(async (date: string, { req }: Meta & { req: Express.Request }) => {
           const { fullDateExclusions } = await this.blockDatesOrSessionsService.getFutureBlockedDatesAndSessions({
-            prisonId: req.session.selectedEstablishment.prisonId,
+            prisonId: (req as RequestWithSelectedEstablishment).context.selectedEstablishment.prisonId,
             includeSessions: false,
           })
 

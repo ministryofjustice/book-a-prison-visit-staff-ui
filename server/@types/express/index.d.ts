@@ -14,10 +14,23 @@ export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
+
+    // Prison ID of the user's selected establishment within the service
+    // (distinct from active case load as this could be changed by the user during a journey)
+    selectedEstablishmentId: string
+
+    /**
+     * @deprecated Use `selectedEstablishmentId` instead.
+     * TODO to handle old sessions during deployment; can be removed in a subsequent deployment
+     */
+    selectedEstablishment?: Prison
+
+    // Visit booking journey
+    visitSessionData: VisitSessionData
     visitorList: { visitors: VisitorListItem[] } // TODO move into VisitSessionData
     adultVisitors: { adults: VisitorListItem[] } // TODO move into VisitSessionData
-    visitSessionData: VisitSessionData
-    selectedEstablishment: Prison & { isEnabledForPublic: boolean }
+
+    // Cancel a visit journey
     cancelledVisitInfo?: CancelledVisitInfo
 
     // Block visit date or session journey
@@ -59,6 +72,11 @@ export declare global {
     interface Request {
       verified?: boolean
       id: string
+
+      context?: {
+        selectedEstablishment?: Prison
+      }
+
       logout(done: (err: unknown) => void): void
 
       flash(type: 'errors', message: ValidationError[]): number
@@ -73,10 +91,14 @@ export declare global {
 
     interface Locals {
       user: PrisonUser
+
       feComponents?: {
         sharedData?: SharedData
       }
+
       appInsightsOperationId?: string
+
+      selectedEstablishment?: Prison
     }
   }
 }

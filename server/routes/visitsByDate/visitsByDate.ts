@@ -17,7 +17,7 @@ export default function routes({
   const router = Router()
 
   router.get('/', async (req, res) => {
-    const { prisonId } = req.session.selectedEstablishment
+    const { prisonId } = res.locals.selectedEstablishment
     const { username } = res.locals.user
 
     const { sessionReference = '', selectedDate = '', firstTabDate = '' } = req.query

@@ -14,7 +14,7 @@ export default class TimetableController {
 
       const { weekOfDates, previousWeek, nextWeek } = getWeekOfDatesStartingMonday(selectedDate)
 
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
       const schedules = await this.visitSessionsService.getSessionSchedule({
         prisonId,
         date: selectedDate,
