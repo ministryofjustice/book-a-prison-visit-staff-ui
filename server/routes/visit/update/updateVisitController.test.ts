@@ -153,12 +153,23 @@ describe('Start a visit update journey', () => {
         })
     })
 
-    it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
+    it('should redirect to /visit/:reference if the prisoner is not in the prison for which the visit is booked', () => {
       visitService.getVisitDetailed.mockResolvedValue(
-        TestData.visitBookingDetails({ prison: { prisonId: 'XYZ', prisonName: '' } }),
+        TestData.visitBookingDetails({
+          prisoner: { prisonId: 'XYZ' } as VisitBookingDetails['prisoner'],
+        }),
       )
 
-      app = appWithAllRoutes({ services: { visitService } })
+      return request(app).post('/visit/ab-cd-ef-gh/update').expect(302).expect('location', '/visit/ab-cd-ef-gh')
+    })
+
+    it('should redirect to /visit/:reference if the prison for which the visit is booked is not for the selected establishment', () => {
+      visitService.getVisitDetailed.mockResolvedValue(
+        TestData.visitBookingDetails({
+          prison: { prisonId: 'XYZ', prisonName: '' },
+          prisoner: { prisonId: 'XYZ' } as VisitBookingDetails['prisoner'],
+        }),
+      )
 
       return request(app).post('/visit/ab-cd-ef-gh/update').expect(302).expect('location', '/visit/ab-cd-ef-gh')
     })
