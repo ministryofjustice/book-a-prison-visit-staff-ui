@@ -11,7 +11,7 @@ export default class BlockSessionChooseController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
       const { blockDateOrSession } = req.session
 
       blockDateOrSession.backLinkHref = '/block-visit-dates-or-sessions/block-date-or-session'

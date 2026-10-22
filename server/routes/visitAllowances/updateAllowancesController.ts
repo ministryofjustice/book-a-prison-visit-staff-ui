@@ -12,7 +12,7 @@ export default class UpdateAllowancesController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
 
       const remandConfig = await this.visitAllowanceService.getRemandConfig({ prisonId })
 
@@ -32,7 +32,7 @@ export default class UpdateAllowancesController {
   public change(): RequestHandler {
     return async (req, res) => {
       const { username } = res.locals.user
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
 
       const errors = validationResult(req)
       if (!errors.isEmpty()) {

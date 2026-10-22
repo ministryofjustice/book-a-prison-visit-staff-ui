@@ -1,8 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 import TestData from '../../testutils/testData'
 import { createMockAuditService, createMockVisitService } from '../../../services/testutils/mocks'
@@ -296,15 +295,10 @@ describe('Visit details page', () => {
     })
 
     it('should not show booking summary if selected establishment does not match prison for which visit booked', () => {
-      const otherPrison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
+      const otherPrison = { prisonId: 'BLI', prisonName: 'Bristol (HMP)' }
+      visitService.getVisitDetailed.mockResolvedValue({ ...visitDetails, prison: otherPrison })
 
-      app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, activeCaseLoadId: otherPrison.prisonId }),
-        services: { auditService, visitService },
-        sessionData: {
-          selectedEstablishment: otherPrison,
-        } as SessionData,
-      })
+      app = appWithAllRoutes({ services: { auditService, visitService } })
 
       return request(app)
         .get('/visit/ab-cd-ef-gh')
@@ -315,8 +309,8 @@ describe('Visit details page', () => {
           expect($('h1').text()).toBe('Visit booking details')
           expect($('[data-test="reference"]').text()).toBe('ab-cd-ef-gh')
 
-          expect(res.text).toContain(`This booking is not for ${otherPrison.prisonName}`)
-          expect(res.text).toContain(`change the establishment to ${visitDetails.prison.prisonName}`)
+          expect(res.text).toContain(`This booking is not for ${visitDetails.prison.prisonName}`)
+          expect(res.text).toContain(`change the establishment to ${otherPrison.prisonName}`)
         })
     })
 

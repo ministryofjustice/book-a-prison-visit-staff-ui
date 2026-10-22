@@ -16,7 +16,7 @@ export default class BlockDateController {
       const { blockDateOrSession } = req.session
       const { backLinkHref, date } = blockDateOrSession
 
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
       const visitCount = await this.visitService.getBookedVisitCountByDate({
         prisonId,
         date,
@@ -43,7 +43,7 @@ export default class BlockDateController {
       const { confirmBlockDate } = matchedData<{ confirmBlockDate: 'yes' | 'no' }>(req)
 
       if (confirmBlockDate === 'yes') {
-        const { prisonId } = req.session.selectedEstablishment
+        const { prisonId } = res.locals.selectedEstablishment
         const { date } = blockDateOrSession
 
         try {

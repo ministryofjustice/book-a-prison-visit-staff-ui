@@ -3,7 +3,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { SanitisedError } from '@ministryofjustice/hmpps-rest-client'
 import { AuditService, VisitOrdersService } from '../../../services'
 import { PVO_MAX, visitBalanceAdjustmentReasons, VO_MAX } from '../../../constants/visitOrders'
-import { PrisonerParams } from '../../../@types/requestParameterTypes'
+import { PrisonerParams } from '../../../@types/requestTypes'
 import {
   PrisonerBalanceAdjustmentDto,
   PrisonerBalanceAdjustmentReason,
@@ -37,7 +37,7 @@ export default class EditVisitOrdersBalancesController {
   public view(): RequestHandler<PrisonerParams> {
     return async (req, res) => {
       const { prisonerId } = req.params
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
 
       const prisonerVoBalance = await this.visitOrdersService.getVoBalance({ prisonId, prisonerId })
 
@@ -58,7 +58,7 @@ export default class EditVisitOrdersBalancesController {
   public submit(): RequestHandler<PrisonerParams> {
     return async (req, res, next) => {
       const { prisonerId } = req.params
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
       const { username } = res.locals.user
 
       const errors = validationResult(req)

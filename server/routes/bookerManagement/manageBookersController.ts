@@ -11,7 +11,7 @@ export default class ManageBookersController {
   public view(): RequestHandler {
     return async (req, res) => {
       delete req.session.matchedBookers
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
 
       const noBookerFound = req.query['no-booker-found'] === ''
 

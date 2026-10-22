@@ -2,7 +2,6 @@ import { Request } from 'express'
 import { Session, SessionData } from 'express-session'
 import { FlashFormValues } from '../@types/bapv'
 import { clearSession, getFlashFormValues } from './visitorUtils'
-import TestData from './testutils/testData'
 
 describe('getFlashFormValues', () => {
   let returnValue: FlashFormValues[]
@@ -36,7 +35,7 @@ describe('clearSession', () => {
     visitorList: { visitors: [] },
     adultVisitors: { adults: [] },
     visitSessionData: { allowOverBooking: false, prisoner: undefined, prisonId: '' },
-    selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
+    selectedEstablishmentId: 'HEI',
     cancelledVisitInfo: {
       prisonerId: '',
       startTimestamp: '',
@@ -54,7 +53,7 @@ describe('clearSession', () => {
     expect(req.session).toStrictEqual(<Session & Partial<SessionData>>{
       returnTo: '/url',
       cookie: undefined,
-      selectedEstablishment: { ...TestData.prison(), isEnabledForPublic: true },
+      selectedEstablishmentId: 'HEI',
     })
   })
 })

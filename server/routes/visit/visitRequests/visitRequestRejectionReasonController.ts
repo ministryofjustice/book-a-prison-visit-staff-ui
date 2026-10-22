@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 import { appendNavStateToPath, extractVisitNavState } from '../visitNavigationUtils'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { visitRequestRejectionReasons } from '../../../constants/visitRequestRejection'
 
 export default class VisitRequestRejectionReasonController {

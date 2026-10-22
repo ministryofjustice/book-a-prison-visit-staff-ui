@@ -9,11 +9,12 @@ export default function routes({ bookerService, visitNotificationsService, visit
   const router = Router()
 
   router.get('/', async (req, res) => {
-    const prison = req.session.selectedEstablishment
+    const prison = res.locals.selectedEstablishment
+    const isPrisonEnabledForPublic = prison.publicClient?.active ?? false
     const { userRoles } = res.locals.user
 
     // Requested visits tile and count (public-enabled prisons only)
-    const showRequestedVisitsTile = prison.isEnabledForPublic
+    const showRequestedVisitsTile = isPrisonEnabledForPublic
     const visitRequestCount = showRequestedVisitsTile
       ? await visitRequestsService.getVisitRequestCount(prison.prisonId)
       : null
@@ -24,7 +25,7 @@ export default function routes({ bookerService, visitNotificationsService, visit
     // Manage online bookers tile (users with ADMIN role) and visitor requests count (pubic-enabled prisons only)
     const showBookerManagementTile = userRoles.includes(bapvUserRoles.BOOKER_ADMIN)
     const visitorRequestCount =
-      showBookerManagementTile && prison.isEnabledForPublic
+      showBookerManagementTile && isPrisonEnabledForPublic
         ? await bookerService.getVisitorRequestCount({ prisonId: prison.prisonId })
         : 0
 

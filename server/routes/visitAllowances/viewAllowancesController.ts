@@ -7,7 +7,7 @@ export default class ViewAllowancesController {
 
   public view(): RequestHandler {
     return async (req, res) => {
-      const { prisonId } = req.session.selectedEstablishment
+      const { prisonId } = res.locals.selectedEstablishment
       const { userRoles } = res.locals.user
 
       const [prisonConfig, incentiveLevels] = await Promise.all([

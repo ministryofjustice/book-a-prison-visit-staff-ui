@@ -3,14 +3,14 @@ import logger from '../../logger'
 
 export default function sessionCheckMiddleware({ stage }: { stage: number }): RequestHandler {
   return (req, res, next) => {
-    const { selectedEstablishment } = req.session
+    const { selectedEstablishmentId } = req.session
     const { visitSessionData } = req.session
 
     if (!visitSessionData) {
       return logAndRedirect(req, res, '/search/prisoner/?error=missing-session')
     }
 
-    if (visitSessionData.prisonId !== selectedEstablishment.prisonId) {
+    if (visitSessionData.prisonId !== selectedEstablishmentId) {
       return logAndRedirect(req, res, '/?error=establishment-mismatch')
     }
 

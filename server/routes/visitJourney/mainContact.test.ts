@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import * as cheerio from 'cheerio'
 import { VisitorListItem, VisitSessionData } from '../../@types/bapv'
 import { appWithAllRoutes, FlashData, flashProvider } from '../testutils/appSetup'
-import { createMockVisitService } from '../../services/testutils/mocks'
+import { createMockSupportedPrisonsService, createMockVisitService } from '../../services/testutils/mocks'
 import { ApplicationDto } from '../../data/orchestrationApiTypes'
 import TestData from '../testutils/testData'
 
@@ -12,7 +12,12 @@ let sessionApp: Express
 let flashData: FlashData
 
 let visitSessionData: VisitSessionData
-let selectedEstablishment: SessionData['selectedEstablishment']
+
+const supportedPrisonsService = createMockSupportedPrisonsService()
+const visitService = createMockVisitService()
+
+const prisonEnabledForPublic = TestData.prison()
+const prisonNotEnabledForPublic = TestData.prison({ publicClient: null })
 
 // run tests for booking and update journeys
 const testJourneys = [
@@ -23,6 +28,9 @@ const testJourneys = [
 beforeEach(() => {
   flashData = { errors: [], formValues: [] }
   flashProvider.mockImplementation((key: keyof FlashData) => flashData[key])
+
+  supportedPrisonsService.getPrison.mockResolvedValue(prisonEnabledForPublic)
+  supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
 })
 
 afterEach(() => {
@@ -107,14 +115,12 @@ testJourneys.forEach(journey => {
           : undefined,
       }
 
-      selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: true }
-
       sessionApp = appWithAllRoutes({
+        services: { supportedPrisonsService, visitService },
         sessionData: {
           adultVisitors,
           visitorList,
           visitSessionData,
-          selectedEstablishment,
         } as SessionData,
       })
     })
@@ -190,7 +196,8 @@ testJourneys.forEach(journey => {
       })
 
       it('should render the main contact page, without the email field, if prison not enabled for public', () => {
-        selectedEstablishment.isEnabledForPublic = false
+        supportedPrisonsService.getPrison.mockResolvedValue(prisonNotEnabledForPublic)
+
         visitSessionData.mainContact = {
           contactId: undefined,
           contactName: 'another person',
@@ -273,8 +280,6 @@ testJourneys.forEach(journey => {
     })
 
     describe(`POST ${journey.urlPrefix}/select-main-contact`, () => {
-      const visitService = createMockVisitService()
-
       beforeEach(() => {
         const application: Partial<ApplicationDto> = {
           reference: visitSessionData.applicationReference,
@@ -283,7 +288,7 @@ testJourneys.forEach(journey => {
         visitService.changeVisitApplication = jest.fn().mockResolvedValue(application)
 
         sessionApp = appWithAllRoutes({
-          services: { visitService },
+          services: { supportedPrisonsService, visitService },
           sessionData: {
             visitorList,
             visitSessionData,

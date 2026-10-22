@@ -3,7 +3,7 @@ import { body, matchedData, ValidationChain, validationResult } from 'express-va
 import { AuditService, BookerService } from '../../../services'
 import { RejectVisitorRequestDto } from '../../../data/orchestrationApiTypes'
 import { requestAlreadyReviewedMessage, requestRejectedMessage } from './visitorRequestMessages'
-import { VisitorRequestParams } from '../../../@types/requestParameterTypes'
+import { VisitorRequestParams } from '../../../@types/requestTypes'
 
 export default class CheckLinkedVisitorsController {
   public constructor(

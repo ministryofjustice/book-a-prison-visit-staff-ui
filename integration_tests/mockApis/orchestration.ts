@@ -37,6 +37,7 @@ import {
   VisitRequestResponse,
   VisitRequestSummary,
   VisitSessionsAndScheduleDto,
+  VisitSchedulerUpdatePrisonDto,
 } from '../../server/data/orchestrationApiTypes'
 import TestData from '../../server/routes/testutils/testData'
 
@@ -1294,6 +1295,33 @@ export default {
         status: 200,
         headers: { 'Content-Type': 'application/json;charset=UTF-8' },
         jsonBody: prison,
+      },
+    })
+  },
+  stubUpdateRemandConfig: ({
+    prisonId = 'HEI',
+    visitSchedulerUpdatePrisonDto = TestData.prisonRemandConfig(),
+  }: {
+    prisonId?: string
+    visitSchedulerUpdatePrisonDto?: VisitSchedulerUpdatePrisonDto
+  } = {}): SuperAgentRequest => {
+    return stubFor({
+      request: {
+        method: 'PUT',
+        url: `/orchestration/config/prisons/prison/${prisonId}`,
+        bodyPatterns: [
+          {
+            equalToJson: {
+              weekStartDay: visitSchedulerUpdatePrisonDto.weekStartDay,
+              remandVisitLimitPerWeek: visitSchedulerUpdatePrisonDto.remandVisitLimitPerWeek,
+            },
+          },
+        ],
+      },
+      response: {
+        status: 200,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        jsonBody: {},
       },
     })
   },

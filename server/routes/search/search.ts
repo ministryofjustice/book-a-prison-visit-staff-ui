@@ -34,7 +34,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
   })
 
   router.get('/prisoner/results', async (req, res) => {
-    const { prisonId } = req.session.selectedEstablishment
+    const { prisonId } = res.locals.selectedEstablishment
     const search = typeof req.query.search === 'string' ? req.query.search : ''
 
     const currentPage = typeof req.query.page === 'string' ? req.query.page : ''
@@ -74,10 +74,10 @@ export default function routes({ auditService, prisonerSearchService, visitServi
     if (numberOfResults === 0 && validPrisonerNumber) {
       prisonerNotFoundMessage = await prisonerSearchService.getPrisonerNotFoundMessage(
         validPrisonerNumber,
-        req.session.selectedEstablishment.prisonName,
+        res.locals.selectedEstablishment.prisonName,
       )
     } else {
-      prisonerNotFoundMessage = `There are no results for this name or number at ${req.session.selectedEstablishment.prisonName}.`
+      prisonerNotFoundMessage = `There are no results for this name or number at ${res.locals.selectedEstablishment.prisonName}.`
     }
 
     res.render('pages/search/prisonerResults', {
@@ -143,7 +143,7 @@ export default function routes({ auditService, prisonerSearchService, visitServi
       try {
         visit = await visitService.getVisit({
           reference: search,
-          prisonId: req.session.selectedEstablishment.prisonId,
+          prisonId: res.locals.selectedEstablishment.prisonId,
         })
         const prisonerDetails = await prisonerSearchService.getPrisonerById(visit.prisonNumber)
         visit.prisonerName = `${prisonerDetails.firstName} ${prisonerDetails.lastName}`

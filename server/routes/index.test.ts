@@ -1,11 +1,11 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
-import { SessionData } from 'express-session'
 import { appWithAllRoutes, user } from './testutils/appSetup'
 import * as visitorUtils from './visitorUtils'
 import {
   createMockBookerService,
+  createMockSupportedPrisonsService,
   createMockVisitNotificationsService,
   createMockVisitRequestsService,
 } from '../services/testutils/mocks'
@@ -19,24 +19,24 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  let sessionData: SessionData
-  let selectedEstablishment: SessionData['selectedEstablishment']
-
   const bookerService = createMockBookerService()
+  const supportedPrisonsService = createMockSupportedPrisonsService()
   const visitNotificationsService = createMockVisitNotificationsService()
   const visitRequestsService = createMockVisitRequestsService()
+
+  const prisonEnabledForPublic = TestData.prison()
+  const prisonNotEnabledForPublic = TestData.prison({ publicClient: null })
 
   const visitorRequestCount = 10
   const notificationCount = 5
   const visitRequestCount = 3
 
   beforeEach(() => {
-    selectedEstablishment = { ...TestData.prison(), isEnabledForPublic: false }
-    sessionData = { selectedEstablishment } as SessionData
+    supportedPrisonsService.getPrison.mockResolvedValue(prisonNotEnabledForPublic)
+    supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
 
     app = appWithAllRoutes({
-      services: { bookerService, visitNotificationsService, visitRequestsService },
-      sessionData,
+      services: { bookerService, supportedPrisonsService, visitNotificationsService, visitRequestsService },
     })
 
     bookerService.getVisitorRequestCount.mockResolvedValue(visitorRequestCount)
@@ -74,13 +74,13 @@ describe('GET /', () => {
 
         expect(bookerService.getVisitorRequestCount).not.toHaveBeenCalled()
         expect(visitRequestsService.getVisitRequestCount).not.toHaveBeenCalled()
-        expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(selectedEstablishment.prisonId)
+        expect(visitNotificationsService.getNotificationCount).toHaveBeenCalledWith(prisonNotEnabledForPublic.prisonId)
       })
   })
 
   describe('Requested visits tile', () => {
     beforeEach(() => {
-      selectedEstablishment.isEnabledForPublic = true
+      supportedPrisonsService.getPrison.mockResolvedValue(prisonEnabledForPublic)
     })
 
     it('should render badge with visit request count', () => {
@@ -90,7 +90,7 @@ describe('GET /', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="visit-request-count"]').text()).toBe(visitRequestCount.toString())
-          expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(selectedEstablishment.prisonId)
+          expect(visitRequestsService.getVisitRequestCount).toHaveBeenCalledWith(prisonEnabledForPublic.prisonId)
         })
     })
 
@@ -175,8 +175,7 @@ describe('GET /', () => {
     it('should render tile if role is present and with no count for a non-public-enabled prison', () => {
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
-        services: { bookerService, visitNotificationsService, visitRequestsService },
-        sessionData,
+        services: { bookerService, supportedPrisonsService, visitNotificationsService, visitRequestsService },
       })
 
       return request(app)
@@ -195,12 +194,11 @@ describe('GET /', () => {
     })
 
     it('should render tile with visitor request count badge if feature enabled, prison is public-enabled and role is present', () => {
-      selectedEstablishment.isEnabledForPublic = true
+      supportedPrisonsService.getPrison.mockResolvedValue(prisonEnabledForPublic)
 
       app = appWithAllRoutes({
         userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
-        services: { bookerService, visitNotificationsService, visitRequestsService },
-        sessionData,
+        services: { bookerService, supportedPrisonsService, visitNotificationsService, visitRequestsService },
       })
 
       return request(app)

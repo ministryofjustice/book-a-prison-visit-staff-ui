@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { body, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, VisitNotificationsService } from '../../../services'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { IgnoreVisitNotificationsDto } from '../../../data/orchestrationApiTypes'
 import { getFlashFormValues } from '../../visitorUtils'
 import { extractVisitNavState, appendNavStateToPath } from '../visitNavigationUtils'

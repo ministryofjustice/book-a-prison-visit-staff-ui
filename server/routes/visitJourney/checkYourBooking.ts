@@ -42,7 +42,7 @@ export default class CheckYourBooking {
   async post(req: Request, res: Response): Promise<void> {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
-    const { prisonId } = req.session.selectedEstablishment
+    const { prisonId } = res.locals.selectedEstablishment
     const { offenderNo } = visitSessionData.prisoner
     const prisonerName = `${visitSessionData.prisoner.firstName} ${visitSessionData.prisoner.lastName}`
 

@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
-import { BookerPrisonerParams } from '../../../@types/requestParameterTypes'
+import { BookerPrisonerParams } from '../../../@types/requestTypes'
 
 export default class VisitorListController {
   public constructor(private readonly bookerService: BookerService) {}

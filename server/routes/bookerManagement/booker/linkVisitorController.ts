@@ -4,7 +4,7 @@ import { SessionData } from 'express-session'
 import { AuditService, BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
 import { SocialContactsDto } from '../../../data/orchestrationApiTypes'
-import { BookerPrisonerVisitorParams } from '../../../@types/requestParameterTypes'
+import { BookerPrisonerVisitorParams } from '../../../@types/requestTypes'
 
 export default class LinkVisitorController {
   public constructor(

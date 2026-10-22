@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { AuditService, VisitService } from '../../../services'
 import { getDpsPrisonerAlertsUrl } from '../../../utils/utils'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { getIdsToFlag, getPrisonerLocation } from '../visitUtils'
 import {
   appendNavStateToPath,
@@ -24,7 +24,7 @@ export default class VisitDetailsController {
   public view(): RequestHandler<VisitReferenceParams> {
     return async (req, res) => {
       const { reference } = req.params
-      const { selectedEstablishment } = req.session
+      const { selectedEstablishment } = res.locals
       const { username } = res.locals.user
 
       const visitDetails = await this.visitService.getVisitDetailed({ reference })

@@ -2,8 +2,7 @@ import type { Express } from 'express'
 import request from 'supertest'
 import * as cheerio from 'cheerio'
 import createError from 'http-errors'
-import { SessionData } from 'express-session'
-import { appWithAllRoutes, user } from '../testutils/appSetup'
+import { appWithAllRoutes } from '../testutils/appSetup'
 import { PrisonerDetailsItem, VisitInformation } from '../../@types/bapv'
 import TestData from '../testutils/testData'
 import {
@@ -334,14 +333,13 @@ describe('Booking search page', () => {
 
     it('should not render visit results page when selected establishment does not equal visit prisonId', () => {
       prisonerSearchService.getPrisonerById.mockResolvedValue(getPrisonerReturnData)
+      // In this scenario of prisonId / visit prisonId mis-match getVisit() throws a 404 (tested at service level)
       visitService.getVisit.mockImplementation(() => {
         throw createError(404, 'Not found')
       })
 
       app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, activeCaseLoadId: 'XYZ' }),
         services: { auditService, prisonerSearchService, visitService },
-        sessionData: { selectedEstablishment: TestData.prison({ prisonId: 'XYZ' }) } as SessionData,
       })
 
       return request(app)
@@ -354,7 +352,7 @@ describe('Booking search page', () => {
           expect($('[data-test=search-by-prisoner]').length).toBe(1)
           expect(visitService.getVisit).toHaveBeenCalledWith({
             reference: 'ab-bc-cd-de',
-            prisonId: 'XYZ',
+            prisonId: 'HEI',
           })
           expect(auditService.visitSearch).toHaveBeenCalledTimes(1)
           expect(auditService.visitSearch).toHaveBeenCalledWith({

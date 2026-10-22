@@ -1,7 +1,7 @@
 import { RequestHandler, Request } from 'express'
 import { BadRequest } from 'http-errors'
 import { isValidVisitReference } from '../../validationChecks'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 import { appendNavStateToPath, extractVisitNavState } from '../visitNavigationUtils'
 
 export default class ConfirmUpdateController {

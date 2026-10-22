@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import { AuditService, BookerService } from '../../../services'
 import { MoJAlert } from '../../../@types/bapv'
-import { VisitReferenceParams } from '../../../@types/requestParameterTypes'
+import { VisitReferenceParams } from '../../../@types/requestTypes'
 
 export default class BookerDetailsController {
   public constructor(

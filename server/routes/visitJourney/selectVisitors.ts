@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express'
-import { body, ValidationChain, validationResult } from 'express-validator'
+import { body, Meta, ValidationChain, validationResult } from 'express-validator'
 import { BookOrUpdate, VisitorListItem } from '../../@types/bapv'
 import PrisonerVisitorsService from '../../services/prisonerVisitorsService'
 import { getFlashFormValues } from '../visitorUtils'
 import { getUrlPrefix } from './visitJourneyUtils'
 import { getBanStatus } from '../../utils/visitorUtils'
 import { getDpsPrisonerAlertsUrl } from '../../utils/utils'
+import type { RequestWithSelectedEstablishment } from '../../@types/requestTypes'
 
 export default class SelectVisitors {
   constructor(
@@ -17,7 +18,7 @@ export default class SelectVisitors {
     const isUpdate = this.mode === 'update'
     const { visitSessionData } = req.session
     const { offenderNo } = visitSessionData.prisoner
-    const { policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
+    const { policyNoticeDaysMax } = res.locals.selectedEstablishment.staffClient
 
     const visitorList = await this.prisonerVisitorsService.getVisitors(offenderNo, policyNoticeDaysMax)
     if (!req.session.visitorList) {
@@ -98,7 +99,7 @@ export default class SelectVisitors {
     )
 
     const allSelectedVisitorBans = selectedVisitors.flatMap(visitor => visitor.restrictions)
-    const { policyNoticeDaysMax } = req.session.selectedEstablishment.staffClient
+    const { policyNoticeDaysMax } = res.locals.selectedEstablishment.staffClient
 
     const banStatus = getBanStatus(allSelectedVisitorBans, policyNoticeDaysMax)
     visitSessionData.daysUntilBanExpiry = banStatus.numDays ? banStatus.numDays : undefined
@@ -109,14 +110,14 @@ export default class SelectVisitors {
   }
 
   validate(): ValidationChain {
-    return body('visitors').custom((value: string, { req }) => {
+    return body('visitors').custom((value: string, { req }: Meta & { req: Express.Request }) => {
       const selected = [].concat(value)
 
       if (value === undefined) {
         throw new Error('No visitors selected')
       }
 
-      const { maxTotalVisitors } = req.session.selectedEstablishment
+      const { maxTotalVisitors } = (req as RequestWithSelectedEstablishment).context.selectedEstablishment
       if (selected.length > maxTotalVisitors) {
         throw new Error(`Select no more than ${maxTotalVisitors} visitors`)
       }

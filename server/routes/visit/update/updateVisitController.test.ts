@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { SessionData } from 'express-session'
-import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
+import { appWithAllRoutes, FlashData, flashProvider } from '../../testutils/appSetup'
 import { VisitBookingDetails } from '../../../data/orchestrationApiTypes'
 import { MoJAlert, VisitSessionData } from '../../../@types/bapv'
 import { clearSession } from '../../visitorUtils'
@@ -153,16 +153,23 @@ describe('Start a visit update journey', () => {
         })
     })
 
-    it('should redirect to /visit/:reference if selected establishment does not match prison for which visit booked', () => {
-      const otherPrison = TestData.prison({ prisonId: 'BLI', prisonName: 'Bristol (HMP)' })
+    it('should redirect to /visit/:reference if the prisoner is not in the prison for which the visit is booked', () => {
+      visitService.getVisitDetailed.mockResolvedValue(
+        TestData.visitBookingDetails({
+          prisoner: { prisonId: 'XYZ' } as VisitBookingDetails['prisoner'],
+        }),
+      )
 
-      app = appWithAllRoutes({
-        userSupplier: () => ({ ...user, activeCaseLoadId: otherPrison.prisonId }),
-        services: { visitService },
-        sessionData: {
-          selectedEstablishment: otherPrison,
-        } as SessionData,
-      })
+      return request(app).post('/visit/ab-cd-ef-gh/update').expect(302).expect('location', '/visit/ab-cd-ef-gh')
+    })
+
+    it('should redirect to /visit/:reference if the prison for which the visit is booked is not for the selected establishment', () => {
+      visitService.getVisitDetailed.mockResolvedValue(
+        TestData.visitBookingDetails({
+          prison: { prisonId: 'XYZ', prisonName: '' },
+          prisoner: { prisonId: 'XYZ' } as VisitBookingDetails['prisoner'],
+        }),
+      )
 
       return request(app).post('/visit/ab-cd-ef-gh/update').expect(302).expect('location', '/visit/ab-cd-ef-gh')
     })

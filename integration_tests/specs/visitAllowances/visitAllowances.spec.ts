@@ -7,8 +7,6 @@ import ViewVisitAllowancesPage from '../../pages/visitAllowances/view'
 import UpdateVisitAllowancesPage from '../../pages/visitAllowances/update'
 import incentivesApi from '../../mockApis/incentives'
 
-const prisonId = 'HEI'
-
 test.beforeEach(async ({ page }) => {
   await resetStubs()
   await orchestrationApi.stubSupportedPrisonIds()
@@ -22,8 +20,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Full visit allowances journey', () => {
   test('should navigate to view visit allowances page, then update', async ({ page }) => {
-    await incentivesApi.stubGetPrisonIncentiveLevels({ prisonId })
-    await incentivesApi.stubGetRemandConfig({ prisonId })
+    await incentivesApi.stubGetPrisonIncentiveLevels()
 
     // Navigate to View visit allowances page
     const homePage = await HomePage.verifyOnPage(page)
@@ -42,16 +39,13 @@ test.describe('Full visit allowances journey', () => {
     await updateAllowancesPage.enterRemandLimit('5')
     await updateAllowancesPage.selectDay('Sunday')
 
-    await incentivesApi.stubUpdateRemandConfig({
+    await orchestrationApi.stubUpdateRemandConfig({
       visitSchedulerUpdatePrisonDto: TestData.prisonRemandConfig({
         weekStartDay: 'SUNDAY',
         remandVisitLimitPerWeek: 5,
       }),
     })
-    await incentivesApi.stubGetRemandConfig({
-      prisonId,
-      remandConfig: TestData.prisonRemandConfig({ remandVisitLimitPerWeek: 5, weekStartDay: 'SUNDAY' }),
-    })
+    await orchestrationApi.stubGetPrison(TestData.prisonDto({ remandVisitLimitPerWeek: 5, weekStartDay: 'SUNDAY' }))
 
     await updateAllowancesPage.submitForm()
 

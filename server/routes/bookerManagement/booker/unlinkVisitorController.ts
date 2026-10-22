@@ -2,7 +2,7 @@ import { RequestHandler } from 'express'
 import { param, ValidationChain, validationResult } from 'express-validator'
 import { AuditService, BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
-import { BookerPrisonerVisitorParams } from '../../../@types/requestParameterTypes'
+import { BookerPrisonerVisitorParams } from '../../../@types/requestTypes'
 
 export default class UnlinkVisitorController {
   public constructor(
