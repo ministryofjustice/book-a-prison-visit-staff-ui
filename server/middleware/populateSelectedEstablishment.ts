@@ -8,10 +8,6 @@ export default function populateSelectedEstablishment({ supportedPrisonsService 
       return next()
     }
 
-    // TODO TODO this is to handle old sessions during deployment; can be removed in a subsequent deployment
-    req.session.selectedEstablishmentId ??= req.session.selectedEstablishment?.prisonId
-    delete req.session.selectedEstablishment
-
     const { selectedEstablishmentId } = req.session
     const { activeCaseLoadId } = res.locals.user
     const establishmentAndCaseLoadMatch = activeCaseLoadId !== undefined && selectedEstablishmentId === activeCaseLoadId
