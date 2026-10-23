@@ -19,12 +19,6 @@ export declare module 'express-session' {
     // (distinct from active case load as this could be changed by the user during a journey)
     selectedEstablishmentId: string
 
-    /**
-     * @deprecated Use `selectedEstablishmentId` instead.
-     * TODO to handle old sessions during deployment; can be removed in a subsequent deployment
-     */
-    selectedEstablishment?: Prison
-
     // Visit booking journey
     visitSessionData: VisitSessionData
     visitorList: { visitors: VisitorListItem[] } // TODO move into VisitSessionData

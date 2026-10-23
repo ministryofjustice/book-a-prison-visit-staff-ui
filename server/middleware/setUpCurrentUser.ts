@@ -23,9 +23,7 @@ export default function setUpCurrentUser() {
 
       // feComponents only populated on GET requests, so fall back to already selected establishment
       const activeCaseLoadId =
-        res.locals.feComponents?.sharedData?.activeCaseLoad?.caseLoadId ??
-        req.session.selectedEstablishmentId ??
-        req.session.selectedEstablishment?.prisonId // TODO to handle old sessions during deployment; can be removed in a subsequent deployment
+        res.locals.feComponents?.sharedData?.activeCaseLoad?.caseLoadId ?? req.session.selectedEstablishmentId
 
       res.locals.user = {
         ...res.locals.user,
