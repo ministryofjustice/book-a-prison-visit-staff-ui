@@ -353,3 +353,7 @@ p.bapv-visit-details__restriction--flagged, p.bapv-visit-details__alert--flagged
   background-color: inherit;
   padding-left: govuk-spacing(4);
 }
+
+.bapv-sortable-table th:first-child > button {
+  max-width: 170px;
+}
