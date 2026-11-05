@@ -27,7 +27,7 @@ Or, to start just Redis if using HMPPS Auth dev:
 
 `docker-compose up redis-bapv`
 
-Install dependencies using `npm run setup`, ensuring you are using >= `Node v24.x`
+Install dependencies using `npm ci`, ensuring you are using >= `Node v26.x` and `npm v12`
 
 Using credentials from the dev namespace, create a [`.env` local settings file](./.env):
 

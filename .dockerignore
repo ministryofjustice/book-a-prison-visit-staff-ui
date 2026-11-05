@@ -6,7 +6,6 @@ node_modules
 npm-debug.log
 README.md
 .*
-!.allowed-scripts.mjs
 !.npmrc
 **/*.test.js
 scss-report.txt
