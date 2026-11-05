@@ -783,7 +783,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/count`)
-        .query(new URLSearchParams({ types: enabledRawNotifications }))
+        .query(new URLSearchParams({ types: enabledRawNotifications } as unknown as Record<string, string>))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
@@ -821,7 +821,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/visits`)
-        .query(new URLSearchParams({ types: enabledRawNotifications }))
+        .query(new URLSearchParams({ types: enabledRawNotifications } as unknown as Record<string, string>))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitNotificationsRaw)
 
