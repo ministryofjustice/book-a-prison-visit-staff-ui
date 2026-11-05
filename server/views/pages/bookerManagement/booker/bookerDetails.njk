@@ -5,6 +5,17 @@
 
 {% set pageHeaderTitle = "Booker details" %}
 
+{% set noLinkedVisitorsHtml %}
+  <p data-test="no-linked-visitors">
+    There are no linked visitors.
+  </p>
+{% endset %}
+{% set noVisitorRequestsHtml %}
+  <p data-test="no-visitor-requests">
+    There are no requests to link visitors.
+  </p>
+{% endset %}
+
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
@@ -26,24 +37,24 @@
       </dl>
 
       {% if booker.permittedPrisoners | length %}
-        <p>Linking a visitor lets the booker select the visitor when booking online.</p>
+        <p>
+          Linking prisoners and visitors to an account lets the booker select them when booking visits online.<br>
+          This page shows prisoners from all prisons.
+        </p>
+
+        {% set visitorRowItems = [] %}
+        {% set visitorRequestRowItems = [] %}
 
         {% for prisoner in booker.permittedPrisoners %}
           {# Prisoner #}
-          {% set prisonerIndex = "prisoner-" + loop.index %}
-          {% set prisonerName = (prisoner.prisoner.firstName + " " + prisoner.prisoner.lastName) | properCaseFullName %}
+          {% set prisonerName = (prisoner.prisoner.lastName + ", " + prisoner.prisoner.firstName) | properCaseFullName %}
           {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
-
-          <h2 class="govuk-heading-m" data-test="{{ prisonerIndex }}">
-            Visitors linked to {{ prisonerName }} ({{ prisonerNumber }}) at {{ prisoner.registeredPrison.prisonName }}
-          </h2>
+          {% set prisonerIndex = "prisoner-" + loop.index %}
 
           {# Visitors #}
-          <h3 class="govuk-heading-s">Linked visitors</h3>
           {% if prisoner.permittedVisitors | length %}
 
             {# Build visitor table row items #}
-            {% set visitorRowItems = [] %}
             {%- for visitor in prisoner.permittedVisitors %}
               {% set visitorIndex = prisonerIndex + "-visitor-" + loop.index %}
               {% set visitorName %}{{ visitor.firstName }} {{ visitor.lastName }}{% endset %}
@@ -56,7 +67,7 @@
                 <form action="/manage-bookers/{{ booker.reference }}/prisoner/{{ prisonerNumber }}/visitor/{{ visitor.visitorId }}/unlink" method="POST" novalidate>
                   <input type="hidden" name="_csrf" value="{{ csrfToken }}">
                   {{ govukButton({
-                    html: 'Unlink<span class="govuk-visually-hidden"> ' + (visitorName | safe) + '</span>',
+                    html: 'Unlink visitor <span class="govuk-visually-hidden">' + (visitorName | safe) + '</span>',
                     classes: "bapv-link-button",
                     preventDoubleClick: true,
                     attributes: { "data-test": visitorIndex + "-unlink" }
@@ -66,23 +77,22 @@
 
               {%- set visitorRowItems = (visitorRowItems.push([
                 {
-                  text: visitorName | safe,
-                  attributes: { "data-test": visitorIndex + "-name" }
+                  html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + visitorIndex + '-prisoner-name">' +
+                  prisonerName | safe +
+                  '</span>' +
+                  '<span class="govuk-!-display-block" data-test="' + visitorIndex + '-prison-number">' +
+                  prisonerNumber | safe +
+                  '</span>'
                 },
                 {
-                  text: visitor.relationshipDescription,
-                  attributes: { "data-test": visitorIndex + "-relationship" }
+                  html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName | safe + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                  </a>',
+                  classes: "bapv-vertical-align-middle",
+                  attributes: { "data-test": visitorIndex +  "-contact-link" }
                 },
                 {
                   text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
                   attributes: { "data-test": visitorIndex + "-dob" }
-                },
-                {
-                  html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state">
-                    View contact <span class="govuk-visually-hidden">details for ' + visitorName + ' (opens in a new tab)</span>
-                  </a>',
-                  classes: "bapv-vertical-align-middle",
-                  attributes: { "data-test": "visitor-" + loop.index + "-contact-link" }
                 },
                 ({
                   html: unlinkVisitorHtml,
@@ -91,47 +101,23 @@
                 ]), visitorRowItems) %}
             {% endfor -%}
 
-            {{ govukTable({
-              classes: "govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
-              firstCellIsHeader: true,
-              head: [
-                { text: "Name"},
-                { text: "Relationship to prisoner"},
-                { text: "Date of birth"},
-                { html: 'Contact information<div class="govuk-caption-m">(opens in a new tab)</div>' },
-                ({ text: "Action"} if active)
-              ],
-              rows: visitorRowItems
-            }) }}
-
-          {% else %}
-            <p data-test="{{ prisonerIndex }}-no-visitors">
-              There are no linked visitors for this prisoner.
-            </p>
           {% endif %}
-
-          {# Link a visitor (if account is active) #}
-          {% if active %}
-            {{ govukButton({
-              text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
-              href: "/manage-bookers/" + booker.reference + "/prisoner/" + prisonerNumber + "/link-visitor",
-              classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
-              attributes: { "data-test": prisonerIndex + "-link-visitor" },
-              preventDoubleClick: true
-            }) }}
-          {% endif %}
-
-          {# Visitor requests #}
-          <h3 class="govuk-heading-s">Requests to link visitors</h3>
 
           {% if visitorRequests[prisonerNumber] | length %}
             {# Build visitor request table row items #}
-            {% set visitorRequestRowItems = [] %}
             {%- for request in visitorRequests[prisonerNumber] %}
               {% set requestIndex = prisonerIndex + "-visitor-request-" + loop.index %}
               {% set visitorName = request.firstName + " " + request.lastName %}
 
               {%- set visitorRequestRowItems = (visitorRequestRowItems.push([
+                {
+                  html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + visitorIndex + '-prisoner-name">' +
+                  prisonerName | safe +
+                  '</span>' +
+                  '<span class="govuk-!-display-block" data-test="' + visitorIndex + '-prison-number">' +
+                  prisonerNumber | safe +
+                '</span>'
+                },
                 {
                   text: visitorName,
                   attributes: { "data-test": requestIndex + "-name" }
@@ -141,33 +127,71 @@
                   attributes: { "data-test": requestIndex + "-requested-date" }
                 },
                 {
-                  html: '<a class="govuk-link--no-visited-state"
-                        href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
-                        'View<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
+                  html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
+                  'View<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
                   classes: "govuk-!-text-align-right",
                   attributes: { "data-test": requestIndex + "-action" }
                 }
-                ]), visitorRequestRowItems) %}
+              ]), visitorRequestRowItems) %}
             {% endfor -%}
 
-            {{ govukTable({
-              classes: "govuk-!-margin-top-6",
-              firstCellIsHeader: true,
-              head: [
-                { text: "Name"},
-                { text: "Requested on"},
-                { text: "Action", classes: "govuk-!-text-align-right"}
-              ],
-              rows: visitorRequestRowItems
-            }) }}
-
-
-            {% else %}
-              <p data-test="{{ prisonerIndex }}-no-visitor-requests">
-                There are no requests to link visitors.
-              </p>
           {% endif %}
         {% endfor %}
+
+        <h2 class="govuk-heading-m">Prisoners and visitors linked to this account</h2>
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
+          classes: "bapv-sortable-table govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
+          head: [
+            {
+              text: 'Prisoner name and prison number',
+              attributes: {
+                "aria-sort": "ascending"
+              }
+            },
+            { html: '<span class="govuk-!-display-block">Visitor name</span> <span class="govuk-!-display-block">(opens in new tab)</span>' },
+            { text: "Visitor’s date of birth" },
+            { text: "Action" }
+          ],
+          rows: visitorRowItems
+        }) if visitorRowItems | length else noLinkedVisitorsHtml | safe }}
+
+        <h3 class="govuk-heading-s">Requests to link visitors</h3>
+
+        {{ govukTable({
+          attributes: {
+            "data-module": "moj-sortable-table"
+          },
+          classes: "bapv-sortable-table govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
+          head: [
+            { text: "Prisoner name and prison number"},
+            { text: "Visitor name"},
+            {
+              text: "Requested on",
+              attributes: {
+                "aria-sort": "ascending"
+              }
+            },
+            { text: "Action", classes: "govuk-!-text-align-right"}
+          ],
+          rows: visitorRequestRowItems
+        }) if visitorRequestRowItems | length else noVisitorRequestsHtml | safe }}
+
+        {# Link a visitor (if account is active) #}
+      {% if active %}
+        {{ govukButton({
+          text: "Link a visitor",
+          href: "/manage-bookers/link-visitor",
+          classes: "govuk-!-margin-top-5" + (" govuk-button--secondary" if booker.permittedPrisoners.length > 1),
+          attributes: { "data-test": "link-visitor" },
+          preventDoubleClick: true
+        }) }}
+      {% endif %}
+
+
       {% else %}
         <p data-test="booker-no-prisoners">This booker has no prisoners.</p>
       {% endif %}
