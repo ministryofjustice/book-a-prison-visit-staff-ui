@@ -270,12 +270,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitPreviews)
 
-      const output = await orchestrationApiClient.getVisitsBySessionTemplate(
-        prisonId,
-        undefined,
-        sessionDate,
-        undefined,
-      )
+      const output = await orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, [])
 
       expect(output).toStrictEqual(visitPreviews)
     })
@@ -783,7 +778,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/count`)
-        .query(new URLSearchParams({ types: enabledRawNotifications } as unknown as Record<string, string>))
+        .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
@@ -821,7 +816,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/visits`)
-        .query(new URLSearchParams({ types: enabledRawNotifications } as unknown as Record<string, string>))
+        .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitNotificationsRaw)
 

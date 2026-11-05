@@ -206,8 +206,8 @@ export default class OrchestrationApiClient extends RestClient {
           ...(reference && { sessionTemplateReference: reference }),
           sessionDate,
           visitStatus: 'BOOKED',
-          ...(visitRestrictions && { visitRestrictions }),
-        } as unknown as Record<string, string>).toString(),
+          ...(visitRestrictions.length && { visitRestrictions: visitRestrictions.toString() }),
+        }).toString(),
       },
       asSystem(),
     )
@@ -478,10 +478,7 @@ export default class OrchestrationApiClient extends RestClient {
       await this.get<NotificationCount>(
         {
           path: `/visits/notification/${prisonId}/count`,
-          query: new URLSearchParams({ types: this.enabledRawNotifications } as unknown as Record<
-            string,
-            string
-          >).toString(),
+          query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
         },
         asSystem(),
       )
@@ -492,10 +489,7 @@ export default class OrchestrationApiClient extends RestClient {
     const visits = await this.get<VisitNotificationsRaw[]>(
       {
         path: `/visits/notification/${prisonId}/visits`,
-        query: new URLSearchParams({ types: this.enabledRawNotifications } as unknown as Record<
-          string,
-          string
-        >).toString(),
+        query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
       },
       asSystem(),
     )
