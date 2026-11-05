@@ -270,7 +270,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitPreviews)
 
-      const output = await orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, [])
+      const output = await orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate)
 
       expect(output).toStrictEqual(visitPreviews)
     })
