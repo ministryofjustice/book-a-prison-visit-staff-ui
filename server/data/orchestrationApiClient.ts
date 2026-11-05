@@ -196,7 +196,7 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId: string,
     reference: string,
     sessionDate: string,
-    visitRestrictions: VisitRestriction[],
+    visitRestrictions?: VisitRestriction[],
   ): Promise<VisitPreview[]> {
     return this.get(
       {
@@ -206,7 +206,7 @@ export default class OrchestrationApiClient extends RestClient {
           ...(reference && { sessionTemplateReference: reference }),
           sessionDate,
           visitStatus: 'BOOKED',
-          ...(visitRestrictions && { visitRestrictions }),
+          ...(visitRestrictions?.length && { visitRestrictions: visitRestrictions.toString() }),
         }).toString(),
       },
       asSystem(),
@@ -478,7 +478,7 @@ export default class OrchestrationApiClient extends RestClient {
       await this.get<NotificationCount>(
         {
           path: `/visits/notification/${prisonId}/count`,
-          query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+          query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
         },
         asSystem(),
       )
@@ -489,7 +489,7 @@ export default class OrchestrationApiClient extends RestClient {
     const visits = await this.get<VisitNotificationsRaw[]>(
       {
         path: `/visits/notification/${prisonId}/visits`,
-        query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+        query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
       },
       asSystem(),
     )

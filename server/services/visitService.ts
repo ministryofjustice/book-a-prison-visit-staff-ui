@@ -136,7 +136,7 @@ export default class VisitService {
     prisonId: string
     sessionDate: string
   }): Promise<VisitPreview[]> {
-    return this.orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate, undefined)
+    return this.orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate)
   }
 
   async getBookedVisitCountByDate({ prisonId, date }: { prisonId: string; date: string }): Promise<number> {
