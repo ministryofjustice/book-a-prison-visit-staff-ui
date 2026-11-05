@@ -196,7 +196,7 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId: string,
     reference: string,
     sessionDate: string,
-    visitRestrictions: VisitRestriction[],
+    visitRestrictions?: VisitRestriction[],
   ): Promise<VisitPreview[]> {
     return this.get(
       {
@@ -206,7 +206,7 @@ export default class OrchestrationApiClient extends RestClient {
           ...(reference && { sessionTemplateReference: reference }),
           sessionDate,
           visitStatus: 'BOOKED',
-          ...(visitRestrictions.length && { visitRestrictions: visitRestrictions.toString() }),
+          ...(visitRestrictions?.length && { visitRestrictions: visitRestrictions.toString() }),
         }).toString(),
       },
       asSystem(),

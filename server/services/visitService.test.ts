@@ -282,12 +282,7 @@ describe('Visit service', () => {
 
         const result = await visitService.getVisitsWithoutSessionTemplate({ prisonId, sessionDate })
 
-        expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(
-          prisonId,
-          undefined,
-          sessionDate,
-          undefined,
-        )
+        expect(orchestrationApiClient.getVisitsBySessionTemplate).toHaveBeenCalledWith(prisonId, undefined, sessionDate)
         expect(result).toStrictEqual(visitPreviews)
       })
     })
