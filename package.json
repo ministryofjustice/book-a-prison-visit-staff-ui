@@ -34,7 +34,7 @@
     "npm": "^12"
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^11.1.0",
+    "@ministryofjustice/frontend": "^12.0.0",
     "@ministryofjustice/hmpps-audit-client": "2.0.0",
     "@ministryofjustice/hmpps-auth-clients": "3.0.0",
     "@ministryofjustice/hmpps-azure-telemetry": "1.2.0",
