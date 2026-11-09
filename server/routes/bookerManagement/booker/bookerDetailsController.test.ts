@@ -72,10 +72,9 @@ describe('Booker management - booker details', () => {
           // Booker details
           expect($('[data-test=booker-email]').text()).toBe(booker.email)
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
-          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
 
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
           const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement,
@@ -171,11 +170,10 @@ describe('Booker management - booker details', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
-          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
-          expect($('[data-test=prisoner-details-2]').text()).toBe('Fred Smith (B4567DE)')
 
           // Prisoner #1
-          expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toBe('A1234BC')
           const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement,
@@ -196,7 +194,8 @@ describe('Booker management - booker details', () => {
           )
 
           // Prisoner #2
-          expect($('[data-test=prisoner-2-visitor-1-prisoner-name]').text()).toBe('Smith, Fred')
+          expect($('[data-test=prisoner-2-prisoner-name]').text()).toBe('Smith, Fred')
+          expect($('[data-test=prisoner-2-prison-number]').text()).toBe('B4567DE')
           const $linkElement2 = $('[data-test="prisoner-2-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement2,
@@ -265,11 +264,10 @@ describe('Booker management - booker details', () => {
           // Booker details
           expect($('[data-test=booker-email]').text()).toBe(booker.email)
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
-          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
-          expect($('[data-test=prisoner-details-2]').text()).toBe('Fred Smith (B4567DE)')
 
           // Prisoner #1
-          expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toBe('A1234BC')
           const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement,
@@ -290,7 +288,7 @@ describe('Booker management - booker details', () => {
           )
 
           // Prisoner #2
-          expect($('[data-test=prisoner-2-visitor-1-prisoner-name]').text()).toBe('Smith, Fred')
+          expect($('[data-test=prisoner-2-prisoner-name]').text()).toBe('Smith, Fred')
           const $linkElement2 = $('[data-test="prisoner-2-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement2,
@@ -347,7 +345,9 @@ describe('Booker management - booker details', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Prisoner and no visitors message
-          expect($('[data-test=no-linked-visitors]').text()).toContain('There are no linked visitors.')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toContain('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toContain('A1234BC')
+          expect($('[data-test=prisoner-1-no-linked-visitors]').text()).toContain('No linked visitors')
           expect($('[data-test=no-visitor-requests]').text()).toContain('There are no requests to link visitors.')
         })
     })
@@ -386,7 +386,7 @@ describe('Booker management - booker details', () => {
           expect($('.moj-alert').text()).toContain('This account is inactive')
 
           // Prisoner and visitors (with no 'Unlink' action)
-          expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
