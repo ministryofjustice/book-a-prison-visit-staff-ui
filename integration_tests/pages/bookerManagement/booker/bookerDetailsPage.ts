@@ -13,10 +13,13 @@ export default class BookerDetailsPage extends AbstractPage {
     this.bookerReference = page.getByTestId('booker-reference')
   }
 
-  prisonerHeading = (index: number): Locator => this.page.getByTestId(`prisoner-${index}`)
+  prisonerHeading = (index: number): Locator => this.page.getByTestId(`prisoner-details-${index}`)
 
   prisonerVisitorName = (prisonerIndex: number, visitorIndex: number): Locator =>
-    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-name`)
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-contact-link`)
+
+  prisonerVisitorDob = (prisonerIndex: number, visitorIndex: number): Locator =>
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-dob`)
 
   linkPrisonerVisitor = (prisonerIndex: number): Locator =>
     this.page.getByTestId(`prisoner-${prisonerIndex}-link-visitor`)

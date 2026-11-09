@@ -72,6 +72,7 @@ describe('Booker management - booker details', () => {
           // Booker details
           expect($('[data-test=booker-email]').text()).toBe(booker.email)
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
+          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
 
           // Prisoner and visitors
           expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
@@ -170,6 +171,8 @@ describe('Booker management - booker details', () => {
         .expect('Content-Type', /html/)
         .expect(res => {
           const $ = cheerio.load(res.text)
+          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
+          expect($('[data-test=prisoner-details-2]').text()).toBe('Fred Smith (B4567DE)')
 
           // Prisoner #1
           expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
@@ -262,6 +265,8 @@ describe('Booker management - booker details', () => {
           // Booker details
           expect($('[data-test=booker-email]').text()).toBe(booker.email)
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
+          expect($('[data-test=prisoner-details-1]').text()).toBe('John Smith (A1234BC)')
+          expect($('[data-test=prisoner-details-2]').text()).toBe('Fred Smith (B4567DE)')
 
           // Prisoner #1
           expect($('[data-test=prisoner-1-visitor-1-prisoner-name]').text()).toBe('Smith, John')
