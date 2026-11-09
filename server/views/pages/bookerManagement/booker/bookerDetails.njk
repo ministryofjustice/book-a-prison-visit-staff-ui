@@ -222,12 +222,12 @@
         {# Link a visitor (if account is active) #}
         {% if active %}
           {{ govukButton({
-            text: "Link a visitor",
-            href: "/manage-bookers/link-visitor",
-            classes: "govuk-!-margin-top-5" + (" govuk-button--primary" if booker.permittedPrisoners.length > 1),
+            text: "Link a visitor" + (" for " + prisonerName if booker.permittedPrisoners.length > 1),
+            href: "/manage-bookers/" + booker.reference + "/prisoner/" + booker.permittedPrisoners[0].prisoner.prisonerNumber + "/link-visitor",
+            classes: "govuk-!-margin-top-5 govuk-button--primary",
             attributes: { "data-test": "link-visitor" },
             preventDoubleClick: true
-          }) }}
+            }) }}
         {% endif %}
 
 
