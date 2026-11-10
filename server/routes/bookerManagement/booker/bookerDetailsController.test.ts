@@ -215,9 +215,6 @@ describe('Booker management - booker details', () => {
             'Unlink visitor',
           )
 
-          // Visitor requests
-          // expect($('[data-test=prisoner-2-no-visitor-requests]').length).toBe(1)
-
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             reference: booker.reference,
           })

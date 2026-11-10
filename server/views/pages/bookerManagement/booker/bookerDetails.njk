@@ -192,7 +192,7 @@
               text: 'Prisoner name and prison number'
             },
             { html: '<span class="govuk-!-display-block">Visitor name</span> <span class="govuk-!-display-block">(opens in new tab)</span>' },
-            { text: "Visitor's date of birth" },
+            { text: "Visitor’s date of birth" },
             { text: "Action" }
           ],
           rows: prisonerRowItems
@@ -201,18 +201,12 @@
         <h3 class="govuk-heading-s">Requests to link visitors</h3>
 
         {{ govukTable({
-          attributes: {
-            "data-module": "moj-sortable-table"
-          },
-          classes: "bapv-sortable-table govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
+          classes: "govuk-!-margin-top-6" + (" govuk-!-width-three-quarters" if not active),
           head: [
             { text: "Prisoner name and prison number"},
             { text: "Visitor name"},
             {
-              text: "Requested on",
-              attributes: {
-                "aria-sort": "ascending"
-              }
+              text: "Requested on"
             },
             { text: "Action", classes: "govuk-!-text-align-right"}
           ],
