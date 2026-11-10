@@ -270,12 +270,7 @@ describe('orchestrationApiClient', () => {
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitPreviews)
 
-      const output = await orchestrationApiClient.getVisitsBySessionTemplate(
-        prisonId,
-        undefined,
-        sessionDate,
-        undefined,
-      )
+      const output = await orchestrationApiClient.getVisitsBySessionTemplate(prisonId, undefined, sessionDate)
 
       expect(output).toStrictEqual(visitPreviews)
     })
@@ -783,7 +778,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/count`)
-        .query(new URLSearchParams({ types: enabledRawNotifications }))
+        .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
 
@@ -821,7 +816,7 @@ describe('orchestrationApiClient', () => {
 
       fakeOrchestrationApi
         .get(`/visits/notification/${prisonId}/visits`)
-        .query(new URLSearchParams({ types: enabledRawNotifications }))
+        .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitNotificationsRaw)
 
@@ -1205,9 +1200,9 @@ describe('orchestrationApiClient', () => {
   })
 
   describe('getVoHistory', () => {
-    it('should return voHistoryDetails for selected prisoner (for past 3 months', async () => {
+    it('should return voHistoryDetails for selected prisoner (for past 16 weeks)', async () => {
       const fakeDate = new Date('2025-12-01')
-      const fakeDateMinus3Months = '2025-09-01'
+      const fakeDateMinus16Weeks = '2025-08-11'
       const maxResults = 30
 
       jest.useFakeTimers({ advanceTimers: true, now: fakeDate })
@@ -1217,7 +1212,7 @@ describe('orchestrationApiClient', () => {
       fakeOrchestrationApi
         .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`)
         .query({
-          fromDate: fakeDateMinus3Months,
+          fromDate: fakeDateMinus16Weeks,
           maxResults,
         })
         .matchHeader('authorization', `Bearer ${token}`)

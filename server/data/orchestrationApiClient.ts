@@ -1,4 +1,4 @@
-import { format, subMonths } from 'date-fns'
+import { format, subWeeks } from 'date-fns'
 import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
@@ -196,7 +196,7 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId: string,
     reference: string,
     sessionDate: string,
-    visitRestrictions: VisitRestriction[],
+    visitRestrictions?: VisitRestriction[],
   ): Promise<VisitPreview[]> {
     return this.get(
       {
@@ -206,7 +206,7 @@ export default class OrchestrationApiClient extends RestClient {
           ...(reference && { sessionTemplateReference: reference }),
           sessionDate,
           visitStatus: 'BOOKED',
-          ...(visitRestrictions && { visitRestrictions }),
+          ...(visitRestrictions?.length && { visitRestrictions: visitRestrictions.toString() }),
         }).toString(),
       },
       asSystem(),
@@ -478,7 +478,7 @@ export default class OrchestrationApiClient extends RestClient {
       await this.get<NotificationCount>(
         {
           path: `/visits/notification/${prisonId}/count`,
-          query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+          query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
         },
         asSystem(),
       )
@@ -489,7 +489,7 @@ export default class OrchestrationApiClient extends RestClient {
     const visits = await this.get<VisitNotificationsRaw[]>(
       {
         path: `/visits/notification/${prisonId}/visits`,
-        query: new URLSearchParams({ types: this.enabledRawNotifications }).toString(),
+        query: new URLSearchParams({ types: this.enabledRawNotifications.toString() }).toString(),
       },
       asSystem(),
     )
@@ -765,9 +765,9 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId: string
     prisonerId: string
   }): Promise<VisitOrderHistoryDetailsDto> {
-    // fixed to get past 3 months of VO history
-    const date3MonthsAgo = subMonths(new Date(), 3)
-    const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
+    // fixed to get past 16 weeks of VO history
+    const date16WeeksAgo = subWeeks(new Date(), 16)
+    const fromDate = format(date16WeeksAgo, 'yyyy-MM-dd')
 
     return this.get(
       {
