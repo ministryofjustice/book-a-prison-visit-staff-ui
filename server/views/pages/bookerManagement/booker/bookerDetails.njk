@@ -47,7 +47,7 @@
 
         {% for prisoner in booker.permittedPrisoners %}
           {# Prisoner #}
-          {% set prisonerName = (prisoner.prisoner.lastName + ", " + prisoner.prisoner.firstName) | properCaseFullName %}
+          {% set prisonerName = (prisoner.prisoner.lastName + ", " + prisoner.prisoner.firstName) | properCaseFullName | escape %}
           {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
           {% set prisonerIndex = "prisoner-" + loop.index %}
 

@@ -47,6 +47,8 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
     })
 
     test('should search for a booker and navigate to booker details page (single booker record)', async ({ page }) => {
+      const today = new Date()
+      const age = today.getFullYear() - 1986 - (today < new Date(today.getFullYear(), 6, 28) ? 1 : 0)
       // Home page - select booker management tile
       const homePage = await HomePage.verifyOnPage(page)
       await homePage.bookerManagementTile.click()
@@ -63,7 +65,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
       await expect(bookerDetailsPage.prisonerName(1)).toContainText('Smith, John')
       await expect(bookerDetailsPage.prisonNumber(1)).toContainText('A1234BC')
       await expect(bookerDetailsPage.prisonerVisitorName(1, 1)).toContainText('Jeanette Smith')
-      await expect(bookerDetailsPage.prisonerVisitorDob(1, 1)).toContainText('28 July 1986 (40 years old)')
+      await expect(bookerDetailsPage.prisonerVisitorDob(1, 1)).toContainText(`28 July 1986 (${age} years old)`)
       await expect(bookerDetailsPage.visitorName(1, 1)).toContainText('Mike Jones')
       await expect(bookerDetailsPage.requestedDate(1, 1)).toContainText('10/12/2025')
       await expect(bookerDetailsPage.viewRequestLink(1, 1, 'Mike Jones')).toBeVisible()
