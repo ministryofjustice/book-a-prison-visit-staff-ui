@@ -97,7 +97,7 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=prisoner-1-visitor-request-1-name]').text()).toBe('Mike Jones')
           expect($('[data-test=prisoner-1-visitor-request-1-requested-date]').text()).toBe('10/12/2025')
           expect($('[data-test=prisoner-1-visitor-request-1-action]').text()).toBe(
-            'View request to add Mike Jones as a visitor',
+            'Review request to add Mike Jones as a visitor',
           )
           expect($('[data-test=prisoner-1-visitor-request-1-action] a').attr('href')).toBe(
             `/manage-bookers/visitor-request/${visitorRequest.reference}/link-visitor?from=booker-details`,

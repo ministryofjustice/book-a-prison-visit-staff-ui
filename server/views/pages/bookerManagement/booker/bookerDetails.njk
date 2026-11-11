@@ -5,11 +5,6 @@
 
 {% set pageHeaderTitle = "Booker details" %}
 
-{% set noLinkedVisitorsHtml %}
-  <p data-test="no-linked-visitors">
-    There are no linked visitors.
-  </p>
-{% endset %}
 {% set noVisitorRequestsHtml %}
   <p data-test="no-visitor-requests">
     There are no requests to link visitors.
@@ -51,6 +46,16 @@
           {% set prisonerNumber = prisoner.prisoner.prisonerNumber %}
           {% set prisonerIndex = "prisoner-" + loop.index %}
 
+          {% set prisonerNameCell = {
+            html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + prisonerIndex + '-prisoner-name">' +
+            prisonerName +
+            '</span>' +
+            '<span class="govuk-!-display-block" data-test="' + prisonerIndex + '-prison-number">' +
+            prisonerNumber +
+            '</span>',
+            rowspan: prisoner.permittedVisitors | length
+          } %}
+
           {# Visitors #}
           {% if prisoner.permittedVisitors | length %}
             {%- for visitor in prisoner.permittedVisitors %}
@@ -73,50 +78,28 @@
                 </form>
               {%- endset %}
 
+              {% set visitorNameCell = {
+                html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                </a>',
+                classes: "bapv-vertical-align-middle",
+                attributes: { "data-test": visitorIndex +  "-contact-link" }
+              } %}
+
+              {% set visitorDobCell =  {
+                text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
+                attributes: { "data-test": visitorIndex + "-dob" }
+              } %}
+
+              {% set visitorUnlinkCell =  ({
+                html: unlinkVisitorHtml,
+                classes: "bapv-vertical-align-middle"
+              } if active) %}
+
               {# Forced to build unique data structure for different rows, due to rowspan #}
               {%- if loop.first %}
-                {%- set prisonerRow = [
-                  {
-                    html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + prisonerIndex + '-prisoner-name">' +
-                    prisonerName +
-                    '</span>' +
-                    '<span class="govuk-!-display-block" data-test="' + prisonerIndex + '-prison-number">' +
-                    prisonerNumber +
-                    '</span>',
-                    rowspan: prisoner.permittedVisitors | length
-                  },
-                  {
-                    html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                    </a>',
-                    classes: "bapv-vertical-align-middle",
-                    attributes: { "data-test": visitorIndex +  "-contact-link" }
-                  },
-                  {
-                    text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
-                    attributes: { "data-test": visitorIndex + "-dob" }
-                  },
-                  ({
-                    html: unlinkVisitorHtml,
-                    classes: "bapv-vertical-align-middle"
-                  } if active)
-                ] %}
+                {%- set prisonerRow = [prisonerNameCell, visitorNameCell, visitorDobCell, visitorUnlinkCell] %}
               {%- else %}
-                {%- set prisonerRow = [
-                  {
-                    html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                    </a>',
-                    classes: "bapv-vertical-align-middle",
-                    attributes: { "data-test": visitorIndex +  "-contact-link" }
-                  },
-                  {
-                    text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
-                    attributes: { "data-test": visitorIndex + "-dob" }
-                  },
-                  ({
-                    html: unlinkVisitorHtml,
-                    classes: "bapv-vertical-align-middle"
-                  } if active)
-                ] %}
+                {%- set prisonerRow = [visitorNameCell, visitorDobCell, visitorUnlinkCell] %}
               {%- endif %}
 
               {%- set prisonerRowItems = (prisonerRowItems.push(prisonerRow), prisonerRowItems) %}
@@ -124,26 +107,14 @@
 
           {% else %}
             {%- set prisonerRow = [
-              {
-                html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + prisonerIndex + '-prisoner-name">' +
-                prisonerName +
-                '</span>' +
-                '<span class="govuk-!-display-block" data-test="' + prisonerIndex + '-prison-number">' +
-                prisonerNumber +
-                '</span>',
-                rowspan: 1
-              },
+              prisonerNameCell,
               {
                 text: 'No linked visitors',
                 attributes: { "data-test": prisonerIndex + "-no-linked-visitors" }
               },
               {
                 text: 'No linked visitors'
-              },
-              ({
-                html: unlinkVisitorHtml,
-                classes: "bapv-vertical-align-middle"
-              } if active)
+              }
             ] %}
             {% set prisonerRowItems = (prisonerRowItems.push(prisonerRow), prisonerRowItems) %}
           {% endif %}
@@ -173,7 +144,7 @@
                 },
                 {
                   html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
-                  'View<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
+                  'Review<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
                   classes: "govuk-!-text-align-right",
                   attributes: { "data-test": requestIndex + "-action" }
                 }
