@@ -13,10 +13,10 @@ describe('prisonerContactRegistryApiClient', () => {
   beforeEach(() => {
     // nock.disableNetConnect()
 
-    nock.emitter.on('no match', req => {
-      // eslint-disable-next-line no-console
-      console.error('NO MATCH', req)
-    })
+    // nock.emitter.on('no match', req => {
+    //   // eslint-disable-next-line no-console
+    //   console.error('NO MATCH', req)
+    // })
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>

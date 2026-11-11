@@ -35,10 +35,10 @@ import { setFeature } from './testutils/mockFeature'
 
 // nock.disableNetConnect()
 
-nock.emitter.on('no match', req => {
-  // eslint-disable-next-line no-console
-  console.error('NO MATCH', req)
-})
+// nock.emitter.on('no match', req => {
+//   // eslint-disable-next-line no-console
+//   console.error('NO MATCH', req)
+// })
 
 describe('orchestrationApiClient', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>

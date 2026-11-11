@@ -6,10 +6,10 @@ import TestData from '../routes/testutils/testData'
 
 // nock.disableNetConnect()
 
-nock.emitter.on('no match', req => {
-  // eslint-disable-next-line no-console
-  console.error('NO MATCH', req)
-})
+// nock.emitter.on('no match', req => {
+//   // eslint-disable-next-line no-console
+//   console.error('NO MATCH', req)
+// })
 
 describe('incentivesApiClient', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
