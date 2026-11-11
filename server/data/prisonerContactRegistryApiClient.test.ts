@@ -33,6 +33,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const contact = [TestData.contact()]
 
       fakePrisonerContactRegistryApi
+        .replyContentLength()
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
@@ -50,6 +51,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const offenderNo = 'A1234BC'
 
       fakePrisonerContactRegistryApi
+        .replyContentLength()
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
