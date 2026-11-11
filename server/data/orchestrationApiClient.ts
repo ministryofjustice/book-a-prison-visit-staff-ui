@@ -1,4 +1,4 @@
-import { format, subMonths } from 'date-fns'
+import { format, subWeeks } from 'date-fns'
 import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
@@ -765,9 +765,9 @@ export default class OrchestrationApiClient extends RestClient {
     prisonId: string
     prisonerId: string
   }): Promise<VisitOrderHistoryDetailsDto> {
-    // fixed to get past 3 months of VO history
-    const date3MonthsAgo = subMonths(new Date(), 3)
-    const fromDate = format(date3MonthsAgo, 'yyyy-MM-dd')
+    // fixed to get past 16 weeks of VO history
+    const date16WeeksAgo = subWeeks(new Date(), 16)
+    const fromDate = format(date16WeeksAgo, 'yyyy-MM-dd')
 
     return this.get(
       {
