@@ -1,5 +1,5 @@
-import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import nock from 'nock'
 import config from '../config'
 import TestData from '../routes/testutils/testData'
 import OrchestrationApiClient from './orchestrationApiClient'
@@ -33,6 +33,13 @@ import {
 import { Prison, VisitSessionData } from '../@types/bapv'
 import { setFeature } from './testutils/mockFeature'
 
+// nock.disableNetConnect()
+
+nock.emitter.on('no match', req => {
+  // eslint-disable-next-line no-console
+  console.error('NO MATCH', req)
+})
+
 describe('orchestrationApiClient', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeOrchestrationApi: nock.Scope
@@ -51,6 +58,15 @@ describe('orchestrationApiClient', () => {
   })
 
   afterEach(() => {
+    const pending = nock.pendingMocks()
+
+    if (pending.length) {
+      // eslint-disable-next-line no-console
+      console.error('Pending mocks:', pending)
+    }
+
+    expect(pending).toHaveLength(0)
+
     if (!nock.isDone()) {
       nock.cleanAll()
       throw new Error('Not all nock interceptors were used!')
