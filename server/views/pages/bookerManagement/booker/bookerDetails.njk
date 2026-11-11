@@ -164,7 +164,7 @@
             },
             { html: '<span class="govuk-!-display-block">Visitor name</span> <span class="govuk-!-display-block">(opens in new tab)</span>' },
             { text: "Visitor’s date of birth" },
-            { text: "Action" }
+            ({ text: "Action"} if active)
           ],
           rows: prisonerRowItems
         }) if prisonerRowItems | length }}
