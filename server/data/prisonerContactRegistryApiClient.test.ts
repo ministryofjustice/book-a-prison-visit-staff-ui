@@ -14,7 +14,7 @@ describe('prisonerContactRegistryApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
+    fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url).replyContentLength()
     prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(mockAuthenticationClient)
   })
 

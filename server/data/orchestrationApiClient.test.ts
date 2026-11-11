@@ -46,7 +46,7 @@ describe('orchestrationApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakeOrchestrationApi = nock(config.apis.orchestration.url)
+    fakeOrchestrationApi = nock(config.apis.orchestration.url).replyContentLength()
     orchestrationApiClient = new OrchestrationApiClient(mockAuthenticationClient)
   })
 

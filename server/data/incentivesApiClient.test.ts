@@ -16,7 +16,7 @@ describe('incentivesApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakeIncentivesApi = nock(config.apis.incentives.url)
+    fakeIncentivesApi = nock(config.apis.incentives.url).replyContentLength()
     incentivesApiClient = new IncentivesApiClient(mockAuthenticationClient)
   })
 

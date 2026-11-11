@@ -16,7 +16,7 @@ describe('prisonSearchClientBuilder', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
+    fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url).replyContentLength()
     prisonerSearchClient = new PrisonerSearchClient(mockAuthenticationClient)
   })
 
