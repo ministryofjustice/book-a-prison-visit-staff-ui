@@ -16,7 +16,7 @@ describe('incentivesApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakeIncentivesApi = nock(config.apis.incentives.url).replyContentLength()
+    fakeIncentivesApi = nock(config.apis.incentives.url)
     incentivesApiClient = new IncentivesApiClient(mockAuthenticationClient)
   })
 
@@ -33,6 +33,7 @@ describe('incentivesApiClient', () => {
     it('should return data from api', async () => {
       const results = [TestData.prisonIncentiveLevel()]
       fakeIncentivesApi
+        .replyContentLength()
         .get(`/incentive/prison-levels/${prisonId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)

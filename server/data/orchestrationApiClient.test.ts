@@ -46,7 +46,7 @@ describe('orchestrationApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakeOrchestrationApi = nock(config.apis.orchestration.url).replyContentLength()
+    fakeOrchestrationApi = nock(config.apis.orchestration.url)
     orchestrationApiClient = new OrchestrationApiClient(mockAuthenticationClient)
   })
 
@@ -159,6 +159,7 @@ describe('orchestrationApiClient', () => {
       const visit = TestData.visit()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/${visit.reference}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visit)
@@ -207,6 +208,7 @@ describe('orchestrationApiClient', () => {
       })
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/${visitBookingDetailsRaw.reference}/detailed`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitBookingDetailsRaw)
@@ -235,6 +237,7 @@ describe('orchestrationApiClient', () => {
       const visitPreviews = [TestData.visitPreview()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visits/session-template')
         .query({
           prisonCode: prisonId,
@@ -261,6 +264,7 @@ describe('orchestrationApiClient', () => {
       const visitPreviews = [TestData.visitPreview()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visits/session-template')
         .query({
           prisonCode: prisonId,
@@ -283,6 +287,7 @@ describe('orchestrationApiClient', () => {
       }
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/search`)
         .query({
           prisonId: 'HEI',
@@ -549,6 +554,7 @@ describe('orchestrationApiClient', () => {
       const bookerReference = 'aaaa-bbbb-cccc'
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/public/booker/${bookerReference}/permitted/prisoners/${prisonerId}/permitted/visitors`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitors)
@@ -601,6 +607,7 @@ describe('orchestrationApiClient', () => {
       const visitorRequestForReview = TestData.visitorRequestForReview()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visitor-requests/${visitorRequestForReview.reference}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequestForReview)
@@ -617,6 +624,7 @@ describe('orchestrationApiClient', () => {
       const { reference } = booker
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/public/booker/${reference}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, booker)
@@ -633,6 +641,7 @@ describe('orchestrationApiClient', () => {
       const socialContacts = [TestData.socialContact()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/public/booker/${reference}/prisoners/${prisonerId}/social-contacts`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, socialContacts)
@@ -712,6 +721,7 @@ describe('orchestrationApiClient', () => {
       const bookerVisitorRequests = [TestData.bookerPrisonerVisitorRequest()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/public/booker/${bookerReference}/permitted/visitors/requests`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, bookerVisitorRequests)
@@ -726,6 +736,7 @@ describe('orchestrationApiClient', () => {
       const visitorRequestListEntries = [TestData.visitorRequestListEntry()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/prison/${prisonId}/visitor-requests`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitorRequestListEntries)
@@ -740,6 +751,7 @@ describe('orchestrationApiClient', () => {
       const count = 2
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/prison/${prisonId}/visitor-requests/count`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
@@ -777,6 +789,7 @@ describe('orchestrationApiClient', () => {
       const { enabledRawNotifications } = config.features.notificationTypes
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/notification/${prisonId}/count`)
         .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
@@ -815,6 +828,7 @@ describe('orchestrationApiClient', () => {
       ]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/notification/${prisonId}/visits`)
         .query(new URLSearchParams({ types: enabledRawNotifications.toString() }))
         .matchHeader('authorization', `Bearer ${token}`)
@@ -869,6 +883,7 @@ describe('orchestrationApiClient', () => {
       const results = TestData.prisonAndSessionsExcludeDatesDto()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/v2/prisons/${prisonId}/config/exclude-dates/future`)
         .query(new URLSearchParams({ includeSessions: 'true' }).toString())
         .matchHeader('authorization', `Bearer ${token}`)
@@ -889,6 +904,7 @@ describe('orchestrationApiClient', () => {
       const excludedDate = '2024-12-12'
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/config/prisons/prison/${prisonId}/exclude-date/${excludedDate}/isExcluded`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -979,6 +995,7 @@ describe('orchestrationApiClient', () => {
       const visitRequests = [TestData.visitRequestSummary()]
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/requests/${prisonId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, visitRequests)
@@ -994,6 +1011,7 @@ describe('orchestrationApiClient', () => {
       const count = 1
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/visits/requests/${prisonId}/count`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, { count })
@@ -1010,6 +1028,7 @@ describe('orchestrationApiClient', () => {
 
       const sessionDate = results.startTimestamp.split('T')[0]
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions/session')
         .query({
           prisonCode: results.prisonId,
@@ -1036,6 +1055,7 @@ describe('orchestrationApiClient', () => {
       const includeExcludedSessions = false
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions/schedule')
         .query({ prisonId, date, includeExcludedSessions })
         .matchHeader('authorization', `Bearer ${token}`)
@@ -1060,6 +1080,7 @@ describe('orchestrationApiClient', () => {
       const sessionCapacity = TestData.sessionCapacity()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions/capacity')
         .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
         .matchHeader('authorization', `Bearer ${token}`)
@@ -1077,6 +1098,7 @@ describe('orchestrationApiClient', () => {
 
     it('should return null if session capacity not available (404 from API)', async () => {
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions/capacity')
         .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
         .matchHeader('authorization', `Bearer ${token}`)
@@ -1095,6 +1117,7 @@ describe('orchestrationApiClient', () => {
     // API returns 500 IllegalStateException if multiple capacities found for specified date & times
     it('should return null if error retrieving session capacity (500 from API)', async () => {
       fakeOrchestrationApi
+        .replyContentLength()
         .persist() // required because 500 causes server/data/restClient.ts to retry but the mock has been consumed
         .get('/visit-sessions/capacity')
         .query({ prisonId, sessionDate, sessionStartTime, sessionEndTime })
@@ -1118,6 +1141,7 @@ describe('orchestrationApiClient', () => {
 
     it('should return array of visit sessions and events for specified prisoner (with youngest visitor age null)', async () => {
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions-and-schedule')
         .query(
           new URLSearchParams({
@@ -1144,6 +1168,7 @@ describe('orchestrationApiClient', () => {
 
     it('should return array of visit sessions and events for specified prisoner (with youngest visitor age provided)', async () => {
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/visit-sessions-and-schedule')
         .query(
           new URLSearchParams({
@@ -1174,6 +1199,7 @@ describe('orchestrationApiClient', () => {
       const prisonerVoBalance = TestData.prisonerVoBalance()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/balance`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisonerVoBalance)
@@ -1210,6 +1236,7 @@ describe('orchestrationApiClient', () => {
       const visitOrderHistoryDetailsDto = TestData.visitOrderHistoryDetailsDto()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/prison/${prisonId}/prisoners/${prisonerId}/visit-orders/history`)
         .query({
           fromDate: fakeDateMinus16Weeks,
@@ -1269,6 +1296,7 @@ describe('orchestrationApiClient', () => {
       const prisonerProfile = TestData.prisonerProfile()
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/prisoner/${prisonId}/${prisonerProfile.prisonerId}/profile`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisonerProfile)
@@ -1284,6 +1312,7 @@ describe('orchestrationApiClient', () => {
       const results = ['HEI', 'BLI']
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get('/config/prisons/user-type/STAFF/supported')
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, results)
@@ -1300,6 +1329,7 @@ describe('orchestrationApiClient', () => {
       const expectedPrison = { prisonId: 'HEI', prisonName: 'Hewell (HMP)' } as Prison
 
       fakeOrchestrationApi
+        .replyContentLength()
         .get(`/config/prisons/prison/${prisonId}`)
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, receivedPrisonDto)

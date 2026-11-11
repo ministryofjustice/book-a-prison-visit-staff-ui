@@ -14,7 +14,7 @@ describe('prisonerContactRegistryApiClient', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url).replyContentLength()
+    fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
     prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(mockAuthenticationClient)
   })
 
@@ -33,6 +33,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const contact = [TestData.contact()]
 
       fakePrisonerContactRegistryApi
+        .replyContentLength()
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
@@ -50,6 +51,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const offenderNo = 'A1234BC'
 
       fakePrisonerContactRegistryApi
+        .replyContentLength()
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',

@@ -16,7 +16,7 @@ describe('prisonSearchClientBuilder', () => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url).replyContentLength()
+    fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
     prisonerSearchClient = new PrisonerSearchClient(mockAuthenticationClient)
   })
 
@@ -44,6 +44,7 @@ describe('prisonSearchClientBuilder', () => {
         ],
       }
       fakePrisonerSearchApi
+        .replyContentLength()
         .get('/prison/HEI/prisoners')
         .query({
           term: 'test',
@@ -64,6 +65,7 @@ describe('prisonSearchClientBuilder', () => {
       const prisoner = TestData.prisoner()
 
       fakePrisonerSearchApi
+        .replyContentLength()
         .get('/prisoner/A1234BC')
         .matchHeader('authorization', `Bearer ${token}`)
         .reply(200, prisoner)
