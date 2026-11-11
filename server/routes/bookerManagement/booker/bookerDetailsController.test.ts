@@ -74,43 +74,30 @@ describe('Booker management - booker details', () => {
           expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
 
           // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe(
-            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-          )
-          expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
-          expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
-          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
-
-          const $linkElement = $('[data-test="visitor-1-contact-link"]')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
+          const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
           testScreenReaderAndVisibleOnlyText(
             $linkElement,
             'View contact details for Jeanette Smith (opens in a new tab)',
-            'View contact',
+            'Jeanette Smith',
           )
           expect($linkElement.find('a').attr('href')).toBe(
             'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
           )
-
-          testScreenReaderAndVisibleOnlyText(
-            $('[data-test=prisoner-1-visitor-1-unlink]'),
-            'Unlink Jeanette Smith',
-            'Unlink',
-          )
+          expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
-
-          // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
-          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-1-visitor-1-unlink]'),
+            'Unlink visitor Jeanette Smith',
+            'Unlink visitor',
           )
-
           // Visitor requests
           expect($('[data-test=prisoner-1-visitor-request-1-name]').text()).toBe('Mike Jones')
           expect($('[data-test=prisoner-1-visitor-request-1-requested-date]').text()).toBe('10/12/2025')
           expect($('[data-test=prisoner-1-visitor-request-1-action]').text()).toBe(
-            'View request to add Mike Jones as a visitor',
+            'Review request to add Mike Jones as a visitor',
           )
           expect($('[data-test=prisoner-1-visitor-request-1-action] a').attr('href')).toBe(
             `/manage-bookers/visitor-request/${visitorRequest.reference}/link-visitor?from=booker-details`,
@@ -185,43 +172,48 @@ describe('Booker management - booker details', () => {
           const $ = cheerio.load(res.text)
 
           // Prisoner #1
-          // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe(
-            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toBe('A1234BC')
+          const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement,
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'Jeanette Smith',
           )
-          expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
-          expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
+          expect($linkElement.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
+          )
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
-          // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
-          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-1-visitor-1-unlink]'),
+            'Unlink visitor Jeanette Smith',
+            'Unlink visitor',
           )
-
-          // Visitor requests
-          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(1)
 
           // Prisoner #2
-          // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text().trim()).toBe(
-            'Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)',
+          expect($('[data-test=prisoner-2-prisoner-name]').text()).toBe('Smith, Fred')
+          expect($('[data-test=prisoner-2-prison-number]').text()).toBe('B4567DE')
+          const $linkElement2 = $('[data-test="prisoner-2-visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement2,
+            'View contact details for Alice Smith (opens in a new tab)',
+            'Alice Smith',
           )
-          expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
-          expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
+          expect($linkElement2.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/B4567DE/contacts/manage/4322/relationship/12345678',
+          )
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
-          // Link visitor
-          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
-          expect($('[data-test=prisoner-2-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/link-visitor',
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-2-visitor-1-unlink]'),
+            'Unlink visitor Alice Smith',
+            'Unlink visitor',
           )
-          // Visitor requests
-          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(1)
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             reference: booker.reference,
@@ -266,38 +258,51 @@ describe('Booker management - booker details', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
 
+          // Booker details
+          expect($('[data-test=booker-email]').text()).toBe(booker.email)
+          expect($('[data-test=booker-reference]').text()).toBe(booker.reference)
+
           // Prisoner #1
-          // Prisoner and visitors
-          expect($('[data-test=prisoner-1]').text().trim()).toBe(
-            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toBe('A1234BC')
+          const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement,
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'Jeanette Smith',
           )
-          expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
-          expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
+          expect($linkElement.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/A1234BC/contacts/manage/4321/relationship/12345678',
+          )
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
           expect($('[data-test=prisoner-1-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/visitor/4321/unlink',
           )
-          // Link visitor
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor for John Smith')
-          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-1-visitor-1-unlink]'),
+            'Unlink visitor Jeanette Smith',
+            'Unlink visitor',
           )
 
           // Prisoner #2
-          // Prisoner and visitors
-          expect($('[data-test=prisoner-2]').text().trim()).toBe(
-            'Visitors linked to Fred Smith (B4567DE) at Bristol (HMP)',
+          expect($('[data-test=prisoner-2-prisoner-name]').text()).toBe('Smith, Fred')
+          const $linkElement2 = $('[data-test="prisoner-2-visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement2,
+            'View contact details for Alice Smith (opens in a new tab)',
+            'Alice Smith',
           )
-          expect($('[data-test=prisoner-2-visitor-1-name]').text()).toBe('Alice Smith')
-          expect($('[data-test=prisoner-2-visitor-1-relationship]').text()).toBe('Wife')
+          expect($linkElement2.find('a').attr('href')).toBe(
+            'https://contacts-dev.hmpps.service.justice.gov.uk/prisoner/B4567DE/contacts/manage/4322/relationship/12345678',
+          )
           expect($('[data-test=prisoner-2-visitor-1-dob]').text()).toBe('23 July 1990 (35 years old)')
           expect($('[data-test=prisoner-2-visitor-1-unlink]').parent('form').attr('action')).toBe(
             '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/visitor/4322/unlink',
           )
-          // Link visitor
-          expect($('[data-test=prisoner-2-link-visitor]').text().trim()).toBe('Link a visitor for Fred Smith')
-          expect($('[data-test=prisoner-2-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/B4567DE/link-visitor',
+          testScreenReaderAndVisibleOnlyText(
+            $('[data-test=prisoner-2-visitor-1-unlink]'),
+            'Unlink visitor Alice Smith',
+            'Unlink visitor',
           )
         })
     })
@@ -337,15 +342,10 @@ describe('Booker management - booker details', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           // Prisoner and no visitors message
-          expect($('[data-test=prisoner-1]').text().trim()).toBe(
-            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-          )
-          expect($('[data-test=prisoner-1-no-visitors]').text()).toContain('no linked visitors')
-
-          expect($('[data-test=prisoner-1-link-visitor]').text().trim()).toBe('Link a visitor')
-          expect($('[data-test=prisoner-1-link-visitor]').attr('href')).toBe(
-            '/manage-bookers/aaaa-bbbb-cccc/prisoner/A1234BC/link-visitor',
-          )
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toContain('Smith, John')
+          expect($('[data-test=prisoner-1-prison-number]').text()).toContain('A1234BC')
+          expect($('[data-test=prisoner-1-no-linked-visitors]').text()).toContain('No linked visitors')
+          expect($('[data-test=no-visitor-requests]').text()).toContain('There are no requests to link visitors.')
         })
     })
 
@@ -383,12 +383,14 @@ describe('Booker management - booker details', () => {
           expect($('.moj-alert').text()).toContain('This account is inactive')
 
           // Prisoner and visitors (with no 'Unlink' action)
-          expect($('[data-test=prisoner-1]').text().trim()).toBe(
-            'Visitors linked to John Smith (A1234BC) at Hewell (HMP)',
-          )
-          expect($('[data-test=prisoner-1-visitor-1-name]').text()).toBe('Jeanette Smith')
-          expect($('[data-test=prisoner-1-visitor-1-relationship]').text()).toBe('Wife')
+          expect($('[data-test=prisoner-1-prisoner-name]').text()).toBe('Smith, John')
           expect($('[data-test=prisoner-1-visitor-1-dob]').text()).toBe('28 July 1986 (39 years old)')
+          const $linkElement = $('[data-test="prisoner-1-visitor-1-contact-link"]')
+          testScreenReaderAndVisibleOnlyText(
+            $linkElement,
+            'View contact details for Jeanette Smith (opens in a new tab)',
+            'Jeanette Smith',
+          )
           expect($('[data-test=prisoner-1-visitor-1-action]').length).toBe(0)
 
           // Link visitor - no button

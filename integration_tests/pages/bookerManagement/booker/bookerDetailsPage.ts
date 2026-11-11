@@ -6,20 +6,25 @@ export default class BookerDetailsPage extends AbstractPage {
 
   readonly bookerReference: Locator
 
+  readonly linkVisitorButton: Locator
+
   constructor(page: Page) {
     super(page, 'Booker details')
 
     this.bookerEmail = page.getByTestId('booker-email')
     this.bookerReference = page.getByTestId('booker-reference')
+    this.linkVisitorButton = page.getByTestId('link-visitor')
   }
 
-  prisonerHeading = (index: number): Locator => this.page.getByTestId(`prisoner-${index}`)
+  prisonerName = (prisonerIndex: number): Locator => this.page.getByTestId(`prisoner-${prisonerIndex}-prisoner-name`)
+
+  prisonNumber = (prisonerIndex: number): Locator => this.page.getByTestId(`prisoner-${prisonerIndex}-prison-number`)
 
   prisonerVisitorName = (prisonerIndex: number, visitorIndex: number): Locator =>
-    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-name`)
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-contact-link`)
 
-  linkPrisonerVisitor = (prisonerIndex: number): Locator =>
-    this.page.getByTestId(`prisoner-${prisonerIndex}-link-visitor`)
+  prisonerVisitorDob = (prisonerIndex: number, visitorIndex: number): Locator =>
+    this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-dob`)
 
   unlinkPrisonerVisitor = (prisonerIndex: number, visitorIndex: number): Locator =>
     this.page.getByTestId(`prisoner-${prisonerIndex}-visitor-${visitorIndex}-unlink`)
