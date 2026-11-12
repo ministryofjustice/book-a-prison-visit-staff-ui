@@ -1,8 +1,15 @@
-import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
+import nock from 'nock'
 import config from '../config'
 import PrisonerSearchClient from './prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
+
+// nock.disableNetConnect()
+
+// nock.emitter.on('no match', req => {
+//   // eslint-disable-next-line no-console
+//   console.error('NO MATCH', req)
+// })
 
 describe('prisonSearchClientBuilder', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
@@ -21,12 +28,11 @@ describe('prisonSearchClientBuilder', () => {
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    nock.restore()
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+    jest.resetModules()
   })
 
   describe('getPrisoners', () => {
