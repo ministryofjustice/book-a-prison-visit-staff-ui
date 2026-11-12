@@ -57,6 +57,8 @@ describe('orchestrationApiClient', () => {
     }
     nock.abortPendingRequests()
     nock.cleanAll()
+    nock.restore()
+    nock.activate()
   })
 
   describe('bookVisit', () => {

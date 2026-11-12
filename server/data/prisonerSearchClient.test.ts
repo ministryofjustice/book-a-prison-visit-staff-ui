@@ -27,6 +27,8 @@ describe('prisonSearchClientBuilder', () => {
     }
     nock.abortPendingRequests()
     nock.cleanAll()
+    nock.restore()
+    nock.activate()
   })
 
   describe('getPrisoners', () => {
