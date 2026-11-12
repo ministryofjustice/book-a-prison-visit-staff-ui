@@ -7,21 +7,17 @@ import { EventEmitter } from 'events'
 // which adds socket listeners during test execution
 EventEmitter.defaultMaxListeners = 0
 
-// Suppress unhandled socket errors from @mswjs/interceptors in nock v15
-// These are expected during test suite teardown and shouldn't crash Jest
-const uncaughtExceptionHandler = (err: Error) => {
-  // Ignore ECONNRESET from socket cleanup in nock v15's @mswjs/interceptors
-  if ((err as NodeJS.ErrnoException)?.code === 'ECONNRESET' && err?.message?.includes('connect')) {
-    // Silently ignore - this is expected from socket cleanup
+// Add a catch-all error handler for sockets to prevent uncaught errors during cleanup
+// This is needed when running with runInBand where all tests share one process
+process.on('uncaughtException', (err: Error) => {
+  const errno = (err as NodeJS.ErrnoException)?.code
+  const isNockSocketError = errno === 'ECONNRESET' && err?.message?.includes('connect')
+
+  if (isNockSocketError) {
+    // Silently ignore - expected from @mswjs/interceptors cleanup in nock v15
+    // This happens during process teardown after tests complete
     return
   }
-  // Re-throw other errors
+
   throw err
-}
-
-process.on('uncaughtException', uncaughtExceptionHandler)
-
-// Cleanup listener when tests complete
-afterAll(() => {
-  process.removeListener('uncaughtException', uncaughtExceptionHandler)
 })
