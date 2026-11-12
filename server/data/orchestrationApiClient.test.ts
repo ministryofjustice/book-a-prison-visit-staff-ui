@@ -1,4 +1,3 @@
-import { describe, it, beforeEach, afterEach, expect } from '@jest/globals'
 import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
