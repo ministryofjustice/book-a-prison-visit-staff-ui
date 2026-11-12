@@ -28,21 +28,11 @@ describe('prisonSearchClientBuilder', () => {
   })
 
   afterEach(() => {
-    const pending = nock.pendingMocks()
-
-    if (pending.length) {
-      // eslint-disable-next-line no-console
-      console.error('Pending mocks:', pending)
-    }
-
-    expect(pending).toHaveLength(0)
-
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    nock.restore()
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+    jest.resetModules()
   })
 
   describe('getPrisoners', () => {

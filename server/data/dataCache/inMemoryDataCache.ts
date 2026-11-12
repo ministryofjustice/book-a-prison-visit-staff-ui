@@ -1,7 +1,7 @@
 import { DataCache } from './dataCache'
 
 export default class InMemoryDataCache implements DataCache {
-  map = new Map<string, { data: string; expiry: Date }>()
+  private map = new Map<string, { data: string; expiry: Date }>()
 
   public async set<DataType>(key: string, data: DataType, durationSeconds: number): Promise<void> {
     this.map.set(key, { data: JSON.stringify(data), expiry: new Date(Date.now() + durationSeconds * 1000) })
