@@ -1,3 +1,4 @@
+import './testutils/nockSetup'
 import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
