@@ -1,13 +1,10 @@
 import nock from 'nock'
-import { EventEmitter } from 'events'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import PrisonerSearchClient from './prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
 
 describe('prisonSearchClientBuilder', () => {
-  // Increase max listeners for nock v15 with @mswjs/interceptors
-  EventEmitter.setMaxListeners(20)
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakePrisonerSearchApi: nock.Scope
   let prisonerSearchClient: PrisonerSearchClient
