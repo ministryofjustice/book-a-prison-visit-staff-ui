@@ -22,7 +22,7 @@
     "lint-fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:ci": "NODE_OPTIONS='--experimental-vm-modules' jest --runInBand --coverage",
+    "test:ci": "NODE_OPTIONS='--experimental-vm-modules' jest --runInBand",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "npx playwright test",
     "int-test-ui": "npx playwright test --ui",
