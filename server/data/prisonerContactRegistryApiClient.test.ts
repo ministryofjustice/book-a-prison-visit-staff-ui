@@ -19,14 +19,8 @@ describe('prisonerContactRegistryApiClient', () => {
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
-    nock.restore()
-    nock.activate()
+    jest.resetAllMocks()
   })
 
   describe('getPrisonersApprovedSocialContacts', () => {
