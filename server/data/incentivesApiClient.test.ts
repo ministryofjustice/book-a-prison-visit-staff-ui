@@ -1,10 +1,13 @@
 import nock from 'nock'
+import { EventEmitter } from 'events'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import IncentivesApiClient from './incentivesApiClient'
 import TestData from '../routes/testutils/testData'
 
 describe('incentivesApiClient', () => {
+  // Increase max listeners for nock v15 with @mswjs/interceptors
+  EventEmitter.setMaxListeners(20)
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeIncentivesApi: nock.Scope
   let incentivesApiClient: IncentivesApiClient
@@ -27,8 +30,6 @@ describe('incentivesApiClient', () => {
     }
     nock.abortPendingRequests()
     nock.cleanAll()
-    nock.restore()
-    nock.activate()
   })
 
   describe('getPrisonIncentiveLevels', () => {

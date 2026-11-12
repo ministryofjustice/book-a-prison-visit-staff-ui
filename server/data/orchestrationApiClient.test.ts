@@ -1,4 +1,5 @@
 import nock from 'nock'
+import { EventEmitter } from 'events'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import TestData from '../routes/testutils/testData'
@@ -34,6 +35,8 @@ import { Prison, VisitSessionData } from '../@types/bapv'
 import { setFeature } from './testutils/mockFeature'
 
 describe('orchestrationApiClient', () => {
+  // Increase max listeners for nock v15 with @mswjs/interceptors
+  EventEmitter.setMaxListeners(20)
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeOrchestrationApi: nock.Scope
   let orchestrationApiClient: OrchestrationApiClient
@@ -57,8 +60,6 @@ describe('orchestrationApiClient', () => {
     }
     nock.abortPendingRequests()
     nock.cleanAll()
-    nock.restore()
-    nock.activate()
   })
 
   describe('bookVisit', () => {
