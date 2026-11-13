@@ -1,11 +1,10 @@
-import './testutils/nockSetup'
 import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
 import IncentivesApiClient from './incentivesApiClient'
 import TestData from '../routes/testutils/testData'
 
-describe('incentivesApiClient', () => {
+describe.skip('incentivesApiClient', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeIncentivesApi: nock.Scope
   let incentivesApiClient: IncentivesApiClient

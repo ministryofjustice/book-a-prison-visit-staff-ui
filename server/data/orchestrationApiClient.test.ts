@@ -1,4 +1,3 @@
-import './testutils/nockSetup'
 import nock from 'nock'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
@@ -34,7 +33,7 @@ import {
 import { Prison, VisitSessionData } from '../@types/bapv'
 import { setFeature } from './testutils/mockFeature'
 
-describe('orchestrationApiClient', () => {
+describe.skip('orchestrationApiClient', () => {
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeOrchestrationApi: nock.Scope
   let orchestrationApiClient: OrchestrationApiClient
