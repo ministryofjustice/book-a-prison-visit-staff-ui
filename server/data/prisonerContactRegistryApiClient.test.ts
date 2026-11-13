@@ -4,27 +4,21 @@ import config from '../config'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import TestData from '../routes/testutils/testData'
 
-describe('prisonerContactRegistryApiClient', () => {
-  let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
-  let fakePrisonerContactRegistryApi: nock.Scope
+describe('PrisonerContactRegistryApiClient', () => {
   let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
-  const token = 'token-1'
+  let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
 
   beforeEach(() => {
     mockAuthenticationClient = {
-      getToken: jest.fn().mockResolvedValue(token),
+      getToken: jest.fn().mockResolvedValue('test-system-token'),
     } as unknown as jest.Mocked<AuthenticationClient>
-    fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
+
     prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(mockAuthenticationClient)
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    jest.resetAllMocks()
   })
 
   describe('getPrisonersApprovedSocialContacts', () => {
@@ -32,35 +26,37 @@ describe('prisonerContactRegistryApiClient', () => {
       const offenderNo = 'A1234BC'
       const contact = [TestData.contact()]
 
-      fakePrisonerContactRegistryApi
+      nock(config.apis.prisonerContactRegistry.url)
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
           withRestrictions: 'true',
         })
-        .matchHeader('authorization', `Bearer ${token}`)
+        .matchHeader('authorization', 'Bearer test-system-token')
         .reply(200, contact)
 
-      const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
+      const response = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
-      expect(output).toStrictEqual(contact)
+      expect(response).toStrictEqual(contact)
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
 
     it('should return an empty array if prisoner not found', async () => {
       const offenderNo = 'A1234BC'
 
-      fakePrisonerContactRegistryApi
+      nock(config.apis.prisonerContactRegistry.url)
         .get(`/v2/prisoners/${offenderNo}/contacts/social/approved`)
         .query({
           hasDateOfBirth: 'false',
           withRestrictions: 'true',
         })
-        .matchHeader('authorization', `Bearer ${token}`)
+        .matchHeader('authorization', 'Bearer test-system-token')
         .reply(404)
 
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual([])
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
   })
 })
