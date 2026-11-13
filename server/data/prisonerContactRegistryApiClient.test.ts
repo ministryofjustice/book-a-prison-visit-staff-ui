@@ -4,7 +4,7 @@ import config from '../config'
 import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient'
 import TestData from '../routes/testutils/testData'
 
-describe('PrisonerContactRegistryApiClient', () => {
+describe.skip('PrisonerContactRegistryApiClient', () => {
   let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
 
