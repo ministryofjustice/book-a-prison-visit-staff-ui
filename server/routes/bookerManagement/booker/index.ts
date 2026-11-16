@@ -5,12 +5,14 @@ import BookerDetailsController from './bookerDetailsController'
 import { isValidBookerReference } from '../../validationChecks'
 import UnlinkVisitorController from './unlinkVisitorController'
 import VisitorListController from './visitorListController'
+import PrisonerListController from './prisonerListController'
 import LinkVisitorController from './linkVisitorController'
 
 export default function routes(services: Services): Router {
   const router = Router()
 
   const bookerDetailsController = new BookerDetailsController(services.auditService, services.bookerService)
+  const prisonerListController = new PrisonerListController(services.bookerService)
   const visitorListController = new VisitorListController(services.bookerService)
   const linkVisitorController = new LinkVisitorController(services.auditService, services.bookerService)
   const unlinkVisitorController = new UnlinkVisitorController(services.auditService, services.bookerService)
@@ -27,6 +29,8 @@ export default function routes(services: Services): Router {
   // Booker details
   router.get('/:reference/booker-details', bookerDetailsController.view())
 
+  router.get('/:reference/prisoner', prisonerListController.view())
+  router.post('/:reference/prisoner', prisonerListController.validate(), prisonerListController.submit())
   // Link visitor - visitor list
   router.get('/:reference/prisoner/:prisonerId/link-visitor', visitorListController.view())
   router.post(

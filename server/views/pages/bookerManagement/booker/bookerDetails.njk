@@ -188,13 +188,12 @@
         {% if active %}
           {{ govukButton({
             text: "Link a visitor",
-            href: "/manage-bookers/" + booker.reference + "/prisoner/" + booker.permittedPrisoners[0].prisoner.prisonerNumber + "/link-visitor",
+            href: "/manage-bookers/" + booker.reference + "/prisoner",
             classes: "govuk-!-margin-top-5 govuk-button--primary",
             attributes: { "data-test": "link-visitor" },
             preventDoubleClick: true
             }) }}
         {% endif %}
-
 
       {% else %}
         <p data-test="booker-no-prisoners">This booker has no prisoners.</p>
