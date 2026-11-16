@@ -84,20 +84,20 @@
             ],
             rows: prisonerRows
           }) }}
+          <div class="govuk-radios__divider">or</div>
+
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id="prisoner-none" name="prisonNumber" type="radio" value="none">
+            <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="visitor-none">
+              {%- if atLeastOnePrisoner -%}
+                None of the above
+              {%- else -%}
+                None
+              {%- endif -%}
+            </label>
+          </div>
         </div>
 
-        <div class="govuk-radios__divider">or</div>
-
-        <div class="govuk-radios__item">
-          <input class="govuk-radios__input" id="prisoner-none" name="prisonNumber" type="radio" value="none">
-          <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="visitor-none">
-            {%- if atLeastOnePrisoner -%}
-              None of the above
-            {%- else -%}
-              None
-            {%- endif -%}
-          </label>
-        </div>
 
         {{ govukButton({
           text: "Continue",
