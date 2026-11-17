@@ -5,26 +5,29 @@ import PrisonerContactRegistryApiClient from './prisonerContactRegistryApiClient
 import TestData from '../routes/testutils/testData'
 
 describe('prisonerContactRegistryApiClient', () => {
+  let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakePrisonerContactRegistryApi: nock.Scope
-  let prisonerContactRegistryApiClient: PrisonerContactRegistryApiClient
-  const token = 'token-1'
+
+  const token = 'test-system-client'
 
   beforeEach(() => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
+
     fakePrisonerContactRegistryApi = nock(config.apis.prisonerContactRegistry.url)
+
     prisonerContactRegistryApiClient = new PrisonerContactRegistryApiClient(mockAuthenticationClient)
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    jest.resetAllMocks()
+  })
+
+  afterAll(() => {
+    nock.restore()
   })
 
   describe('getPrisonersApprovedSocialContacts', () => {
@@ -44,6 +47,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual(contact)
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
 
     it('should return an empty array if prisoner not found', async () => {
@@ -61,6 +65,7 @@ describe('prisonerContactRegistryApiClient', () => {
       const output = await prisonerContactRegistryApiClient.getPrisonersApprovedSocialContacts(offenderNo)
 
       expect(output).toStrictEqual([])
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
   })
 })
