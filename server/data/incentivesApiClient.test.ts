@@ -5,28 +5,30 @@ import IncentivesApiClient from './incentivesApiClient'
 import TestData from '../routes/testutils/testData'
 
 describe('incentivesApiClient', () => {
+  let incentivesApiClient: IncentivesApiClient
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakeIncentivesApi: nock.Scope
-  let incentivesApiClient: IncentivesApiClient
 
+  const token = 'test-system-client'
   const prisonId = 'HEI'
-  const token = 'token-1'
 
   beforeEach(() => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
+
     fakeIncentivesApi = nock(config.apis.incentives.url)
+
     incentivesApiClient = new IncentivesApiClient(mockAuthenticationClient)
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    jest.resetAllMocks()
+  })
+
+  afterAll(() => {
+    nock.restore()
   })
 
   describe('getPrisonIncentiveLevels', () => {
@@ -40,6 +42,7 @@ describe('incentivesApiClient', () => {
       const output = await incentivesApiClient.getPrisonIncentiveLevels(prisonId)
 
       expect(output).toEqual(results)
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
   })
 })
