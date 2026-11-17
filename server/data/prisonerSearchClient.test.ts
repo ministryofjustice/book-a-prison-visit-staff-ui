@@ -5,28 +5,30 @@ import PrisonerSearchClient from './prisonerSearchClient'
 import TestData from '../routes/testutils/testData'
 
 describe('prisonSearchClientBuilder', () => {
+  let prisonerSearchClient: PrisonerSearchClient
   let mockAuthenticationClient: jest.Mocked<AuthenticationClient>
   let fakePrisonerSearchApi: nock.Scope
-  let prisonerSearchClient: PrisonerSearchClient
 
+  const token = 'test-system-client'
   const prisonId = 'HEI'
-  const token = 'token-1'
 
   beforeEach(() => {
     mockAuthenticationClient = {
       getToken: jest.fn().mockResolvedValue(token),
     } as unknown as jest.Mocked<AuthenticationClient>
+
     fakePrisonerSearchApi = nock(config.apis.prisonerSearch.url)
+
     prisonerSearchClient = new PrisonerSearchClient(mockAuthenticationClient)
   })
 
   afterEach(() => {
-    if (!nock.isDone()) {
-      nock.cleanAll()
-      throw new Error('Not all nock interceptors were used!')
-    }
-    nock.abortPendingRequests()
     nock.cleanAll()
+    jest.resetAllMocks()
+  })
+
+  afterAll(() => {
+    nock.restore()
   })
 
   describe('getPrisoners', () => {
@@ -56,6 +58,7 @@ describe('prisonSearchClientBuilder', () => {
       const output = await prisonerSearchClient.getPrisoners('test', prisonId)
 
       expect(output).toEqual(results)
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -71,6 +74,7 @@ describe('prisonSearchClientBuilder', () => {
       const output = await prisonerSearchClient.getPrisonerById('A1234BC')
 
       expect(output).toEqual(prisoner)
+      expect(mockAuthenticationClient.getToken).toHaveBeenCalledTimes(1)
     })
   })
 })
