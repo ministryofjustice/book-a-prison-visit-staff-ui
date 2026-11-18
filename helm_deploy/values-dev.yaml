@@ -23,6 +23,7 @@ generic-service:
     DPS_CONTACTS_URL: "https://contacts-dev.hmpps.service.justice.gov.uk"
     DPS_INCENTIVES_URL: "https://incentives-ui-dev.hmpps.service.justice.gov.uk/"
     ENVIRONMENT_NAME: dev
+    LOG_LEVEL: "debug"
 
     DATA_CACHE_PRISON_TTL_SECS: "30"
 
