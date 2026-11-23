@@ -2,12 +2,12 @@ import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
 import { BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
-import { BookerPrisonerParams } from '../../../@types/requestTypes'
+import { BookerParams } from '../../../@types/requestTypes'
 
 export default class PrisonerListController {
   public constructor(private readonly bookerService: BookerService) {}
 
-  public view(): RequestHandler<BookerPrisonerParams> {
+  public view(): RequestHandler<BookerParams> {
     return async (req, res) => {
       const { reference } = req.params
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
@@ -25,7 +25,7 @@ export default class PrisonerListController {
     }
   }
 
-  public submit(): RequestHandler<BookerPrisonerParams> {
+  public submit(): RequestHandler<BookerParams> {
     return async (req, res) => {
       const { reference } = req.params
 

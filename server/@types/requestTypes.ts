@@ -1,6 +1,10 @@
 import type { ParamsDictionary } from 'express-serve-static-core'
 import type { Prison } from './bapv'
 
+export interface BookerParams extends ParamsDictionary {
+  reference: string
+}
+
 export interface BookerPrisonerParams extends ParamsDictionary {
   reference: string
   prisonerId: string

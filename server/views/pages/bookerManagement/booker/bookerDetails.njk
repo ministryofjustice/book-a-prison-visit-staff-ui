@@ -81,18 +81,19 @@
               {% set visitorNameCell = {
                 html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
                 </a>',
-                classes: "bapv-vertical-align-middle",
+                classes: "bapv-vertical-align-middle" + (" bapv-remove-td-border" if not loop.last),
                 attributes: { "data-test": visitorIndex +  "-contact-link" }
               } %}
 
               {% set visitorDobCell =  {
                 text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
                 attributes: { "data-test": visitorIndex + "-dob" }
               } %}
 
               {% set visitorUnlinkCell =  ({
                 html: unlinkVisitorHtml,
-                classes: "bapv-vertical-align-middle"
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last)
               } if active) %}
 
               {# Forced to build unique data structure for different rows, due to rowspan #}
@@ -114,7 +115,8 @@
               },
               {
                 text: 'No linked visitors'
-              }
+              },
+              { text: '' }
             ] %}
             {% set prisonerRowItems = (prisonerRowItems.push(prisonerRow), prisonerRowItems) %}
           {% endif %}
@@ -125,30 +127,45 @@
               {% set requestIndex = prisonerIndex + "-visitor-request-" + loop.index %}
               {% set visitorName = request.firstName + " " + request.lastName %}
 
-              {%- set visitorRequestRowItems = (visitorRequestRowItems.push([
-                {
-                  html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + requestIndex + '-prisoner-name">' +
-                  prisonerName +
-                  '</span>' +
-                  '<span class="govuk-!-display-block" data-test="' + requestIndex + '-prison-number">' +
-                  prisonerNumber +
-                  '</span>'
-                },
-                {
-                  text: visitorName,
-                  attributes: { "data-test": requestIndex + "-name" }
-                },
-                {
-                  text: request.requestedOn | formatDate("d/M/yyyy"),
-                  attributes: { "data-test": requestIndex + "-requested-date" }
-                },
-                {
-                  html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
-                  'Review<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
-                  classes: "govuk-!-text-align-right",
-                  attributes: { "data-test": requestIndex + "-action" }
-                }
-              ]), visitorRequestRowItems) %}
+              {% set prisonerRequestNameCell = {
+                html: '<span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="' + requestIndex + '-prisoner-name">' +
+                prisonerName +
+                '</span>' +
+                '<span class="govuk-!-display-block" data-test="' + requestIndex + '-prison-number">' +
+                prisonerNumber +
+                '</span>',
+                rowspan: visitorRequests[prisonerNumber] | length
+              } %}
+
+              {% set visitorNameCell = {
+                text: visitorName,
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
+                attributes: { "data-test": requestIndex + "-name" }
+              } %}
+
+              {% set requestedDateCell = {
+                text: request.requestedOn | formatDate("d/M/yyyy"),
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
+                attributes: { "data-test": requestIndex + "-requested-date" }
+              } %}
+
+              {% set requestReviewCell = {
+                html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
+                'Review<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
+                classes: "govuk-!-text-align-right bapv-vertical-align-middle" + (" bapv-remove-td-border" if not loop.last),
+                attributes: { "data-test": requestIndex + "-action" }
+              } %}
+
+
+              {# Forced to build unique data structure for different rows, due to rowspan #}
+              {%- if loop.first %}
+                {%- set visitorRequestRow = [prisonerRequestNameCell, visitorNameCell, requestedDateCell, requestReviewCell] %}
+              {%- else %}
+                {%- set visitorRequestRow = [visitorNameCell, requestedDateCell, requestReviewCell] %}
+              {%- endif %}
+
+              {%- set visitorRequestRowItems = (visitorRequestRowItems.push(visitorRequestRow), visitorRequestRowItems) %}
+
             {% endfor -%}
 
           {% endif %}
