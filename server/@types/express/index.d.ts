@@ -39,6 +39,9 @@ export declare module 'express-session' {
     // matched booker accounts from an email search (sorted, most recent 'active' account first)
     matchedBookers?: BookerSearchResultsDto[]
 
+    // current selected booker's reference, for validating add visitor journey
+    selectedBooker?: string
+
     // non-linked visitors for linking to a booker's prisoner
     bookerLinkVisitor?: {
       reference: string

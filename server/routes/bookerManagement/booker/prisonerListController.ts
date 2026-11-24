@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 import { body, matchedData, ValidationChain, validationResult } from 'express-validator'
+import { BadRequest } from 'http-errors'
 import { BookerService } from '../../../services'
 import { isValidPrisonerNumber } from '../../validationChecks'
 import { BookerParams } from '../../../@types/requestTypes'
@@ -10,7 +11,12 @@ export default class PrisonerListController {
   public view(): RequestHandler<BookerParams> {
     return async (req, res) => {
       const { reference } = req.params
+      const { selectedBooker } = req.session
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
+
+      if (selectedBooker !== reference) {
+        throw new BadRequest()
+      }
 
       const booker = await this.bookerService.getBookerDetails({ reference })
       const atLeastOnePrisoner = !!booker.permittedPrisoners.length
@@ -28,6 +34,11 @@ export default class PrisonerListController {
   public submit(): RequestHandler<BookerParams> {
     return async (req, res) => {
       const { reference } = req.params
+      const { selectedBooker } = req.session
+
+      if (selectedBooker !== reference) {
+        throw new BadRequest()
+      }
 
       const errors = validationResult(req)
       if (!errors.isEmpty()) {

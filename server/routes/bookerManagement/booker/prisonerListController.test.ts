@@ -65,7 +65,12 @@ describe('Booker management - prisoner list', () => {
       return request(app).get(`/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner`).expect(400)
     })
 
+    it('should reject an incorrect (but valid) booker reference', () => {
+      return request(app).get(`/manage-bookers/zzzz-qqqq-wwww/prisoner`).expect(400)
+    })
+
     it('should render all prisoners linked to booker account', () => {
+      sessionData.selectedBooker = booker.reference
       bookerService.getBookerDetails.mockResolvedValue(booker)
 
       return request(app)
@@ -102,6 +107,7 @@ describe('Booker management - prisoner list', () => {
     })
 
     it('should render validation errors', () => {
+      sessionData.selectedBooker = booker.reference
       const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
       bookerService.getNonLinkedSocialContacts.mockResolvedValue([socialContact])
@@ -130,7 +136,12 @@ describe('Booker management - prisoner list', () => {
       return request(app).post(`/manage-bookers/INVALID-BOOKER-REFERENCE/prisoner`).expect(400)
     })
 
+    it('should reject an incorrect (but valid) booker reference', () => {
+      return request(app).post(`/manage-bookers/zzzz-qqqq-wwww/prisoner`).expect(400)
+    })
+
     it('should redirect to visitor page for selected prisoner', () => {
+      sessionData.selectedBooker = booker.reference
       return request(app)
         .post(url)
         .send({ prisonNumber: 'A1234BC' })
@@ -142,6 +153,7 @@ describe('Booker management - prisoner list', () => {
     })
 
     it('should set validation error if no prisoner selected and redirect to original page', () => {
+      sessionData.selectedBooker = booker.reference
       return request(app)
         .post(url)
         .send({})
