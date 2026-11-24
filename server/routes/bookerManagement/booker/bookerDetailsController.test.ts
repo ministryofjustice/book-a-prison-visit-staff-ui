@@ -121,6 +121,8 @@ describe('Booker management - booker details', () => {
             `/manage-bookers/visitor-request/${visitorRequest2.reference}/link-visitor?from=booker-details`,
           )
 
+          expect($('[data-test=link-visitor]').attr('href')).toBe('/manage-bookers/aaaa-bbbb-cccc/prisoner')
+
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             reference: booker.reference,
           })
