@@ -108,9 +108,7 @@ describe('Booker management - prisoner list', () => {
 
     it('should render validation errors', () => {
       sessionData.selectedBooker = booker.reference
-      const socialContact = TestData.socialContact()
       bookerService.getBookerDetails.mockResolvedValue(booker)
-      bookerService.getNonLinkedSocialContacts.mockResolvedValue([socialContact])
 
       flashData.errors = <FieldValidationError[]>[{ msg: 'Select a prisoner', path: 'prisonNumber' }]
 
