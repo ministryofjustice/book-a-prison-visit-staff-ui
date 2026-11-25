@@ -57,6 +57,10 @@ export default class PrisonerListController {
   }
 
   public validate(): ValidationChain[] {
-    return [body('prisonNumber').isString().withMessage('Select a prisoner')]
+    return [
+      body('prisonNumber')
+        .custom(prisonNumber => isValidPrisonerNumber(prisonNumber))
+        .withMessage('Select a prisoner'),
+    ]
   }
 }

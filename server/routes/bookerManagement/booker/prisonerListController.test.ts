@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 import { SessionData } from 'express-session'
 import { FieldValidationError } from 'express-validator'
 import { appWithAllRoutes, FlashData, flashProvider, user } from '../../testutils/appSetup'
-import { createMockAuditService, createMockBookerService } from '../../../services/testutils/mocks'
+import { createMockBookerService } from '../../../services/testutils/mocks'
 import bapvUserRoles from '../../../constants/bapvUserRoles'
 import TestData from '../../testutils/testData'
 
@@ -12,7 +12,6 @@ let app: Express
 let flashData: FlashData
 let sessionData: SessionData
 
-const auditService = createMockAuditService()
 const bookerService = createMockBookerService()
 
 const prisoner1 = TestData.bookerPrisoner()
@@ -43,7 +42,7 @@ beforeEach(() => {
   sessionData = {} as SessionData
 
   app = appWithAllRoutes({
-    services: { auditService, bookerService },
+    services: { bookerService },
     userSupplier: () => ({ ...user, userRoles: [bapvUserRoles.BOOKER_ADMIN] }),
     sessionData,
   })
@@ -57,7 +56,7 @@ afterEach(() => {
 describe('Booker management - prisoner list', () => {
   describe(`GET ${url}`, () => {
     it('should require booker admin role', () => {
-      app = appWithAllRoutes({ services: { auditService, bookerService } })
+      app = appWithAllRoutes({ services: { bookerService } })
       return request(app).get(url).expect(302).expect('location', '/authError')
     })
 
@@ -126,7 +125,7 @@ describe('Booker management - prisoner list', () => {
 
   describe(`POST ${url}`, () => {
     it('should require booker admin role', () => {
-      app = appWithAllRoutes({ services: { auditService, bookerService } })
+      app = appWithAllRoutes({ services: { bookerService } })
       return request(app).post(url).expect(302).expect('location', '/authError')
     })
 

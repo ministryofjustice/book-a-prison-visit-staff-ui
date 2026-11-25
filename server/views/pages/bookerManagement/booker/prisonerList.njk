@@ -56,7 +56,7 @@
 
       <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
 
-      <h2 class="govuk-heading-m">Prisoners linked to {{ email }}'s booker account</h2>
+      <h2 class="govuk-heading-m">Prisoners linked to {{ email }}’s booker account</h2>
 
       <p>Select a prisoner to view their visitor list.</p>
 
@@ -84,20 +84,7 @@
             ],
             rows: prisonerRows
           }) }}
-          <div class="govuk-radios__divider">or</div>
-
-          <div class="govuk-radios__item">
-            <input class="govuk-radios__input" id="prisoner-none" name="prisonNumber" type="radio" value="none">
-            <label class="govuk-label govuk-radios__label govuk-!-font-weight-bold" for="prisoner-none">
-              {%- if atLeastOnePrisoner -%}
-                None of the above
-              {%- else -%}
-                None
-              {%- endif -%}
-            </label>
-          </div>
         </div>
-
 
         {{ govukButton({
           text: "Continue",

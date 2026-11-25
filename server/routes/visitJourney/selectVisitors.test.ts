@@ -134,7 +134,7 @@ testJourneys.forEach(journey => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="prisoner-name"]').text()).toBe(
-            "Review John Smith's restrictions and alerts before selecting visitors.",
+            'Review John Smith’s restrictions and alerts before selecting visitors.',
           )
           expect($('[data-test=alert-description]').text()).toBe(
             'This table shows alerts that are relevant for social visits. You can also view all alerts (opens in a new tab).',

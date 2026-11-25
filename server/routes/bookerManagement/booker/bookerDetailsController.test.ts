@@ -244,6 +244,7 @@ describe('Booker management - booker details', () => {
             email: booker.email,
             reference: booker.reference,
           })
+          expect(sessionData.selectedBooker === 'aaaa-bbbb-cccc')
         })
     })
 

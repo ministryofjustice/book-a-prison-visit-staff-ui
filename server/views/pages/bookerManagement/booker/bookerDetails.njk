@@ -81,19 +81,19 @@
               {% set visitorNameCell = {
                 html: '<a href="'+ contactDetailsUrl +'" target="_blank" rel="noopener noreferrer" class="govuk-link--no-visited-state"><span class="govuk-visually-hidden">View contact details for</span> ' + visitorName + ' <span class="govuk-visually-hidden">(opens in a new tab)</span>
                 </a>',
-                classes: "bapv-vertical-align-middle" + (" bapv-remove-td-border" if not loop.last),
+                classes: "bapv-vertical-align-middle" + (" bapv-remove-bottom-border" if not loop.last),
                 attributes: { "data-test": visitorIndex +  "-contact-link" }
               } %}
 
               {% set visitorDobCell =  {
                 text : (visitor.dateOfBirth | formatDate) + " (" + (visitor.dateOfBirth | displayAge) + ")",
-                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-bottom-border" if not loop.last),
                 attributes: { "data-test": visitorIndex + "-dob" }
               } %}
 
               {% set visitorUnlinkCell =  ({
                 html: unlinkVisitorHtml,
-                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last)
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-bottom-border" if not loop.last)
               } if active) %}
 
               {# Forced to build unique data structure for different rows, due to rowspan #}
@@ -139,20 +139,20 @@
 
               {% set visitorNameCell = {
                 text: visitorName,
-                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-bottom-border" if not loop.last),
                 attributes: { "data-test": requestIndex + "-name" }
               } %}
 
               {% set requestedDateCell = {
                 text: request.requestedOn | formatDate("d/M/yyyy"),
-                classes: "bapv-vertical-align-middle"  + (" bapv-remove-td-border" if not loop.last),
+                classes: "bapv-vertical-align-middle"  + (" bapv-remove-bottom-border" if not loop.last),
                 attributes: { "data-test": requestIndex + "-requested-date" }
               } %}
 
               {% set requestReviewCell = {
                 html: '<a class="govuk-link--no-visited-state" href="/manage-bookers/visitor-request/' + request.reference + '/link-visitor?from=booker-details" >' +
                 'Review<span class="govuk-visually-hidden"> request to add ' + (visitorName | escape) + ' as a visitor</span></a>',
-                classes: "govuk-!-text-align-right bapv-vertical-align-middle" + (" bapv-remove-td-border" if not loop.last),
+                classes: "govuk-!-text-align-right bapv-vertical-align-middle" + (" bapv-remove-bottom-border" if not loop.last),
                 attributes: { "data-test": requestIndex + "-action" }
               } %}
 
