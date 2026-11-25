@@ -151,7 +151,7 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
 
       // Select prisoner
       const prisonerListPage = await PrisonerListPage.verifyOnPage(page)
-      await expect(prisonerListPage.prisonerName(1)).toContainText('John Smith')
+      await expect(prisonerListPage.prisonerName(1)).toContainText('Smith, John')
       await expect(prisonerListPage.prisonNumber(1)).toContainText('A1234BC')
       await expect(prisonerListPage.prisonerDob(1)).toContainText('2 April 1975')
       await prisonerListPage.selectPrisoner('A1234BC').check()
