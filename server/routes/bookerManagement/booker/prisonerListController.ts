@@ -48,10 +48,6 @@ export default class PrisonerListController {
 
       const { prisonNumber } = matchedData<{ prisonNumber: string }>(req)
 
-      if (!isValidPrisonerNumber(prisonNumber)) {
-        return res.redirect(`/manage-bookers/${reference}/booker-details`)
-      }
-
       return res.redirect(`/manage-bookers/${reference}/prisoner/${prisonNumber}/link-visitor`)
     }
   }
