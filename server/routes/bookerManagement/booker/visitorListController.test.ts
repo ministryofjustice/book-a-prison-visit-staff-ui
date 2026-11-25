@@ -67,7 +67,7 @@ describe('Booker management - visitor list', () => {
           // Page header
           expect($('title').text()).toMatch(/^Link a visitor -/)
           expect($('.govuk-breadcrumbs li').length).toBe(0)
-          expect($('.govuk-back-link').attr('href')).toBe(`/manage-bookers/${booker.reference}/booker-details`)
+          expect($('.govuk-back-link').attr('href')).toBe(`/manage-bookers/${booker.reference}/prisoner`)
           expect($('h1').text().trim()).toBe('Link a visitor')
 
           // Visitor list

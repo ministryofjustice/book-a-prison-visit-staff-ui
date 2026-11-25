@@ -1,0 +1,98 @@
+{% extends "layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set pageHeaderTitle = "Select a prisoner" %}
+
+{% set prisonerRows = [] %}
+{% for prisoner in prisoners %}
+  {% set prisonerName = (prisoner.prisoner.firstName + ' ' + prisoner.prisoner.lastName) | properCaseFullName | escape %}
+  {% set prisonNumber = prisoner.prisoner.prisonerNumber%}
+
+  {# Radio input markup for prisoner #}
+  {% set selectPrisonerInputHtml %}
+    <div class="govuk-radios__item">
+      <input class="govuk-radios__input" id="prisoner-{{ loop.index }}" name="prisonNumber" type="radio" value="{{ prisonNumber }}">
+      <label class="govuk-label govuk-radios__label" for="prisoner-{{ loop.index }}">
+        <span class="govuk-visually-hidden">Select {{ prisonNumber }}</span>
+      </label>
+    </div>
+  {% endset %}
+
+  {% set prisonerNameAndNumberHtml %}
+    <span class="govuk-!-font-weight-bold govuk-!-display-block" data-test="prisoner-{{ loop.index }}-prisoner-name">
+      {{ prisonerName }}
+    </span>
+    <span class="govuk-!-display-block" data-test="prisoner-{{ loop.index }}-prison-number">
+      {{ prisonNumber }}
+    </span>
+  {% endset %}
+
+
+  {% set prisonerRows = (prisonerRows.push([
+    {
+      html: selectPrisonerInputHtml,
+      classes: "govuk-!-padding-top-6 govuk-!-padding-bottom-6",
+      attributes: { "data-test": "prisoner-" + loop.index + "-select" }
+    },
+    {
+      html: prisonerNameAndNumberHtml,
+      classes: "bapv-vertical-align-middle"
+    },
+    {
+      text: (prisoner.prisoner.dateOfBirth | formatDate + " (" + prisoner.prisoner.dateOfBirth | displayAge + ")"),
+      classes: "bapv-vertical-align-middle",
+      attributes: { "data-test": "prisoner-" + loop.index + "-dob" }
+    }
+  ]), prisonerRows)%}
+{% endfor %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {% include "partials/errorSummary.njk" %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+      <h2 class="govuk-heading-m">Prisoners linked to {{ email }}’s booker account</h2>
+
+      <p>Select a prisoner to view their visitor list.</p>
+
+      <form action="/manage-bookers/{{ reference }}/prisoner" method="POST" novalidate>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {% if errors | length %}
+          <p id="prisonNumber-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span> {{ errors[0].msg }}
+          </p>
+        {% endif %}
+
+        <div class="govuk-form-group{% if errors | length %} govuk-form-group--error{% endif %}">
+          {{ govukTable({
+            head: [
+              {
+                text: "Select"
+              },
+              {
+                text: "Prisoner name and number"
+              },
+              {
+                text: "Date of birth"
+              }
+            ],
+            rows: prisonerRows
+          }) }}
+        </div>
+
+        {{ govukButton({
+          text: "Continue",
+          attributes: { "data-test": "continue-button" },
+          classes: "govuk-!-margin-top-6",
+          preventDoubleClick: true
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}

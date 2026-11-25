@@ -52,9 +52,17 @@ describe('Booker management - booker details', () => {
 
     it('should render booker details page - booker with single prisoner, visitors and visitor request', () => {
       const booker = TestData.bookerDetailedInfo()
-      const visitorRequest = TestData.bookerPrisonerVisitorRequest()
+      const visitorRequest1 = TestData.bookerPrisonerVisitorRequest()
+      const visitorRequest2 = TestData.bookerPrisonerVisitorRequest({
+        firstName: 'Jake',
+        lastName: 'Johnson',
+        dateOfBirth: '2000-12-12',
+        requestedOn: '2026-01-01',
+      })
       bookerService.getBookerDetails.mockResolvedValue(booker)
-      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({ A1234BC: [visitorRequest] })
+      bookerService.getBookerVisitorRequestsByPrisoner.mockResolvedValue({
+        A1234BC: [visitorRequest1, visitorRequest2],
+      })
       bookerService.getBookerStatus.mockResolvedValue({ active: true, emailHasMultipleAccounts: false })
 
       return request(app)
@@ -93,16 +101,27 @@ describe('Booker management - booker details', () => {
             'Unlink visitor Jeanette Smith',
             'Unlink visitor',
           )
-          // Visitor requests
+          // Visitor request 1
           expect($('[data-test=prisoner-1-visitor-request-1-name]').text()).toBe('Mike Jones')
           expect($('[data-test=prisoner-1-visitor-request-1-requested-date]').text()).toBe('10/12/2025')
           expect($('[data-test=prisoner-1-visitor-request-1-action]').text()).toBe(
             'Review request to add Mike Jones as a visitor',
           )
           expect($('[data-test=prisoner-1-visitor-request-1-action] a').attr('href')).toBe(
-            `/manage-bookers/visitor-request/${visitorRequest.reference}/link-visitor?from=booker-details`,
+            `/manage-bookers/visitor-request/${visitorRequest1.reference}/link-visitor?from=booker-details`,
           )
-          expect($('[data-test=prisoner-1-no-visitor-requests]').length).toBe(0)
+
+          // Visitor request 2
+          expect($('[data-test=prisoner-1-visitor-request-2-name]').text()).toBe('Jake Johnson')
+          expect($('[data-test=prisoner-1-visitor-request-2-requested-date]').text()).toBe('1/1/2026')
+          expect($('[data-test=prisoner-1-visitor-request-2-action]').text()).toBe(
+            'Review request to add Jake Johnson as a visitor',
+          )
+          expect($('[data-test=prisoner-1-visitor-request-2-action] a').attr('href')).toBe(
+            `/manage-bookers/visitor-request/${visitorRequest2.reference}/link-visitor?from=booker-details`,
+          )
+
+          expect($('[data-test=link-visitor]').attr('href')).toBe('/manage-bookers/aaaa-bbbb-cccc/prisoner')
 
           expect(bookerService.getBookerDetails).toHaveBeenCalledWith({
             reference: booker.reference,
@@ -225,6 +244,7 @@ describe('Booker management - booker details', () => {
             email: booker.email,
             reference: booker.reference,
           })
+          expect(sessionData.selectedBooker).toStrictEqual('aaaa-bbbb-cccc')
         })
     })
 
