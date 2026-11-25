@@ -7,7 +7,7 @@
 
 {% set prisonerRows = [] %}
 {% for prisoner in prisoners %}
-  {% set prisonerName = (prisoner.prisoner.firstName + ' ' + prisoner.prisoner.lastName) | properCaseFullName | escape %}
+  {% set prisonerName = (prisoner.prisoner.lastName + ', ' + prisoner.prisoner.firstName) | properCaseFullName | escape %}
   {% set prisonNumber = prisoner.prisoner.prisonerNumber%}
 
   {# Radio input markup for prisoner #}

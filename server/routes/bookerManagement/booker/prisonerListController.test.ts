@@ -85,12 +85,12 @@ describe('Booker management - prisoner list', () => {
 
           // Prisoner list
           expect($('[data-test=prisoner-1-select] input').val()).toBe('A1234BC')
-          expect($('[data-test=prisoner-1-prisoner-name]').text().trim()).toBe('John Smith')
+          expect($('[data-test=prisoner-1-prisoner-name]').text().trim()).toBe('Smith, John')
           expect($('[data-test=prisoner-1-prison-number]').text().trim()).toBe('A1234BC')
           expect($('[data-test=prisoner-1-dob]').text()).toContain('2 April 1975')
 
           expect($('[data-test=prisoner-2-select] input').val()).toBe('B9876CD')
-          expect($('[data-test=prisoner-2-prisoner-name]').text().trim()).toBe('Jack Williams')
+          expect($('[data-test=prisoner-2-prisoner-name]').text().trim()).toBe('Williams, Jack')
           expect($('[data-test=prisoner-2-prison-number]').text().trim()).toBe('B9876CD')
           expect($('[data-test=prisoner-2-dob]').text()).toContain('1 January 1990')
 
