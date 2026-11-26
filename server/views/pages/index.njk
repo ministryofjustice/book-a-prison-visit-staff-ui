@@ -72,6 +72,18 @@
             id: "view-visits-by-date"
           }) }}
         </li>
+
+        {% if features.recordAttendance %}
+          <li class="govuk-grid-column-one-third card-group__item">
+            {{ card({
+              href: "/record-attendance",
+              clickable: "true",
+              heading: "Record attendance",
+              description: "Record visit attendance and completion circumstances",
+              id: "record-attendance"
+            }) }}
+          </li>
+        {% endif %}
       </ul>
 
       <h2 class="govuk-heading-m govuk-!-margin-top-5">Admin</h2>
