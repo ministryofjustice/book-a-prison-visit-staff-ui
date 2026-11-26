@@ -26,6 +26,7 @@ import bookerManagementRoutes from './routes/bookerManagement'
 import establishmentNotSupportedRoutes from './routes/establishmentNotSupported'
 import maintenancePageRoute from './routes/maintenancePageRoute'
 import prisonerRoutes from './routes/prisoner'
+import recordAttendanceRoutes from './routes/recordAttendance'
 import requestRoutes from './routes/request'
 import reviewRoutes from './routes/review'
 import searchRoutes from './routes/search/search'
@@ -83,6 +84,7 @@ export default function createApp(services: Services): express.Application {
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
+  app.use('/record-attendance', recordAttendanceRoutes(services))
   app.use('/search', searchRoutes(services))
   app.use('/timetable', timetableRoutes(services))
   app.use('/requested-visits', requestRoutes(services))
