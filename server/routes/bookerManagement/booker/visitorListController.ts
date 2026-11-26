@@ -11,6 +11,7 @@ export default class VisitorListController {
     return async (req, res) => {
       const { reference, prisonerId } = req.params
       const bookerDetailsPageUrl = `/manage-bookers/${reference}/booker-details`
+      const prisonerSelectPageUrl = `/manage-bookers/${reference}/prisoner`
 
       if (!isValidPrisonerNumber(prisonerId)) {
         return res.redirect(bookerDetailsPageUrl)
@@ -30,7 +31,7 @@ export default class VisitorListController {
       req.session.bookerLinkVisitor = { reference, prisonerId, nonLinkedContacts }
 
       return res.render('pages/bookerManagement/booker/visitorList', {
-        backLinkHref: bookerDetailsPageUrl,
+        backLinkHref: prisonerSelectPageUrl,
         errors: req.flash('errors'),
         nonLinkedContacts,
         prisoner,

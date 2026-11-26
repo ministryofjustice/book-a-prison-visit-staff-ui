@@ -72,7 +72,7 @@ You can also <a class="govuk-link--no-visited-state" href="{{ prisonerDpsAlertsU
 
         {% if restrictions | length or alerts | length %}
 
-          <p data-test="prisoner-name">Review {{ prisonerName }}'s restrictions and alerts before selecting visitors.</p>
+          <p data-test="prisoner-name">Review {{ prisonerName }}’s restrictions and alerts before selecting visitors.</p>
 
           {% set prisonerRestrictions = [] %}
           {% for restriction in restrictions %}

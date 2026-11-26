@@ -10,6 +10,7 @@ import BookerDetailsPage from '../../pages/bookerManagement/booker/bookerDetails
 import SelectBookerAccountPage from '../../pages/bookerManagement/selectBookerAccountPage'
 import ApprovedVisitorListPage from '../../pages/bookerManagement/booker/approvedVisitorListPage'
 import LinkVisitorPage from '../../pages/bookerManagement/booker/linkVisitorPage'
+import PrisonerListPage from '../../pages/bookerManagement/booker/prisonerListPage'
 
 test.describe('Booker management - search, manual link/unlink visitors', () => {
   test.beforeEach(async () => {
@@ -147,6 +148,16 @@ test.describe('Booker management - search, manual link/unlink visitors', () => {
         socialContacts: [unlinkedContact],
       })
       bookerDetailsPage.linkVisitorButton.click()
+
+      // Select prisoner
+      const prisonerListPage = await PrisonerListPage.verifyOnPage(page)
+      await expect(prisonerListPage.prisonerName(1)).toContainText('Smith, John')
+      await expect(prisonerListPage.prisonNumber(1)).toContainText('A1234BC')
+      await expect(prisonerListPage.prisonerDob(1)).toContainText('2 April 1975')
+      await prisonerListPage.selectPrisoner('A1234BC').check()
+      await prisonerListPage.continueButton.click()
+
+      // Select visitor
       const approvedVisitorListPage = await ApprovedVisitorListPage.verifyOnPage(page)
       await expect(approvedVisitorListPage.visitorName(1)).toContainText('Keith Williams')
       await expect(approvedVisitorListPage.visitorDob(1)).toContainText('1 January 1999')
