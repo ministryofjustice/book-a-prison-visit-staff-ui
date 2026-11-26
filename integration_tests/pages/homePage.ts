@@ -14,6 +14,8 @@ export default class HomePage extends AbstractPage {
 
   readonly viewVisitsTile: Locator
 
+  readonly recordAttendanceTile: Locator
+
   readonly viewTimetableTile: Locator
 
   readonly blockDatesTile: Locator
@@ -31,6 +33,7 @@ export default class HomePage extends AbstractPage {
     this.needReviewTile = page.getByTestId('need-review')
     this.needReviewBadgeCount = page.getByTestId('need-review-count')
     this.viewVisitsTile = page.getByTestId('view-visits-by-date')
+    this.recordAttendanceTile = page.getByTestId('record-attendance')
     this.viewTimetableTile = page.getByTestId('view-timetable')
     this.blockDatesTile = page.getByTestId('block-dates-or-sessions')
     this.bookerManagementTile = page.getByTestId('booker-management')

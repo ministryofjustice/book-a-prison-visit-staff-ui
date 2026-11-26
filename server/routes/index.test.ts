@@ -11,6 +11,7 @@ import {
 } from '../services/testutils/mocks'
 import TestData from './testutils/testData'
 import bapvUserRoles from '../constants/bapvUserRoles'
+import { setFeature } from '../data/testutils/mockFeature'
 
 let app: Express
 
@@ -34,6 +35,7 @@ describe('GET /', () => {
   beforeEach(() => {
     supportedPrisonsService.getPrison.mockResolvedValue(prisonNotEnabledForPublic)
     supportedPrisonsService.isSupportedPrison.mockResolvedValue(true)
+    setFeature('recordAttendance', false)
 
     app = appWithAllRoutes({
       services: { bookerService, supportedPrisonsService, visitNotificationsService, visitRequestsService },
@@ -151,6 +153,34 @@ describe('GET /', () => {
         .expect(res => {
           const $ = cheerio.load(res.text)
           expect($('[data-test="need-review-count"]').text()).toBe('99+')
+        })
+    })
+  })
+
+  describe('Record attendance tile', () => {
+    it('should not render tile if RECORD_ATTENDANCE feature is disabled', () => {
+      return request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="record-attendance"] .card__link').length).toBe(0)
+        })
+    })
+
+    it('should render tile if RECORD_ATTENDANCE feature is enabled', () => {
+      setFeature('recordAttendance', true)
+      app = appWithAllRoutes({
+        services: { bookerService, supportedPrisonsService, visitNotificationsService, visitRequestsService },
+      })
+
+      return request(app)
+        .get('/')
+        .expect('Content-Type', /html/)
+        .expect(res => {
+          const $ = cheerio.load(res.text)
+          expect($('[data-test="record-attendance"] .card__link').text()).toBe('Record attendance')
+          expect($('[data-test="record-attendance"] .card__link').attr('href')).toBe('/record-attendance')
         })
     })
   })

@@ -28,6 +28,7 @@ generic-service:
     DATA_CACHE_PRISON_TTL_SECS: "30"
 
     FEATURE_REMAND_LIMITS: "true"
+    FEATURE_RECORD_ATTENDANCE: "true"
 
   allowlist:
     groups:
