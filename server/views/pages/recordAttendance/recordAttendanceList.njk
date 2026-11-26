@@ -1,0 +1,24 @@
+{% extends "layout.njk" %}
+{% from "partials/breadcrumbs.njk" import breadcrumbs with context %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+
+{% set pageHeaderTitle = "Record attendance" %}
+
+{% block beforeContent %}
+  {{ breadcrumbs() }}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+      {# Messages #}
+      {% for message in messages %}
+        {{ mojAlert(message) }}
+      {% endfor %}
+
+      <h1 class="govuk-heading-l">{{ pageHeaderTitle }}</h1>
+
+    </div>
+  </div>
+{% endblock %}

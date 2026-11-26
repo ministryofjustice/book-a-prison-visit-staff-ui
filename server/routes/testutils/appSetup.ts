@@ -28,6 +28,7 @@ import bookerManagementRoutes from '../bookerManagement'
 import establishmentNotSupportedRoutes from '../establishmentNotSupported'
 import maintenancePageRoute from '../maintenancePageRoute'
 import prisonerRoutes from '../prisoner'
+import recordAttendanceRoutes from '../recordAttendance'
 import requestRoutes from '../request'
 import reviewRoutes from '../review'
 import searchRoutes from '../search/search'
@@ -119,6 +120,7 @@ function appSetup(
   app.use('/establishment-not-supported', establishmentNotSupportedRoutes(services))
   app.use('/manage-bookers', bookerManagementRoutes(services))
   app.use('/prisoner', prisonerRoutes(services))
+  app.use('/record-attendance', recordAttendanceRoutes(services))
   app.use('/requested-visits', requestRoutes(services))
   app.use('/review', reviewRoutes(services))
   app.use('/search', searchRoutes(services))
